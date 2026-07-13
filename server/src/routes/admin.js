@@ -237,4 +237,19 @@ router.put('/settings', async (req, res) => {
   res.json(settings);
 });
 
+// ========== Store Management ==========
+
+// GET /api/admin/stores
+router.get('/stores', async (req, res) => {
+  const rows = await all(
+    `SELECT s.*, u.name as user_name, u.email as user_email
+     FROM stores s JOIN users u ON u.id = s.user_id
+     ORDER BY s.opened_at DESC`
+  );
+  res.json(rows.map(r => ({
+    ...r,
+    todayEarnings: 0, // lazy: could compute from store_orders
+  })));
+});
+
 module.exports = router;

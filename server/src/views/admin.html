@@ -124,6 +124,7 @@ tr:hover td { background:#fefaf5; }
     <button id="tabNotifs" onclick="switchTab('notifs')">🔔 通知记录</button>
     <button id="tabClaims" onclick="switchTab('claims')">📋 领取审批</button>
     <button id="tabWithdrawals" onclick="switchTab('withdrawals')">💸 提现管理</button>
+    <button id="tabStores" onclick="switchTab('stores')">🏪 店铺管理</button>
   </nav>
   <main id="content"></main>
 </div>
@@ -191,6 +192,7 @@ async function switchTab(tab) {
     else if (tab === 'notifs') await loadNotifs(c);
     else if (tab === 'proofs') await loadProofs(c);
     else if (tab === 'withdrawals') await loadWithdrawals(c);
+    else if (tab === 'stores') await loadStores(c);
   } catch(e) {
     c.innerHTML = '<div class="empty" style="color:red">⚠️ 加载失败: ' + (e.message || '未知错误') + '<br><small>请检查网络后刷新重试</small></div>';
   }
@@ -518,6 +520,15 @@ async function loadNotifs(c){
   if(d.length==0)h+='<tr><td colspan=6 class=empty>暂无通知</td></tr>';
   h+='</tbody></table></div>';c.innerHTML=h;
 }
+async function loadStores(c){
+  var r=await fetch(API+'/api/admin/stores',{headers:{'Authorization':'Bearer '+token}});
+  var d=await r.json();
+  var h='<div class=panel><h2>🏪 店铺管理 <span style=font-weight:400;font-size:13px;color:var(--muted)>共 '+(d||[]).length+' 家</span></h2><table><thead><tr><th>ID</th><th>用户</th><th>等级</th><th>押金</th><th>状态</th><th>开店时间</th></tr></thead><tbody>';
+  for(var i=0;i<d.length;i++){var x=d[i];h+='<tr><td>'+x.id+'</td><td>'+(x.user_name||x.user_email)+'</td><td>'+x.tier+'</td><td style=font-weight:700;color:var(--red)>$'+x.deposit+'</td><td><span class="badge badge-'+(x.status==='active'?'delivered':'rejected')+'">'+(x.status==='active'?'运营中':'已关闭')+'</span></td><td style=font-size:12px>'+(x.opened_at||'').slice(0,16)+'</td></tr>';}
+  if(d.length===0)h+='<tr><td colspan=6 class=empty>暂无店铺</td></tr>';
+  h+='</tbody></table></div>';c.innerHTML=h;
+}
+
 // ====== INIT ======
 document.body.classList.add('login-body');
 const saved = localStorage.getItem('admin_token');

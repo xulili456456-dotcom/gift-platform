@@ -7,7 +7,7 @@ import { referralApi } from '../api/referral';
 import client from '../api/client';
 import useAuthStore from '../store/authStore';
 import DarkModeToggle from '../components/shared/DarkModeToggle';
-import { Users, CreditCard, Bell, Globe, Lock, Shield, LogOut, SunMoon, Crown, Star, ChevronRight, Info, ArrowUpRight, MessageCircle, Camera, BellRing } from 'lucide-react';
+import { Users, CreditCard, Bell, Globe, Lock, Shield, LogOut, SunMoon, Crown, Star, ChevronRight, Info, ArrowUpRight, MessageCircle, Camera, BellRing, Store } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const langs = [
@@ -200,6 +200,7 @@ export default function MinePage() {
         {[
           { Icon: Users, label: t('mine.myTeam'), desc: t('mine.myTeamDesc'), to: '/mine/team' },
           { Icon: CreditCard, label: t('mine.myWallet'), desc: t('mine.myWalletDesc'), to: '/mine/wallet' },
+          { Icon: Store, label: t('mine.myStore'), desc: t('mine.myStoreDesc'), to: '/mine/store' },
           { Icon: Bell, label: t('mine.messages'), desc: t('mine.messagesDesc'), to: '/mine/messages' },
         ].map(({ Icon, label, desc, to }, i) => (
           <button key={i} onClick={() => navigate(to)}

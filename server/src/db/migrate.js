@@ -161,6 +161,33 @@ CREATE TABLE IF NOT EXISTS withdrawals (
 CREATE INDEX IF NOT EXISTS idx_withdrawals_user ON withdrawals(user_id);
 CREATE INDEX IF NOT EXISTS idx_withdrawals_status ON withdrawals(status);
 
+-- Store (simulated e-commerce)
+CREATE TABLE IF NOT EXISTS stores (
+    id              SERIAL PRIMARY KEY,
+    user_id         INTEGER NOT NULL UNIQUE,
+    tier            TEXT NOT NULL CHECK(tier IN ('small', 'medium', 'large')),
+    deposit         NUMERIC(10,2) NOT NULL,
+    status          TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'closed')),
+    opened_at       TIMESTAMP NOT NULL DEFAULT NOW(),
+    closed_at       TIMESTAMP DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_stores_user ON stores(user_id);
+
+-- Store orders (daily e-commerce tasks)
+CREATE TABLE IF NOT EXISTS store_orders (
+    id              SERIAL PRIMARY KEY,
+    store_id        INTEGER NOT NULL,
+    user_id         INTEGER NOT NULL,
+    amount          NUMERIC(10,2) NOT NULL DEFAULT 0,
+    status          TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'done')),
+    processed_at    TIMESTAMP DEFAULT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_store_orders_user_date ON store_orders(user_id, created_at);
+
 -- Admin settings
 CREATE TABLE IF NOT EXISTS admin_settings (
     key             VARCHAR(255) PRIMARY KEY,

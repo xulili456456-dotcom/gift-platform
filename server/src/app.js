@@ -61,6 +61,7 @@ async function start() {
   app.use('/api/staking', require('./routes/staking'));
   app.use('/api/notifications', require('./routes/notifications').router);
   app.use('/api/withdrawals', require('./routes/withdrawals'));
+  app.use('/api/store', require('./routes/store'));
   app.use('/api/referral', referralRoutes);
   app.use('/api/admin', adminRoutes);
 

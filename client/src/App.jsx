@@ -29,6 +29,7 @@ const VerifyPage = lazy(() => import('./pages/VerifyPage'));
 const SupportPage = lazy(() => import('./pages/SupportPage'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
 const GiftDetailPage = lazy(() => import('./pages/GiftDetailPage'));
+const StorePage = lazy(() => import('./pages/StorePage'));
 
 const PageLoader = () => (
   <div className="min-h-screen bg-bg flex items-center justify-center">
@@ -81,6 +82,7 @@ export default function App() {
           <Route path="/mine/verify" element={<Lazy Comp={VerifyPage} />} />
           <Route path="/mine/support" element={<Lazy Comp={SupportPage} />} />
           <Route path="/mine/notifications" element={<Lazy Comp={NotificationsPage} />} />
+          <Route path="/mine/store" element={<Lazy Comp={StorePage} />} />
 
           <Route path="/gift/:id" element={<Lazy Comp={GiftDetailPage} />} />
           <Route path="/admin" element={<AdminRedirect />} />
