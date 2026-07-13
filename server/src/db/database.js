@@ -25,11 +25,16 @@ function toPgInsert(sql) {
 
 function getPool() {
   if (!pool) {
+    const connString = config.DATABASE_URL + (config.DATABASE_URL.includes('?') ? '&' : '?') + 'client_encoding=UTF8';
     pool = new Pool({
-      connectionString: config.DATABASE_URL,
+      connectionString: connString,
       ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
       max: 5,
       idleTimeoutMillis: 30000,
+    });
+    // Ensure UTF-8 encoding on every new connection
+    pool.on('connect', async (client) => {
+      await client.query("SET client_encoding TO 'UTF8'");
     });
   }
   return pool;
