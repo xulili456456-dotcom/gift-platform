@@ -1,0 +1,12 @@
+{
+  "name": "gift-platform",
+  "version": "1.0.0",
+  "description": "邀请任务制礼物平台 - 好礼相送",
+  "main": "server/src/app.js",
+  "scripts": {
+    "start": "cd server && npm install --production && node src/app.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
