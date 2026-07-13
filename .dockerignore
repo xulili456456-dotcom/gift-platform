@@ -1,0 +1,9 @@
+node_modules/
+server/node_modules/
+client/node_modules/
+server/data/*.db
+server/uploads/*
+.env
+*.log
+.DS_Store
+.git/

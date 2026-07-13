@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>好礼相送 - 后台管理</title>
+<style>
+:root {
+  --red: #C41E3A; --red-dark: #8B0000; --gold: #D4A574;
+  --bg: #FFF8F0; --white: #FFF; --text: #2D2D2D; --muted: #8B7355;
+  --success: #2E7D32; --danger: #DC2626; --border: #e5e7eb;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'PingFang SC','Microsoft YaHei',sans-serif; background: var(--bg); color: var(--text); min-height:100vh; }
+body.login-body { display:flex; align-items:center; justify-content:center; }
+
+/* Login */
+.login-box { background: var(--white); border-radius:20px; padding:40px 32px; width:380px; max-width:90vw; box-shadow:0 8px 40px rgba(0,0,0,0.08); text-align:center; }
+.login-box h1 { font-size:24px; margin-bottom:4px; }
+.login-box .sub { color:var(--muted); font-size:13px; margin-bottom:24px; }
+.login-box input { width:100%; padding:12px 16px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; margin-bottom:12px; outline:none; transition:border-color .2s; }
+.login-box input:focus { border-color:var(--red); }
+.login-box button { width:100%; padding:13px; background:linear-gradient(135deg,var(--red),var(--red-dark)); color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; transition:transform .1s; }
+.login-box button:active { transform:scale(.97); }
+.login-box .err { color:var(--danger); font-size:13px; margin-bottom:12px; min-height:20px; }
+
+/* Main Layout */
+header { background:linear-gradient(135deg,var(--red),var(--red-dark)); color:#fff; padding:14px 24px; display:flex; align-items:center; justify-content:space-between; }
+header h1 { font-size:18px; }
+header .logout { background:rgba(255,255,255,.2); color:#fff; border:none; padding:8px 16px; border-radius:20px; cursor:pointer; font-size:13px; }
+header .logout:hover { background:rgba(255,255,255,.3); }
+
+nav { background:var(--white); border-bottom:1px solid var(--border); display:flex; gap:0; overflow-x:auto; padding:0 16px; }
+nav button { padding:14px 20px; border:none; background:none; font-size:14px; cursor:pointer; color:var(--muted); border-bottom:2px solid transparent; white-space:nowrap; transition:all .2s; }
+nav button:hover { color:var(--text); }
+nav button.active { color:var(--red); border-bottom-color:var(--red); font-weight:600; }
+
+main { max-width:1100px; margin:0 auto; padding:24px; }
+
+/* Cards */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:24px; }
+.stat-card { background:var(--white); border-radius:16px; padding:20px; box-shadow:0 2px 12px rgba(0,0,0,0.04); display:flex; align-items:center; gap:14px; }
+.stat-card .icon { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; }
+.stat-card .val { font-size:28px; font-weight:700; }
+.stat-card .lbl { font-size:12px; color:var(--muted); }
+
+/* Table */
+.panel { background:var(--white); border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.04); overflow:hidden; margin-bottom:24px; }
+.panel h2 { padding:18px 20px; font-size:16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.panel h2 button { font-size:13px; padding:6px 14px; border-radius:8px; border:none; cursor:pointer; background:var(--red); color:#fff; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { background:#faf7f2; text-align:left; padding:12px 16px; font-weight:600; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.5px; }
+td { padding:12px 16px; border-bottom:1px solid #f3f0eb; }
+tr:hover td { background:#fefaf5; }
+
+/* Badges & Buttons */
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+.badge-pending { background:#FEF3C7; color:#92400E; }
+.badge-delivered { background:#DCFCE7; color:#166534; }
+.badge-rejected { background:#FEE2E2; color:#991B1B; }
+
+.btn-sm { padding:5px 12px; border-radius:8px; border:none; cursor:pointer; font-size:12px; font-weight:500; transition:transform .1s; }
+.btn-sm:active { transform:scale(.95); }
+.btn-green { background:#16A34A; color:#fff; }
+.btn-red { background:#DC2626; color:#fff; }
+.btn-gray { background:#f3f4f6; color:#374151; }
+
+/* Modal */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:100; display:flex; align-items:flex-end; justify-content:center; }
+.modal { background:var(--white); border-radius:20px 20px 0 0; padding:24px; width:100%; max-width:500px; max-height:85vh; overflow-y:auto; }
+.modal h3 { font-size:18px; margin-bottom:16px; }
+.modal input, .modal select { width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; margin-bottom:10px; outline:none; }
+.modal input:focus, .modal select:focus { border-color:var(--red); }
+.modal .row { display:flex; gap:10px; }
+.modal .row>* { flex:1; }
+.modal button.primary { width:100%; padding:12px; background:var(--red); color:#fff; border:none; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; margin-top:4px; }
+
+/* Search */
+.search-bar { display:flex; gap:8px; margin-bottom:16px; }
+.search-bar input { flex:1; padding:10px 14px; border:1.5px solid var(--border); border-radius:12px; font-size:14px; outline:none; }
+.search-bar input:focus { border-color:var(--red); }
+.search-bar button { padding:10px 20px; background:var(--red); color:#fff; border:none; border-radius:12px; cursor:pointer; font-size:14px; }
+
+/* Top inviters */
+.top-list { display:flex; flex-wrap:wrap; gap:10px; }
+.top-item { display:flex; align-items:center; gap:8px; background:#fefaf5; border-radius:10px; padding:10px 14px; font-size:13px; min-width:180px; }
+.top-item .rank { font-size:20px; width:28px; text-align:center; }
+.top-item .cnt { font-weight:700; color:var(--red); margin-left:auto; }
+
+.pagination { display:flex; align-items:center; justify-content:center; gap:12px; padding:14px; font-size:13px; color:var(--muted); }
+.pagination button { padding:6px 14px; border-radius:8px; border:1px solid var(--border); background:var(--white); cursor:pointer; font-size:13px; }
+.pagination button:disabled { opacity:.3; cursor:default; }
+
+.empty { text-align:center; padding:40px; color:var(--muted); font-size:14px; }
+.hidden { display:none !important; }
+</style>
+</head>
+<body>
+
+<!-- ========== LOGIN ========== -->
+<div id="loginPage">
+  <div class="login-box">
+    <h1>🧧 好礼相送</h1>
+    <p class="sub">后台管理系统</p>
+    <input id="loginEmail" type="email" placeholder="管理员邮箱" value="admin@gift.com">
+    <input id="loginPass" type="password" placeholder="密码" value="admin888">
+    <p id="loginErr" class="err"></p>
+    <button onclick="doLogin()">登 录</button>
+  </div>
+</div>
+
+<!-- ========== MAIN ========== -->
+<div id="mainPage" class="hidden">
+  <header>
+    <h1>🧧 好礼相送 · 后台管理</h1>
+    <button class="logout" onclick="doLogout()">退出</button>
+  </header>
+  <nav>
+    <button id="tabDash" class="active" onclick="switchTab('dash')">📊 仪表盘</button>
+    <button id="tabUsers" onclick="switchTab('users')">👥 用户管理</button>
+    <button id="tabGifts" onclick="switchTab('gifts')">🎁 礼物管理</button>
+    <button id="tabKyc" onclick="switchTab('kyc')">🛂 实名认证</button>
+    <button id="tabProofs" onclick="switchTab('proofs')">📸 邀请验证</button>
+    <button id="tabNotifs" onclick="switchTab('notifs')">🔔 通知记录</button>
+    <button id="tabClaims" onclick="switchTab('claims')">📋 领取审批</button>
+    <button id="tabWithdrawals" onclick="switchTab('withdrawals')">💸 提现管理</button>
+  </nav>
+  <main id="content"></main>
+</div>
+
+<script>
+let token = '';
+const API = '';
+
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(API + path, { headers, ...opts });
+  if (res.status === 401) { doLogout(); throw new Error('未登录'); }
+  return res.json();
+}
+
+// ====== LOGIN ======
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.textContent = '';
+  try {
+    const res = await fetch(API + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { errEl.textContent = data.error || '登录失败'; return; }
+    if (!data.user.is_admin) { errEl.textContent = '需要管理员账号'; return; }
+    token = data.access_token;
+    localStorage.setItem('admin_token', token);
+    document.getElementById('loginPage').classList.add('hidden');
+    document.getElementById('mainPage').classList.remove('hidden');
+    document.body.classList.remove('login-body');
+    switchTab('dash');
+  } catch(e) { errEl.textContent = '网络错误'; }
+}
+
+function doLogout() {
+  token = '';
+  localStorage.removeItem('admin_token');
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('mainPage').classList.add('hidden');
+  document.body.classList.add('login-body');
+}
+
+// ====== TABS ======
+let currentTab = 'dash';
+
+async function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab' + tab[0].toUpperCase() + tab.slice(1)).classList.add('active');
+  const c = document.getElementById('content');
+  c.innerHTML = '<div class="empty">加载中...</div>';
+  if (tab === 'dash') await loadDash(c);
+  else if (tab === 'users') await loadUsers(c);
+  else if (tab === 'gifts') await loadGifts(c);
+  else if (tab === 'claims') await loadClaims(c);
+  else if (tab === 'kyc') await loadKyc(c);
+  else if (tab === 'notifs') await loadNotifs(c);
+  else if (tab === 'proofs') await loadProofs(c);
+  else if (tab === 'withdrawals') await loadWithdrawals(c);
+}
+
+// ====== DASHBOARD ======
+async function loadDash(c) {
+  const stats = await (await fetch(API + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } })).json();
+  c.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card"><div class="icon" style="background:#EBF5FF;color:#2563EB;">👥</div><div><div class="val">${stats.total_users||0}</div><div class="lbl">总用户数</div></div></div>
+      <div class="stat-card"><div class="icon" style="background:#DCFCE7;color:#16A34A;">🔗</div><div><div class="val">${stats.total_invites||0}</div><div class="lbl">总邀请数</div></div></div>
+      <div class="stat-card"><div class="icon" style="background:#FEF3C7;color:#D97706;">⏳</div><div><div class="val">${stats.pending_claims||0}</div><div class="lbl">待审批</div></div></div>
+      <div class="stat-card"><div class="icon" style="background:#F3E8FF;color:#9333EA;">🎁</div><div><div class="val">${stats.active_gifts||0}</div><div class="lbl">活跃礼物</div></div></div>
+    </div>
+    ${stats.top_inviters && stats.top_inviters.length > 0 ? `
+    <div class="panel"><h2>🏆 邀请排行榜</h2>
+      <div style="padding:16px;" class="top-list">
+        ${stats.top_inviters.slice(0,10).map((u,i) => `
+          <div class="top-item">
+            <span class="rank">${['🥇','🥈','🥉'][i]||(i+1)}</span>
+            <span>${u.name||u.email}</span>
+            <span class="cnt">${u.invite_count}人</span>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}
+  `;
+}
+
+// ====== USERS ======
+async function loadUsers(c, page = 1, search = '') {
+  const params = new URLSearchParams({ page, limit: 20, search });
+  const data = await (await fetch(API + '/api/admin/users?' + params, { headers: { 'Authorization': 'Bearer ' + token } })).json();
+  const { users, total } = data || {};
+  const totalPages = Math.ceil((total||0) / 20);
+
+  c.innerHTML = `
+    <div class="panel">
+      <h2>👥 用户列表 <span style="font-weight:400;font-size:13px;color:var(--muted)">共 ${total||0} 人</span></h2>
+      <div style="padding:16px 20px">
+        <div class="search-bar">
+          <input id="userSearch" placeholder="搜索邮箱/手机/昵称..." value="${search||''}" onkeydown="if(event.key==='Enter')loadUsers(document.getElementById('content'),1,document.getElementById('userSearch').value)">
+          <button onclick="loadUsers(document.getElementById('content'),1,document.getElementById('userSearch').value)">搜索</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>ID</th><th>邮箱</th><th>邀请</th><th>收益</th><th>注册时间</th><th>操作</th></tr></thead>
+          <tbody>
+            ${(users||[]).map(u => `
+              <tr>
+                <td>${u.id}</td><td>${u.email}<br><span style="font-size:11px;color:var(--muted)">${u.phone}</span></td><td style="font-weight:600">${u.invite_count||0}人</td><td style="font-weight:700;color:var(--red)">$${(u.balance||0).toFixed(0)}</td>
+                <td style="font-size:12px">${(u.created_at||"").slice(0,10)}</td>
+                <td><button class="btn-sm btn-gray" onclick="viewUserDetail(${u.id})">详情</button></td>
+              </tr>`).join('')}
+            ${(!users||users.length===0) ? '<tr><td colspan="6" class="empty">暂无数据</td></tr>' : ''}
+          </tbody>
+        </table>
+      </div>
+      ${totalPages > 1 ? `
+      <div class="pagination">
+        <button ${page<=1?'disabled':''} onclick="loadUsers(document.getElementById('content'),${page-1},'${search}')">上一页</button>
+        <span>${page} / ${totalPages}</span>
+        <button ${page>=totalPages?'disabled':''} onclick="loadUsers(document.getElementById('content'),${page+1},'${search}')">下一页</button>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+async function viewUserDetail(userId) {
+  const res = await fetch(API + '/api/admin/users/' + userId, { headers: { 'Authorization': 'Bearer ' + token } });
+  const u = await res.json();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>👤 ${u.name||u.email}</h3>
+      <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:2;">
+        <div><b>ID:</b> ${u.id} &nbsp; <b>邮箱:</b> ${u.email} &nbsp; <b>手机:</b> ${u.phone}</div>
+        <div><b>邀请码:</b> <code>${u.referral_code}</code> &nbsp; <b>上级:</b> ${u.parent_id||'无'}</div>
+        <div><b>注册时间:</b> ${u.created_at}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
+        <div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:28px;font-weight:700;color:var(--red)">${u.stats?.level1||0}</div>
+          <div style="font-size:12px;color:var(--muted)">一级邀请</div>
+        </div>
+        <div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:28px;font-weight:700;color:var(--red)">${u.stats?.level2||0}</div>
+          <div style="font-size:12px;color:var(--muted)">二级邀请</div>
+        </div>
+        <div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:28px;font-weight:700;color:var(--red)">${u.stats?.level3||0}</div>
+          <div style="font-size:12px;color:var(--muted)">三级邀请</div>
+        </div>
+      </div>
+      <p style="font-size:13px;margin-bottom:14px"><b>有效邀请:</b> ${u.effective?.effective||0} &nbsp; <b>领取数:</b> ${u.claims?.length||0}</p>
+      <button class="primary" onclick="this.closest('.modal-overlay').remove()">关闭</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+}
+
+// ====== GIFTS ======
+let giftList = [];
+async function loadGifts(c) {
+  const res = await fetch(API + '/api/admin/gifts', { headers: { 'Authorization': 'Bearer ' + token } });
+  giftList = await res.json();
+  renderGiftTable(c);
+}
+
+function renderGiftTable(c) {
+  c.innerHTML = `
+    <div class="panel">
+      <h2>🎁 礼物列表 <button onclick="showGiftForm()">+ 添加礼物</button></h2>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>ID</th><th>名称</th><th>类型</th><th>金额</th><th>需邀请</th><th>库存</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+            ${giftList.map(g => `
+              <tr>
+                <td>${g.id}</td>
+                <td><b>${g.name}</b></td>
+                <td>${g.gift_type==='cash'?'🧧 现金':'🎁 实物'}</td>
+                <td style="font-weight:700;color:var(--red)">¥${g.value}</td>
+                <td>${g.required_invites} 人</td>
+                <td>${g.stock===-1?'无限':g.stock}</td>
+                <td><span class="badge ${g.is_active?'badge-delivered':'badge-rejected'}">${g.is_active?'上架':'已下架'}</span></td>
+                <td>
+                  <button class="btn-sm btn-gray" onclick="showGiftForm(${g.id})">编辑</button>
+                  ${g.is_active ? `<button class="btn-sm btn-red" onclick="deactivateGift(${g.id})">下架</button>` : ''}
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function showGiftForm(editId) {
+  const g = editId ? giftList.find(x => x.id === editId) : {};
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <h3>${editId ? '编辑礼物' : '添加礼物'}</h3>
+      <input id="gfName" placeholder="名称" value="${g.name||''}">
+      <input id="gfDesc" placeholder="描述" value="${g.description||''}">
+      <div class="row">
+        <select id="gfType"><option value="cash" ${g.gift_type==='cash'?'selected':''}>现金红包</option><option value="physical" ${g.gift_type==='physical'?'selected':''}>实物礼品</option></select>
+        <input id="gfValue" type="number" placeholder="金额" value="${g.value||0}" step="0.01">
+      </div>
+      <div class="row">
+        <input id="gfReq" type="number" placeholder="所需邀请人数" value="${g.required_invites||1}" min="1">
+        <input id="gfStock" type="number" placeholder="库存(-1无限)" value="${g.stock??-1}" min="-1">
+      </div>
+      <input id="gfSort" type="number" placeholder="排序" value="${g.sort_order||0}">
+      <button class="primary" id="gfSubmit">${editId ? '保存修改' : '创建礼物'}</button>
+      <button class="primary" style="background:#6B7280;margin-top:8px;" onclick="this.closest('.modal-overlay').remove()">取消</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+  document.getElementById('gfSubmit').addEventListener('click', async () => {
+    const body = {
+      name: document.getElementById('gfName').value,
+      description: document.getElementById('gfDesc').value,
+      gift_type: document.getElementById('gfType').value,
+      value: Number(document.getElementById('gfValue').value),
+      required_invites: Number(document.getElementById('gfReq').value),
+      stock: Number(document.getElementById('gfStock').value),
+      sort_order: Number(document.getElementById('gfSort').value),
+    };
+    const url = editId ? API + '/api/admin/gifts/' + editId : API + '/api/admin/gifts';
+    const method = editId ? 'PUT' : 'POST';
+    await fetch(url, { method, headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+token }, body: JSON.stringify(body) });
+    overlay.remove();
+    await loadGifts(document.getElementById('content'));
+  });
+}
+
+async function deactivateGift(id) {
+  if (!confirm('确定下架该礼物？')) return;
+  await fetch(API + '/api/admin/gifts/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+  await loadGifts(document.getElementById('content'));
+}
+
+// ====== CLAIMS ======
+async function loadClaims(c, page = 1, filter = '') {
+  const params = new URLSearchParams({ page, limit: 20 });
+  if (filter) params.set('status', filter);
+  const res = await fetch(API + '/api/admin/claims?' + params, { headers: { 'Authorization': 'Bearer ' + token } });
+  const data = await res.json();
+  const { claims, total } = data || {};
+  const totalPages = Math.ceil((total||0) / 20);
+
+  c.innerHTML = `
+    <div class="panel">
+      <h2>📋 领取审批 <span style="font-weight:400;font-size:13px;color:var(--muted)">共 ${total||0} 条</span></h2>
+      <div style="padding:16px 20px;display:flex;gap:8px;flex-wrap:wrap">
+        ${['','pending','delivered','rejected'].map(s => `
+          <button class="btn-sm ${filter===s?'btn-green':'btn-gray'}" onclick="loadClaims(document.getElementById('content'),1,'${s}')">${s===''?'全部':s==='pending'?'⏳ 待审核':s==='delivered'?'✅ 已发放':'❌ 已拒绝'}</button>
+        `).join('')}
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>ID</th><th>用户</th><th>礼物</th><th>金额</th><th>状态</th><th>申请时间</th><th>操作</th></tr></thead>
+          <tbody>
+            ${(claims||[]).map(c => `
+              <tr>
+                <td>${c.id}</td>
+                <td><b>${c.user_name||c.user_email}</b><br><span style="font-size:11px;color:var(--muted)">${c.user_phone}</span></td>
+                <td>${c.gift_name}</td>
+                <td style="font-weight:700;color:var(--red)">¥${c.value}</td>
+                <td><span class="badge badge-${c.status}">${c.status==='pending'?'待审核':c.status==='delivered'?'已发放':c.status==='rejected'?'已拒绝':c.status}</span></td>
+                <td style="font-size:12px">${(c.claimed_at||'').slice(0,16)}</td>
+                <td>
+                  ${c.status==='pending' ? `
+                    <button class="btn-sm btn-green" onclick="updateClaim(${c.id},'delivered')">✅ 发放</button>
+                    <button class="btn-sm btn-red" onclick="updateClaim(${c.id},'rejected')" style="margin-top:4px">❌ 拒绝</button>
+                  ` : '-'}
+                </td>
+              </tr>`).join('')}
+            ${(!claims||claims.length===0) ? '<tr><td colspan="7" class="empty">暂无数据</td></tr>' : ''}
+          </tbody>
+        </table>
+      </div>
+      ${totalPages > 1 ? `
+      <div class="pagination">
+        <button ${page<=1?'disabled':''} onclick="loadClaims(document.getElementById('content'),${page-1},'${filter}')">上一页</button>
+        <span>${page} / ${totalPages}</span>
+        <button ${page>=totalPages?'disabled':''} onclick="loadClaims(document.getElementById('content'),${page+1},'${filter}')">下一页</button>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+async function updateClaim(id, status) {
+  await fetch(API + '/api/admin/claims/' + id, {
+    method: 'PUT',
+    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
+    body: JSON.stringify({ status })
+  });
+  await loadClaims(document.getElementById('content'));
+}
+
+// ====== WITHDRAWALS ======
+async function loadWithdrawals(c, page = 1, filter = '') {
+  const params = new URLSearchParams({ page, limit: 20 });
+  if (filter) params.set('status', filter);
+  const res = await fetch(API + '/api/admin/withdrawals?' + params, { headers: { 'Authorization': 'Bearer ' + token } });
+  const data = await res.json();
+  const { withdrawals, total } = data || {};
+  const totalPages = Math.ceil((total||0) / 20);
+
+  c.innerHTML = `
+    <div class="panel">
+      <h2>💸 提现管理 <span style="font-weight:400;font-size:13px;color:var(--muted)">共 ${total||0} 条</span></h2>
+      <div style="padding:16px 20px;display:flex;gap:8px;flex-wrap:wrap">
+        ${['','pending','completed','rejected'].map(s => `
+          <button class="btn-sm ${filter===s?'btn-green':'btn-gray'}" onclick="loadWithdrawals(document.getElementById('content'),1,'${s}')">${s===''?'全部':s==='pending'?'⏳ 待处理':s==='completed'?'✅ 已完成':'❌ 已拒绝'}</button>
+        `).join('')}
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>ID</th><th>用户</th><th>金额</th><th>网络</th><th>钱包地址</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+          <tbody>
+            ${(withdrawals||[]).map(w => `
+              <tr>
+                <td>${w.id}</td>
+                <td><b>${w.user_name||w.user_email}</b><br><span style="font-size:11px;color:var(--muted)">${w.user_phone||''}</span></td>
+                <td style="font-weight:700;color:var(--red)">$${w.amount}</td>
+                <td>${(w.network||'').toUpperCase()}</td>
+                <td style="font-size:12px;font-family:monospace">${(w.wallet_address||'').slice(0,8)}...${(w.wallet_address||'').slice(-6)}</td>
+                <td><span class="badge badge-${w.status==='completed'?'delivered':w.status==='rejected'?'rejected':'pending'}">${w.status==='pending'?'待处理':w.status==='completed'?'已完成':'已拒绝'}</span></td>
+                <td style="font-size:12px">${(w.created_at||'').slice(0,16)}</td>
+                <td>
+                  ${w.status==='pending' ? `
+                    <button class="btn-sm btn-green" onclick="updateWithdrawal(${w.id},'completed')">✅ 通过</button>
+                    <button class="btn-sm btn-red" onclick="updateWithdrawal(${w.id},'rejected')" style="margin-top:4px">❌ 拒绝</button>
+                  ` : '-'}
+                </td>
+              </tr>`).join('')}
+            ${(!withdrawals||withdrawals.length===0) ? '<tr><td colspan="6" class="empty">暂无数据</td></tr>' : ''}
+          </tbody>
+        </table>
+      </div>
+      ${totalPages > 1 ? `
+      <div class="pagination">
+        <button ${page<=1?'disabled':''} onclick="loadWithdrawals(document.getElementById('content'),${page-1},'${filter}')">上一页</button>
+        <span>${page} / ${totalPages}</span>
+        <button ${page>=totalPages?'disabled':''} onclick="loadWithdrawals(document.getElementById('content'),${page+1},'${filter}')">下一页</button>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+async function updateWithdrawal(id, status) {
+  await fetch(API + '/api/admin/withdrawals/' + id, {
+    method: 'PUT',
+    headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+token },
+    body: JSON.stringify({ status })
+  });
+  loadWithdrawals(document.getElementById('content'));
+}
+
+
+async function loadKyc(c){var r=await fetch(API+"/api/kyc/admin/list",{headers:{"Authorization":"Bearer "+token}});var d=await r.json();var h='<div class=panel><h2>🛂 KYC认证</h2><table><thead><tr><th>ID</th><th>用户</th><th>姓名</th><th>证件号</th><th>状态</th><th>操作</th></tr></thead><tbody>';for(var i=0;i<d.length;i++){var x=d[i];h+='<tr><td>'+x.id+'</td><td>'+(x.user_name||x.user_email)+'</td><td>'+x.real_name+'</td><td>'+x.id_number+'</td><td><span class="badge badge-'+(x.status=="approved"?"delivered":x.status=="rejected"?"rejected":"pending")+'">'+(x.status=="pending"?"待审":x.status=="approved"?"通过":"拒绝")+'</span></td><td>'+(x.status=="pending"?'<button class="btn-sm btn-green" onclick=updateKyc('+x.id+',"approved")>通过</button> <button class="btn-sm btn-red" onclick=updateKyc('+x.id+',"rejected")>拒绝</button>':'-')+'</td></tr>'}if(d.length==0)h+='<tr><td colspan=6 class=empty>暂无数据</td></tr>';h+='</tbody></table></div>';c.innerHTML=h}
+function updateKyc(id,s){fetch(API+"/api/kyc/admin/"+id,{method:"PUT",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({status:s})}).then(()=>loadKyc(document.getElementById("content")))}
+async function loadProofs(c){var r=await fetch(API+"/api/proofs/admin/list",{headers:{"Authorization":"Bearer "+token}});var d=await r.json();var h='<div class=panel><h2>📸 邀请验证截图</h2><div style=display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:16px>';for(var i=0;i<d.length;i++){var x=d[i];h+='<div style=background:#faf7f2;border-radius:12px;padding:12px;text-align:center><img src='+x.image+' style=max-width:100%;max-height:160px;border-radius:8px><p style=font-size:13px;font-weight:600>'+(x.user_name||x.user_email)+'</p><span class="badge badge-'+(x.status=="approved"?"delivered":x.status=="rejected"?"rejected":"pending")+'">'+(x.status=="pending"?"待审":x.status=="approved"?"通过":"拒绝")+'</span><p style=font-size:11px;color:var(--muted)>'+(x.submitted_at||"").slice(0,10)+'</p>'+(x.status=="pending"?'<div style=margin-top:8px><button class="btn-sm btn-green" onclick=updateProof('+x.id+',"approved")>通过</button> <button class="btn-sm btn-red" onclick=updateProof('+x.id+',"rejected")>拒绝</button></div>':'')+'</div>'}if(d.length==0)h+='<div class=empty>暂无数据</div>';h+='</div></div>';c.innerHTML=h}
+function updateProof(id,s){fetch(API+"/api/proofs/admin/"+id,{method:"PUT",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({status:s})}).then(()=>loadProofs(document.getElementById("content")))}
+
+async function loadNotifs(c){
+  var r=await fetch(API+'/api/admin/notifications',{headers:{'Authorization':'Bearer '+token}});
+  var d=await r.json();
+  var h='<div class=panel><h2>🔔 通知记录</h2><table><thead><tr><th>ID</th><th>用户</th><th>标题</th><th>内容</th><th>类型</th><th>时间</th></tr></thead><tbody>';
+  for(var i=0;i<d.length;i++){var x=d[i];h+='<tr><td>'+x.id+'</td><td>'+(x.user_name||x.user_email)+'</td><td>'+x.title+'</td><td>'+(x.body||'')+'</td><td>'+x.type+'</td><td style=font-size:12px>'+(x.created_at||'').slice(0,16)+'</td></tr>';}
+  if(d.length==0)h+='<tr><td colspan=6 class=empty>暂无通知</td></tr>';
+  h+='</tbody></table></div>';c.innerHTML=h;
+}
+// ====== INIT ======
+document.body.classList.add('login-body');
+const saved = localStorage.getItem('admin_token');
+if (saved) {
+  token = saved;
+  fetch(API + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } })
+    .then(r => { if (!r.ok) throw new Error('invalid'); return r.json(); })
+    .then(u => {
+      if (u.is_admin) {
+        document.getElementById('loginPage').classList.add('hidden');
+        document.getElementById('mainPage').classList.remove('hidden');
+        document.body.classList.remove('login-body');
+        switchTab('dash');
+      } else { token = ''; localStorage.removeItem('admin_token'); }
+    })
+    .catch(() => { token = ''; localStorage.removeItem('admin_token'); });
+}
+</script>
+</body>
+</html>

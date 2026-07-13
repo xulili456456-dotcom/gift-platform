@@ -1,0 +1,395 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #E8225A;
+  --color-primary-dark: #C41E4F;
+  --color-primary-light: #FF6B8A;
+  --color-accent: #8B2FC9;
+  --color-accent-light: #A855F7;
+  --color-gold: #FFB800;
+  --color-gold-light: #FFF7E0;
+  --color-bg: #FFF0F3;
+  --color-card: #FFFFFF;
+  --color-text: #1A1A1A;
+  --color-text-secondary: #666666;
+  --color-text-muted: #999999;
+  --color-success: #FF6B00;
+  --color-success-light: #FFF3E8;
+  --color-separator: #F0E0E5;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Helvetica Neue', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  background: #F2F2F7;
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Dark mode */
+body.dark {
+  --color-bg: #0f0f0f;
+  --color-card: #1a1a1a;
+  --color-text: #f0f0f0;
+  --color-text-secondary: #999;
+  --color-text-muted: #666;
+  --color-separator: #2a2a2a;
+  background: #0f0f0f;
+  color: #f0f0f0;
+}
+body.dark .bg-bg { background: #0f0f0f; }
+body.dark .bg-card { background: #1a1a1a; }
+body.dark .bg-white { background: #1a1a1a; }
+body.dark .text-text { color: #f0f0f0; }
+body.dark .text-text-secondary { color: #999; }
+body.dark .text-text-muted { color: #666; }
+body.dark .border-separator { border-color: #2a2a2a; }
+body.dark .border-gray-100 { border-color: #2a2a2a; }
+body.dark .border-gray-200 { border-color: #2a2a2a; }
+body.dark .border-gray-50 { border-color: #1f1f1f; }
+body.dark .shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+body.dark .shadow-md { box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+body.dark .skeleton { background: linear-gradient(90deg, #2a2a2a 25%, #333 50%, #2a2a2a 75%); background-size: 200% 100%; }
+body.dark .bg-bg, body.dark [class*="bg-gray-"] { background: #1a1a1a; }
+body.dark .from-\[\#FFF0F3\] { --tw-gradient-from: #1a1015; }
+body.dark .to-\[\#FFF5F8\] { --tw-gradient-to: #10101a; }
+body.dark .bg-gradient-to-b.from-\[\#FFF0F3\] { background-image: linear-gradient(to bottom, #1a1015, #10101a); }
+body.dark .divide-separator > * { border-color: #2a2a2a; }
+body.dark .hover\:bg-bg:hover { background: #222; }
+body.dark .active\:bg-bg:active { background: #222; }
+
+/* VIP membership card dark mode */
+body.dark .bg-slate-50 { background: #1e1e2a !important; }
+body.dark .bg-amber-50 { background: #1e1a10 !important; }
+body.dark .bg-indigo-50 { background: #1a1a2e !important; }
+body.dark .bg-blue-50 { background: #1a1e2a !important; }
+body.dark .bg-purple-50 { background: #1e1a2a !important; }
+body.dark .bg-orange-50 { background: #1e1a10 !important; }
+
+/* Staking plan cards */
+body.dark .border-slate-200 { border-color: #2a2a3a; }
+body.dark .border-amber-200 { border-color: #3a2a10; }
+body.dark .border-indigo-200 { border-color: #2a2a4a; }
+body.dark .border-blue-200 { border-color: #1a2a3a; }
+body.dark .border-purple-200 { border-color: #2a1a3a; }
+
+/* Gradient cards that stay white in dark mode */
+body.dark .from-\[\#FFF9E6\] { --tw-gradient-from: #1e1a10; }
+body.dark .to-\[\#FFF3CC\] { --tw-gradient-to: #1a1508; }
+
+/* Success and warning backgrounds */
+body.dark .bg-success\/5 { background: rgba(52,199,89,0.1); }
+body.dark .bg-success\/10 { background: rgba(52,199,89,0.15); }
+body.dark .bg-yellow-50 { background: #1e1a10; }
+body.dark .bg-yellow-100 { background: #2e2410; }
+body.dark .bg-red-50 { background: #1e1015; }
+body.dark .bg-red-100 { background: #2e1015; }
+
+/* Input backgrounds */
+body.dark .bg-bg { background: #1a1a1a; }
+body.dark input, body.dark textarea { background: #1a1a1a; color: #f0f0f0; }
+body.dark input::placeholder { color: #555; }
+
+/* Staking cards */
+body.dark .from-blue-50 { --tw-gradient-from: #1a1e2a; }
+body.dark .to-blue-100\\\/50 { --tw-gradient-to: rgba(26,30,42,0.5); }
+body.dark .from-green-50 { --tw-gradient-from: #1a2a1e; }
+body.dark .from-orange-50 { --tw-gradient-from: #2a1e10; }
+
+#root { min-height: 100dvh; }
+
+.page-container {
+  max-width: 430px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 100dvh;
+  background: #F2F2F7;
+  position: relative;
+  overflow-x: clip;
+}
+
+/* Ensure text containers don't clip content */
+.break-text { word-break: break-word; overflow-wrap: break-word; min-width: 0; }
+
+/* Native scrolling */
+.native-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in { animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Flat design - no rounded corners on cards */
+.rounded-2xl, .rounded-3xl, .rounded-\[32px\], .rounded-\[36px\], .rounded-\[40px\], .rounded-xl:not(.keep-round) {
+  border-radius: 4px !important;
+}
+
+/* Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #E5E5EA 25%, #EFEFF4 50%, #E5E5EA 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 10px;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Marquee / 弹幕 */
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.animate-marquee { animation: marquee 20s linear infinite; }
+
+/* Red envelope open / 红包开启 */
+@keyframes envOpen {
+  0% { transform: scale(0.3) rotateY(90deg); opacity: 0; }
+  50% { transform: scale(1.1) rotateY(0deg); opacity: 1; }
+  100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+}
+.animate-env-open { animation: envOpen 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Float up and fade / 金币飘出 */
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-60px) scale(0.5); opacity: 0; }
+}
+.animate-float-up { animation: floatUp 1s ease-out forwards; }
+
+/* Bounce pulse / 脉冲弹跳 */
+@keyframes bouncePulse {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.15); }
+  50% { transform: scale(0.95); }
+  70% { transform: scale(1.05); }
+}
+.animate-bounce-pulse { animation: bouncePulse 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Shimmer sweep / 金光扫过 */
+@keyframes shimmer-sweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+.animate-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer-sweep 2s infinite;
+}
+
+/* Haptic-like press effect */
+@keyframes press {
+  from { transform: scale(1); }
+  to { transform: scale(0.96); }
+}
+.press-active:active { animation: press 0.1s ease-in forwards; }
+
+/* 1. Number count-up */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.8); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-count-up { animation: countUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* 2. Page transition */
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-page-in { animation: pageIn 0.3s ease-out; }
+
+/* 3. Red envelope rain */
+@keyframes envRain {
+  0% { transform: translateY(-120px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(105vh) rotate(720deg); opacity: 0.3; }
+}
+.animate-env-rain { animation: envRain linear infinite; }
+
+/* 4. Celebration burst */
+@keyframes burstIn {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  60% { transform: scale(1.3) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.animate-burst { animation: burstIn 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* 5. Progress bar shimmer */
+@keyframes progressShine {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+.progress-shine::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: progressShine 2s infinite;
+}
+
+/* 6. 3D card tilt */
+.card-tilt {
+  transition: transform 0.3s ease;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+.card-tilt:hover {
+  transform: rotateY(-2deg) rotateX(2deg) scale(1.02);
+}
+
+/* 7. Button ripple */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+.btn-ripple::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255,255,255,0.4) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.btn-ripple:active::after { opacity: 1; transition: opacity 0s; }
+
+/* 8. Staggered list entry */
+@keyframes listItemIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-item {
+  opacity: 0;
+  animation: listItemIn 0.4s ease-out forwards;
+}
+
+/* 9. Pull-to-refresh indicator */
+@keyframes pullSpinner {
+  to { transform: rotate(360deg); }
+}
+.pull-indicator {
+  width: 24px; height: 24px;
+  border: 3px solid #E5E5EA;
+  border-top-color: #E8225A;
+  border-radius: 50%;
+  animation: pullSpinner 0.8s linear infinite;
+}
+
+/* 10. Banner carousel dots */
+@keyframes bannerDot {
+  0%, 100% { width: 8px; }
+  50% { width: 24px; }
+}
+.animate-banner-dot { animation: bannerDot 3s ease-in-out infinite; }
+
+/* Gradient shift animation */
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes particleFloat {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+  50% { transform: translateY(-12px) scale(1.5); opacity: 0.8; }
+}
+
+/* 1. Number count-up animation */
+@keyframes numberPop {
+  0% { transform: translateY(20px) scale(0.8); opacity: 0; }
+  60% { transform: translateY(-4px) scale(1.05); }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.number-roll { animation: numberPop 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* 2. Glowing border */
+@keyframes borderGlow {
+  0%, 100% { border-color: #E8225A; box-shadow: 0 0 8px rgba(232,34,90,0.3); }
+  33% { border-color: #D4206A; box-shadow: 0 0 12px rgba(212,32,106,0.4); }
+  66% { border-color: #8B2FC9; box-shadow: 0 0 8px rgba(139,47,201,0.3); }
+}
+.glow-border { animation: borderGlow 3s ease-in-out infinite; }
+
+/* 3. Progress bar laser sweep */
+@keyframes laserSweep {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+.progress-glow {
+  position: relative;
+  overflow: hidden;
+}
+.progress-glow::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 30%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  animation: laserSweep 2s ease-in-out infinite;
+}
+
+/* 4. Staggered list entry */
+@keyframes staggerIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-in {
+  opacity: 0;
+  animation: staggerIn 0.35s ease-out forwards;
+}
+
+/* Tab transition */
+.tab-enter { animation: tabIn 0.25s ease-out; }
+@keyframes tabIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Button press feedback */
+.btn-press {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.btn-press:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Improved skeleton */
+.skeleton-pulse {
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* Safe area for iPhone notch */
+.safe-top { padding-top: env(safe-area-inset-top, 0px); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 16px); }
