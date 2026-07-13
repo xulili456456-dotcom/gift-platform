@@ -48,13 +48,13 @@ async function start() {
   app.use('/api/users', userRoutes);
   app.use('/api/gifts', giftRoutes);
   app.use('/api/claims', claimRoutes);
-app.use('/api/tasks', require('./routes/tasks'));
-app.use('/api/wallet', require('./routes/wallet'));
-app.use('/api/kyc', require('./routes/kyc'));
-app.use('/api/proofs', require('./routes/proofs'));
-app.use('/api/staking', require('./routes/staking'));
-app.use('/api/notifications', require('./routes/notifications').router);
-app.use('/api/withdrawals', require('./routes/withdrawals'));
+  app.use('/api/tasks', require('./routes/tasks'));
+  app.use('/api/wallet', require('./routes/wallet'));
+  app.use('/api/kyc', require('./routes/kyc'));
+  app.use('/api/proofs', require('./routes/proofs'));
+  app.use('/api/staking', require('./routes/staking'));
+  app.use('/api/notifications', require('./routes/notifications').router);
+  app.use('/api/withdrawals', require('./routes/withdrawals'));
   app.use('/api/referral', referralRoutes);
   app.use('/api/admin', adminRoutes);
 

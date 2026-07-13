@@ -1,18 +1,18 @@
 const { all, get, run } = require('../db/database');
 
 const settingsModel = {
-  get(key, defaultValue = null) {
-    const row = get('SELECT value FROM admin_settings WHERE key = ?', [key]);
+  async get(key, defaultValue = null) {
+    const row = await get('SELECT value FROM admin_settings WHERE key = ?', [key]);
     return row ? row.value : defaultValue;
   },
 
-  getNumber(key, defaultValue = 0) {
-    const val = this.get(key, String(defaultValue));
+  async getNumber(key, defaultValue = 0) {
+    const val = await this.get(key, String(defaultValue));
     return parseFloat(val);
   },
 
-  getAll() {
-    const rows = all('SELECT key, value, updated_at FROM admin_settings ORDER BY key');
+  async getAll() {
+    const rows = await all('SELECT key, value, updated_at FROM admin_settings ORDER BY key');
     const obj = {};
     for (const row of rows) {
       obj[row.key] = row.value;
@@ -20,17 +20,17 @@ const settingsModel = {
     return obj;
   },
 
-  set(key, value) {
-    run(
-      `INSERT INTO admin_settings (key, value, updated_at) VALUES (?, ?, datetime('now'))
-       ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = datetime('now')`,
+  async set(key, value) {
+    await run(
+      `INSERT INTO admin_settings (key, value, updated_at) VALUES (?, ?, NOW())
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
       [key, String(value)]
     );
   },
 
-  setMultiple(obj) {
+  async setMultiple(obj) {
     for (const [key, value] of Object.entries(obj)) {
-      this.set(key, value);
+      await this.set(key, value);
     }
   },
 };

@@ -6,27 +6,27 @@ const router = Router();
 router.use(authMiddleware);
 
 // GET /api/notifications
-router.get('/', (req, res) => {
-  const rows = all(
+router.get('/', async (req, res) => {
+  const rows = await all(
     'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 30',
     [req.user.id]
   );
-  const unread = get(
-    'SELECT COUNT(*) as c FROM notifications WHERE user_id = ? AND is_read = 0',
+  const unread = await get(
+    'SELECT COUNT(*) as c FROM notifications WHERE user_id = ? AND is_read = false',
     [req.user.id]
   );
   res.json({ notifications: rows, unread: unread?.c || 0 });
 });
 
 // PUT /api/notifications/read-all
-router.put('/read-all', (req, res) => {
-  run('UPDATE notifications SET is_read = 1 WHERE user_id = ?', [req.user.id]);
+router.put('/read-all', async (req, res) => {
+  await run('UPDATE notifications SET is_read = true WHERE user_id = ?', [req.user.id]);
   res.json({ ok: true });
 });
 
 // Helper: add notification
-function notify(userId, title, body, type = 'info') {
-  run('INSERT INTO notifications (user_id, title, body, type) VALUES (?, ?, ?, ?)',
+async function notify(userId, title, body, type = 'info') {
+  await run('INSERT INTO notifications (user_id, title, body, type) VALUES (?, ?, ?, ?)',
     [userId, title, body, type]);
 }
 

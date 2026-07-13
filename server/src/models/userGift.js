@@ -1,7 +1,7 @@
 const { all, get, run, insert } = require('../db/database');
 
 const userGiftModel = {
-  findById(id) {
+  async findById(id) {
     return get(
       `SELECT ug.*, g.name as gift_name, g.gift_type, g.value, g.image_url
        FROM user_gifts ug
@@ -11,7 +11,7 @@ const userGiftModel = {
     );
   },
 
-  findByUser(userId) {
+  async findByUser(userId) {
     return all(
       `SELECT ug.id, ug.gift_id, ug.status, ug.claimed_at, ug.delivered_at, ug.admin_note,
               g.name as gift_name, g.gift_type, g.value, g.image_url, g.required_invites
@@ -23,31 +23,31 @@ const userGiftModel = {
     );
   },
 
-  findByUserAndGift(userId, giftId) {
+  async findByUserAndGift(userId, giftId) {
     return get(
       'SELECT * FROM user_gifts WHERE user_id = ? AND gift_id = ?',
       [userId, giftId]
     );
   },
 
-  create(userId, giftId) {
-    const result = insert(
+  async create(userId, giftId) {
+    const result = await insert(
       'INSERT INTO user_gifts (user_id, gift_id, status) VALUES (?, ?, ?)',
       [userId, giftId, 'pending']
     );
     return this.findById(result.id);
   },
 
-  updateStatus(id, status, adminNote = '') {
-    const deliveredAt = status === 'delivered' ? `datetime('now')` : null;
-    run(
-      `UPDATE user_gifts SET status = ?, admin_note = ?, delivered_at = ${deliveredAt || 'NULL'} WHERE id = ?`,
+  async updateStatus(id, status, adminNote = '') {
+    const deliveredAtExpr = status === 'delivered' ? 'NOW()' : 'NULL';
+    await run(
+      `UPDATE user_gifts SET status = ?, admin_note = ?, delivered_at = ${deliveredAtExpr} WHERE id = ?`,
       [status, adminNote, id]
     );
     return this.findById(id);
   },
 
-  listAll({ page = 1, limit = 20, status = '' }) {
+  async listAll({ page = 1, limit = 20, status = '' }) {
     const offset = (page - 1) * limit;
     let where = '';
     const params = [];
@@ -55,7 +55,7 @@ const userGiftModel = {
       where = 'WHERE ug.status = ?';
       params.push(status);
     }
-    const rows = all(
+    const rows = await all(
       `SELECT ug.*, g.name as gift_name, g.gift_type, g.value,
               u.name as user_name, u.email as user_email, u.phone as user_phone
        FROM user_gifts ug
@@ -66,13 +66,13 @@ const userGiftModel = {
        LIMIT ? OFFSET ?`,
       [...params, limit, offset]
     );
-    const countRow = get(
-      `SELECT COUNT(*) as total FROM user_gifts ug ${where.replace(/ug\./g, 'ug.')}`,
+    const countRow = await get(
+      `SELECT COUNT(*) as total FROM user_gifts ug ${where}`,
       params
     );
     return {
       claims: rows,
-      total: countRow ? countRow.total : 0,
+      total: countRow ? Number(countRow.total) : 0,
       page,
       limit,
     };

@@ -10,8 +10,8 @@ const router = Router();
 router.use(authMiddleware);
 
 // GET /api/users/me
-router.get('/me', (req, res) => {
-  const user = userModel.findById(req.user.id);
+router.get('/me', async (req, res) => {
+  const user = await userModel.findById(req.user.id);
   if (!user) {
     return res.status(404).json({ error: '用户不存在' });
   }
@@ -28,16 +28,16 @@ router.get('/me', (req, res) => {
 });
 
 // PUT /api/users/me
-router.put('/me', (req, res) => {
+router.put('/me', async (req, res) => {
   const { name, phone } = req.body;
-  const user = userModel.update(req.user.id, { name, phone });
+  const user = await userModel.update(req.user.id, { name, phone });
   res.json(user);
 });
 
 // GET /api/users/me/stats
-router.get('/me/stats', (req, res) => {
-  const rawStats = invitationModel.getStats(req.user.id);
-  const effective = invitationModel.getEffectiveCount(req.user.id);
+router.get('/me/stats', async (req, res) => {
+  const rawStats = await invitationModel.getStats(req.user.id);
+  const effective = await invitationModel.getEffectiveCount(req.user.id);
   res.json({
     ...rawStats,
     effective: effective.effective,
@@ -46,9 +46,9 @@ router.get('/me/stats', (req, res) => {
 });
 
 // GET /api/users/me/invitees
-router.get('/me/invitees', (req, res) => {
+router.get('/me/invitees', async (req, res) => {
   const { level = 1, page = 1, limit = 20 } = req.query;
-  const result = invitationModel.getInvitees(req.user.id, parseInt(level), parseInt(page), parseInt(limit));
+  const result = await invitationModel.getInvitees(req.user.id, parseInt(level), parseInt(page), parseInt(limit));
   res.json(result);
 });
 
@@ -62,7 +62,7 @@ router.put('/me/password', async (req, res) => {
     if (newPassword.length < 6) {
       return res.status(400).json({ error: '新密码长度不能少于6位' });
     }
-    const user = userModel.findById(req.user.id);
+    const user = await userModel.findById(req.user.id);
     if (!user) return res.status(404).json({ error: '用户不存在' });
 
     const valid = await verifyPassword(oldPassword, user.password_hash);
@@ -70,7 +70,7 @@ router.put('/me/password', async (req, res) => {
 
     const newHash = await hashPassword(newPassword);
     const { run } = require('../db/database');
-    run('UPDATE users SET password_hash = ?, updated_at = datetime(\'now\') WHERE id = ?', [newHash, req.user.id]);
+    await run("UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?", [newHash, req.user.id]);
     res.json({ message: '密码修改成功' });
   } catch (err) {
     res.status(500).json({ error: '修改失败' });
@@ -83,7 +83,7 @@ router.put('/me/contact', async (req, res) => {
     const { email, phone, password } = req.body;
     if (!password) return res.status(400).json({ error: '请输入当前密码确认身份' });
 
-    const user = userModel.findById(req.user.id);
+    const user = await userModel.findById(req.user.id);
     if (!user) return res.status(404).json({ error: '用户不存在' });
 
     const valid = await verifyPassword(password, user.password_hash);
@@ -91,7 +91,7 @@ router.put('/me/contact', async (req, res) => {
 
     const updates = {};
     if (email && email !== user.email) {
-      const existing = userModel.findByEmail(email);
+      const existing = await userModel.findByEmail(email);
       if (existing) return res.status(409).json({ error: '该邮箱已被使用' });
       updates.email = email;
     }
@@ -100,7 +100,7 @@ router.put('/me/contact', async (req, res) => {
 
     const { run } = require('../db/database');
     const sets = Object.keys(updates).map(k => `${k} = ?`).join(', ');
-    run(`UPDATE users SET ${sets}, updated_at = datetime('now') WHERE id = ?`,
+    await run(`UPDATE users SET ${sets}, updated_at = NOW() WHERE id = ?`,
       [...Object.values(updates), req.user.id]);
     res.json({ message: '更新成功', ...updates });
   } catch (err) {

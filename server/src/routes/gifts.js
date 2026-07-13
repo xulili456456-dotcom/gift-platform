@@ -7,9 +7,9 @@ const userGiftModel = require('../models/userGift');
 const router = Router();
 
 // GET /api/gifts/eligible - must be before /:id
-router.get('/eligible', authMiddleware, (req, res) => {
-  const gifts = giftModel.list(true);
-  const { effective } = invitationModel.getEffectiveCount(req.user.id);
+router.get('/eligible', authMiddleware, async (req, res) => {
+  const gifts = await giftModel.list(true);
+  const { effective } = await invitationModel.getEffectiveCount(req.user.id);
 
   const eligible = gifts.filter(g => {
     if (!g.is_active) return false;
@@ -22,14 +22,14 @@ router.get('/eligible', authMiddleware, (req, res) => {
 });
 
 // GET /api/gifts - public list
-router.get('/', (req, res) => {
-  const gifts = giftModel.list(false);
+router.get('/', async (req, res) => {
+  const gifts = await giftModel.list(false);
   res.json(gifts);
 });
 
 // GET /api/gifts/:id
-router.get('/:id', (req, res) => {
-  const gift = giftModel.findById(parseInt(req.params.id));
+router.get('/:id', async (req, res) => {
+  const gift = await giftModel.findById(parseInt(req.params.id));
   if (!gift) {
     return res.status(404).json({ error: '礼物不存在' });
   }

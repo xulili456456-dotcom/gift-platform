@@ -5,7 +5,14 @@ function errorHandler(err, req, res, next) {
     return res.status(400).json({ error: '请求格式错误' });
   }
 
-  if (err.code === 'SQLITE_CONSTRAINT') {
+  // PostgreSQL constraint violation error codes
+  if (err.code === '23505') { // unique_violation
+    return res.status(409).json({ error: '数据已存在或不符合唯一约束条件' });
+  }
+  if (err.code === '23503') { // foreign_key_violation
+    return res.status(400).json({ error: '关联数据不存在' });
+  }
+  if (err.code && err.code.startsWith('23')) { // integrity_constraint_violation family
     return res.status(409).json({ error: '数据已存在或不符合约束条件' });
   }
 

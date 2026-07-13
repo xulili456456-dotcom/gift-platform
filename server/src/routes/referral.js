@@ -9,7 +9,7 @@ router.use(authMiddleware);
 
 // GET /api/referral/code - get my referral info
 router.get('/code', async (req, res) => {
-  const user = userModel.findById(req.user.id);
+  const user = await userModel.findById(req.user.id);
   if (!user) {
     return res.status(404).json({ error: '用户不存在' });
   }
@@ -35,12 +35,12 @@ router.get('/code', async (req, res) => {
 });
 
 // GET /api/referral/stats - detailed stats
-router.get('/stats', (req, res) => {
-  const rawStats = invitationModel.getStats(req.user.id);
-  const effective = invitationModel.getEffectiveCount(req.user.id);
+router.get('/stats', async (req, res) => {
+  const rawStats = await invitationModel.getStats(req.user.id);
+  const effective = await invitationModel.getEffectiveCount(req.user.id);
 
   // Get recent invitees
-  const level1Invitees = invitationModel.getInvitees(req.user.id, 1, 1, 5);
+  const level1Invitees = await invitationModel.getInvitees(req.user.id, 1, 1, 5);
 
   res.json({
     direct_count: rawStats.level1,

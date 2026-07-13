@@ -13,11 +13,9 @@ router.post('/register', async (req, res) => {
   try {
     const { email, phone, password, name, referral_code } = req.body;
 
-    // Validate required fields
     if (!email || !phone || !password) {
       return res.status(400).json({ error: '邮箱、手机号和密码为必填项' });
     }
-
     if (password.length < 6) {
       return res.status(400).json({ error: '密码长度不能少于6位' });
     }
@@ -25,60 +23,48 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: '请输入有效的手机号码' });
     }
 
-    // Check email uniqueness
-    const existing = userModel.findByEmail(email);
+    const existing = await userModel.findByEmail(email);
     if (existing) {
       return res.status(409).json({ error: '该邮箱已被注册' });
     }
 
-    // Find inviter if referral code provided
     let parentId = null;
     let inviter = null;
     if (referral_code) {
-      inviter = userModel.findByReferralCode(referral_code);
+      inviter = await userModel.findByReferralCode(referral_code);
       if (!inviter) {
         return res.status(400).json({ error: '邀请码无效' });
       }
       parentId = inviter.id;
     }
 
-    // Generate unique referral code for new user
     let code;
     let attempts = 0;
     do {
       code = generateReferralCode();
       attempts++;
-    } while (userModel.findByReferralCode(code) && attempts < 10);
+    } while (await userModel.findByReferralCode(code) && attempts < 10);
 
-    // Create user
     const passwordHash = await hashPassword(password);
-    const user = userModel.create({
-      email,
-      phone,
-      passwordHash,
+    const user = await userModel.create({
+      email, phone, passwordHash,
       name: name || '',
       referralCode: code,
       parentId,
     });
 
-    // Create multi-level invitation records
     if (parentId && inviter) {
-      invitationModel.createChain(parentId, user.id);
+      await invitationModel.createChain(parentId, user.id);
     }
 
-    // Generate tokens
     const tokenPayload = { id: user.id, email: user.email, is_admin: user.is_admin };
     const accessToken = signAccessToken(tokenPayload);
     const refreshToken = signRefreshToken(tokenPayload);
 
     res.status(201).json({
       user: {
-        id: user.id,
-        email: user.email,
-        phone: user.phone,
-        name: user.name,
-        referral_code: user.referral_code,
-        is_admin: user.is_admin,
+        id: user.id, email: user.email, phone: user.phone, name: user.name,
+        referral_code: user.referral_code, is_admin: user.is_admin,
       },
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -93,33 +79,24 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({ error: '请输入邮箱和密码' });
     }
-
-    const user = userModel.findByEmail(email);
+    const user = await userModel.findByEmail(email);
     if (!user) {
       return res.status(401).json({ error: '邮箱或密码错误' });
     }
-
     const valid = await verifyPassword(password, user.password_hash);
     if (!valid) {
       return res.status(401).json({ error: '邮箱或密码错误' });
     }
-
     const tokenPayload = { id: user.id, email: user.email, is_admin: user.is_admin };
     const accessToken = signAccessToken(tokenPayload);
     const refreshToken = signRefreshToken(tokenPayload);
-
     res.json({
       user: {
-        id: user.id,
-        email: user.email,
-        phone: user.phone,
-        name: user.name,
-        referral_code: user.referral_code,
-        is_admin: user.is_admin,
+        id: user.id, email: user.email, phone: user.phone, name: user.name,
+        referral_code: user.referral_code, is_admin: user.is_admin,
       },
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -131,47 +108,36 @@ router.post('/login', async (req, res) => {
 });
 
 // POST /api/auth/refresh
-router.post('/refresh', (req, res) => {
+router.post('/refresh', async (req, res) => {
   try {
     const { refresh_token } = req.body;
     if (!refresh_token) {
       return res.status(400).json({ error: '缺少refresh_token' });
     }
-
     const decoded = verifyRefreshToken(refresh_token);
-    const user = userModel.findById(decoded.id);
+    const user = await userModel.findById(decoded.id);
     if (!user) {
       return res.status(401).json({ error: '用户不存在' });
     }
-
     const tokenPayload = { id: user.id, email: user.email, is_admin: user.is_admin };
     const accessToken = signAccessToken(tokenPayload);
     const newRefreshToken = signRefreshToken(tokenPayload);
-
-    res.json({
-      access_token: accessToken,
-      refresh_token: newRefreshToken,
-    });
+    res.json({ access_token: accessToken, refresh_token: newRefreshToken });
   } catch (err) {
     return res.status(401).json({ error: 'refresh_token无效或已过期' });
   }
 });
 
 // GET /api/auth/me
-router.get('/me', authMiddleware, (req, res) => {
-  const user = userModel.findById(req.user.id);
+router.get('/me', authMiddleware, async (req, res) => {
+  const user = await userModel.findById(req.user.id);
   if (!user) {
     return res.status(404).json({ error: '用户不存在' });
   }
   res.json({
-    id: user.id,
-    email: user.email,
-    phone: user.phone,
-    name: user.name,
-    avatar_url: user.avatar_url,
-    referral_code: user.referral_code,
-    is_admin: user.is_admin,
-    created_at: user.created_at,
+    id: user.id, email: user.email, phone: user.phone, name: user.name,
+    avatar_url: user.avatar_url, referral_code: user.referral_code,
+    is_admin: user.is_admin, created_at: user.created_at,
   });
 });
 
@@ -181,13 +147,11 @@ router.post('/reset-password', async (req, res) => {
     const { email, phone, newPassword } = req.body;
     if (!email || !phone || !newPassword) return res.status(400).json({ error: '请填写所有字段' });
     if (newPassword.length < 6) return res.status(400).json({ error: '密码至少6位' });
-
-    const user = userModel.findByEmail(email);
+    const user = await userModel.findByEmail(email);
     if (!user || user.phone !== phone) return res.status(400).json({ error: '邮箱或手机号不匹配' });
-
     const newHash = await hashPassword(newPassword);
     const { run } = require('../db/database');
-    run("UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?", [newHash, user.id]);
+    await run("UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?", [newHash, user.id]);
     res.json({ message: '密码重置成功' });
   } catch (err) {
     res.status(500).json({ error: '重置失败' });
@@ -196,7 +160,6 @@ router.post('/reset-password', async (req, res) => {
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
-  // With JWT, logout is handled client-side by removing the token
   res.json({ message: '已退出登录' });
 });
 

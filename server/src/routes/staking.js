@@ -12,13 +12,13 @@ const PLANS = {
 };
 
 // GET /api/staking - my stake
-router.get('/', authMiddleware, (req, res) => {
-  const s = get('SELECT * FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
+router.get('/', authMiddleware, async (req, res) => {
+  const s = await get('SELECT * FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   res.json(s || null);
 });
 
 // POST /api/staking - lock stake
-router.post('/', authMiddleware, (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   const { plan_id, amount } = req.body;
   const plan = PLANS[plan_id];
   const amt = plan ? plan.amount : (parseFloat(amount) || 0);
@@ -27,11 +27,11 @@ router.post('/', authMiddleware, (req, res) => {
 
   if (!amt || isNaN(amt) || amt < 10) return res.status(400).json({ error: '最低锁仓金额为 $10' });
 
-  const existing = get('SELECT id FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
+  const existing = await get('SELECT id FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (existing) return res.status(400).json({ error: 'already staking' });
 
   const unlockAt = new Date(Date.now() + days * 86400000).toISOString();
-  const result = insert(
+  const result = await insert(
     'INSERT INTO stakes (user_id, amount, plan_id, bonus, unlock_at) VALUES (?, ?, ?, ?, ?)',
     [req.user.id, amt, plan_id || 'custom', bonus, unlockAt]
   );
@@ -39,21 +39,21 @@ router.post('/', authMiddleware, (req, res) => {
 });
 
 // POST /api/staking/unlock - force unlock
-router.post('/unlock', authMiddleware, (req, res) => {
-  const s = get('SELECT * FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
+router.post('/unlock', authMiddleware, async (req, res) => {
+  const s = await get('SELECT * FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!s) return res.status(400).json({ error: 'no active stake' });
 
   const daysLeft = Math.ceil((new Date(s.unlock_at) - Date.now()) / 86400000);
   const penalty = daysLeft > 0 ? Number((s.amount * 0.2).toFixed(0)) : 0;
   const refund = s.amount;
 
-  run('DELETE FROM stakes WHERE id = ?', [s.id]);
+  await run('DELETE FROM stakes WHERE id = ?', [s.id]);
   res.json({ refund, penalty, amount: s.amount });
 });
 
 // === Admin ===
-router.get('/admin/list', authMiddleware, adminMiddleware, (req, res) => {
-  const rows = all('SELECT s.*, u.name, u.email FROM stakes s JOIN users u ON u.id = s.user_id ORDER BY s.locked_at DESC');
+router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
+  const rows = await all('SELECT s.*, u.name, u.email FROM stakes s JOIN users u ON u.id = s.user_id ORDER BY s.locked_at DESC');
   res.json(rows);
 });
 

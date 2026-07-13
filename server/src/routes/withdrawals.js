@@ -6,16 +6,15 @@ const router = Router();
 router.use(authMiddleware);
 
 // POST /api/withdrawals
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { amount, network, wallet_address } = req.body;
   if (!amount || amount < 0.01) return res.status(400).json({ error: '请输入有效金额' });
   if (!network || !wallet_address) return res.status(400).json({ error: 'wallet required' });
 
   // Check available balance
-  const { get } = require('../db/database');
-  const taskBal = get('SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?',
+  const taskBal = await get('SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?',
     [req.user.id, 'delivered']);
-  const giftBal = get(`SELECT COALESCE(SUM(g.value), 0) as total FROM user_gifts ug JOIN gifts g ON g.id = ug.gift_id WHERE ug.user_id = ? AND ug.status = ?`,
+  const giftBal = await get(`SELECT COALESCE(SUM(g.value), 0) as total FROM user_gifts ug JOIN gifts g ON g.id = ug.gift_id WHERE ug.user_id = ? AND ug.status = ?`,
     [req.user.id, 'delivered']);
   const available = (taskBal?.total || 0) + (giftBal?.total || 0);
 
@@ -23,8 +22,7 @@ router.post('/', (req, res) => {
 
   // Deduct from task_earnings first
   let remaining = amount;
-  const { run, all } = require('../db/database');
-  const tasks = all('SELECT id, amount, type FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC',
+  const tasks = await all('SELECT id, amount, type FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC',
     [req.user.id, 'delivered']);
   const deductedIds = [];
   for (const t of tasks) {
@@ -32,15 +30,15 @@ router.post('/', (req, res) => {
     const deduct = Math.min(t.amount, remaining);
     deductedIds.push(t.id);
     const rest = t.amount - deduct;
-    run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', t.id]);
+    await run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', t.id]);
     if (rest > 0.001) {
-      const newId = insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+      await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
         [req.user.id, rest, t.type, 'delivered']);
     }
     remaining -= deduct;
   }
 
-  const result = insert(
+  const result = await insert(
     'INSERT INTO withdrawals (user_id, amount, network, wallet_address, status, deducted_ids) VALUES (?, ?, ?, ?, ?, ?)',
     [req.user.id, amount, network, wallet_address, 'pending', deductedIds.join(',')]
   );
@@ -49,8 +47,8 @@ router.post('/', (req, res) => {
 });
 
 // GET /api/withdrawals
-router.get('/', (req, res) => {
-  const rows = all(
+router.get('/', async (req, res) => {
+  const rows = await all(
     'SELECT * FROM withdrawals WHERE user_id = ? ORDER BY created_at DESC LIMIT 20',
     [req.user.id]
   );
@@ -58,17 +56,17 @@ router.get('/', (req, res) => {
 });
 
 // DELETE /api/withdrawals/:id
-router.delete('/:id', (req, res) => {
-  const w = get('SELECT * FROM withdrawals WHERE id = ? AND user_id = ? AND status = ?',
+router.delete('/:id', async (req, res) => {
+  const w = await get('SELECT * FROM withdrawals WHERE id = ? AND user_id = ? AND status = ?',
     [req.params.id, req.user.id, 'pending']);
   if (!w) return res.status(404).json({ error: 'not found or already processed' });
-  run('UPDATE withdrawals SET status = ? WHERE id = ?', ['rejected', req.params.id]);
+  await run('UPDATE withdrawals SET status = ? WHERE id = ?', ['rejected', req.params.id]);
 
   // Precisely restore deducted earnings
   if (w.deducted_ids) {
     const ids = w.deducted_ids.split(',').filter(Boolean);
     for (const id of ids) {
-      run('UPDATE task_earnings SET status = ? WHERE id = ?', ['delivered', parseInt(id)]);
+      await run('UPDATE task_earnings SET status = ? WHERE id = ?', ['delivered', parseInt(id)]);
     }
   }
   res.json({ ok: true, message: '已取消，余额已退回' });

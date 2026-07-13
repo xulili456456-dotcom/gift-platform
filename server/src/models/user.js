@@ -1,36 +1,36 @@
 const { all, get, run, insert } = require('../db/database');
 
 const userModel = {
-  findById(id) {
+  async findById(id) {
     return get(
       'SELECT id, email, phone, name, avatar_url, referral_code, parent_id, is_admin, is_active, created_at FROM users WHERE id = ?',
       [id]
     );
   },
 
-  findByEmail(email) {
+  async findByEmail(email) {
     return get(
       'SELECT * FROM users WHERE email = ?',
       [email]
     );
   },
 
-  findByReferralCode(code) {
+  async findByReferralCode(code) {
     return get(
       'SELECT id, email, phone, name, avatar_url, referral_code, parent_id, is_admin, created_at FROM users WHERE referral_code = ?',
       [code]
     );
   },
 
-  create({ email, phone, passwordHash, name, referralCode, parentId }) {
-    const result = insert(
+  async create({ email, phone, passwordHash, name, referralCode, parentId }) {
+    const result = await insert(
       'INSERT INTO users (email, phone, password_hash, name, referral_code, parent_id) VALUES (?, ?, ?, ?, ?, ?)',
       [email, phone, passwordHash, name, referralCode, parentId || null]
     );
     return this.findById(result.id);
   },
 
-  update(id, fields) {
+  async update(id, fields) {
     const allowed = ['name', 'avatar_url', 'phone'];
     const sets = [];
     const values = [];
@@ -42,14 +42,14 @@ const userModel = {
     }
     if (sets.length === 0) return this.findById(id);
     values.push(id);
-    run(
-      `UPDATE users SET ${sets.join(', ')}, updated_at = datetime('now') WHERE id = ?`,
+    await run(
+      `UPDATE users SET ${sets.join(', ')}, updated_at = NOW() WHERE id = ?`,
       values
     );
     return this.findById(id);
   },
 
-  list({ page = 1, limit = 20, search = '' }) {
+  async list({ page = 1, limit = 20, search = '' }) {
     const offset = (page - 1) * limit;
     let where = 'WHERE 1=1';
     const params = [];
@@ -57,14 +57,14 @@ const userModel = {
       where += ' AND (email LIKE ? OR phone LIKE ? OR name LIKE ?)';
       params.push(`%${search}%`, `%${search}%`, `%${search}%`);
     }
-    const rows = all(
+    const rows = await all(
       `SELECT u.id, u.email, u.phone, u.name, u.referral_code, u.parent_id, u.is_admin, u.is_active, u.created_at,
         COALESCE((SELECT SUM(g.value) FROM user_gifts ug JOIN gifts g ON g.id = ug.gift_id WHERE ug.user_id = u.id AND ug.status != 'rejected'), 0) as balance,
         COALESCE((SELECT COUNT(*) FROM invitations WHERE inviter_id = u.id AND level = 1), 0) as invite_count
        FROM users u ${where} ORDER BY u.id DESC LIMIT ? OFFSET ?`,
       [...params, limit, offset]
     );
-    const countRow = get(
+    const countRow = await get(
       `SELECT COUNT(*) as total FROM users ${where}`,
       params
     );
@@ -76,13 +76,13 @@ const userModel = {
     };
   },
 
-  getParentChain(userId, maxLevel = 3) {
+  async getParentChain(userId, maxLevel = 3) {
     const chain = [];
     let currentId = userId;
     for (let i = 0; i < maxLevel; i++) {
-      const user = this.findById(currentId);
+      const user = await this.findById(currentId);
       if (!user || !user.parent_id) break;
-      const parent = this.findById(user.parent_id);
+      const parent = await this.findById(user.parent_id);
       if (!parent) break;
       chain.push(parent);
       currentId = parent.id;

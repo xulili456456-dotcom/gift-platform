@@ -8,13 +8,13 @@ const router = Router();
 router.use(authMiddleware);
 
 // POST /api/claims - claim a gift
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { gift_id } = req.body;
   if (!gift_id) {
     return res.status(400).json({ error: '请指定礼物ID' });
   }
 
-  const gift = giftModel.findById(parseInt(gift_id));
+  const gift = await giftModel.findById(parseInt(gift_id));
   if (!gift || !gift.is_active) {
     return res.status(404).json({ error: '礼物不存在或已下架' });
   }
@@ -25,7 +25,7 @@ router.post('/', (req, res) => {
   }
 
   // Check eligibility
-  const { effective } = invitationModel.getEffectiveCount(req.user.id);
+  const { effective } = await invitationModel.getEffectiveCount(req.user.id);
   if (effective < gift.required_invites) {
     return res.status(400).json({
       error: `邀请人数不足，当前有效邀请: ${effective}，需要: ${gift.required_invites}`,
@@ -35,31 +35,31 @@ router.post('/', (req, res) => {
   }
 
   // Check duplicate
-  const existing = userGiftModel.findByUserAndGift(req.user.id, gift.id);
+  const existing = await userGiftModel.findByUserAndGift(req.user.id, gift.id);
   if (existing) {
     return res.status(409).json({ error: '您已领取过该礼物' });
   }
 
   // Create claim
-  const claim = userGiftModel.create(req.user.id, gift.id);
+  const claim = await userGiftModel.create(req.user.id, gift.id);
 
   // Decrement stock if limited
   if (gift.stock > 0) {
-    giftModel.update(gift.id, { stock: gift.stock - 1 });
+    await giftModel.update(gift.id, { stock: gift.stock - 1 });
   }
 
   res.status(201).json(claim);
 });
 
 // GET /api/claims - list user's claims
-router.get('/', (req, res) => {
-  const claims = userGiftModel.findByUser(req.user.id);
+router.get('/', async (req, res) => {
+  const claims = await userGiftModel.findByUser(req.user.id);
   res.json(claims);
 });
 
 // GET /api/claims/:id
-router.get('/:id', (req, res) => {
-  const claim = userGiftModel.findById(parseInt(req.params.id));
+router.get('/:id', async (req, res) => {
+  const claim = await userGiftModel.findById(parseInt(req.params.id));
   if (!claim) {
     return res.status(404).json({ error: '领取记录不存在' });
   }
