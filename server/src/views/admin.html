@@ -245,7 +245,7 @@ async function loadUsers(c, page = 1, search = '') {
           <tbody>
             ${(users||[]).map(u => `
               <tr>
-                <td>${u.id}</td><td>${u.email}<br><span style="font-size:11px;color:var(--muted)">${u.phone}</span></td><td style="font-weight:600">${u.invite_count||0}人</td><td style="font-weight:700;color:var(--red)">$${(u.balance||0).toFixed(0)}</td>
+                <td>${u.id}</td><td>${u.email}<br><span style="font-size:11px;color:var(--muted)">${u.phone}</span></td><td style="font-weight:600">${u.invite_count||0}人</td><td style="font-weight:700;color:var(--red)">$${Number(u.balance||0).toFixed(0)}</td>
                 <td style="font-size:12px">${(u.created_at||"").slice(0,10)}</td>
                 <td><button class="btn-sm btn-gray" onclick="viewUserDetail(${u.id})">详情</button></td>
               </tr>`).join('')}
