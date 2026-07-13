@@ -31,11 +31,11 @@ router.get('/stats', async (req, res) => {
   );
 
   res.json({
-    total_users: totalUsers?.total || 0,
-    total_invites: totalInvites?.total || 0,
-    pending_claims: pendingClaims?.total || 0,
-    active_gifts: totalGifts?.total || 0,
-    top_inviters: topInviters,
+    total_users: Number(totalUsers?.total) || 0,
+    total_invites: Number(totalInvites?.total) || 0,
+    pending_claims: Number(pendingClaims?.total) || 0,
+    active_gifts: Number(totalGifts?.total) || 0,
+    top_inviters: topInviters.map(u => ({ ...u, invite_count: Number(u.invite_count) })),
   });
 });
 

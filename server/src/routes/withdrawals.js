@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
     [req.user.id, 'delivered']);
   const giftBal = await get(`SELECT COALESCE(SUM(g.value), 0) as total FROM user_gifts ug JOIN gifts g ON g.id = ug.gift_id WHERE ug.user_id = ? AND ug.status = ?`,
     [req.user.id, 'delivered']);
-  const available = (taskBal?.total || 0) + (giftBal?.total || 0);
+  const available = Number(taskBal?.total || 0) + Number(giftBal?.total || 0);
 
   if (amount > available) return res.status(400).json({ error: 'insufficient balance' });
 

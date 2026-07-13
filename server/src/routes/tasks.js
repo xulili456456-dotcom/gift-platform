@@ -42,11 +42,11 @@ router.post('/ad', async (req, res) => {
   const count = await get('SELECT COUNT(*) as c FROM task_earnings WHERE user_id = ? AND type = ? AND created_at >= ?',
     [req.user.id, 'ad', today]);
 
-  if (count.c >= 3) return res.status(400).json({ error: '今日广告已完成' });
+  if (Number(count.c) >= 3) return res.status(400).json({ error: '今日广告已完成' });
 
   const result = await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
     [req.user.id, 0.5, 'ad', 'delivered']);
-  res.json({ id: result.id, amount: 0.5, remaining: 3 - count.c - 1 });
+  res.json({ id: result.id, amount: 0.5, remaining: 3 - Number(count.c) - 1 });
 });
 
 // GET /api/tasks/balance
@@ -62,7 +62,7 @@ router.get('/balance', async (req, res) => {
 
   // Get streak
   let streak = 0;
-  if (checkins.c > 0) {
+  if (Number(checkins.c) > 0) {
     const rows = await all('SELECT created_at FROM task_earnings WHERE user_id = ? AND type = ? ORDER BY id DESC LIMIT 7',
       [req.user.id, 'checkin']);
     for (let i = 0; i < rows.length; i++) {
@@ -72,12 +72,12 @@ router.get('/balance', async (req, res) => {
       else break;
     }
   }
-  const balanceAmount = Math.round((earnings?.available || 0) * 100) / 100;
+  const balanceAmount = Math.round((Number(earnings?.available) || 0) * 100) / 100;
   res.json({
     available: balanceAmount,
     total: balanceAmount,
-    checkedToday: checkins.c > 0,
-    adsToday: ads.c,
+    checkedToday: Number(checkins.c) > 0,
+    adsToday: Number(ads.c),
     streak,
   });
 });
