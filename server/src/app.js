@@ -17,10 +17,16 @@ const referralRoutes = require('./routes/referral');
 const adminRoutes = require('./routes/admin');
 
 async function start() {
-  // Initialize database + run migrations
+  // Initialize database + run migrations + seed
   await getDb();
   await migrate();
   console.log('Database initialized.');
+  try {
+    await require('./db/seed')();
+    console.log('Seed complete.');
+  } catch (e) {
+    console.log('Seed skipped or already done:', e.message);
+  }
 
   const app = express();
 

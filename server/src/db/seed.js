@@ -5,14 +5,11 @@ const { generateReferralCode } = require('../utils/referralCode');
 
 async function seed() {
   console.log('Running seed...');
-  await migrate();
-  await getDb();
 
   // Check if admin already exists
   const admin = await get('SELECT id FROM users WHERE is_admin = true LIMIT 1');
   if (admin) {
     console.log('Seed data already exists. Skipping user/gift creation.');
-    await closeDb();
     return;
   }
 
@@ -41,12 +38,16 @@ async function seed() {
     );
   }
   console.log(`${gifts.length} gifts created.`);
-
-  await closeDb();
-  console.log('Seed complete.');
 }
 
-seed().catch(err => {
-  console.error('Seed failed:', err);
-  process.exit(1);
-});
+// Run directly if called as script
+if (require.main === module) {
+  migrate().then(() => getDb()).then(() => seed()).then(() => closeDb()).then(() => {
+    console.log('Seed complete.');
+  }).catch(err => {
+    console.error('Seed failed:', err);
+    process.exit(1);
+  });
+}
+
+module.exports = seed;
