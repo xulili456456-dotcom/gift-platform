@@ -178,17 +178,22 @@ let currentTab = 'dash';
 async function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab' + tab[0].toUpperCase() + tab.slice(1)).classList.add('active');
-  const c = document.getElementById('content');
+  var btn = document.getElementById('tab' + tab[0].toUpperCase() + tab.slice(1));
+  if (btn) btn.classList.add('active');
+  var c = document.getElementById('content');
   c.innerHTML = '<div class="empty">加载中...</div>';
-  if (tab === 'dash') await loadDash(c);
-  else if (tab === 'users') await loadUsers(c);
-  else if (tab === 'gifts') await loadGifts(c);
-  else if (tab === 'claims') await loadClaims(c);
-  else if (tab === 'kyc') await loadKyc(c);
-  else if (tab === 'notifs') await loadNotifs(c);
-  else if (tab === 'proofs') await loadProofs(c);
-  else if (tab === 'withdrawals') await loadWithdrawals(c);
+  try {
+    if (tab === 'dash') await loadDash(c);
+    else if (tab === 'users') await loadUsers(c);
+    else if (tab === 'gifts') await loadGifts(c);
+    else if (tab === 'claims') await loadClaims(c);
+    else if (tab === 'kyc') await loadKyc(c);
+    else if (tab === 'notifs') await loadNotifs(c);
+    else if (tab === 'proofs') await loadProofs(c);
+    else if (tab === 'withdrawals') await loadWithdrawals(c);
+  } catch(e) {
+    c.innerHTML = '<div class="empty" style="color:red">⚠️ 加载失败: ' + (e.message || '未知错误') + '<br><small>请检查网络后刷新重试</small></div>';
+  }
 }
 
 // ====== DASHBOARD ======
@@ -217,8 +222,11 @@ async function loadDash(c) {
 
 // ====== USERS ======
 async function loadUsers(c, page = 1, search = '') {
+  try {
   const params = new URLSearchParams({ page, limit: 20, search });
-  const data = await (await fetch(API + '/api/admin/users?' + params, { headers: { 'Authorization': 'Bearer ' + token } })).json();
+  const res = await fetch(API + '/api/admin/users?' + params, { headers: { 'Authorization': 'Bearer ' + token } });
+  if (!res.ok) { c.innerHTML = '<div class="empty">请求失败: ' + res.status + '</div>'; return; }
+  const data = await res.json();
   const { users, total } = data || {};
   const totalPages = Math.ceil((total||0) / 20);
 
@@ -253,6 +261,9 @@ async function loadUsers(c, page = 1, search = '') {
       </div>` : ''}
     </div>
   `;
+  } catch(e) {
+    c.innerHTML = '<div class="empty" style="color:red">加载失败: ' + (e.message || '未知错误') + '<br><small>请刷新页面重试</small></div>';
+  }
 }
 
 async function viewUserDetail(userId) {
