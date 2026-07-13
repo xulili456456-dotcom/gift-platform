@@ -15,7 +15,7 @@ router.post('/checkin', async (req, res) => {
     [req.user.id, 'checkin']);
 
   if (last) {
-    const lastDate = last.created_at.slice(0, 10);
+    const lastDate = new Date(last.created_at).toISOString().slice(0, 10);
     if (lastDate === today) return res.status(400).json({ error: '今日已签到' });
   }
 
@@ -66,7 +66,7 @@ router.get('/balance', async (req, res) => {
     const rows = await all('SELECT created_at FROM task_earnings WHERE user_id = ? AND type = ? ORDER BY id DESC LIMIT 7',
       [req.user.id, 'checkin']);
     for (let i = 0; i < rows.length; i++) {
-      const d = rows[i].created_at.slice(0, 10);
+      const d = new Date(rows[i].created_at).toISOString().slice(0, 10);
       const expected = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
       if (d === expected) streak++;
       else break;
