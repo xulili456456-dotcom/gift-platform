@@ -9,6 +9,6 @@ module.exports = {
   DB_PATH: path.join(__dirname, '..', 'data', 'gift_platform.db'),
   UPLOADS_DIR: path.join(__dirname, '..', 'uploads'),
   MAX_REFERRAL_LEVEL: 3,
-  CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  CORS_ORIGIN: process.env.CORS_ORIGIN || (process.env.NODE_ENV === 'production' ? true : 'http://localhost:5173'),
   NODE_ENV: process.env.NODE_ENV || 'development',
 };
