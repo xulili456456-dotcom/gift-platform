@@ -301,7 +301,7 @@ function genProducts(tier, cat = '全部') {
   const shuffled = [...filtered].sort(() => Math.random() - 0.5);
   return shuffled.map((p, i) => ({
     ...p, id: i,
-    img: `https://source.unsplash.com/400x600/?${encodeURIComponent(p.kw)}&sig=${i}`,
+    img: `https://loremflickr.com/400/600/${encodeURIComponent(p.kw)}?random=${i}`,
     capital: ti.capital,
     profit: Math.round((ti.min + Math.random() * (ti.max - ti.min)) * 100) / 100,
   }));
