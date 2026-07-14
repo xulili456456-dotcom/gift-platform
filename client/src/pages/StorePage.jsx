@@ -375,7 +375,7 @@ export default function StorePage() {
           <span className="text-sm font-medium text-gray-900 truncate">{p.name}</span>
         </div>
 
-        <div className="flex-1 overflow-y-auto native-scroll pb-28">
+        <div className="flex-1 overflow-y-auto native-scroll" style={{paddingBottom:'100px'}}>
           {/* Product image */}
           <div className="relative">
             <img src={p.img} alt={p.name} className="w-full aspect-square object-cover bg-gray-50" />
@@ -451,7 +451,7 @@ export default function StorePage() {
 
   // Product list page
   return (
-    <div className="h-full bg-[#f5f5f5] safe-top flex flex-col">
+    <div className="min-h-screen bg-[#f5f5f5] safe-top flex flex-col page-container">
       {/* Header */}
       <div className="shrink-0 bg-[#131921] text-white">
         <div className="px-4 py-3 flex items-center gap-3">
@@ -483,7 +483,7 @@ export default function StorePage() {
       </div>
 
       {/* Product list */}
-      <div className="flex-1 overflow-y-auto native-scroll pb-28">
+      <div className="flex-1 overflow-y-auto native-scroll" style={{paddingBottom:'100px'}}>
         <div className="px-4 py-2 text-[11px] text-gray-500 flex justify-between">
           <span>{products.length} 件</span>
           {!s.canAfford && s.remaining > 0 && <span className="text-red-500">余额不足</span>}
