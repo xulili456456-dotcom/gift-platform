@@ -15,6 +15,7 @@ const CATEGORIES = ['全部', '数码', '女装', '男装', '美妆', '鞋靴', 
 // 商品列表 — 亮哥逐个添加
 // 格式: { img:'图片URL', name:'商品名称', price:市场价, sold:销量, cat:'分类', rating:评分, reviews:评论数, specs:{'参数':'值'}, desc:'描述' }
 const PRODUCTS = [
+  { img:'/products/1.jpg', name:'Samsung 14" Galaxy Chromebook Go Laptop - Intel Celeron N4500, 4GB RAM, 64GB Storage, ChromeOS, Silver', price:212.22, sold:6500, cat:'数码', rating:4.3, reviews:656, specs:{'屏幕':'14" HD','处理器':'Intel Celeron N4500','内存':'4GB','存储':'64GB eMMC','系统':'ChromeOS','颜色':'Silver','型号':'XE340XDA-KA2US'}, desc:'Samsung Galaxy Chromebook Go 轻薄便携，适合学生和日常办公。Intel Celeron N4500处理器，4GB内存，64GB存储。ChromeOS系统，开机快、续航长、安全省心。14英寸高清屏幕，WiFi6无线连接，Type-C充电。' },
 ];
 
 
