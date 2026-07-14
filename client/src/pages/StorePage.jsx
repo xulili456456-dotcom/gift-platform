@@ -451,7 +451,7 @@ export default function StorePage() {
 
   // Product list page
   return (
-    <div className="bg-[#f5f5f5] safe-top flex flex-col page-container" style={{paddingBottom:'80px'}}>
+    <div className="h-full bg-[#f5f5f5] safe-top flex flex-col">
       {/* Header */}
       <div className="shrink-0 bg-[#131921] text-white">
         <div className="px-4 py-3 flex items-center gap-3">
