@@ -18,6 +18,12 @@ router.get('/', async (req, res) => {
   res.json({ notifications: rows, unread: unread?.c || 0 });
 });
 
+// PUT /api/notifications/:id/read
+router.put('/:id/read', async (req, res) => {
+  await run('UPDATE notifications SET is_read = true WHERE id = ? AND user_id = ?', [req.params.id, req.user.id]);
+  res.json({ ok: true });
+});
+
 // PUT /api/notifications/read-all
 router.put('/read-all', async (req, res) => {
   await run('UPDATE notifications SET is_read = true WHERE user_id = ?', [req.user.id]);
