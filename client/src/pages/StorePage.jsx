@@ -1,123 +1,69 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import client from '../api/client';
-import { TrendingUp, Package, DollarSign, Clock, ArrowRight, Eye, ShoppingCart, Star, Zap, ArrowDownUp, X, Search } from 'lucide-react';
+import { ArrowRight, ShoppingCart, Package, Star, X, Flame, TrendingUp, DollarSign } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const TIERS = {
-  small:  { nameKey: 'store.small',  capital: 1,  daily: 10, min: 0.05, max: 0.3,  color: 'from-amber-400 to-orange-500', bg: 'bg-amber-50', text: 'text-amber-600', icon: '🏪' },
-  medium: { nameKey: 'store.medium', capital: 3,  daily: 20, min: 0.1,  max: 0.5,  color: 'from-violet-500 to-purple-600', bg: 'bg-violet-50', text: 'text-violet-600', icon: '🏬', rec: true },
-  large:  { nameKey: 'store.large',  capital: 10, daily: 40, min: 0.2,  max: 1.0,  color: 'from-rose-500 to-red-600', bg: 'bg-rose-50', text: 'text-rose-600', icon: '🏢' },
+  small:  { nameKey: 'store.small',  capital: 1,  daily: 10, min: 0.05, max: 0.3,  color: '#F59E0B', icon: '🏪', tag: '入门' },
+  medium: { nameKey: 'store.medium', capital: 3,  daily: 20, min: 0.1,  max: 0.5,  color: '#8B5CF6', icon: '🏬', tag: '推荐' },
+  large:  { nameKey: 'store.large',  capital: 10, daily: 40, min: 0.2,  max: 1.0,  color: '#EF4444', icon: '🏢', tag: '专业' },
 };
 
-// Product catalog - random each time
-const ALL_PRODUCTS = [
-  { emoji: '👗', name: '夏季连衣裙', cat: '服装' },
-  { emoji: '👟', name: '潮流运动鞋', cat: '鞋靴' },
-  { emoji: '👜', name: '轻奢手提包', cat: '箱包' },
-  { emoji: '📱', name: '蓝牙耳机', cat: '数码' },
-  { emoji: '⌚', name: '智能手表', cat: '数码' },
-  { emoji: '🕶️', name: '偏光太阳镜', cat: '配饰' },
-  { emoji: '🧴', name: '精华面霜', cat: '美妆' },
-  { emoji: '💄', name: '丝绒口红', cat: '美妆' },
-  { emoji: '🎧', name: '降噪耳机', cat: '数码' },
-  { emoji: '👔', name: '商务衬衫', cat: '服装' },
-  { emoji: '🧸', name: '限量手办', cat: '潮玩' },
-  { emoji: '🍵', name: '精品茶叶礼盒', cat: '食品' },
-  { emoji: '📦', name: '收纳整理箱', cat: '家居' },
-  { emoji: '💡', name: 'LED护眼台灯', cat: '家居' },
-  { emoji: '🎮', name: '游戏手柄', cat: '数码' },
-  { emoji: '🧢', name: '棒球帽', cat: '配饰' },
-  { emoji: '👶', name: '婴儿推车', cat: '母婴' },
-  { emoji: '🐶', name: '宠物智能喂食器', cat: '宠物' },
-  { emoji: '🌹', name: '永生花礼盒', cat: '礼品' },
-  { emoji: '🎂', name: '定制蛋糕', cat: '食品' },
-  { emoji: '💻', name: '机械键盘', cat: '数码' },
-  { emoji: '🧣', name: '羊绒围巾', cat: '服装' },
-  { emoji: '☕', name: '精品咖啡豆', cat: '食品' },
-  { emoji: '🔦', name: '强光手电筒', cat: '户外' },
-  { emoji: '🎒', name: '户外双肩包', cat: '户外' },
+const PRODUCTS = [
+  { emoji: '👗', name: '法式碎花连衣裙', price: 19.99, sold: 2834, cat: '女装', img: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400' },
+  { emoji: '👟', name: 'Air Max 复古运动鞋', price: 89.99, sold: 5621, cat: '鞋靴', img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400' },
+  { emoji: '👜', name: '轻奢链条斜挎包', price: 45.00, sold: 1892, cat: '箱包', img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400' },
+  { emoji: '📱', name: '无线降噪蓝牙耳机', price: 29.99, sold: 8947, cat: '数码', img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400' },
+  { emoji: '⌚', name: '智能运动手表', price: 59.99, sold: 3401, cat: '数码', img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400' },
+  { emoji: '🕶️', name: '复古圆框太阳镜', price: 15.99, sold: 6723, cat: '配饰', img: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400' },
+  { emoji: '💄', name: '丝绒雾面唇釉套装', price: 24.99, sold: 4567, cat: '美妆', img: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400' },
+  { emoji: '👔', name: '意式修身西装外套', price: 129.00, sold: 892, cat: '男装', img: 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=400' },
+  { emoji: '🎧', name: '头戴式电竞耳机', price: 39.99, sold: 2098, cat: '数码', img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400' },
+  { emoji: '🧸', name: '限量版潮玩公仔', price: 69.99, sold: 1234, cat: '潮玩', img: 'https://images.unsplash.com/photo-1559715541-5daf8a5c3e0d?w=400' },
+  { emoji: '☕', name: '埃塞俄比亚咖啡豆', price: 18.00, sold: 3456, cat: '食品', img: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400' },
+  { emoji: '🌹', name: '永生玫瑰花礼盒', price: 35.00, sold: 5678, cat: '礼品', img: 'https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=400' },
+  { emoji: '💡', name: '北欧极简台灯', price: 22.00, sold: 2345, cat: '家居', img: 'https://images.unsplash.com/photo-1507473885765-e6ed057ab6fe?w=400' },
+  { emoji: '🧴', name: '玻尿酸精华液', price: 32.00, sold: 7890, cat: '美妆', img: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400' },
+  { emoji: '🍵', name: '龙井明前茶礼盒', price: 55.00, sold: 1678, cat: '食品', img: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400' },
 ];
 
-function genProducts(tier, count = 12) {
-  const shuffled = [...ALL_PRODUCTS].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count).map((p, i) => ({
+function genProducts(tier) {
+  const shuffled = [...PRODUCTS].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, 12).map((p, i) => ({
     ...p,
     id: i,
     capital: tier.capital,
     profit: Math.round((tier.min + Math.random() * (tier.max - tier.min)) * 100) / 100,
-    roi: Math.round(((tier.max) / tier.capital) * 100),
   }));
 }
 
-const PROCESS_STEPS = [
-  { icon: ShoppingCart, label: '进货下单', time: '2s', color: 'text-blue-500', bg: 'bg-blue-50' },
-  { icon: Package, label: '打包发货', time: '2s', color: 'text-amber-500', bg: 'bg-amber-50' },
-  { icon: Star, label: '收货好评', time: '2s', color: 'text-green-500', bg: 'bg-green-50' },
-];
-
-// ── Product Picker Sheet ──
-function ProductPicker({ tier, onPick, onClose }) {
-  const { t } = useTranslation();
-  const products = useMemo(() => genProducts(TIERS[tier]), [tier]);
-
-  return (
-    <div className="fixed inset-0 z-[150] flex flex-col justify-end">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-t-3xl max-h-[70vh] overflow-hidden animate-slide-up flex flex-col">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-separator">
-          <h3 className="text-base font-bold text-text">🛍️ 选品进货</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-bg flex items-center justify-center"><X size={16} /></button>
-        </div>
-        <div className="px-4 py-2 text-xs text-text-muted bg-amber-50 mx-4 mt-3 rounded-lg">
-          💡 选择商品 → 垫付货款进货 → 卖出赚差价
-        </div>
-        <div className="flex-1 overflow-y-auto p-4 grid grid-cols-3 gap-2 native-scroll">
-          {products.map(p => (
-            <button
-              key={p.id}
-              onClick={() => onPick(p)}
-              className="bg-bg rounded-2xl p-3 text-center hover:bg-separator/30 transition-colors active:scale-95"
-            >
-              <div className="text-3xl mb-2">{p.emoji}</div>
-              <p className="text-[11px] font-semibold text-text leading-tight line-clamp-1">{p.name}</p>
-              <p className="text-[10px] text-text-muted mt-0.5">{p.cat}</p>
-              <div className="mt-2 pt-2 border-t border-separator/50">
-                <p className="text-[10px] text-text-muted">利润</p>
-                <p className="text-sm font-black text-green-500">+${p.profit.toFixed(2)}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Processing Modal ──
+// ── Processing Animation ──
 function ProcessingModal({ product, onDone }) {
-  const { t } = useTranslation();
   const [step, setStep] = useState(0);
-  const [showResult, setShowResult] = useState(false);
+  const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (step >= 3) { setShowResult(true); const tm = setTimeout(onDone, 1200); return () => clearTimeout(tm); }
-    const tm = setTimeout(() => setStep(s => s + 1), 2000);
-    return () => clearTimeout(tm);
+    if (step >= 3) { setDone(true); const t = setTimeout(onDone, 1000); return () => clearTimeout(t); }
+    const t = setTimeout(() => setStep(s => s + 1), 2200);
+    return () => clearTimeout(t);
   }, [step]);
 
-  if (showResult) {
+  const steps = [
+    { icon: '📦', label: '已下单，等待发货...' },
+    { icon: '🚚', label: '商品配送中...' },
+    { icon: '✅', label: '买家已确认收货！' },
+  ];
+
+  if (done) {
     return (
-      <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-        <div className="bg-white rounded-3xl p-8 text-center animate-burst shadow-2xl mx-4 w-80">
-          <div className="w-16 h-16 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <p className="text-4xl mb-2">{product.emoji}</p>
-          <p className="text-sm text-text-muted">{product.name} 已卖出</p>
-          <p className="text-3xl font-black text-primary mt-2">+${(product.capital + product.profit).toFixed(2)}</p>
-          <div className="flex justify-center gap-4 mt-2 text-xs text-text-muted">
-            <span>货款 ${product.capital}</span>
+      <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div className="bg-white rounded-3xl p-8 text-center animate-burst shadow-2xl w-full max-w-sm">
+          <div className="text-6xl mb-3">{product.emoji}</div>
+          <p className="text-sm text-text-muted mb-1">{product.name}</p>
+          <p className="text-3xl font-black text-primary">+${(product.capital + product.profit).toFixed(2)}</p>
+          <div className="flex justify-center gap-4 mt-2 text-xs">
+            <span className="text-text-muted">货款 ${product.capital} 退回</span>
             <span className="text-green-500 font-bold">+${product.profit} 利润</span>
           </div>
         </div>
@@ -125,199 +71,199 @@ function ProcessingModal({ product, onDone }) {
     );
   }
 
-  const s = PROCESS_STEPS[step];
-  if (!s) return null;
-  const Icon = s.icon;
+  const s = steps[step];
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl p-8 text-center animate-scale-in shadow-2xl mx-4 w-80">
-        <div className="text-5xl mb-3">{product.emoji}</div>
-        <p className="text-sm font-semibold text-text mb-4">{product.name}</p>
-        <div className={`w-14 h-14 mx-auto mb-3 ${s.bg} rounded-full flex items-center justify-center animate-bounce-pulse`}>
-          <Icon size={28} className={s.color} />
-        </div>
-        <h3 className="text-base font-bold text-text mb-1">{s.label}</h3>
-        <div className="flex gap-1.5 justify-center mt-3">
-          {PROCESS_STEPS.map((_, i) => (
-            <div key={i} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === step ? 'bg-primary scale-125' : i < step ? 'bg-green-400' : 'bg-gray-200'}`} />
-          ))}
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+      <div className="bg-white rounded-3xl p-8 text-center animate-scale-in shadow-2xl w-full max-w-sm">
+        <div className="text-5xl mb-4 animate-bounce-pulse">{s.icon}</div>
+        <div className="text-lg font-bold text-text mb-1">{s.label}</div>
+        <div className="w-full h-1.5 bg-gray-100 rounded-full mt-4 overflow-hidden">
+          <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${((step+1)/3)*100}%` }} />
         </div>
       </div>
     </div>
   );
 }
 
-// ── Store Selection ──
-function StoreSelection({ onOpen, loading }) {
-  const { t } = useTranslation();
-  const [selected, setSelected] = useState('medium');
-
+// ── Product Detail Sheet ──
+function ProductDetail({ product, tier, onBuy, onClose }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF5F5] to-bg safe-top safe-bottom">
-      <div className="bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] px-5 pt-8 pb-12 text-white text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          {Array.from({length: 16}).map((_,i) => (
-            <div key={i} className="absolute text-xl animate-env-rain" style={{left:`${5+(i*6)%90}%`, top:'-20px', animationDuration:`${4+(i%3)*2}s`, animationDelay:`${i*0.3}s`}}>
-              {['📦','🛍️','👗','👟','📱','💄'][i%6]}
+    <div className="fixed inset-0 z-[150] flex flex-col justify-end">
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-t-3xl max-h-[80vh] overflow-hidden animate-slide-up">
+        {/* Product image area */}
+        <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
+          <span className="text-8xl">{product.emoji}</span>
+          <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center shadow"><X size={16} /></button>
+        </div>
+
+        <div className="p-5 space-y-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold">{product.cat}</span>
+              {product.sold > 5000 && <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 font-bold flex items-center gap-1"><Flame size={10} /> 热销</span>}
             </div>
-          ))}
-        </div>
-        <div className="relative z-10">
-          <div className="w-16 h-16 mx-auto mb-3 bg-white/15 rounded-2xl flex items-center justify-center text-3xl backdrop-blur">🛒</div>
-          <h1 className="text-2xl font-black tracking-tight mb-1">{t('store.title')}</h1>
-          <p className="text-white/60 text-sm">{t('store.subtitle')}</p>
-        </div>
-      </div>
+            <h2 className="text-xl font-bold text-text">{product.name}</h2>
+            <p className="text-sm text-text-muted mt-1">已售 {product.sold.toLocaleString()} 件 · ⭐ 4.8</p>
+          </div>
 
-      <div className="px-4 -mt-6 relative z-10 space-y-3 pb-24">
-        {Object.entries(TIERS).map(([key, tier]) => {
-          const isSelected = selected === key;
-          return (
-            <div key={key} onClick={() => setSelected(key)}
-              className={`relative bg-white rounded-2xl p-4 border-2 transition-all cursor-pointer ${
-                isSelected ? 'border-primary shadow-lg shadow-primary/10 scale-[1.02]' : 'border-separator shadow-sm'}`}>
-              {tier.rec && <span className="absolute -top-2 right-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow">🔥 推荐</span>}
-              <div className="flex items-center gap-3 mb-3">
-                <div className={`w-12 h-12 rounded-xl ${tier.bg} flex items-center justify-center text-2xl`}>{tier.icon}</div>
-                <div className="flex-1">
-                  <h3 className="text-base font-bold text-text">{t(tier.nameKey)}</h3>
-                  <p className="text-[11px] text-text-muted">每单垫付 <b>${tier.capital}</b> · 日{tier.daily}单 · 利润率{tier.min*100}%-{tier.max*100}%</p>
-                </div>
-                {isSelected && <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center"><div className="w-2 h-2 rounded-full bg-white" /></div>}
-              </div>
-              <div className={`rounded-xl p-3 grid grid-cols-3 gap-2 text-center ${isSelected ? 'bg-primary/5' : 'bg-bg'}`}>
-                <div><p className="text-[10px] text-text-muted">垫付货款</p><p className="text-sm font-black text-primary">${tier.capital}</p></div>
-                <div><p className="text-[10px] text-text-muted">每单利润</p><p className="text-sm font-black text-green-500">${tier.min}-${tier.max}</p></div>
-                <div><p className="text-[10px] text-text-muted">商品可选</p><p className="text-sm font-black text-text">12款</p></div>
-              </div>
+          <div className="bg-bg rounded-2xl p-4 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-text-muted">市场售价</span>
+              <span className="text-sm font-bold text-text line-through">${product.price}</span>
             </div>
-          );
-        })}
-
-        <button onClick={() => onOpen(selected)} disabled={loading}
-          className="w-full py-4 bg-gradient-to-r from-[#FF6B00] via-[#FF8C00] to-[#FFB800] text-white font-bold rounded-2xl shadow-xl shadow-orange-500/25 active:scale-[0.98] transition-all disabled:opacity-50 text-base flex items-center justify-center gap-2">
-          {loading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <>🆓 {t('store.openFree')}</>}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ── Store Dashboard ──
-function StoreDashboard({ store: s, onProcess, onClose, processing, showPicker, setShowPicker }) {
-  const { t } = useTranslation();
-  const tier = TIERS[s.tier];
-  const pct = s.dailyOrders > 0 ? (s.doneToday / s.dailyOrders) * 100 : 0;
-  const allDone = s.remaining <= 0;
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF5F5] to-bg safe-top safe-bottom">
-      <div className={`bg-gradient-to-br ${tier.color} px-5 pt-8 pb-6 text-white relative overflow-hidden shadow-lg`}>
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/20" />
-          <div className="absolute -left-5 -bottom-5 w-24 h-24 rounded-full bg-white/10" />
-        </div>
-        <div className="relative z-10 flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-3xl backdrop-blur">{tier.icon}</div>
-            <div>
-              <h1 className="text-lg font-bold">{t(tier.nameKey)}</h1>
-              <p className="text-white/70 text-xs">垫付${tier.capital}/单 · {tier.daily}单/天</p>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-text-muted">垫付货款</span>
+              <span className="text-sm font-bold text-red-500">-${product.capital}</span>
+            </div>
+            <div className="flex justify-between items-center pt-2 border-t border-separator">
+              <span className="text-sm font-bold text-text">预估利润</span>
+              <span className="text-lg font-black text-green-500">+${product.profit.toFixed(2)}</span>
             </div>
           </div>
-          <button onClick={onClose} className="text-xs bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-full text-white/80 transition-colors">
-            {t('store.closeStore')}
+
+          <button
+            onClick={() => onBuy(product)}
+            className="w-full py-4 bg-gradient-to-r from-[#FF4D4D] via-[#FF6B6B] to-[#FF3366] text-white font-bold rounded-2xl shadow-lg shadow-red-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-base"
+          >
+            <ShoppingCart size={20} /> 立即进货 · 垫付${product.capital}
           </button>
         </div>
+      </div>
+    </div>
+  );
+}
 
-        <div className="relative z-10 bg-white/15 backdrop-blur rounded-2xl p-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-white/80 text-sm font-medium">📋 {t('store.todayProgress')}</span>
-            <span className="text-white font-black text-lg">{s.doneToday}<span className="text-white/50 text-sm font-normal">/{s.dailyOrders}</span></span>
-          </div>
-          <div className="w-full h-3 bg-white/15 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-white/80 via-white to-yellow-200 rounded-full transition-all duration-700 progress-glow"
-              style={{ width: `${pct}%` }} />
-          </div>
-          <div className="flex justify-between mt-2 text-xs text-white/60">
-            <span>{t('store.todayEarnings')}: <b className="text-white">${s.todayEarnings.toFixed(2)}</b></span>
-            <span>余额: <b className="text-white">${s.balance.toFixed(2)}</b></span>
-          </div>
-        </div>
+// ── TikTok-Style Product Feed ──
+function ProductFeed({ tier, products, onSelect, doneToday, dailyOrders, balance }) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex-1 overflow-y-auto native-scroll px-4 pb-4 space-y-3">
+      {/* Header stats */}
+      <div className="flex items-center gap-2 text-xs text-text-muted py-2">
+        <span>📋 {doneToday}/{dailyOrders} 单</span>
+        <span className="w-1 h-1 rounded-full bg-text-muted" />
+        <span>💰 ${balance.toFixed(2)}</span>
       </div>
 
-      <div className="px-4 -mt-3 relative z-10 pb-24 space-y-4">
-        {/* Process Button */}
-        <button onClick={() => setShowPicker(true)} disabled={allDone || processing || !s.canAfford}
-          className={`w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.98] ${
-            allDone ? 'bg-green-50 text-green-600 shadow-green-100'
-            : !s.canAfford ? 'bg-gray-100 text-text-muted'
-            : 'bg-gradient-to-r from-[#FF6B00] via-[#FF8C00] to-[#FFB800] text-white shadow-orange-500/25'
-          } disabled:opacity-80`}>
-          {processing ? <><div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" /> {t('store.processing')}</>
-          : allDone ? <>🎉 {t('store.allDone')}</>
-          : !s.canAfford ? <>⚠️ 余额不足，需要 ${tier.capital}</>
-          : <><ShoppingCart size={20} /> 选品进货 <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">{s.remaining}</span></>}
-        </button>
+      {/* Product cards - 2 columns */}
+      <div className="grid grid-cols-2 gap-3">
+        {products.map(p => (
+          <div
+            key={p.id}
+            onClick={() => onSelect(p)}
+            className="bg-white rounded-2xl overflow-hidden shadow-sm border border-separator active:scale-[0.97] transition-transform cursor-pointer"
+          >
+            {/* Product image */}
+            <div className="relative h-36 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+              <span className="text-6xl">{p.emoji}</span>
+              {/* Badges */}
+              <div className="absolute top-2 left-2 flex flex-col gap-1">
+                {p.sold > 5000 && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-black/60 text-white backdrop-blur flex items-center gap-0.5">
+                    <Flame size={10} /> 热销
+                  </span>
+                )}
+              </div>
+              <div className="absolute bottom-2 left-2 text-[10px] px-1.5 py-0.5 rounded-md bg-primary text-white font-bold">
+                +${p.profit.toFixed(2)}
+              </div>
+            </div>
+            {/* Product info */}
+            <div className="p-2.5">
+              <p className="text-[12px] font-semibold text-text line-clamp-2 leading-tight">{p.name}</p>
+              <div className="flex items-center justify-between mt-1.5">
+                <span className="text-[10px] text-text-muted">{p.cat}</span>
+                <span className="text-[10px] text-text-muted">已售{p.sold >= 1000 ? (p.sold/1000).toFixed(1)+'k' : p.sold}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-        {/* Capital flow */}
-        <div className="bg-white rounded-2xl shadow-sm border border-separator p-4">
-          <h3 className="text-sm font-bold text-text mb-3 flex items-center gap-2">
-            <ArrowDownUp size={16} className="text-violet-500" /> 进货流转
-          </h3>
-          <div className="flex items-center gap-2 text-xs">
-            <div className="flex-1 bg-red-50 rounded-xl p-2 text-center">
-              <p className="text-text-muted mb-0.5">垫付货款</p>
-              <p className="text-sm font-black text-red-500">-${tier.capital}</p>
-            </div>
-            <ArrowRight size={14} className="text-text-muted shrink-0" />
-            <div className="flex-1 bg-blue-50 rounded-xl p-2 text-center">
-              <p className="text-text-muted mb-0.5">选品卖出</p>
-              <p className="text-[10px]">3步流程</p>
-            </div>
-            <ArrowRight size={14} className="text-text-muted shrink-0" />
-            <div className="flex-1 bg-green-50 rounded-xl p-2 text-center">
-              <p className="text-text-muted mb-0.5">货款+利润</p>
-              <p className="text-sm font-black text-green-500">+${(tier.capital + tier.max).toFixed(1)}</p>
-            </div>
+// ── Store Header ──
+function StoreHeader({ tier, onClose, doneToday, dailyOrders, todayEarnings, balance }) {
+  const { t } = useTranslation();
+  const pct = dailyOrders > 0 ? (doneToday / dailyOrders) * 100 : 0;
+  const ti = TIERS[tier];
+
+  return (
+    <div className="shrink-0 px-4 pt-4 pb-2" style={{ background: `linear-gradient(180deg, ${ti.color}15 0%, transparent 100%)` }}>
+      {/* Top bar */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-2xl" style={{ background: `${ti.color}20` }}>
+            {ti.icon}
+          </div>
+          <div>
+            <h1 className="text-base font-bold text-text flex items-center gap-1.5">
+              {t(ti.nameKey)}
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-normal" style={{ background: ti.color, color: '#fff' }}>{ti.tag}</span>
+            </h1>
+            <p className="text-[11px] text-text-muted">每单垫付${TIERS[tier].capital}</p>
           </div>
         </div>
+        <button onClick={onClose} className="text-[11px] text-text-muted px-3 py-1.5 rounded-full bg-bg">关店</button>
+      </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-separator">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center"><TrendingUp size={16} className="text-blue-500" /></div>
-              <span className="text-[11px] text-text-muted">今日已完成</span>
-            </div>
-            <p className="text-2xl font-black text-text">{s.doneToday}<span className="text-sm font-normal text-text-muted">/{s.dailyOrders}</span></p>
-          </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-separator">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-green-50 flex items-center justify-center"><DollarSign size={16} className="text-green-500" /></div>
-              <span className="text-[11px] text-text-muted">今日利润</span>
-            </div>
-            <p className="text-2xl font-black text-green-500">${s.todayEarnings.toFixed(2)}</p>
-          </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-separator">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center"><Package size={16} className="text-amber-500" /></div>
-              <span className="text-[11px] text-text-muted">累计订单</span>
-            </div>
-            <p className="text-2xl font-black text-text">{s.totalOrders}<span className="text-sm font-normal text-text-muted"> 单</span></p>
-          </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-separator">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center"><Clock size={16} className="text-violet-500" /></div>
-              <span className="text-[11px] text-text-muted">每单货款</span>
-            </div>
-            <p className="text-2xl font-black text-text">${tier.capital}</p>
-          </div>
+      {/* Progress bar */}
+      <div className="flex items-center gap-3 mb-1">
+        <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${ti.color}, ${ti.color}cc)` }} />
         </div>
+        <span className="text-xs font-bold text-text shrink-0">{doneToday}/{dailyOrders}</span>
+      </div>
 
-        <div className="bg-white/50 rounded-2xl p-3 border border-dashed border-separator text-center">
-          <p className="text-xs text-text-muted">💡 选品 → 垫付${tier.capital}货款 → 卖出后货款+利润一起返还</p>
-        </div>
+      {/* Quick stats */}
+      <div className="flex gap-4 text-xs">
+        <span className="text-text-muted">今日利润 <b className="text-green-500">${todayEarnings.toFixed(2)}</b></span>
+        <span className="text-text-muted">余额 <b className="text-text">${balance.toFixed(2)}</b></span>
+      </div>
+    </div>
+  );
+}
+
+// ── Tier Selection ──
+function TierPicker({ onOpen, loading }) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="min-h-screen bg-bg safe-top safe-bottom flex flex-col">
+      <div className="px-5 pt-12 pb-6 text-center">
+        <div className="text-5xl mb-3">🛍️</div>
+        <h1 className="text-2xl font-black text-text mb-1">{t('store.title')}</h1>
+        <p className="text-sm text-text-muted">免费开店 · 选品进货 · 卖出赚差价</p>
+      </div>
+
+      <div className="px-4 space-y-3 flex-1">
+        {Object.entries(TIERS).map(([key, tier]) => (
+          <button
+            key={key}
+            onClick={() => onOpen(key)}
+            disabled={loading}
+            className="w-full bg-white rounded-2xl p-4 border border-separator shadow-sm text-left active:scale-[0.98] transition-all disabled:opacity-50"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl" style={{ background: `${tier.color}15` }}>{tier.icon}</div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-text flex items-center gap-1.5">
+                  {t(tier.nameKey)}
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full text-white font-normal" style={{ background: tier.color }}>{tier.tag}</span>
+                </h3>
+                <p className="text-[11px] text-text-muted">垫付${tier.capital}/单 · {tier.daily}单/天 · 利润${tier.min}-${tier.max}/单</p>
+              </div>
+              <ArrowRight size={16} className="text-text-muted" />
+            </div>
+          </button>
+        ))}
+      </div>
+
+      <div className="px-4 py-4 text-center text-xs text-text-muted">
+        免费开店，无需押金
       </div>
     </div>
   );
@@ -329,99 +275,109 @@ export default function StorePage() {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [opening, setOpening] = useState(false);
-  const [showPicker, setShowPicker] = useState(false);
+  const [showDetail, setShowDetail] = useState(null);
   const [showProcess, setShowProcess] = useState(false);
-  const [pickedProduct, setPickedProduct] = useState(null);
+  const [processingProduct, setProcessingProduct] = useState(null);
 
   const loadStatus = useCallback(async () => {
     try { const { data } = await client.get('/store/status'); setStatus(data); }
-    catch { /* silent */ }
+    catch { /* */ }
     finally { setLoading(false); }
   }, []);
 
   useEffect(() => { loadStatus(); }, []);
+
+  const products = useMemo(() =>
+    status?.hasStore ? genProducts(status.store.tier) : [],
+  [status?.hasStore, status?.store?.tier, status?.store?.doneToday]);
 
   const handleOpen = async (tier) => {
     setOpening(true);
     try {
       const { data } = await client.post('/store/open', { tier });
       setStatus({ hasStore: true, store: data });
-      toast.success(t('store.openSuccess'));
-    } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
+      toast.success('开店成功！');
+    } catch (err) { toast.error(err.response?.data?.error || '操作失败'); }
     finally { setOpening(false); }
   };
 
-  const handlePickProduct = (product) => {
-    setPickedProduct(product);
-    setShowPicker(false);
-    // Start processing with the picked product
-    processOrder(product);
-  };
-
-  const processOrder = async (product) => {
+  const handleBuy = async (product) => {
+    setShowDetail(null);
+    setProcessingProduct(product);
     setShowProcess(true);
     try {
       await client.post('/store/orders/process');
       setTimeout(async () => {
         setShowProcess(false);
-        setPickedProduct(null);
+        setProcessingProduct(null);
         await loadStatus();
-        toast.success(`💰 货款+利润已到账！`, { duration: 2500 });
-      }, 7200);
+        toast.success(`💰 +$${(product.capital + product.profit).toFixed(2)}`, { duration: 2500 });
+      }, 7000);
     } catch (err) {
       setShowProcess(false);
-      setPickedProduct(null);
-      toast.error(err.response?.data?.error || t('common.operationFailed'));
+      setProcessingProduct(null);
+      toast.error(err.response?.data?.error || '操作失败');
     }
   };
 
   const handleClose = async () => {
-    if (!confirm(t('store.closeConfirm'))) return;
+    if (!confirm('确定关店？')) return;
     try {
       await client.post('/store/close');
       setStatus({ hasStore: false });
       toast.success('店铺已关闭');
-    } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
+    } catch (err) { toast.error(err.response?.data?.error || '操作失败'); }
   };
 
   if (loading) return (
     <div className="min-h-screen bg-bg flex items-center justify-center">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin" />
-        <span className="text-text-muted text-sm">{t('app.loading')}</span>
-      </div>
+      <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
     </div>
   );
 
+  // Tier selection
+  if (!status?.hasStore) {
+    return <TierPicker onOpen={handleOpen} loading={opening} />;
+  }
+
+  const s = status.store;
+
   return (
-    <>
-      {/* Product Picker */}
-      {showPicker && status?.hasStore && (
-        <ProductPicker
-          tier={status.store.tier}
-          onPick={handlePickProduct}
-          onClose={() => setShowPicker(false)}
+    <div className="min-h-screen bg-bg safe-top safe-bottom flex flex-col page-container">
+      {/* Header */}
+      <StoreHeader
+        tier={s.tier}
+        onClose={handleClose}
+        doneToday={s.doneToday}
+        dailyOrders={s.dailyOrders}
+        todayEarnings={s.todayEarnings}
+        balance={s.balance}
+      />
+
+      {/* Product Feed */}
+      <ProductFeed
+        tier={s.tier}
+        products={products}
+        onSelect={(p) => setShowDetail(p)}
+        doneToday={s.doneToday}
+        dailyOrders={s.dailyOrders}
+        balance={s.balance}
+      />
+
+      {/* Product Detail Sheet */}
+      {showDetail && (
+        <ProductDetail
+          product={showDetail}
+          tier={s.tier}
+          onBuy={handleBuy}
+          onClose={() => setShowDetail(null)}
         />
       )}
 
-      {/* Processing */}
-      {showProcess && pickedProduct && (
-        <ProcessingModal product={pickedProduct} onDone={() => {}} />
+      {/* Processing Animation */}
+      {showProcess && processingProduct && (
+        <ProcessingModal product={processingProduct} onDone={() => {}} />
       )}
-
-      {/* Main content */}
-      {!status?.hasStore ? (
-        <StoreSelection onOpen={handleOpen} loading={opening} />
-      ) : (
-        <StoreDashboard
-          store={status.store}
-          onProcess={() => setShowPicker(true)}
-          onClose={handleClose}
-          processing={showProcess}
-          showPicker={showPicker}
-          setShowPicker={setShowPicker}
-        />
-      )}
-    </>
+    </div>
   );
 }
