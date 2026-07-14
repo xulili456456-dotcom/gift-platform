@@ -10,28 +10,69 @@ const TIER_INFO = {
   large:  { nameKey: 'store.large',  capital: 10, daily: 40, min: 0.2,  max: 1.0,  color: '#EF4444', tag: 'Lv.3', need: 200 },
 };
 
+const CATEGORIES = ['全部', '数码', '女装', '男装', '美妆', '鞋靴', '家居', '配饰', '食品', '潮玩'];
+
 const PRODUCTS = [
-  { img: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=800&fit=crop', name: '法式碎花连衣裙', price: 19.99, sold: 2834, cat: '女装' },
-  { img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=800&fit=crop', name: 'Air Max 复古运动鞋', price: 89.99, sold: 5621, cat: '鞋靴' },
-  { img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600&h=800&fit=crop', name: '轻奢链条斜挎包', price: 45.00, sold: 1892, cat: '箱包' },
+  // ── 数码 (15 items) ──
   { img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=800&fit=crop', name: '无线降噪蓝牙耳机', price: 29.99, sold: 8947, cat: '数码' },
   { img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=800&fit=crop', name: '智能运动手表', price: 59.99, sold: 3401, cat: '数码' },
-  { img: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=800&fit=crop', name: '复古圆框太阳镜', price: 15.99, sold: 6723, cat: '配饰' },
-  { img: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=600&h=800&fit=crop', name: '丝绒雾面唇釉套装', price: 24.99, sold: 4567, cat: '美妆' },
-  { img: 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=600&h=800&fit=crop', name: '意式修身西装外套', price: 129.00, sold: 892, cat: '男装' },
   { img: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=600&h=800&fit=crop', name: '头戴式电竞耳机', price: 39.99, sold: 2098, cat: '数码' },
-  { img: 'https://images.unsplash.com/photo-1559715541-5daf8a5c3e0d?w=600&h=800&fit=crop', name: '限量版潮玩公仔', price: 69.99, sold: 1234, cat: '潮玩' },
-  { img: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&h=800&fit=crop', name: '埃塞俄比亚咖啡豆', price: 18.00, sold: 3456, cat: '食品' },
-  { img: 'https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=600&h=800&fit=crop', name: '永生玫瑰花礼盒', price: 35.00, sold: 5678, cat: '礼品' },
-  { img: 'https://images.unsplash.com/photo-1507473885765-e6ed057ab6fe?w=600&h=800&fit=crop', name: '北欧极简台灯', price: 22.00, sold: 2345, cat: '家居' },
+  { img: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=600&h=800&fit=crop', name: '4K高清运动相机', price: 199.00, sold: 1567, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&h=800&fit=crop', name: '便携蓝牙音箱', price: 49.99, sold: 4521, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1546868871-af0de0ae72be?w=600&h=800&fit=crop', name: '机械键盘RGB', price: 79.99, sold: 3210, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&h=800&fit=crop', name: '无线鼠标', price: 25.99, sold: 6789, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1551645120-d70bfe84c826?w=600&h=800&fit=crop', name: 'iPad平板保护壳', price: 15.99, sold: 8901, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=800&fit=crop', name: '轻薄笔记本电脑', price: 699.00, sold: 567, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&h=800&fit=crop', name: '单反相机镜头', price: 349.00, sold: 432, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&h=800&fit=crop', name: '智能家居中控屏', price: 129.00, sold: 1234, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1572569511254-d8f448fe7f5a?w=600&h=800&fit=crop', name: '手机云台稳定器', price: 89.99, sold: 2345, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&h=800&fit=crop', name: 'VR虚拟现实眼镜', price: 299.00, sold: 876, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1546435770-ecbc689b7b9e?w=600&h=800&fit=crop', name: '无线充电底座', price: 19.99, sold: 7654, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=600&h=800&fit=crop', name: '无人机航拍器', price: 459.00, sold: 345, cat: '数码' },
+  // ── 女装 (5 items) ──
+  { img: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=800&fit=crop', name: '法式碎花连衣裙', price: 19.99, sold: 2834, cat: '女装' },
+  { img: 'https://images.unsplash.com/photo-1434389677669-e08b4cda5b60?w=600&h=800&fit=crop', name: '针织开衫外套', price: 35.00, sold: 1987, cat: '女装' },
+  { img: 'https://images.unsplash.com/photo-1551232864-3f0890a3a0b6?w=600&h=800&fit=crop', name: '高腰阔腿裤', price: 28.00, sold: 3456, cat: '女装' },
+  { img: 'https://images.unsplash.com/photo-1562157873-81fbb35a4e95?w=600&h=800&fit=crop', name: '纯棉短袖T恤', price: 12.99, sold: 9876, cat: '女装' },
+  { img: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600&h=800&fit=crop', name: '真丝围巾礼盒', price: 22.00, sold: 2345, cat: '女装' },
+  // ── 男装 (4 items) ──
+  { img: 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=600&h=800&fit=crop', name: '意式修身西装外套', price: 129.00, sold: 892, cat: '男装' },
+  { img: 'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600&h=800&fit=crop', name: '商务休闲长裤', price: 45.00, sold: 2345, cat: '男装' },
+  { img: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&h=800&fit=crop', name: '纯棉Polo衫', price: 25.99, sold: 5678, cat: '男装' },
+  { img: 'https://images.unsplash.com/photo-1603252109303-2751441dd157?w=600&h=800&fit=crop', name: '羊绒围巾', price: 32.00, sold: 1456, cat: '男装' },
+  // ── 美妆 (4 items) ──
+  { img: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=600&h=800&fit=crop', name: '丝绒雾面唇釉套装', price: 24.99, sold: 4567, cat: '美妆' },
   { img: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&h=800&fit=crop', name: '玻尿酸精华液', price: 32.00, sold: 7890, cat: '美妆' },
+  { img: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=800&fit=crop', name: '眼影盘大地色', price: 18.00, sold: 6543, cat: '美妆' },
+  { img: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=600&h=800&fit=crop', name: '香奈儿风香水', price: 55.00, sold: 3210, cat: '美妆' },
+  // ── 鞋靴 (4 items) ──
+  { img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=800&fit=crop', name: 'Air Max 复古运动鞋', price: 89.99, sold: 5621, cat: '鞋靴' },
+  { img: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=600&h=800&fit=crop', name: '经典帆布鞋', price: 35.00, sold: 7890, cat: '鞋靴' },
+  { img: 'https://images.unsplash.com/photo-1543163521-1bf5397cc6f9?w=600&h=800&fit=crop', name: '真皮乐福鞋', price: 65.00, sold: 2109, cat: '鞋靴' },
+  { img: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4b6?w=600&h=800&fit=crop', name: '透气跑步鞋', price: 55.00, sold: 4321, cat: '鞋靴' },
+  // ── 家居 (3 items) ──
+  { img: 'https://images.unsplash.com/photo-1507473885765-e6ed057ab6fe?w=600&h=800&fit=crop', name: '北欧极简台灯', price: 22.00, sold: 2345, cat: '家居' },
+  { img: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=800&fit=crop', name: '简约布艺沙发', price: 189.00, sold: 876, cat: '家居' },
+  { img: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=800&fit=crop', name: '北欧餐椅四件套', price: 159.00, sold: 654, cat: '家居' },
+  // ── 配饰 (3 items) ──
+  { img: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=800&fit=crop', name: '复古圆框太阳镜', price: 15.99, sold: 6723, cat: '配饰' },
+  { img: 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=600&h=800&fit=crop', name: '真皮钱包', price: 28.00, sold: 3456, cat: '配饰' },
+  { img: 'https://images.unsplash.com/photo-1515562141584-4054cf76b68a?w=600&h=800&fit=crop', name: '18K金项链', price: 89.00, sold: 1234, cat: '配饰' },
+  // ── 食品 (3 items) ──
+  { img: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&h=800&fit=crop', name: '埃塞俄比亚咖啡豆', price: 18.00, sold: 3456, cat: '食品' },
   { img: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&h=800&fit=crop', name: '龙井明前茶礼盒', price: 55.00, sold: 1678, cat: '食品' },
+  { img: 'https://images.unsplash.com/photo-1511381939415-1234abcde?w=600&h=800&fit=crop', name: '进口巧克力礼盒', price: 25.00, sold: 4567, cat: '食品' },
+  // ── 潮玩 (3 items) ──
+  { img: 'https://images.unsplash.com/photo-1559715541-5daf8a5c3e0d?w=600&h=800&fit=crop', name: '限量版潮玩公仔', price: 69.99, sold: 1234, cat: '潮玩' },
+  { img: 'https://images.unsplash.com/photo-1566576912221-025448b8c2be?w=600&h=800&fit=crop', name: '高达模型套件', price: 45.00, sold: 2345, cat: '潮玩' },
+  { img: 'https://images.unsplash.com/photo-1612404730960-5c0a7a5b5c3b?w=600&h=800&fit=crop', name: '乐高积木城堡', price: 89.00, sold: 1876, cat: '潮玩' },
 ];
 
-function genProducts(tier) {
+function genProducts(tier, cat = '全部') {
   const ti = TIER_INFO[tier];
-  const shuffled = [...PRODUCTS].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, 12).map((p, i) => ({
+  const filtered = cat === '全部' ? PRODUCTS : PRODUCTS.filter(p => p.cat === cat);
+  const shuffled = [...filtered].sort(() => Math.random() - 0.5);
+  return shuffled.map((p, i) => ({
     ...p, id: i,
     capital: ti.capital,
     profit: Math.round((ti.min + Math.random() * (ti.max - ti.min)) * 100) / 100,
@@ -102,15 +143,30 @@ function ProductDetail({ product, onBuy, onClose }) {
 }
 
 // ── Product Feed ──
-function ProductFeed({ products, onSelect, doneToday, dailyOrders, balance }) {
+function ProductFeed({ products, onSelect, doneToday, dailyOrders, balance, cat, setCat }) {
   return (
-    <div className="flex-1 overflow-y-auto native-scroll px-4 pb-4">
-      <div className="flex items-center gap-2 text-xs text-text-muted py-3 sticky top-0 bg-bg z-10">
-        <span>{doneToday}/{dailyOrders}单</span>
-        <span className="w-1 h-1 rounded-full bg-text-muted" />
-        <span>余额 ${balance.toFixed(2)}</span>
+    <div className="flex-1 overflow-y-auto native-scroll pb-4">
+      {/* Category tabs */}
+      <div className="sticky top-0 bg-bg z-10 px-4 pt-2 pb-1">
+        <div className="flex gap-2 overflow-x-auto native-scroll scrollbar-none pb-1">
+          {CATEGORIES.map(c => (
+            <button key={c} onClick={() => setCat(c)}
+              className={`shrink-0 px-4 py-1.5 rounded-full text-[12px] font-semibold transition-all ${
+                cat === c ? 'bg-primary text-white shadow-sm' : 'bg-white text-text-muted border border-separator'
+              }`}>
+              {c}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 text-[11px] text-text-muted py-2">
+          <span>{doneToday}/{dailyOrders}单</span>
+          <span className="w-1 h-1 rounded-full bg-text-muted" />
+          <span>余额 ${balance.toFixed(2)}</span>
+          <span className="w-1 h-1 rounded-full bg-text-muted" />
+          <span>{products.length}款商品</span>
+        </div>
       </div>
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2 px-4">
         {products.map(p => (
           <div key={p.id} onClick={() => onSelect(p)} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-separator active:scale-[0.97] transition-transform cursor-pointer">
             <div className="relative">
@@ -212,6 +268,7 @@ export default function StorePage() {
   const [showDetail, setShowDetail] = useState(null);
   const [showProcess, setShowProcess] = useState(false);
   const [processingProduct, setProcessingProduct] = useState(null);
+  const [category, setCategory] = useState('数码');
 
   const loadStatus = useCallback(async () => {
     try { const { data } = await client.get('/store/status'); setStatus(data); } catch { /* */ }
@@ -221,8 +278,8 @@ export default function StorePage() {
   useEffect(() => { loadStatus(); }, []);
 
   const products = useMemo(() =>
-    status?.hasStore ? genProducts(status.store.tier) : [],
-  [status?.hasStore, status?.store?.tier, status?.store?.doneToday]);
+    status?.hasStore ? genProducts(status.store.tier, category) : [],
+  [status?.hasStore, status?.store?.tier, status?.store?.doneToday, category]);
 
   const handleOpen = async () => {
     setOpening(true);
@@ -265,7 +322,7 @@ export default function StorePage() {
       <StoreHeader tier={s.tier} onClose={handleClose} doneToday={s.doneToday} dailyOrders={s.dailyOrders}
         todayEarnings={s.todayEarnings} balance={s.balance} totalOrders={s.totalOrders} nextTier={s.nextTier} />
       <ProductFeed products={products} onSelect={(p) => setShowDetail(p)} doneToday={s.doneToday}
-        dailyOrders={s.dailyOrders} balance={s.balance} />
+        dailyOrders={s.dailyOrders} balance={s.balance} cat={category} setCat={setCategory} />
       {showDetail && <ProductDetail product={showDetail} onBuy={handleBuy} onClose={() => setShowDetail(null)} />}
       {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => {}} />}
     </div>
