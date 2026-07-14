@@ -45,7 +45,7 @@ export default function NotificationsPage() {
         {data.notifications.length > 0 ? (
           <div className="space-y-2">
             {data.notifications.map((n, idx) => (
-              <div key={n.id} onClick={() => { client.put('/notifications/' + n.id + '/read').then(() => loadData()).catch(() => {}); }} className={`bg-white rounded-2xl p-4 border shadow-sm stagger-item cursor-pointer active:scale-[0.98] transition-transform ${n.is_read ? 'border-separator' : 'border-primary/20 bg-primary/[0.02]'}`} style={{ animationDelay: idx * 0.05 + 's' }}>
+              <div key={n.id} onClick={() => { if (!n.is_read) { setData(prev => ({ ...prev, notifications: prev.notifications.map(x => x.id === n.id ? {...x, is_read: true} : x), unread: Math.max(0, prev.unread - 1) })); client.put('/notifications/' + n.id + '/read').catch(() => {}); window.dispatchEvent(new Event('notifUpdate')); } }} className={`bg-white rounded-2xl p-4 border shadow-sm stagger-item cursor-pointer active:scale-[0.98] transition-all hover:bg-gray-50 ${n.is_read ? 'border-separator opacity-60' : 'border-primary/20 bg-primary/[0.02]'}`} style={{ animationDelay: idx * 0.05 + 's' }}>
                 <div className="flex items-start gap-3">
                   <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
                     n.type === 'success' ? 'bg-success/10' : n.type === 'warning' ? 'bg-yellow-100' : 'bg-bg'
