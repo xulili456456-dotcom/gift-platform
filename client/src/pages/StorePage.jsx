@@ -50,7 +50,6 @@ const PRODUCTS = [
   { img:'/products/33.jpg', name:'Philips Homerun Series 2000 2nd Gen Robot Vacuum & Mop - 6000Pa Suction, LiDAR Navigation, 130min', price:445.00, sold:110, cat:'家居', rating:4.0, reviews:100, specs:{'吸力':'6000Pa','导航':'LiDAR激光','续航':'130分钟','功能':'吸拖一体','地毯':'增压模式','控制':'App远程','颜色':'Arctic White'}, desc:'Philips Homerun 2000二代扫拖机器人。6000Pa大吸力，LiDAR激光导航。吸拖一体，地毯自动增压。130分钟续航，App远程控制。' },
   { img:'/products/34.jpg', name:'Tapo Robot Vacuum RV30Max Plus - 5300Pa, LiDAR Navigation, Auto Empty Station, 150min, Pet Hair', price:289.00, sold:240, cat:'家居', rating:4.3, reviews:231, specs:{'吸力':'5300Pa','导航':'LiDAR+IMU双导航','续航':'150分钟','自动集尘':'支持','越障':'22mm','集尘袋':'3L'}, desc:'Tapo RV30Max Plus扫拖机器人。5300Pa超强吸力，LiDAR+IMU双导航。自动集尘站，3L大容量尘袋。150分钟续航，宠物毛发克星。' },
 ];
-];
 
 
 function genProducts(tier, cat, search) {
