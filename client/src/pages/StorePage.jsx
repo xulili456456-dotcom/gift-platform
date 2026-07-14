@@ -24,7 +24,7 @@ const PRODUCTS = [
   { img:'/products/7.jpg', name:'Sony Alpha 7 V Full-Frame Hybrid Mirrorless Camera Body Only', price:2898.00, sold:120, cat:'数码', rating:4.7, reviews:89, specs:{'传感器':'33MP Stacked Exmor RS CMOS','处理器':'BIONZ XR2 with AI','连拍':'30fps Blackout-Free','防抖':'5轴IBIS 7.5档','视频':'4K 120p','对焦':'AI智能对焦'}, desc:'Sony A7 V全画幅微单旗舰。33MP堆栈式Exmor RS传感器，BIONZ XR2 AI处理器。30fps无黑视连拍，AI智能对焦。5轴防抖7.5档，4K120p视频。专业摄影首选。' },
   { img:'/products/8.jpg', name:'Apple iPhone 17 Pro 256GB Unlocked - Cosmic Orange (Renewed Premium)', price:1069.00, sold:320, cat:'数码', rating:4.3, reviews:249, specs:{'存储':'256GB','屏幕':'6.3" ProMotion','芯片':'A19 Pro','摄像头':'48MP三摄','网络':'5G eSIM','颜色':'Cosmic Orange','系统':'iOS 19'}, desc:'Apple iPhone 17 Pro 256GB解锁版。A19 Pro芯片，48MP三摄系统。6.3寸ProMotion屏幕，5G网络。Cosmic Orange配色，Amazon Renewed Premium认证翻新。' },
   { img:'/products/9.jpg', name:'Apple Studio Display XDR 27" 5K Monitor - Standard Glass, VESA Mount Adapter', price:2889.00, sold:8, cat:'数码', rating:4.2, reviews:5, specs:{'屏幕':'27" 5K Retina','分辨率':'5120x2880 218ppi','亮度':'1600nit XDR','接口':'Thunderbolt 4 x1 + USB-C x3','音频':'6扬声器 空间音频','摄像头':'12MP Ultra Wide','芯片':'Apple A13'}, desc:'Apple Studio Display XDR 27寸5K显示器。5120x2880分辨率，1600nit峰值亮度。Thunderbolt 4接口，6扬声器空间音频。12MP超广角摄像头，人物居中功能。' },
-  { img:'/products/10.jpg', name:'LG 83" Class OLED evo AI 4K G5 Series Smart TV with Dolby Atmos, Dolby Vision, HDR10', price:4999.99, sold:55, cat:'数码', rating:4.6, reviews:297, specs:{'屏幕':'83" OLED evo 4K','处理器':'AI α11 Gen2','系统':'webOS 24','音频':'Dolby Atmos','HDR':'Dolby Vision/HDR10','功能':'AI Super Upscaling, Filmmaker Mode, Alexa'}, desc:'LG 83英寸OLED evo G5系列旗舰电视。AI α11 Gen2处理器，4K超清画质。Dolby Atmos全景声，Dolby Vision视界。AI超分辨率，电影制作人模式。webOS 24智能系统，内置Alexa。' },
+  { img:'/products/10.jpg', name:'LG 83" OLED evo AI 4K G5 Smart TV Dolby Atmos Vision HDR10', price:4999.99, sold:55, cat:'数码', rating:4.6, reviews:297, specs:{'屏幕':'83" OLED evo 4K','处理器':'AI α11 Gen2','音频':'Dolby Atmos','HDR':'Dolby Vision/HDR10'}, desc:'LG 83英寸OLED evo G5旗舰。AI处理器，4K超清。Dolby全景声+视界。' },
 ];
 
 
@@ -33,12 +33,12 @@ function genProducts(tier, cat, search) {
   let filtered = cat === '全部' ? [...PRODUCTS] : PRODUCTS.filter(p => p.cat === cat);
   if (search) filtered = filtered.filter(p => p.name.includes(search) || p.cat.includes(search));
   filtered.sort((a,b) => b.sold - a.sold);
-  return filtered.map((p, i) => ({
-    ...p, id: i,
-    img: p.img,
-    capital: ti.capital,
-    profit: Math.round((ti.min + Math.random() * (ti.max - ti.min)) * 100) / 100,
-  }));
+  return filtered.map((p, i) => {
+    const rate = 0.7 + Math.random() * 0.2; // 70%-90%
+    const cost = Math.round(p.price * rate * 100) / 100;
+    const profit = Math.round((p.price - cost) * 100) / 100;
+    return { ...p, id: i, img: p.img, costPrice: cost, capital: cost, profit, dailyOrders: ti.dailyOrders };
+  });
 }
 
 function Stars({ rating, reviews, showCount }) {
@@ -160,13 +160,12 @@ export default function StorePage() {
             {/* Price */}
             <div className="mt-2 pb-3 border-b border-gray-200">
               <div className="flex items-baseline gap-1">
-                <span className="text-xs text-gray-500">-</span>
-                <span className="text-3xl font-medium text-gray-900">${p.capital}</span>
-                <span className="text-xs text-gray-500">垫付本金</span>
+                <span className="text-xs text-gray-500">市场价</span>
+                <span className="text-3xl font-medium text-gray-900">${p.price}</span>
               </div>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-sm text-gray-500 ">市场价: $${p.price}</span>
-                <span className="text-sm text-green-600 font-bold">利润 +${p.profit.toFixed(2)}</span>
+              <div className="flex items-center gap-3 mt-1">
+                <span className="text-sm text-gray-500">进货价 <b className="text-red-500">${p.costPrice.toFixed(2)}</b></span>
+                <span className="text-sm text-green-600 font-bold">赚 +${p.profit.toFixed(2)}</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">完成后本金全额退回 + 利润到账</p>
             </div>
@@ -199,8 +198,8 @@ export default function StorePage() {
         {/* Bottom buy bar */}
         <div className="shrink-0 px-4 py-3 border-t border-gray-200 bg-white flex items-center gap-3 safe-bottom">
           <div className="flex-1">
-            <p className="text-lg font-bold text-gray-900">${p.capital} <span className="text-xs font-normal text-gray-500">本金</span></p>
-            <p className="text-xs text-green-600">+${p.profit.toFixed(2)} 利润</p>
+            <p className="text-lg font-bold text-gray-900">${p.costPrice.toFixed(2)} <span className="text-xs font-normal text-gray-500">进货价</span></p>
+            <p className="text-xs text-green-600">卖出赚 +${p.profit.toFixed(2)}</p>
           </div>
           <button onClick={() => handleBuy(p)} disabled={!s.canAfford || s.remaining <= 0}
             className={`px-8 py-3 rounded-full font-bold text-sm ${!s.canAfford || s.remaining <= 0 ? 'bg-gray-300 text-gray-500' : 'bg-[#FFD814] hover:bg-[#F7CA00] text-gray-900 shadow-md active:scale-95'} transition-all`}>
@@ -250,7 +249,7 @@ export default function StorePage() {
       <div className="flex-1 overflow-y-auto native-scroll pb-4">
         <div className="px-4 py-2 text-[11px] text-gray-500 flex justify-between">
           <span>{products.length} 件</span>
-          {!s.canAfford && s.remaining > 0 && <span className="text-red-500">余额不足${ti.capital}</span>}
+          {!s.canAfford && s.remaining > 0 && <span className="text-red-500">余额不足</span>}
         </div>
         {products.map(p => (
           <div key={p.id} onClick={() => setDetail(p)} className="bg-white border-b border-gray-200 flex gap-3 px-4 py-3 active:bg-gray-50 cursor-pointer">
@@ -266,8 +265,8 @@ export default function StorePage() {
               </div>
               <div className="flex items-end justify-between">
                 <div>
-                  <span className="text-[10px] text-gray-400 ">$${p.price}</span>
-                  <div><span className="text-lg font-bold text-gray-900">${p.capital}</span><span className="text-xs text-gray-500 ml-1">本金</span><span className="ml-2 text-sm font-bold text-green-600">+${p.profit.toFixed(2)}</span></div>
+                  <span className="text-[10px] text-gray-500">市场价: <b className="text-gray-900">${p.price}</b></span>
+                  <div><span className="text-xs text-gray-500">进货价</span> <span className="text-base font-bold text-red-500">${p.costPrice.toFixed(2)}</span><span className="ml-2 text-sm font-bold text-green-600">赚 +${p.profit.toFixed(2)}</span></div>
                 </div>
                 <button className="shrink-0 px-4 py-1.5 rounded-full bg-[#FFD814] text-gray-900 text-[11px] font-bold active:scale-95">进货</button>
               </div>
