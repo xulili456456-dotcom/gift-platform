@@ -75,8 +75,9 @@ function ProductDetail({ product, onBuy, onClose }) {
     <div className="fixed inset-0 z-[150] flex flex-col justify-end">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white rounded-t-3xl max-h-[80vh] overflow-hidden animate-slide-up">
-        <div className="h-56 bg-gray-100 relative overflow-hidden">
-          <img src={product.img} alt={product.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
+        <div className="h-56 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200 relative overflow-hidden">
+          <img src={product.img} alt={product.name} className="w-full h-full object-cover absolute inset-0" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
           <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center shadow"><X size={16} /></button>
         </div>
         <div className="p-5 space-y-4">
@@ -115,9 +116,9 @@ function ProductFeed({ products, onSelect, doneToday, dailyOrders, balance, tier
       <div className="grid grid-cols-2 gap-3">
         {products.map(p => (
           <div key={p.id} onClick={() => onSelect(p)} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-separator active:scale-[0.97] transition-transform cursor-pointer">
-            <div className="relative h-36 bg-gray-100 overflow-hidden">
-              <img src={p.img} alt={p.name} className="w-full h-full object-cover" loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
-              <span className="hidden text-6xl absolute inset-0 items-center justify-center bg-gray-100">{p.name[0]}</span>
+            <div className="relative h-40 overflow-hidden bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200">
+              <img src={p.img} alt={p.name} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
               {p.sold > 5000 && <span className="absolute top-2 left-2 text-[10px] px-1.5 py-0.5 rounded-md bg-black/60 text-white backdrop-blur flex items-center gap-0.5"><Flame size={10} />热销</span>}
               <div className="absolute bottom-2 left-2 text-[10px] px-1.5 py-0.5 rounded-md bg-primary text-white font-bold">+${p.profit.toFixed(2)}</div>
             </div>
