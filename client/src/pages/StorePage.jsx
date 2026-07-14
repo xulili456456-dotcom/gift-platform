@@ -116,7 +116,7 @@ function genProducts(tier, cat) {
   const shuffled = [...filtered].sort(() => Math.random() - 0.5);
   return shuffled.map((p, i) => ({
     ...p, id: i,
-    img: `https://picsum.photos/seed/${encodeURIComponent(p.name)}/400/600`,
+    img: `https://images.unsplash.com/photo-${p.img}?w=400&h=600&fit=crop`,
     capital: ti.capital,
     profit: Math.round((ti.min + Math.random() * (ti.max - ti.min)) * 100) / 100,
   }));
@@ -212,7 +212,7 @@ function ProductFeed({ products, onSelect, doneToday, dailyOrders, balance, cat,
         {products.map(p => (
           <div key={p.id} onClick={() => onSelect(p)} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-separator active:scale-[0.97] transition-transform cursor-pointer">
             <div className="relative">
-              <img src={p.img} alt={p.name} className="w-full aspect-[3/4] object-cover" loading="lazy" />
+              <img src={p.img} alt={p.name} className="w-full aspect-[3/4] object-cover" loading="lazy" onError={(e)=>{e.target.style.display='none';e.target.parentElement.classList.add('bg-gradient-to-br','from-gray-200','to-gray-300','flex','items-center','justify-center');e.target.parentElement.innerHTML='<span class=text-4xl>'+p.cat[0]+'</span><span class=text-xs absolute bottom-2>'+p.name.slice(0,4)+'</span>';}} />
               {p.sold > 5000 && <span className="absolute top-2 left-2 text-[10px] px-1.5 py-0.5 rounded-md bg-black/50 text-white backdrop-blur flex items-center gap-0.5"><Flame size={10} />热销</span>}
               <div className="absolute bottom-2 left-2 text-[11px] px-2 py-1 rounded-lg bg-primary text-white font-bold">+${p.profit.toFixed(2)}</div>
             </div>
