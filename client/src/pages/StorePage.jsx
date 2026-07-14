@@ -165,7 +165,7 @@ export default function StorePage() {
                 <span className="text-xs text-gray-500">垫付本金</span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-sm text-gray-500 line-through">市场价: ${p.price}</span>
+                <span className="text-sm text-gray-500 ">市场价: $${p.price}</span>
                 <span className="text-sm text-green-600 font-bold">利润 +${p.profit.toFixed(2)}</span>
               </div>
               <p className="text-xs text-gray-500 mt-1">完成后本金全额退回 + 利润到账</p>
@@ -266,7 +266,7 @@ export default function StorePage() {
               </div>
               <div className="flex items-end justify-between">
                 <div>
-                  <span className="text-[10px] text-gray-400 line-through">${p.price}</span>
+                  <span className="text-[10px] text-gray-400 ">$${p.price}</span>
                   <div><span className="text-lg font-bold text-gray-900">${p.capital}</span><span className="text-xs text-gray-500 ml-1">本金</span><span className="ml-2 text-sm font-bold text-green-600">+${p.profit.toFixed(2)}</span></div>
                 </div>
                 <button className="shrink-0 px-4 py-1.5 rounded-full bg-[#FFD814] text-gray-900 text-[11px] font-bold active:scale-95">进货</button>
