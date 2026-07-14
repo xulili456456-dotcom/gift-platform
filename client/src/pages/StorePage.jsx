@@ -1,63 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import client from '../api/client';
+import { TrendingUp, Package, DollarSign, Clock, ArrowRight, Store, X, ShoppingCart, Star, Eye, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const TIER_ICONS = { small: '🏪', medium: '🏬', large: '🏢' };
-const STEPS = [
-  { icon: '📱', key: 'browse', duration: 3, label: '浏览商品' },
-  { icon: '🛒', key: 'order', duration: 2, label: '下单购买' },
-  { icon: '⭐', key: 'review', duration: 1, label: '确认好评' },
+const TIERS = {
+  small:  { name: '小店', nameKey: 'store.small',  deposit: 10,  daily: 10, min: 0.05, max: 0.3,  color: 'from-amber-400 to-orange-500', bg: 'bg-amber-50', text: 'text-amber-600', icon: '🏪', desc: '入门之选，低门槛开启电商之旅' },
+  medium: { name: '中店', nameKey: 'store.medium', deposit: 50,  daily: 20, min: 0.1,  max: 0.5,  color: 'from-violet-500 to-purple-600', bg: 'bg-violet-50', text: 'text-violet-600', icon: '🏬', desc: '最佳性价比，收益翻倍', rec: true },
+  large:  { name: '大店', nameKey: 'store.large',  deposit: 200, daily: 40, min: 0.2,  max: 1.0,  color: 'from-rose-500 to-red-600', bg: 'bg-rose-50', text: 'text-rose-600', icon: '🏢', desc: '专业级店铺，最大化收益' },
+};
+
+const PROCESS_STEPS = [
+  { icon: Eye, label: '浏览商品', time: '3s', color: 'text-blue-500', bg: 'bg-blue-50' },
+  { icon: ShoppingCart, label: '下单购买', time: '2s', color: 'text-green-500', bg: 'bg-green-50' },
+  { icon: Star, label: '确认好评', time: '1s', color: 'text-yellow-500', bg: 'bg-yellow-50' },
 ];
 
-function TierCard({ tier, info, onOpen, loading }) {
-  const { t } = useTranslation();
-  return (
-    <div className="bg-white rounded-2xl shadow-md border border-separator p-5 flex flex-col gap-3">
-      <div className="flex items-center gap-3">
-        <span className="text-4xl">{TIER_ICONS[tier]}</span>
-        <div>
-          <h3 className="text-lg font-bold text-text">{info.name}</h3>
-          <p className="text-xs text-text-muted">{t('store.dailyOrders', { n: info.dailyOrders })}</p>
-        </div>
-      </div>
-      <div className="bg-bg rounded-xl p-3 space-y-1 text-sm">
-        <div className="flex justify-between"><span className="text-text-muted">{t('store.deposit')}</span><span className="font-bold text-primary">${info.deposit}</span></div>
-        <div className="flex justify-between"><span className="text-text-muted">{t('store.perOrder')}</span><span className="font-medium text-text">${info.minReward} - ${info.maxReward}</span></div>
-        <div className="flex justify-between"><span className="text-text-muted">{t('store.dailyMax')}</span><span className="font-medium text-success">${(info.dailyOrders * info.maxReward).toFixed(0)}</span></div>
-      </div>
-      <button
-        onClick={() => onOpen(tier)}
-        disabled={loading}
-        className="w-full py-3 bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-xl shadow-lg shadow-primary/25 active:scale-[0.98] transition-all disabled:opacity-50 text-sm"
-      >
-        {loading ? t('common.loading') : t('store.openBtn', { deposit: info.deposit })}
-      </button>
-    </div>
-  );
-}
-
-function ProcessingOverlay({ onComplete }) {
+// ── Processing Animation ──
+function ProcessingModal({ onDone }) {
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
-  const [done, setDone] = useState(false);
+  const [showCheck, setShowCheck] = useState(false);
 
   useEffect(() => {
-    if (step >= STEPS.length) {
-      setDone(true);
-      const t = setTimeout(() => onComplete(), 600);
-      return () => clearTimeout(t);
-    }
-    const t = setTimeout(() => setStep(s => s + 1), STEPS[step].duration * 1000);
-    return () => clearTimeout(t);
+    if (step >= 3) { setShowCheck(true); const tm = setTimeout(onDone, 800); return () => clearTimeout(tm); }
+    const durations = [3000, 2000, 1000];
+    const tm = setTimeout(() => setStep(s => s + 1), durations[step]);
+    return () => clearTimeout(tm);
   }, [step]);
 
-  if (done) {
+  if (showCheck) {
     return (
-      <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div className="bg-white rounded-3xl p-10 text-center animate-scale-in shadow-2xl">
-          <div className="text-6xl mb-4">💰</div>
+      <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="bg-white rounded-3xl p-10 text-center animate-burst shadow-2xl mx-4">
+          <div className="w-20 h-20 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
           <h2 className="text-xl font-bold text-text mb-1">{t('store.orderDone')}</h2>
           <p className="text-text-muted text-sm">{t('store.rewardAdded')}</p>
         </div>
@@ -65,40 +43,246 @@ function ProcessingOverlay({ onComplete }) {
     );
   }
 
-  const s = STEPS[step];
+  const s = PROCESS_STEPS[step];
   if (!s) return null;
-
+  const Icon = s.icon;
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-3xl p-8 text-center animate-scale-in shadow-2xl w-72">
-        <div className="text-5xl mb-4 animate-bounce-pulse">{s.icon}</div>
-        <h3 className="text-lg font-bold text-text mb-2">{s.label}</h3>
-        <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all"
-            style={{ width: `${((step + 1) / STEPS.length) * 100}%`, transitionDuration: '0.3s' }} />
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="bg-white rounded-3xl p-8 text-center animate-scale-in shadow-2xl mx-4 w-80">
+        <div className={`w-16 h-16 mx-auto mb-4 ${s.bg} rounded-full flex items-center justify-center animate-bounce-pulse`}>
+          <Icon size={32} className={s.color} />
         </div>
-        <p className="text-xs text-text-muted mt-2">{t('store.processing')}</p>
+        <h3 className="text-lg font-bold text-text mb-1">{s.label}</h3>
+        <p className="text-text-muted text-sm mb-4">{s.time}</p>
+        <div className="flex gap-1.5 justify-center">
+          {PROCESS_STEPS.map((_, i) => (
+            <div key={i} className={`w-2 h-2 rounded-full transition-all duration-300 ${i === step ? 'bg-primary scale-125' : i < step ? 'bg-green-400' : 'bg-gray-200'}`} />
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
+// ── Tier Selection Screen ──
+function StoreSelection({ onOpen, loading }) {
+  const { t } = useTranslation();
+  const [selected, setSelected] = useState('medium');
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF5F5] to-bg safe-top safe-bottom">
+      {/* Top Banner */}
+      <div className="bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] px-5 pt-8 pb-12 text-white text-center relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          {Array.from({length: 20}).map((_,i) => (
+            <div key={i} className="absolute text-2xl animate-env-rain" style={{left:`${5 + (i*5)%90}%`, top:'-20px', animationDuration:`${4+(i%3)*2}s`, animationDelay:`${i*0.3}s`}}>
+              {['📦','🛍️','🏷️','💳'][i%4]}
+            </div>
+          ))}
+        </div>
+        <div className="relative z-10">
+          <div className="w-16 h-16 mx-auto mb-3 bg-white/15 rounded-2xl flex items-center justify-center text-3xl backdrop-blur">🛒</div>
+          <h1 className="text-2xl font-black tracking-tight mb-1">{t('store.title')}</h1>
+          <p className="text-white/60 text-sm">{t('store.subtitle')}</p>
+        </div>
+      </div>
+
+      {/* Tier Cards */}
+      <div className="px-4 -mt-6 relative z-10 space-y-3 pb-24">
+        {Object.entries(TIERS).map(([key, tier]) => {
+          const isSelected = selected === key;
+          const dailyMax = (tier.daily * tier.max).toFixed(0);
+          return (
+            <div
+              key={key}
+              onClick={() => setSelected(key)}
+              className={`relative bg-white rounded-2xl p-4 border-2 transition-all cursor-pointer ${
+                isSelected ? 'border-primary shadow-lg shadow-primary/10 scale-[1.02]' : 'border-separator shadow-sm'
+              }`}
+            >
+              {tier.rec && (
+                <span className="absolute -top-2 right-4 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow">
+                  🔥 推荐
+                </span>
+              )}
+              <div className="flex items-center gap-3 mb-3">
+                <div className={`w-12 h-12 rounded-xl ${tier.bg} flex items-center justify-center text-2xl`}>{tier.icon}</div>
+                <div className="flex-1">
+                  <h3 className="text-base font-bold text-text">{t(tier.nameKey)}</h3>
+                  <p className="text-[11px] text-text-muted">{tier.desc}</p>
+                </div>
+                {isSelected && <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center"><div className="w-2 h-2 rounded-full bg-white" /></div>}
+              </div>
+              <div className={`rounded-xl p-3 grid grid-cols-3 gap-2 text-center ${isSelected ? 'bg-primary/5' : 'bg-bg'}`}>
+                <div><p className="text-[10px] text-text-muted">押金</p><p className="text-sm font-black text-primary">${tier.deposit}</p></div>
+                <div><p className="text-[10px] text-text-muted">日单量</p><p className="text-sm font-black text-text">{tier.daily}单</p></div>
+                <div><p className="text-[10px] text-text-muted">每单收益</p><p className="text-sm font-black text-success">${tier.min}-{tier.max}</p></div>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Open Button */}
+        <button
+          onClick={() => onOpen(selected)}
+          disabled={loading}
+          className="w-full py-4 bg-gradient-to-r from-[#FF6B00] via-[#FF8C00] to-[#FFB800] text-white font-bold rounded-2xl shadow-xl shadow-orange-500/25 active:scale-[0.98] transition-all disabled:opacity-50 text-base flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <>{TIERS[selected].icon} {t('store.openBtn', { deposit: TIERS[selected].deposit })}</>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Store Dashboard ──
+function StoreDashboard({ store: s, onProcess, onClose, processing }) {
+  const { t } = useTranslation();
+  const tier = TIERS[s.tier];
+  const pct = s.dailyOrders > 0 ? (s.doneToday / s.dailyOrders) * 100 : 0;
+  const allDone = s.remaining <= 0;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF5F5] to-bg safe-top safe-bottom">
+      {/* Store Header */}
+      <div className={`bg-gradient-to-br ${tier.color} px-5 pt-8 pb-6 text-white relative overflow-hidden shadow-lg`}>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/20" />
+          <div className="absolute -left-5 -bottom-5 w-24 h-24 rounded-full bg-white/10" />
+        </div>
+        <div className="relative z-10 flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-3xl backdrop-blur">{tier.icon}</div>
+            <div>
+              <h1 className="text-lg font-bold">{t(tier.nameKey)}</h1>
+              <p className="text-white/70 text-xs">{t('store.deposit')}: ${s.deposit} · {s.dailyOrders}单/天</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-xs bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-full text-white/80 transition-colors">
+            {t('store.closeStore')}
+          </button>
+        </div>
+
+        {/* Today's Card */}
+        <div className="relative z-10 bg-white/15 backdrop-blur rounded-2xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-white/80 text-sm font-medium">📋 {t('store.todayProgress')}</span>
+            <span className="text-white font-black text-lg">{s.doneToday}<span className="text-white/50 text-sm font-normal">/{s.dailyOrders}</span></span>
+          </div>
+          <div className="w-full h-3 bg-white/15 rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-white/80 via-white to-yellow-200 rounded-full transition-all duration-700 relative overflow-hidden"
+              style={{ width: `${pct}%` }}>
+              <div className="absolute inset-0 progress-shine" />
+            </div>
+          </div>
+          <div className="flex justify-between mt-2 text-xs text-white/60">
+            <span>{t('store.todayEarnings')}: <b className="text-white">${s.todayEarnings.toFixed(2)}</b></span>
+            <span>{t('store.perOrder')}: ${s.minReward}-${s.maxReward}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="px-4 -mt-3 relative z-10 pb-24 space-y-4">
+        {/* Process Button */}
+        <button
+          onClick={onProcess}
+          disabled={allDone || processing}
+          className={`w-full py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.98] ${
+            allDone
+              ? 'bg-green-50 text-green-600 shadow-green-100'
+              : 'bg-gradient-to-r from-[#FF6B00] via-[#FF8C00] to-[#FFB800] text-white shadow-orange-500/25'
+          } disabled:opacity-80`}
+        >
+          {processing ? (
+            <><div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" /> {t('store.processing')}</>
+          ) : allDone ? (
+            <>🎉 {t('store.allDone')}</>
+          ) : (
+            <><Package size={20} /> {t('store.processOrder')} <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">{s.remaining}</span></>
+          )}
+        </button>
+
+        {/* Process Flow */}
+        <div className="bg-white rounded-2xl shadow-sm border border-separator p-4">
+          <h3 className="text-sm font-bold text-text mb-3 flex items-center gap-2">
+            <Zap size={16} className="text-amber-500" /> {t('store.howToProcess')}
+          </h3>
+          <div className="flex items-center gap-1">
+            {PROCESS_STEPS.map((step, i) => (
+              <div key={i} className="flex items-center gap-1 flex-1">
+                <div className={`flex-1 ${step.bg} rounded-xl p-2 text-center`}>
+                  <step.icon size={18} className={`${step.color} mx-auto mb-1`} />
+                  <p className="text-[10px] font-semibold text-text">{step.label}</p>
+                  <p className="text-[10px] text-text-muted">{step.time}</p>
+                </div>
+                {i < 2 && <ArrowRight size={14} className="text-text-muted shrink-0" />}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-separator">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 flex items-center justify-center"><TrendingUp size={16} className="text-blue-500" /></div>
+              <span className="text-[11px] text-text-muted">{t('store.dailyOrdersShort')}</span>
+            </div>
+            <p className="text-2xl font-black text-text">{s.dailyOrders}<span className="text-sm font-normal text-text-muted"> 单</span></p>
+          </div>
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-separator">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-green-50 flex items-center justify-center"><Package size={16} className="text-green-500" /></div>
+              <span className="text-[11px] text-text-muted">{t('store.completedShort')}</span>
+            </div>
+            <p className="text-2xl font-black text-text">{s.doneToday}<span className="text-sm font-normal text-text-muted"> 单</span></p>
+          </div>
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-separator">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center"><DollarSign size={16} className="text-amber-500" /></div>
+              <span className="text-[11px] text-text-muted">{t('store.earnedShort')}</span>
+            </div>
+            <p className="text-2xl font-black text-[#FF6B00]">${s.todayEarnings.toFixed(2)}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-4 shadow-sm border border-separator">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center"><Clock size={16} className="text-violet-500" /></div>
+              <span className="text-[11px] text-text-muted">{t('store.remaining')}</span>
+            </div>
+            <p className="text-2xl font-black text-text">{s.remaining}<span className="text-sm font-normal text-text-muted"> 单</span></p>
+          </div>
+        </div>
+
+        {/* Deposit Info */}
+        <div className="bg-white/50 rounded-2xl p-4 border border-dashed border-separator text-center">
+          <p className="text-xs text-text-muted">
+            💡 {t('store.deposit')} <b className="text-text">${s.deposit}</b> · 关店可退 · 7天内关店扣20%手续费
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main ──
 export default function StorePage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [opening, setOpening] = useState(false);
   const [processing, setProcessing] = useState(false);
-  const [result, setResult] = useState(null);
+  const [showProcess, setShowProcess] = useState(false);
 
-  const loadStatus = async () => {
-    try {
-      const { data } = await client.get('/store/status');
-      setStatus(data);
-    } catch { toast.error(t('common.loadingFailed')); }
+  const loadStatus = useCallback(async () => {
+    try { const { data } = await client.get('/store/status'); setStatus(data); }
+    catch { /* silent */ }
     finally { setLoading(false); }
-  };
+  }, []);
 
   useEffect(() => { loadStatus(); }, []);
 
@@ -108,25 +292,22 @@ export default function StorePage() {
       const { data } = await client.post('/store/open', { tier });
       setStatus({ hasStore: true, store: data });
       toast.success(t('store.openSuccess'));
-    } catch (err) {
-      toast.error(err.response?.data?.error || t('common.operationFailed'));
-    } finally { setOpening(false); }
+    } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
+    finally { setOpening(false); }
   };
 
   const handleProcess = async () => {
-    setProcessing(true);
-    // Processing animation handled by overlay, API called after
+    setShowProcess(true);
     try {
       const { data } = await client.post('/store/orders/process');
-      setResult(data);
-      // Reload status after a moment
-      setTimeout(() => {
-        setResult(null);
+      setTimeout(async () => {
+        setShowProcess(false);
         setProcessing(false);
-        loadStatus();
-        toast.success(`+$${data.amount} ${t('store.earned')}`);
-      }, 2000);
+        await loadStatus();
+        toast.success(`+$${data.amount} ${t('store.earned')}`, { icon: '💰' });
+      }, 6500);
     } catch (err) {
+      setShowProcess(false);
       setProcessing(false);
       toast.error(err.response?.data?.error || t('common.operationFailed'));
     }
@@ -138,138 +319,31 @@ export default function StorePage() {
       const { data } = await client.post('/store/close');
       setStatus({ hasStore: false });
       toast.success(data.message);
-    } catch (err) {
-      toast.error(err.response?.data?.error || t('common.operationFailed'));
-    }
+    } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
   };
 
   if (loading) return (
     <div className="min-h-screen bg-bg flex items-center justify-center">
-      <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+        <span className="text-text-muted text-sm">{t('app.loading')}</span>
+      </div>
     </div>
   );
 
-  // No store — show tier selection
-  if (!status?.hasStore) {
+  // Processing overlay
+  if (showProcess) {
     return (
-      <div className="min-h-screen bg-bg safe-top safe-bottom page-container">
-        <div className="p-4">
-          <h1 className="text-xl font-bold text-text mb-1">🏪 {t('store.title')}</h1>
-          <p className="text-sm text-text-muted mb-4">{t('store.subtitle')}</p>
-          <div className="space-y-3">
-            <TierCard tier="small" info={{ name: t('store.small'), deposit: 10, dailyOrders: 10, minReward: 0.05, maxReward: 0.3 }} onOpen={handleOpen} loading={opening} />
-            <TierCard tier="medium" info={{ name: t('store.medium'), deposit: 50, dailyOrders: 20, minReward: 0.1, maxReward: 0.5 }} onOpen={handleOpen} loading={opening} />
-            <TierCard tier="large" info={{ name: t('store.large'), deposit: 200, dailyOrders: 40, minReward: 0.2, maxReward: 1.0 }} onOpen={handleOpen} loading={opening} />
-          </div>
-        </div>
-      </div>
+      <>
+        {status?.hasStore ? <StoreDashboard store={status.store} onProcess={handleProcess} onClose={handleClose} processing={true} /> : null}
+        <ProcessingModal onDone={() => {}} />
+      </>
     );
   }
 
-  // Has store — show dashboard
-  const s = status.store;
-  const pct = s.dailyOrders > 0 ? (s.doneToday / s.dailyOrders) * 100 : 0;
+  if (!status?.hasStore) {
+    return <StoreSelection onOpen={handleOpen} loading={opening} />;
+  }
 
-  return (
-    <div className="min-h-screen bg-bg safe-top safe-bottom page-container">
-      {/* Processing overlay */}
-      {processing && !result && (
-        <ProcessingOverlay onComplete={() => {}} />
-      )}
-
-      {/* Result overlay */}
-      {result && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => { setResult(null); loadStatus(); }}>
-          <div className="bg-white rounded-3xl p-10 text-center animate-burst shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="text-5xl mb-3">🧧</div>
-            <p className="text-3xl font-black text-primary">+${result.amount}</p>
-            <p className="text-sm text-text-muted mt-1">{t('store.earned')}</p>
-            <p className="text-xs text-text-muted mt-3">{result.totalDone}/{result.dailyOrders} {t('store.completed')}</p>
-          </div>
-        </div>
-      )}
-
-      <div className="p-4">
-        {/* Header */}
-        <div className="bg-gradient-to-br from-primary via-primary to-primary-dark rounded-2xl p-5 text-white shadow-lg">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-3xl">{TIER_ICONS[s.tier]}</span>
-              <div>
-                <h1 className="text-lg font-bold">{s.tierName}</h1>
-                <p className="text-white/70 text-xs">{t('store.deposit')}: ${s.deposit}</p>
-              </div>
-            </div>
-            <button onClick={handleClose} className="text-xs bg-white/20 px-3 py-1.5 rounded-full text-white/80">
-              {t('store.closeStore')}
-            </button>
-          </div>
-
-          {/* Progress */}
-          <div className="bg-black/20 rounded-xl p-3.5">
-            <div className="flex justify-between text-sm mb-1.5">
-              <span>{t('store.todayProgress')}</span>
-              <span className="font-bold">{s.doneToday}/{s.dailyOrders}</span>
-            </div>
-            <div className="w-full h-2.5 bg-white/20 rounded-full progress-glow">
-              <div className="h-full rounded-full bg-gradient-to-r from-gold to-[#FF6B00] transition-all duration-500"
-                style={{ width: `${pct}%` }} />
-            </div>
-            <div className="flex justify-between text-xs mt-1.5 text-white/60">
-              <span>{t('store.todayEarnings')}: ${s.todayEarnings.toFixed(2)}</span>
-              <span>{t('store.perOrder')}: ${s.minReward}-${s.maxReward}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Process Order Button */}
-        <div className="mt-4">
-          <button
-            onClick={handleProcess}
-            disabled={s.remaining <= 0}
-            className="w-full py-4 bg-gradient-to-r from-[#FF6B00] via-[#FF8C00] to-[#FFB800] text-white font-bold rounded-2xl shadow-lg shadow-orange-500/25 active:scale-[0.98] transition-all disabled:opacity-40 disabled:scale-100 flex items-center justify-center gap-2 text-base"
-          >
-            {s.remaining > 0 ? (
-              <>📦 {t('store.processOrder')} ({s.remaining} {t('store.remaining')})</>
-            ) : (
-              <>✅ {t('store.allDone')}</>
-            )}
-          </button>
-        </div>
-
-        {/* Steps Info */}
-        <div className="mt-4 bg-white rounded-2xl shadow-sm border border-separator p-4">
-          <h3 className="text-sm font-bold text-text mb-3">{t('store.howToProcess')}</h3>
-          <div className="flex items-center gap-2">
-            {STEPS.map((step, i) => (
-              <div key={step.key} className="flex items-center gap-2 flex-1">
-                <div className="flex flex-col items-center gap-1 flex-1">
-                  <span className="text-2xl">{step.icon}</span>
-                  <span className="text-[10px] text-text-muted text-center">{step.label}</span>
-                  <span className="text-[10px] text-text-muted">{step.duration}s</span>
-                </div>
-                {i < STEPS.length - 1 && <span className="text-text-muted text-xs mb-4">→</span>}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="mt-3 grid grid-cols-3 gap-2">
-          <div className="bg-white rounded-xl p-3 text-center shadow-sm">
-            <p className="text-lg font-black text-primary">{s.dailyOrders}</p>
-            <p className="text-[10px] text-text-muted">{t('store.dailyOrdersShort')}</p>
-          </div>
-          <div className="bg-white rounded-xl p-3 text-center shadow-sm">
-            <p className="text-lg font-black text-success">{s.doneToday}</p>
-            <p className="text-[10px] text-text-muted">{t('store.completedShort')}</p>
-          </div>
-          <div className="bg-white rounded-xl p-3 text-center shadow-sm">
-            <p className="text-lg font-black text-gold">${s.todayEarnings.toFixed(2)}</p>
-            <p className="text-[10px] text-text-muted">{t('store.earnedShort')}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <StoreDashboard store={status.store} onProcess={handleProcess} onClose={handleClose} processing={processing} />;
 }
