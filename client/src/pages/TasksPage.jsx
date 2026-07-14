@@ -4,10 +4,8 @@ import { referralApi } from '../api/referral';
 import { giftsApi } from '../api/gifts';
 import client from '../api/client';
 import PullToRefresh from '../components/shared/PullToRefresh';
-import { CheckCircle, Play, Flame, Copy, Info, Store, ShoppingBag } from 'lucide-react';
+import { CheckCircle, Play, Flame, Copy, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-const TIER_ICONS = { small: '🏪', medium: '🏬', large: '🏢' };
 
 export default function TasksPage() {
   const { t, i18n } = useTranslation();
@@ -19,16 +17,15 @@ export default function TasksPage() {
   const [balance, setBalance] = useState({ available: 0, total: 0, checkedToday: false, adsToday: 0, streak: 0 });
   const [submitting, setSubmitting] = useState(false);
   const [showExplain, setShowExplain] = useState(false);
-  const [store, setStore] = useState(null);
 
   const loadAll = async () => {
     try {
-      const [s, g, c, b, st] = await Promise.all([
+      const [s, g, c, b] = await Promise.all([
         referralApi.getStats(), giftsApi.list(), referralApi.getCode(),
-        client.get('/tasks/balance'), client.get('/store/status')
+        client.get('/tasks/balance')
       ]);
       setStats(s.data); setGifts(g.data); setInviteData(c.data);
-      setBalance(b.data); setStore(st.data);
+      setBalance(b.data);
     } catch { toast.error(t('common.loadingFailed')); }
     finally { setLoading(false); }
   };
@@ -46,31 +43,12 @@ export default function TasksPage() {
 
   const watchAd = async () => {
     setSubmitting(true);
+    toast.success('正在播放广告...');
     try {
       const { data } = await client.post('/tasks/ad');
       toast.success(`+$${data.amount} 广告奖励已到账`);
       loadAll();
     } catch (err) { toast.error(err.response?.data?.error || '失败'); }
-    finally { setSubmitting(false); }
-  };
-
-  const handleOpenStore = async (tier) => {
-    setSubmitting(true);
-    try {
-      await client.post('/store/open', { tier });
-      toast.success(t('store.openSuccess'));
-      loadAll();
-    } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
-    finally { setSubmitting(false); }
-  };
-
-  const handleProcess = async () => {
-    setSubmitting(true);
-    try {
-      const { data } = await client.post('/store/orders/process');
-      toast.success(`📦 +$${data.amount} ${t('store.earned')}`);
-      loadAll();
-    } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
     finally { setSubmitting(false); }
   };
 
@@ -140,57 +118,6 @@ export default function TasksPage() {
             className={`w-full py-2.5 rounded-xl text-[13px] font-bold ${balance.adsToday >= 3 ? 'bg-bg text-text-muted' : 'bg-primary text-white active:scale-[0.98]'}`}>
             {balance.adsToday >= 3 ? t('tasks.adDone') : `${t('tasks.watchAdNow')} +$0.5`}
           </button>
-        </div>
-
-        {/* ── 电商 ── */}
-        <div className="bg-white rounded-2xl border border-separator shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b border-separator flex items-center gap-2">
-            <ShoppingBag size={20} className="text-[#FF6B00]" />
-            <span className="text-[14px] font-bold text-text">{t('store.title')}</span>
-            {store?.hasStore && <span className="ml-auto text-[11px] px-2 py-0.5 rounded-full bg-success/10 text-success font-bold">{TIER_ICONS[store.store.tier]} {store.store.tierName}</span>}
-          </div>
-
-          {store?.hasStore ? (
-            <div className="p-4">
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-text-muted">{t('store.todayProgress')}</span>
-                <span className="font-bold text-text">{store.store.doneToday}/{store.store.dailyOrders}</span>
-              </div>
-              <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden mb-3">
-                <div className="h-full bg-gradient-to-r from-[#FF6B00] to-[#FFB800] rounded-full transition-all"
-                  style={{ width: `${store.store.dailyOrders > 0 ? (store.store.doneToday / store.store.dailyOrders) * 100 : 0}%` }} />
-              </div>
-              <div className="flex justify-between text-xs text-text-muted mb-3">
-                <span>{t('store.todayEarnings')}: <b className="text-success">${store.store.todayEarnings.toFixed(2)}</b></span>
-                <span>{t('store.perOrder')}: ${store.store.minReward}-${store.store.maxReward}</span>
-              </div>
-              <button onClick={handleProcess} disabled={store.store.remaining <= 0 || submitting}
-                className={`w-full py-2.5 rounded-xl text-[13px] font-bold ${store.store.remaining <= 0 ? 'bg-bg text-text-muted' : 'bg-gradient-to-r from-[#FF6B00] to-[#FFB800] text-white active:scale-[0.98]'}`}>
-                {store.store.remaining > 0 ? `📦 ${t('store.processOrder')} (${store.store.remaining} ${t('store.remaining')})` : `✅ ${t('store.allDone')}`}
-              </button>
-            </div>
-          ) : (
-            <div className="p-4 space-y-2">
-              <p className="text-[12px] text-text-muted mb-2">{t('store.subtitle')}</p>
-              {[
-                { tier: 'small', name: t('store.small'), deposit: 10, daily: 10, range: '$0.05-0.3' },
-                { tier: 'medium', name: t('store.medium'), deposit: 50, daily: 20, range: '$0.1-0.5' },
-                { tier: 'large', name: t('store.large'), deposit: 200, daily: 40, range: '$0.2-1.0' },
-              ].map(tier => (
-                <button key={tier.tier} onClick={() => handleOpenStore(tier.tier)} disabled={submitting}
-                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-bg hover:bg-separator/50 transition-colors disabled:opacity-50">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{TIER_ICONS[tier.tier]}</span>
-                    <div className="text-left">
-                      <p className="text-[13px] font-bold text-text">{tier.name}</p>
-                      <p className="text-[10px] text-text-muted">{tier.daily}单/天 · {tier.range}/单</p>
-                    </div>
-                  </div>
-                  <span className="text-[12px] font-bold text-primary">${tier.deposit}</span>
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Explanation Tooltip */}

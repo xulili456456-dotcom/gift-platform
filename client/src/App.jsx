@@ -11,6 +11,7 @@ import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import TasksPage from './pages/TasksPage';
 import MinePage from './pages/MinePage';
+import StorePage from './pages/StorePage';
 import OnboardingPage from './pages/OnboardingPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import AdminRedirect from './pages/AdminRedirect';
@@ -29,7 +30,6 @@ const VerifyPage = lazy(() => import('./pages/VerifyPage'));
 const SupportPage = lazy(() => import('./pages/SupportPage'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
 const GiftDetailPage = lazy(() => import('./pages/GiftDetailPage'));
-const StorePage = lazy(() => import('./pages/StorePage'));
 
 const PageLoader = () => (
   <div className="min-h-screen bg-bg flex items-center justify-center">
@@ -69,6 +69,7 @@ export default function App() {
         <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/tasks" element={<TasksPage />} />
+          <Route path="/store" element={<StorePage />} />
           <Route path="/mine" element={<MinePage />} />
           <Route path="/mine/team" element={<Lazy Comp={TeamPage} />} />
           <Route path="/mine/wallet" element={<Lazy Comp={WalletPage} />} />
