@@ -35,7 +35,7 @@ export default function AppLayout() {
 
       {/* Mine sub-pages: no TopBar, own header */}
 
-      <main className={`flex-1 ${isAdminPage || showTopBar ? 'pb-4' : 'pb-24'}`}>
+      <main className={`flex-1 ${isAdminPage ? 'pb-4' : 'pb-24'}`}>
         <Outlet />
       </main>
 
