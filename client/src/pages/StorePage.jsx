@@ -11,21 +11,21 @@ const TIER_INFO = {
 };
 
 const PRODUCTS = [
-  { emoji: '👗', name: '法式碎花连衣裙', price: 19.99, sold: 2834, cat: '女装' },
-  { emoji: '👟', name: 'Air Max 复古运动鞋', price: 89.99, sold: 5621, cat: '鞋靴' },
-  { emoji: '👜', name: '轻奢链条斜挎包', price: 45.00, sold: 1892, cat: '箱包' },
-  { emoji: '📱', name: '无线降噪蓝牙耳机', price: 29.99, sold: 8947, cat: '数码' },
-  { emoji: '⌚', name: '智能运动手表', price: 59.99, sold: 3401, cat: '数码' },
-  { emoji: '🕶️', name: '复古圆框太阳镜', price: 15.99, sold: 6723, cat: '配饰' },
-  { emoji: '💄', name: '丝绒雾面唇釉套装', price: 24.99, sold: 4567, cat: '美妆' },
-  { emoji: '👔', name: '意式修身西装外套', price: 129.00, sold: 892, cat: '男装' },
-  { emoji: '🎧', name: '头戴式电竞耳机', price: 39.99, sold: 2098, cat: '数码' },
-  { emoji: '🧸', name: '限量版潮玩公仔', price: 69.99, sold: 1234, cat: '潮玩' },
-  { emoji: '☕', name: '埃塞俄比亚咖啡豆', price: 18.00, sold: 3456, cat: '食品' },
-  { emoji: '🌹', name: '永生玫瑰花礼盒', price: 35.00, sold: 5678, cat: '礼品' },
-  { emoji: '💡', name: '北欧极简台灯', price: 22.00, sold: 2345, cat: '家居' },
-  { emoji: '🧴', name: '玻尿酸精华液', price: 32.00, sold: 7890, cat: '美妆' },
-  { emoji: '🍵', name: '龙井明前茶礼盒', price: 55.00, sold: 1678, cat: '食品' },
+  { img: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=400&fit=crop', name: '法式碎花连衣裙', price: 19.99, sold: 2834, cat: '女装' },
+  { img: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop', name: 'Air Max 复古运动鞋', price: 89.99, sold: 5621, cat: '鞋靴' },
+  { img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&h=400&fit=crop', name: '轻奢链条斜挎包', price: 45.00, sold: 1892, cat: '箱包' },
+  { img: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop', name: '无线降噪蓝牙耳机', price: 29.99, sold: 8947, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop', name: '智能运动手表', price: 59.99, sold: 3401, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop', name: '复古圆框太阳镜', price: 15.99, sold: 6723, cat: '配饰' },
+  { img: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=400&h=400&fit=crop', name: '丝绒雾面唇釉套装', price: 24.99, sold: 4567, cat: '美妆' },
+  { img: 'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=400&h=400&fit=crop', name: '意式修身西装外套', price: 129.00, sold: 892, cat: '男装' },
+  { img: 'https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=400&h=400&fit=crop', name: '头戴式电竞耳机', price: 39.99, sold: 2098, cat: '数码' },
+  { img: 'https://images.unsplash.com/photo-1559715541-5daf8a5c3e0d?w=400&h=400&fit=crop', name: '限量版潮玩公仔', price: 69.99, sold: 1234, cat: '潮玩' },
+  { img: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=400&fit=crop', name: '埃塞俄比亚咖啡豆', price: 18.00, sold: 3456, cat: '食品' },
+  { img: 'https://images.unsplash.com/photo-1490750967868-88aa4f44baee?w=400&h=400&fit=crop', name: '永生玫瑰花礼盒', price: 35.00, sold: 5678, cat: '礼品' },
+  { img: 'https://images.unsplash.com/photo-1507473885765-e6ed057ab6fe?w=400&h=400&fit=crop', name: '北欧极简台灯', price: 22.00, sold: 2345, cat: '家居' },
+  { img: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop', name: '玻尿酸精华液', price: 32.00, sold: 7890, cat: '美妆' },
+  { img: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop', name: '龙井明前茶礼盒', price: 55.00, sold: 1678, cat: '食品' },
 ];
 
 function genProducts(tier) {
@@ -50,7 +50,7 @@ function ProcessingModal({ product, onDone }) {
   if (done) return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
       <div className="bg-white rounded-3xl p-8 text-center animate-burst shadow-2xl w-full max-w-sm">
-        <div className="text-6xl mb-3">{product.emoji}</div>
+        <img src={product.img} alt={product.name} className="w-24 h-24 object-cover rounded-2xl mx-auto mb-3 shadow-md" />
         <p className="text-sm text-text-muted mb-1">{product.name}</p>
         <p className="text-3xl font-black text-primary">+${(product.capital + product.profit).toFixed(2)}</p>
         <div className="flex justify-center gap-4 mt-2 text-xs"><span className="text-text-muted">货款${product.capital}退回</span><span className="text-green-500 font-bold">+${product.profit}利润</span></div>
@@ -75,8 +75,8 @@ function ProductDetail({ product, onBuy, onClose }) {
     <div className="fixed inset-0 z-[150] flex flex-col justify-end">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white rounded-t-3xl max-h-[80vh] overflow-hidden animate-slide-up">
-        <div className="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
-          <span className="text-8xl">{product.emoji}</span>
+        <div className="h-56 bg-gray-100 relative overflow-hidden">
+          <img src={product.img} alt={product.name} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
           <button onClick={onClose} className="absolute top-4 right-4 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center shadow"><X size={16} /></button>
         </div>
         <div className="p-5 space-y-4">
@@ -115,8 +115,9 @@ function ProductFeed({ products, onSelect, doneToday, dailyOrders, balance, tier
       <div className="grid grid-cols-2 gap-3">
         {products.map(p => (
           <div key={p.id} onClick={() => onSelect(p)} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-separator active:scale-[0.97] transition-transform cursor-pointer">
-            <div className="relative h-36 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-              <span className="text-6xl">{p.emoji}</span>
+            <div className="relative h-36 bg-gray-100 overflow-hidden">
+              <img src={p.img} alt={p.name} className="w-full h-full object-cover" loading="lazy" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+              <span className="hidden text-6xl absolute inset-0 items-center justify-center bg-gray-100">{p.name[0]}</span>
               {p.sold > 5000 && <span className="absolute top-2 left-2 text-[10px] px-1.5 py-0.5 rounded-md bg-black/60 text-white backdrop-blur flex items-center gap-0.5"><Flame size={10} />热销</span>}
               <div className="absolute bottom-2 left-2 text-[10px] px-1.5 py-0.5 rounded-md bg-primary text-white font-bold">+${p.profit.toFixed(2)}</div>
             </div>
