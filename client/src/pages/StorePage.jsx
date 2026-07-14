@@ -17,6 +17,7 @@ const CATEGORIES = ['全部', '数码', '女装', '男装', '美妆', '鞋靴', 
 const PRODUCTS = [
   { img:'/products/1.jpg', name:'Samsung 14" Galaxy Chromebook Go Laptop - Intel Celeron N4500, 4GB RAM, 64GB Storage, ChromeOS, Silver', price:212.22, sold:6500, cat:'数码', rating:4.3, reviews:656, specs:{'屏幕':'14" HD','处理器':'Intel Celeron N4500','内存':'4GB','存储':'64GB eMMC','系统':'ChromeOS','型号':'XE340XDA-KA2US'}, desc:'轻便Chromebook，适合学生和日常使用。14英寸屏，WiFi6，Type-C充电。' },
   { img:'/products/2.jpg', name:'HP OmniBook 3 14" Next Gen AI PC - Snapdragon X, 16GB RAM, 512GB SSD, 2K Display, Windows 11 Home', price:599.99, sold:1200, cat:'数码', rating:4.3, reviews:28, specs:{'屏幕':'14" 2K IPS 300nit','处理器':'Snapdragon X X1-26-100','内存':'16GB LPDDR5x','存储':'512GB SSD','显卡':'Qualcomm Adreno','系统':'Windows 11 Home','颜色':'Glacier Silver'}, desc:'HP OmniBook 3 新一代AI PC。Snapdragon X处理器，16GB高速内存，512GB固态硬盘。14英寸2K超清屏幕，轻薄便携。Windows 11 Home系统，AI智能助手。长续航，Type-C快充。' },
+  { img:'/products/3.jpg', name:'ASUS ROG Astral NVIDIA GeForce RTX 5080 16GB GDDR7 OC Edition Gaming Graphics Card', price:1843.99, sold:230, cat:'数码', rating:4.4, reviews:167, specs:{'芯片':'NVIDIA RTX 5080','显存':'16GB GDDR7','频率':'2790MHz OC','接口':'PCIe 5.0','输出':'DP 2.1a x3 + HDMI 2.1b x2','散热':'3.8槽 4风扇 均热板','保修':'3年'}, desc:'ASUS ROG Astral RTX 5080 OC版旗舰显卡。16GB GDDR7高速显存，PCIe 5.0接口。4风扇设计+专利均热板散热。支持DLSS 4、光线追踪。3个DP 2.1a和2个HDMI 2.1b输出。' },
 ];
 
 
