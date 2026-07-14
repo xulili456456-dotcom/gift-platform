@@ -68,8 +68,18 @@ router.post('/open', async (req, res) => {
   const plan = TIERS[tier];
   if (!plan) return res.status(400).json({ error: '无效的店铺等级，可选: small, medium, large' });
 
-  const existing = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (existing) return res.status(400).json({ error: '你已有一家店铺在运营中' });
+  const existing = await get('SELECT * FROM stores WHERE user_id = ?', [req.user.id]);
+  if (existing) {
+    if (existing.status === 'active') {
+      return res.status(400).json({ error: '你已有一家店铺在运营中' });
+    }
+    // Reactivate closed store
+    await run("UPDATE stores SET status = 'active', tier = ?, deposit = 0, opened_at = NOW(), closed_at = NULL WHERE id = ?",
+      [tier, existing.id]);
+    require('./notifications').notify(req.user.id, '🏪 店铺已重开！',
+      `${plan.name}已重新开业，每天可处理 ${plan.dailyOrders} 笔订单`, 'success');
+    return res.status(200).json({ id: existing.id, tier, capital: plan.capital, dailyOrders: plan.dailyOrders });
+  }
 
   const result = await insert(
     'INSERT INTO stores (user_id, tier, deposit) VALUES (?, ?, ?)',
