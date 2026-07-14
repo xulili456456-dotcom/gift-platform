@@ -15,7 +15,8 @@ const CATEGORIES = ['全部', '数码', '女装', '男装', '美妆', '鞋靴', 
 // 商品列表 — 亮哥逐个添加
 // 格式: { img:'图片URL', name:'商品名称', price:市场价, sold:销量, cat:'分类', rating:评分, reviews:评论数, specs:{'参数':'值'}, desc:'描述' }
 const PRODUCTS = [
-  { img:'/products/1.jpg', name:'Samsung 14" Galaxy Chromebook Go Laptop - Intel Celeron N4500, 4GB RAM, 64GB Storage, ChromeOS, Silver', price:212.22, sold:6500, cat:'数码', rating:4.3, reviews:656, specs:{'屏幕':'14" HD','处理器':'Intel Celeron N4500','内存':'4GB','存储':'64GB eMMC','系统':'ChromeOS','颜色':'Silver','型号':'XE340XDA-KA2US'}, desc:'Samsung Galaxy Chromebook Go 轻薄便携，适合学生和日常办公。Intel Celeron N4500处理器，4GB内存，64GB存储。ChromeOS系统，开机快、续航长、安全省心。14英寸高清屏幕，WiFi6无线连接，Type-C充电。' },
+  { img:'/products/1.jpg', name:'Samsung 14" Galaxy Chromebook Go Laptop - Intel Celeron N4500, 4GB RAM, 64GB Storage, ChromeOS, Silver', price:212.22, sold:6500, cat:'数码', rating:4.3, reviews:656, specs:{'屏幕':'14" HD','处理器':'Intel Celeron N4500','内存':'4GB','存储':'64GB eMMC','系统':'ChromeOS','型号':'XE340XDA-KA2US'}, desc:'轻便Chromebook，适合学生和日常使用。14英寸屏，WiFi6，Type-C充电。' },
+  { img:'/products/2.jpg', name:'HP OmniBook 3 14" Next Gen AI PC - Snapdragon X, 16GB RAM, 512GB SSD, 2K Display, Windows 11 Home', price:599.99, sold:1200, cat:'数码', rating:4.3, reviews:28, specs:{'屏幕':'14" 2K IPS 300nit','处理器':'Snapdragon X X1-26-100','内存':'16GB LPDDR5x','存储':'512GB SSD','显卡':'Qualcomm Adreno','系统':'Windows 11 Home','颜色':'Glacier Silver'}, desc:'HP OmniBook 3 新一代AI PC。Snapdragon X处理器，16GB高速内存，512GB固态硬盘。14英寸2K超清屏幕，轻薄便携。Windows 11 Home系统，AI智能助手。长续航，Type-C快充。' },
 ];
 
 
