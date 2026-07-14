@@ -40,7 +40,6 @@ const PRODUCTS = [
   { img:'/products/23.jpg', name:'DJI Osmo Action 4 - 4K/120fps Waterproof Action Camera, 1/1.3" Sensor, 160min Battery', price:231.00, sold:1900, cat:'数码', rating:4.6, reviews:1802, specs:{'视频':'4K/120fps','传感器':'1/1.3英寸CMOS','防水':'防水','续航':'160分钟','色彩':'10-bit D-Log M'}, desc:'DJI Osmo Action 4运动相机。4K/120fps超清录制，1/1.3英寸大底传感器。低光表现出色，10-bit D-Log M色彩。160分钟超长续航。' },
   { img:'/products/24.jpg', name:'DJI Osmo Action 6 Enhanced Combo - 8K Action Camera, Variable Aperture f/2.0-f/4.0, 2 Batteries', price:478.00, sold:740, cat:'数码', rating:4.5, reviews:725, specs:{'视频':'8K','传感器':'1/1.1英寸方形','光圈':'f/2.0-f/4.0可变','电池':'2块延长续航','屏幕':'2.5英寸'}, desc:'DJI Osmo Action 6增强版。8K超清运动相机，1/1.1英寸方形传感器。f/2.0-f/4.0可变光圈，双电池超长续航。专业户外拍摄利器。' },
 ];
-];
 
 
 function genProducts(tier, cat, search) {
