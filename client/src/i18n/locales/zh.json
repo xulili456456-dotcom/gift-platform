@@ -230,8 +230,8 @@
     "myWalletDesc": "收款管理",
     "messages": "消息",
     "messagesDesc": "通知帮助",
-    "myStore": "模拟电商",
-    "myStoreDesc": "开店处理订单赚钱",
+    "myStore": "电商",
+    "myStoreDesc": "开店处理订单赚收益",
     "noWallet": "还没有绑定收款方式",
     "noWalletHint": "绑定账户，奖励到账更快",
     "bindAccount": "绑定钱包",
@@ -595,7 +595,7 @@
     "networkError": "网络错误"
   },
   "store": {
-    "title": "模拟电商",
+    "title": "电商",
     "subtitle": "开店处理订单，赚取现金奖励",
     "small": "小店",
     "medium": "中店",

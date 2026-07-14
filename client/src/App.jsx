@@ -82,7 +82,6 @@ export default function App() {
           <Route path="/mine/verify" element={<Lazy Comp={VerifyPage} />} />
           <Route path="/mine/support" element={<Lazy Comp={SupportPage} />} />
           <Route path="/mine/notifications" element={<Lazy Comp={NotificationsPage} />} />
-          <Route path="/mine/store" element={<Lazy Comp={StorePage} />} />
 
           <Route path="/gift/:id" element={<Lazy Comp={GiftDetailPage} />} />
           <Route path="/admin" element={<AdminRedirect />} />
