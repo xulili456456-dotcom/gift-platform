@@ -58,9 +58,9 @@ export default function HomePage() {
 
   return (
     <PullToRefresh onRefresh={loadAll}>
-    <div className="tab-enter bg-gradient-to-b from-[#FFF0F3] to-[#FFF5F8] min-h-screen">
+    <div className="tab-enter bg-gradient-to-b from-[#0d0d1a] to-[#141420] min-h-screen">
       {/* ── Compact Hero ── */}
-      <div className="bg-gradient-to-br from-[#E8225A] via-[#D4206A] to-[#8B2FC9] px-5 pt-10 pb-5 shadow-xl shadow-purple-500/20 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#c8a06e] via-[#b8905e] to-[#a07840] px-5 pt-10 pb-5 shadow-xl shadow-purple-500/20 relative overflow-hidden">
         {/* Red envelope rain */}
         {['🧧','🎁','💰','🎊'].map((e, i) => (
           <span key={i} className="absolute text-xl animate-env-rain pointer-events-none select-none"
@@ -90,7 +90,7 @@ export default function HomePage() {
           </div>
           {/* Progress bar */}
           <div className="w-full h-2.5 bg-white/15 rounded-full progress-glow">
-            <div className="h-full rounded-full bg-gradient-to-r from-[#FFB800] via-[#FF6B00] to-[#FF3D00] transition-all duration-700"
+            <div className="h-full rounded-full bg-gradient-to-r from-[#e0c78e] via-[#FF6B00] to-[#FF3D00] transition-all duration-700"
               style={{ width: `${Math.min(100, (effective / maxReq) * 100)}%` }} />
           </div>
           <div className="flex justify-between mt-1.5">
@@ -160,7 +160,7 @@ export default function HomePage() {
       {/* ── CTA ── */}
       <div className="px-4 mt-4">
         <button onClick={() => navigate('/tasks')}
-          className="w-full py-3.5 bg-gradient-to-r from-[#E8225A] via-[#D4206A] to-[#8B2FC9] text-white font-bold rounded-2xl shadow-lg shadow-purple-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm">
+          className="w-full py-3.5 bg-gradient-to-r from-[#c8a06e] via-[#b8905e] to-[#a07840] text-white font-bold rounded-2xl shadow-lg shadow-purple-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm">
           📨 {t('home.inviteNow')}
         </button>
       </div>

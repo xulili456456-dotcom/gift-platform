@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #E8225A;
-  --color-primary-dark: #C41E4F;
-  --color-primary-light: #FF6B8A;
-  --color-accent: #8B2FC9;
-  --color-accent-light: #A855F7;
-  --color-gold: #FFB800;
-  --color-gold-light: #FFF7E0;
-  --color-bg: #FFF0F3;
-  --color-warm-bg: #FFF5F5;
-  --color-warm-white: #FFFFFF;
-  --color-card: #FFFFFF;
-  --color-text: #1A1A1A;
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #666666;
-  --color-text-muted: #999999;
-  --color-success: #FF6B00;
-  --color-success-light: #FFF3E8;
-  --color-separator: #F0E0E5;
+  --color-primary: #c8a06e;
+  --color-primary-dark: #a07840;
+  --color-primary-light: #e0c78e;
+  --color-accent: #e0c78e;
+  --color-accent-light: #f5ecd7;
+  --color-gold: #c8a06e;
+  --color-gold-light: #1E1E32;
+  --color-bg: #0d0d1a;
+  --color-warm-bg: #141420;
+  --color-warm-white: #141420;
+  --color-card: #141420;
+  --color-text: #f8f7f4;
+  --color-text-primary: #f8f7f4;
+  --color-text-secondary: #9e9eaa;
+  --color-text-muted: #6e6e7a;
+  --color-success: #00c758;
+  --color-success-light: #0d2418;
+  --color-separator: #262636;
   --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Helvetica Neue', sans-serif;
 }
 
@@ -27,7 +27,7 @@
 body {
   font-family: var(--font-sans);
   font-size: 17px;
-  background: #F2F2F7;
+  background: #08080f;
   color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

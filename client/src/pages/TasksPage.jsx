@@ -60,8 +60,8 @@ export default function TasksPage() {
 
   return (
     <PullToRefresh onRefresh={loadAll}>
-    <div className="tab-enter bg-gradient-to-b from-[#FFF0F3] to-[#FFF5F8] min-h-screen pb-4">
-      <div className="bg-gradient-to-r from-[#E8225A] to-[#8B2FC9] px-5 py-3 text-white text-center">
+    <div className="tab-enter bg-gradient-to-b from-[#0d0d1a] to-[#141420] min-h-screen pb-4">
+      <div className="bg-gradient-to-r from-[#c8a06e] to-[#a07840] px-5 py-3 text-white text-center">
         <p className="text-[11px] text-white/60">{t('mine.totalEarned')}</p>
         <p className="text-2xl font-black">${balance.total.toFixed(2)}</p>
       </div>
@@ -108,12 +108,12 @@ export default function TasksPage() {
         {/* Invite Progress */}
         <div>
           <h3 className="text-[13px] font-bold text-text-secondary uppercase tracking-wider mb-3 ml-1">{t('tasks.inviteProgress')}</h3>
-          <div className="bg-gradient-to-br from-[#E8225A] via-[#D4206A] to-[#8B2FC9] rounded-2xl p-5 text-white shadow-xl shadow-purple-500/20">
+          <div className="bg-gradient-to-br from-[#c8a06e] via-[#b8905e] to-[#a07840] rounded-2xl p-5 text-white shadow-xl shadow-purple-500/20">
             <div className="flex items-center gap-4">
               <div className="relative w-[80px] h-[80px] shrink-0">
                 <svg className="w-[80px] h-[80px] -rotate-90" viewBox="0 0 80 80">
                   <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="7" />
-                  <circle cx="40" cy="40" r="34" fill="none" stroke="#FFB800" strokeWidth="7" strokeLinecap="round"
+                  <circle cx="40" cy="40" r="34" fill="none" stroke="#e0c78e" strokeWidth="7" strokeLinecap="round"
                     strokeDasharray={`${Math.min(214, (effective / Math.max(1, ...gifts.map(g => g.required_invites))) * 214)} 214`} />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -163,7 +163,7 @@ export default function TasksPage() {
             </div>
             <div className="px-4 py-3 border-b border-separator">
               <p className="text-[11px] text-text-secondary break-all mb-2 font-mono bg-bg rounded-lg p-2 select-all">{inviteData?.share_link || ''}</p>
-              <button onClick={() => copyText(inviteData?.share_link)} className="w-full py-2.5 bg-gradient-to-r from-[#E8225A] to-[#8B2FC9] text-white font-bold rounded-xl text-[12px] active:scale-[0.98]">📋 {t('invite.copyLink')}</button>
+              <button onClick={() => copyText(inviteData?.share_link)} className="w-full py-2.5 bg-gradient-to-r from-[#c8a06e] to-[#a07840] text-white font-bold rounded-xl text-[12px] active:scale-[0.98]">📋 {t('invite.copyLink')}</button>
             </div>
             {inviteData?.qr_code && (
               <div className="px-4 py-4 text-center"><img src={inviteData.qr_code} alt="QR" className="w-36 h-36 mx-auto rounded-xl border border-separator" /><p className="text-[10px] text-text-muted mt-2">{t('invite.qrHint')}</p></div>

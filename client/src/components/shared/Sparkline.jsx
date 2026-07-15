@@ -1,5 +1,5 @@
 // Simple SVG sparkline chart
-export default function Sparkline({ data = [], width = 160, height = 48, color = '#E8225A', area = false }) {
+export default function Sparkline({ data = [], width = 160, height = 48, color = '#c8a06e', area = false }) {
   if (data.length < 2 || data.every(v => v === 0)) {
     return <div style={{ width, height }} />;
   }

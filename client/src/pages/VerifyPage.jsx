@@ -50,7 +50,7 @@ export default function VerifyPage() {
         <h2 className="text-[16px] font-bold text-text">{t('verify.title')}</h2>
       </div>
       <div className="p-4 space-y-5">
-        <div className="relative rounded-2xl p-4 text-[12px] leading-relaxed overflow-hidden" style={{ background: 'linear-gradient(135deg, #E8225A, #D4206A, #8B2FC9, #E8225A)', backgroundSize: '200% 200%', animation: 'gradientShift 4s ease-in-out infinite' }}>
+        <div className="relative rounded-2xl p-4 text-[12px] leading-relaxed overflow-hidden" style={{ background: 'linear-gradient(135deg, #c8a06e, #b8905e, #a07840, #c8a06e)', backgroundSize: '200% 200%', animation: 'gradientShift 4s ease-in-out infinite' }}>
           {[...Array(6)].map((_, i) => (<div key={i} className="absolute rounded-full bg-white/10" style={{ width: 4+Math.random()*8, height: 4+Math.random()*8, left: 10+i*16+'%', top: 20+Math.random()*60+'%', animation: 'particleFloat '+(2+Math.random()*3)+'s ease-in-out '+i*0.4+'s infinite' }} />))}
           <div className="relative z-10 text-white">
             <div className="flex items-center gap-2 mb-2"><Sparkles size={16} className="animate-pulse" /><p className="text-[13px] font-bold">{t('verify.howTo')}</p></div>

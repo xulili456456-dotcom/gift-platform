@@ -17,7 +17,7 @@ function Confetti() {
     left: Math.random() * 100,
     delay: Math.random() * 1.5,
     duration: 1.5 + Math.random() * 2,
-    color: ['#FFB800','#E8225A','#8B2FC9','#FF6B00','#FFD54F'][i % 5],
+    color: ['#e0c78e','#c8a06e','#a07840','#FF6B00','#FFD54F'][i % 5],
     size: 6 + Math.random() * 8,
   }));
 
@@ -83,7 +83,7 @@ export default function OnboardingPage() {
   const isLast = step === slides.length - 1;
 
   return (
-    <div className="min-h-dvh flex flex-col bg-gradient-to-b from-[#E8225A] via-[#D4206A] to-[#8B2FC9] relative overflow-hidden"
+    <div className="min-h-dvh flex flex-col bg-gradient-to-b from-[#c8a06e] via-[#b8905e] to-[#a07840] relative overflow-hidden"
       onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       {/* ═══ Animated Background ═══ */}
       <div className="absolute -top-32 -right-32 w-80 h-80 rounded-full bg-white/5 animate-pulse" style={{ animationDuration: '8s' }} />
@@ -143,7 +143,7 @@ export default function OnboardingPage() {
 
         {/* Button */}
         <button onClick={next}
-          className="w-full py-4 bg-white text-[#E8225A] font-bold rounded-2xl text-base active:scale-95 transition-all shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-0.5">
+          className="w-full py-4 bg-white text-[#c8a06e] font-bold rounded-2xl text-base active:scale-95 transition-all shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-0.5">
           {isLast ? t('common.start') : t('common.next')}
         </button>
 

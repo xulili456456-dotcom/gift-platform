@@ -14,7 +14,7 @@ export default function DarkModeToggle() {
     <button
       onClick={() => setDark(!dark)}
       className="w-14 h-7 rounded-full relative transition-colors duration-300 focus:outline-none"
-      style={{ background: dark ? '#8B2FC9' : '#E5E5EA' }}
+      style={{ background: dark ? '#a07840' : '#E5E5EA' }}
     >
       <div
         className="absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-all duration-300 flex items-center justify-center text-xs"

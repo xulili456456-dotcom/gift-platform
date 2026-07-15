@@ -79,9 +79,9 @@ export default function MinePage() {
   const current = langs.find(l => l.code === i18n.language) || langs[0];
 
   return (
-    <div className="tab-enter bg-gradient-to-b from-[#FFF0F3] to-[#FFF5F8] min-h-screen">
+    <div className="tab-enter bg-gradient-to-b from-[#0d0d1a] to-[#141420] min-h-screen">
       {/* Hero */}
-      <div className="relative bg-gradient-to-br from-[#E8225A] via-[#D4206A] to-[#8B2FC9] px-5 pt-10 pb-5 shadow-xl shadow-purple-500/20 overflow-hidden"
+      <div className="relative bg-gradient-to-br from-[#c8a06e] via-[#b8905e] to-[#a07840] px-5 pt-10 pb-5 shadow-xl shadow-purple-500/20 overflow-hidden"
         style={{ backgroundSize: '200% 200%', animation: 'gradientShift 4s ease-in-out infinite' }}>
         {/* Floating particles */}
         {[...Array(12)].map((_, i) => (
@@ -141,7 +141,7 @@ export default function MinePage() {
                 </div>
                 <button
                   onClick={() => setShowClaimConfirm(gift)}
-                  className="bg-gradient-to-r from-[#E8225A] to-[#8B2FC9] text-white px-4 py-2 rounded-xl text-[12px] font-bold active:scale-95 transition-transform shadow-md shadow-purple-500/20">
+                  className="bg-gradient-to-r from-[#c8a06e] to-[#a07840] text-white px-4 py-2 rounded-xl text-[12px] font-bold active:scale-95 transition-transform shadow-md shadow-purple-500/20">
                   ${gift.value} {t('gifts.claimNow')}
                 </button>
               </div>
@@ -353,7 +353,7 @@ export default function MinePage() {
               <button onClick={() => setShowClaimConfirm(null)}
                 className="flex-1 py-3 bg-bg rounded-xl text-[13px] font-semibold text-text-secondary">{t('common.cancel')}</button>
               <button onClick={() => handleClaim(showClaimConfirm)} disabled={claimingGift === showClaimConfirm.id}
-                className="flex-1 py-3 bg-gradient-to-r from-[#E8225A] to-[#8B2FC9] text-white rounded-xl text-[13px] font-bold active:scale-95 transition-transform">
+                className="flex-1 py-3 bg-gradient-to-r from-[#c8a06e] to-[#a07840] text-white rounded-xl text-[13px] font-bold active:scale-95 transition-transform">
                 {claimingGift === showClaimConfirm.id ? '...' : t('gifts.claimNow')}
               </button>
             </div>

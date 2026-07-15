@@ -2,7 +2,7 @@
   "app": {
     "name": "Shopee Shopping Operations",
     "slogan": "E-commerce Task Platform — Connect to global marketplaces and earn from every transaction",
-    "cta_register": "Start Earning Now",
+    "cta_register": "Download App",
     "cta_download": "Download App",
     "cta_share": "Share",
     "cta_store": "Open in App"
@@ -188,8 +188,8 @@
   },
   "cta": {
     "title": "Ready to earn from global e-commerce?",
-    "subtitle": "Zero inventory. Zero capital. Zero risk. Sign up and claim your welcome bonus task!",
-    "button": "Sign Up Free — Start Earning Margins"
+    "subtitle": "Zero inventory. Zero capital. Zero risk. Download the app and start earning today.",
+    "button": "Download App — Start Earning"
   },
   "footer": {
     "description": "Shopee Shopping Operations — Connecting global marketplaces, empowering everyone to earn from e-commerce.",
