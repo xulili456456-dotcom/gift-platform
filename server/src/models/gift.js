@@ -34,14 +34,14 @@ const giftModel = {
     if (sets.length === 0) return this.findById(id);
     values.push(id);
     await run(
-      `UPDATE gifts SET ${sets.join(', ')}, updated_at = datetime('now') WHERE id = ?`,
+      `UPDATE gifts SET ${sets.join(', ')}, updated_at = NOW() WHERE id = ?`,
       values
     );
     return this.findById(id);
   },
 
   async deactivate(id) {
-    await run(`UPDATE gifts SET is_active = false, updated_at = datetime('now') WHERE id = ?`, [id]);
+    await run(`UPDATE gifts SET is_active = false, updated_at = NOW() WHERE id = ?`, [id]);
   },
 };
 

@@ -39,7 +39,7 @@ const userGiftModel = {
   },
 
   async updateStatus(id, status, adminNote = '') {
-    const deliveredAtExpr = status === 'delivered' ? "datetime('now')" : 'NULL';
+    const deliveredAtExpr = status === 'delivered' ? 'NOW()' : 'NULL';
     await run(
       `UPDATE user_gifts SET status = ?, admin_note = ?, delivered_at = ${deliveredAtExpr} WHERE id = ?`,
       [status, adminNote, id]

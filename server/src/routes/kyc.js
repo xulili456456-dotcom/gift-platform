@@ -40,7 +40,7 @@ router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
 router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { status, admin_note } = req.body;
   if (!status) return res.status(400).json({ error: 'status required' });
-  await run("UPDATE kyc_submissions SET status = ?, admin_note = ?, reviewed_at = datetime('now') WHERE id = ?",
+  await run("UPDATE kyc_submissions SET status = ?, admin_note = ?, reviewed_at = NOW() WHERE id = ?",
     [status, admin_note || '', req.params.id]);
   res.json({ ok: true });
 });

@@ -151,7 +151,7 @@ router.post('/reset-password', async (req, res) => {
     if (!user || user.phone !== phone) return res.status(400).json({ error: '邮箱或手机号不匹配' });
     const newHash = await hashPassword(newPassword);
     const { run } = require('../db/database');
-    await run("UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?", [newHash, user.id]);
+    await run("UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?", [newHash, user.id]);
     res.json({ message: '密码重置成功' });
   } catch (err) {
     res.status(500).json({ error: '重置失败' });

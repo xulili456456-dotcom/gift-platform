@@ -18,7 +18,7 @@ router.put('/', async (req, res) => {
 
   const existing = await get('SELECT id FROM user_wallets WHERE user_id = ?', [req.user.id]);
   if (existing) {
-    await run("UPDATE user_wallets SET address = ?, network = ?, created_at = datetime('now') WHERE user_id = ?",
+    await run("UPDATE user_wallets SET address = ?, network = ?, created_at = NOW() WHERE user_id = ?",
       [address, network, req.user.id]);
   } else {
     await run('INSERT INTO user_wallets (user_id, address, network) VALUES (?, ?, ?)',

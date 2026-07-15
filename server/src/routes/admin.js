@@ -204,7 +204,7 @@ router.put('/withdrawals/:id', async (req, res) => {
   const id = parseInt(req.params.id);
   const { status, admin_note } = req.body;
   if (!status) return res.status(400).json({ error: 'status required' });
-  const completedAt = status === 'completed' ? "datetime('now')" : 'NULL';
+  const completedAt = status === 'completed' ? 'NOW()' : 'NULL';
   await run(
     `UPDATE withdrawals SET status = ?, admin_note = ?, completed_at = ${completedAt} WHERE id = ?`,
     [status, admin_note || '', id]
