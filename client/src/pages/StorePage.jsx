@@ -331,6 +331,7 @@ function ProcessingModal({ product, onDone, t }) {
 
 export default function StorePage() {
   const { t } = useTranslation();
+  const tSpec = (k) => { const r = t('specs.'+k); return r.startsWith('specs.') ? k : r; };
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [opening, setOpening] = useState(false);
@@ -426,7 +427,7 @@ export default function StorePage() {
               <h3 className="text-sm font-bold text-gray-900 mb-2">{t('store.specs')}</h3>
               <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                 {Object.entries(p.specs || {}).map(([k, v]) => (
-                  <div key={k} className="flex justify-between text-xs"><span className="text-gray-500">{t('specs.'+k, {defaultValue: k})}</span><span className="text-gray-900 font-medium">{v}</span></div>
+                  <div key={k} className="flex justify-between text-xs"><span className="text-gray-500">{tSpec(k)}</span><span className="text-gray-900 font-medium">{v}</span></div>
                 ))}
               </div>
             </div>
