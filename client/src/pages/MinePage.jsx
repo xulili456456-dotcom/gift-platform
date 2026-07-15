@@ -6,8 +6,7 @@ import { giftsApi } from '../api/gifts';
 import { referralApi } from '../api/referral';
 import client from '../api/client';
 import useAuthStore from '../store/authStore';
-import DarkModeToggle from '../components/shared/DarkModeToggle';
-import { Users, CreditCard, Bell, Globe, Lock, Shield, LogOut, SunMoon, Crown, Star, ChevronRight, Info, ArrowUpRight, MessageCircle, Camera, BellRing, Store } from 'lucide-react';
+import { Users, CreditCard, Bell, Globe, Lock, Shield, LogOut, Crown, Star, ChevronRight, Info, ArrowUpRight, MessageCircle, Camera, BellRing, Store } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const langs = [
@@ -235,16 +234,6 @@ export default function MinePage() {
             ))}
           </div>
         )}
-
-        {/* Dark Mode */}
-        <div className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm border border-separator">
-          <SunMoon size={22} className="text-primary shrink-0" />
-          <div className="flex-1 text-left">
-            <p className="text-[14px] font-bold text-text">{t('common.darkMode')}</p>
-            <p className="text-[12px] text-text-muted">{t('common.darkModeHint')}</p>
-          </div>
-          <DarkModeToggle />
-        </div>
 
         {/* KYC */}
         <button onClick={() => navigate('/mine/kyc')}
