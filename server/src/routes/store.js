@@ -228,6 +228,6 @@ router.post('/orders/process', async (req, res) => {
     throw err;
   }
   });
-});
 
 module.exports = router;
+
