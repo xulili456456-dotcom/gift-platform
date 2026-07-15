@@ -21,7 +21,7 @@ export default function WalletPage() {
   const [form, setForm] = useState({ address: '', network: 'trc20' });
 
   useEffect(() => {
-    client.get('/wallet').then(({ data }) => data && setWallet(data)).catch(() => {});
+    client.get('/wallet').then(({ data }) => data && setWallet(data)).catch(() => toast.error(t('common.loadingFailed')));
   }, []);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function WalletPage() {
   const loadClaims = () => {
     claimsApi.list()
       .then(({ data }) => setClaims(data))
-      .catch(() => {})
+      .catch(() => toast.error(t('common.loadingFailed')))
       .finally(() => setLoading(false));
   };
 
@@ -51,13 +51,13 @@ export default function WalletPage() {
     client.put('/wallet', { address: '', network: 'trc20' }).then(() => {
       setWallet(null);
       toast.success(t('wallet.unbound'));
-    });
+    }).catch(() => toast.error(t('common.operationFailed')));
   };
 
   const currentNet = NETWORKS.find(n => n.id === (wallet?.network || 'trc20'));
   const [taskBal, setTaskBal] = useState({ available: 0, total: 0 });
   useEffect(() => {
-    client.get('/tasks/balance').then(({ data }) => setTaskBal({ available: data.available || 0, total: data.total || 0 })).catch(() => {});
+    client.get('/tasks/balance').then(({ data }) => setTaskBal({ available: data.available || 0, total: data.total || 0 })).catch(() => toast.error(t('common.loadingFailed')));
   }, [claims]);
   const giftEarned = claims.filter(c => c.status !== 'rejected').reduce((s, c) => s + (c.value || 0), 0);
   const giftDelivered = claims.filter(c => c.status === 'delivered').reduce((s, c) => s + (c.value || 0), 0);
@@ -100,8 +100,7 @@ export default function WalletPage() {
             )}
           </div>
           <p className="text-white/40 text-[12px] font-medium uppercase tracking-[0.15em] mb-1">{t('mine.totalEarned')}</p>
-          <p className="text-4xl font-black tracking-tight mb-1 break-text">${totalEarned.toFixed(0)}</p>
-          <p className="text-white/40 text-[12px]">≈ {totalEarned > 0 ? (totalEarned / 7.2).toFixed(2) : '0.00'} USDT</p>
+          <p className="text-4xl font-black tracking-tight mb-1 break-text">${totalEarned.toFixed(2)}</p>
           <div className="flex gap-4 mt-5 pt-4 border-t border-white/10">
             <div className="flex-1">
               <p className="text-white/40 text-[12px] uppercase tracking-wider">{t('wallet.deliveredLabel')}</p>

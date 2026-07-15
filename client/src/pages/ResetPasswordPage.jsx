@@ -13,14 +13,14 @@ export default function ResetPasswordPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.email || !form.phone || !form.newPassword) { toast.error('请填写所有字段'); return; }
-    if (form.newPassword.length < 6) { toast.error('密码至少6位'); return; }
+    if (!form.email || !form.phone || !form.newPassword) { toast.error(t('auth.fillRequired')); return; }
+    if (form.newPassword.length < 8) { toast.error(t('auth.passMinLength')); return; }
     setLoading(true);
     try {
       await client.post('/auth/reset-password', form);
       setDone(true);
-      toast.success('密码重置成功');
-    } catch (err) { toast.error(err.response?.data?.error || '重置失败'); }
+      toast.success(t('auth.resetDone'));
+    } catch (err) { toast.error(err.response?.data?.error || t('auth.resetFailed')); }
     finally { setLoading(false); }
   };
 

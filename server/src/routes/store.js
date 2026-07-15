@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/auth');
-const { get, all, run, insert } = require('../db/database');
+const { get, all, run, insert, tx } = require('../db/database');
 
 const router = Router();
 router.use(authMiddleware);
@@ -14,8 +14,9 @@ const TIERS = {
 };
 
 // Product profit formula (shared with frontend)
-const COST_RATE = 0.8;    // 进货价 = 市场价 × 80%
-const PROFIT_RATE = 0.08; // 利润 = 市场价 × 8%
+// cost + profit = price × 100% — no money vanishes
+const COST_RATE = 0.85;   // 进货价 = 市场价 × 85%
+const PROFIT_RATE = 0.15; // 利润 = 市场价 × 15%
 
 function calcProduct(productPrice) {
   const cost = Math.round(productPrice * COST_RATE * 100) / 100;
@@ -163,54 +164,69 @@ router.post('/orders/process', async (req, res) => {
   // Product-based pricing
   const { cost, profit, totalReturn } = calcProduct(productPrice);
 
-  // Check balance against actual product cost
-  const taskBal = await get(
-    "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
-    [req.user.id, 'delivered']
-  );
-  const available = Number(taskBal?.total || 0);
+  // Transaction: balance check + FIFO deduction + order insert + return
+  const t = await tx();
+  try {
+    const taskBal = await t.get(
+      "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
+      [req.user.id, 'delivered']
+    );
+    const available = Number(taskBal?.total || 0);
 
-  if (available < cost) {
-    return res.status(400).json({
-      error: `余额不足！该商品进货价 $${cost}，当前可用 $${available.toFixed(2)}`,
-      need: cost, have: available
-    });
-  }
-
-  // Deduct product cost from balance (FIFO)
-  let remaining = cost;
-  const tasks = await all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC',
-    [req.user.id, 'delivered']);
-  for (const t of tasks) {
-    if (remaining <= 0) break;
-    const deduct = Math.min(Number(t.amount), remaining);
-    await run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', t.id]);
-    const rest = Number(t.amount) - deduct;
-    if (rest > 0.001) {
-      await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
-        [req.user.id, rest, 'bonus', 'delivered']);
+    if (available < cost) {
+      await t.rollback();
+      return res.status(400).json({
+        error: `余额不足！该商品进货价 $${cost}，当前可用 $${available.toFixed(2)}`,
+        need: cost, have: available
+      });
     }
-    remaining -= deduct;
+
+    // Deduct product cost from balance (FIFO)
+    let remaining = cost;
+    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC',
+      [req.user.id, 'delivered']);
+    for (const task of tasks) {
+      if (remaining <= 0) break;
+      const deduct = Math.min(Number(task.amount), remaining);
+      await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
+      const rest = Number(task.amount) - deduct;
+      if (rest > 0.001) {
+        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+          [req.user.id, rest, 'bonus', 'delivered']);
+      }
+      remaining -= deduct;
+    }
+
+    if (remaining > 0.001) {
+      await t.rollback();
+      return res.status(400).json({ error: '余额不足，进货失败' });
+    }
+
+    // Record the order (amount = profit earned)
+    const result = await t.insert(
+      "INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'done', NOW())",
+      [store.id, req.user.id, profit]
+    );
+
+    // Return cost + profit to balance
+    await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+      [req.user.id, totalReturn, 'bonus', 'delivered']);
+
+    await t.commit();
+
+    const left = Math.max(0, tier.dailyOrders - (Number(doneToday?.c || 0) + 1));
+
+    res.json({
+      id: result.id, cost, profit, totalReturn,
+      remaining: left,
+      totalDone: Number(doneToday?.c || 0) + 1,
+      dailyOrders: tier.dailyOrders,
+      tier: store.tier,
+    });
+  } catch (err) {
+    await t.rollback().catch(() => {});
+    throw err;
   }
-
-  // Record the order (amount = profit earned)
-  const result = await insert(
-    "INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'done', NOW())",
-    [store.id, req.user.id, profit]
-  );
-
-  // Return cost + profit to balance
-  await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
-    [req.user.id, totalReturn, 'bonus', 'delivered']);
-
-  const left = Math.max(0, tier.dailyOrders - (Number(doneToday?.c || 0) + 1));
-
-  res.json({
-    id: result.id, cost, profit, totalReturn,
-    remaining: left,
-    totalDone: Number(doneToday?.c || 0) + 1,
-    dailyOrders: tier.dailyOrders,
-    tier: store.tier,
   });
 });
 

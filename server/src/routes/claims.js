@@ -3,11 +3,12 @@ const authMiddleware = require('../middleware/auth');
 const giftModel = require('../models/gift');
 const userGiftModel = require('../models/userGift');
 const invitationModel = require('../models/invitation');
+const { tx } = require('../db/database');
 
 const router = Router();
 router.use(authMiddleware);
 
-// POST /api/claims - claim a gift
+// POST /api/claims - claim a gift (transaction-protected)
 router.post('/', async (req, res) => {
   const { gift_id } = req.body;
   if (!gift_id) {
@@ -19,12 +20,7 @@ router.post('/', async (req, res) => {
     return res.status(404).json({ error: '礼物不存在或已下架' });
   }
 
-  // Check stock
-  if (gift.stock === 0) {
-    return res.status(400).json({ error: '该礼物已被领完' });
-  }
-
-  // Check eligibility
+  // Check eligibility (read-only, outside tx)
   const { effective } = await invitationModel.getEffectiveCount(req.user.id);
   if (effective < gift.required_invites) {
     return res.status(400).json({
@@ -34,21 +30,36 @@ router.post('/', async (req, res) => {
     });
   }
 
-  // Check duplicate
-  const existing = await userGiftModel.findByUserAndGift(req.user.id, gift.id);
-  if (existing) {
-    return res.status(409).json({ error: '您已领取过该礼物' });
+  // Transaction: stock check + duplicate check + create + stock decrement
+  const t = await tx();
+  try {
+    // Re-read gift within transaction for stock check
+    const g = await t.get('SELECT * FROM gifts WHERE id = ?', [gift.id]);
+    if (!g || !g.is_active) { await t.rollback(); return res.status(404).json({ error: '礼物不存在或已下架' }); }
+    if (g.stock === 0) { await t.rollback(); return res.status(400).json({ error: '该礼物已被领完' }); }
+
+    // Check duplicate within transaction
+    const existing = await t.get('SELECT id FROM user_gifts WHERE user_id = ? AND gift_id = ?',
+      [req.user.id, gift.id]);
+    if (existing) { await t.rollback(); return res.status(409).json({ error: '您已领取过该礼物' }); }
+
+    // Create claim
+    const result = await t.insert(
+      'INSERT INTO user_gifts (user_id, gift_id, status) VALUES (?, ?, ?)',
+      [req.user.id, gift.id, 'pending']);
+
+    // Decrement stock if limited
+    if (g.stock > 0) {
+      await t.run('UPDATE gifts SET stock = stock - 1 WHERE id = ? AND stock > 0', [gift.id]);
+    }
+
+    await t.commit();
+    require('./notifications').notify(req.user.id, '🎁 领取成功', `已领取: ${g.name}`, 'success');
+    res.status(201).json({ id: result.id, gift_id: gift.id, status: 'pending' });
+  } catch (err) {
+    await t.rollback().catch(() => {});
+    throw err;
   }
-
-  // Create claim
-  const claim = await userGiftModel.create(req.user.id, gift.id);
-
-  // Decrement stock if limited
-  if (gift.stock > 0) {
-    await giftModel.update(gift.id, { stock: gift.stock - 1 });
-  }
-
-  res.status(201).json(claim);
 });
 
 // GET /api/claims - list user's claims

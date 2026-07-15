@@ -96,7 +96,7 @@ export default function TasksPage() {
             </div>
             <button onClick={doCheckin} disabled={balance.checkedToday || submitting}
               className={`w-full py-3 rounded-xl text-[13px] font-bold ${balance.checkedToday ? 'bg-bg text-text-muted' : 'bg-gradient-to-r from-amber-400 to-amber-500 text-white active:scale-[0.98]'}`}>
-              {balance.checkedToday ? `✅ ${t('tasks.checkedIn')}` : `${t('tasks.checkinNow')} +$${0.1}`}
+              {balance.checkedToday ? `✅ ${t('tasks.checkedIn')}` : `${t('tasks.checkinNow')} +$${balance.nextCheckinReward || 0.1}`}
             </button>
           </div>
         </div>
@@ -144,7 +144,7 @@ export default function TasksPage() {
                 <svg className="w-[80px] h-[80px] -rotate-90" viewBox="0 0 80 80">
                   <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="7" />
                   <circle cx="40" cy="40" r="34" fill="none" stroke="#FFB800" strokeWidth="7" strokeLinecap="round"
-                    strokeDasharray={`${Math.min(214, (effective / Math.max(...gifts.map(g => g.required_invites), 1)) * 214)} 214`} />
+                    strokeDasharray={`${Math.min(214, (effective / Math.max(1, ...gifts.map(g => g.required_invites))) * 214)} 214`} />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-xl font-black">{effective}</span>

@@ -41,12 +41,21 @@
     "placeholderConfirm": "Confirma tu contrase帽a",
     "placeholderName": "Elige un apodo",
     "placeholderReferral": "Ingresa c贸digo si tienes uno",
-    "passMinLength": "La contrase帽a debe tener al menos 6 caracteres",
+    "passMinLength": "La contrase帽a debe tener al menos 8 caracteres",
     "passNotMatch": "Las contrase帽as no coinciden",
     "fillRequired": "Completa todos los campos obligatorios",
     "loginSuccess": "隆Inicio de sesi贸n exitoso!",
     "registerSuccess": "隆Registro exitoso!",
-    "invalidCode": "C贸digo de invitaci贸n inv谩lido"
+    "invalidCode": "C贸digo de invitaci贸n inv谩lido",
+    "resetTitle": "Restablecer contrase帽a",
+    "resetDesc": "Verifica tu correo y tel茅fono para establecer una nueva contrase帽a",
+    "newPassword": "Nueva contrase帽a",
+    "placeholderNewPass": "Ingresa nueva contrase帽a (m铆n 8 caracteres)",
+    "forgotPassword": "驴Olvidaste tu contrase帽a?",
+    "resetBtn": "Restablecer contrase帽a",
+    "resetDone": "Contrase帽a restablecida con 茅xito",
+    "resetDoneDesc": "Inicia sesi贸n con tu nueva contrase帽a",
+    "resetFailed": "Error al restablecer la contrase帽a"
   },
   "gifts": {
     "title": "Cat谩logo de regalos",
@@ -173,54 +182,12 @@
     }
   },
   "giftData": {
-    "鏂颁汉绾㈠寘": {
-      "name": "Bono Principiante",
-      "desc": "Invita 1 amigo para reclamar esta recompensa"
-    },
-    "鍒濈骇绾㈠寘": {
-      "name": "Recompensa Bronce",
-      "desc": "Invita 5 amigos - 隆vas empezando!"
-    },
-    "涓骇绾㈠寘": {
-      "name": "Recompensa Plata",
-      "desc": "Invita 15 amigos - 隆sigue as铆!"
-    },
-    "楂樼骇绾㈠寘": {
-      "name": "Recompensa Oro",
-      "desc": "Invita 50 amigos - 隆eres un experto!"
-    },
-    "椤剁骇绾㈠寘": {
-      "name": "Recompensa Diamante",
-      "desc": "Invita 150 amigos - 隆nivel 茅lite!"
-    },
-    "鑷冲皧澶у": {
-      "name": "Premio Legendario",
-      "desc": "Invita 500 amigos - 隆estatus legendario!"
-    },
-    "新人红包": {
-      "name": "Newcomer Bonus",
-      "desc": "Invite 1 friend to claim this newcomer reward"
-    },
-    "初级红包": {
-      "name": "Bronze Reward",
-      "desc": "Invite 5 friends - you're getting started!"
-    },
-    "中级红包": {
-      "name": "Silver Reward",
-      "desc": "Invite 15 friends - keep the momentum!"
-    },
-    "高级红包": {
-      "name": "Gold Reward",
-      "desc": "Invite 50 friends - true hustler status!"
-    },
-    "顶级红包": {
-      "name": "Diamond Reward",
-      "desc": "Invite 150 friends - elite tier achieved!"
-    },
-    "至尊大奖": {
-      "name": "Legendary Jackpot",
-      "desc": "Invite 500 friends - legendary status!"
-    }
+    "新人红包": { "name": "Bono Principiante", "desc": "Invita 1 amigo para reclamar esta recompensa" },
+    "初级红包": { "name": "Recompensa Bronce", "desc": "Invita 5 amigos - ¡vas empezando!" },
+    "中级红包": { "name": "Recompensa Plata", "desc": "Invita 15 amigos - ¡sigue así!" },
+    "高级红包": { "name": "Recompensa Oro", "desc": "Invita 50 amigos - ¡eres un experto!" },
+    "顶级红包": { "name": "Recompensa Diamante", "desc": "Invita 150 amigos - ¡nivel élite!" },
+    "至尊大奖": { "name": "Premio Legendario", "desc": "Invita 500 amigos - ¡estatus legendario!" }
   },
   "home": {
     "greeting": "Hola",
@@ -581,7 +548,7 @@
   },
   "sec": {
     "fillAll": "Completa todos los campos",
-    "passLength": "M铆nimo 6 caracteres",
+    "passLength": "M铆nimo 8 caracteres",
     "passMismatch": "Las contrase帽as no coinciden",
     "passChanged": "Contrase帽a cambiada",
     "enterPass": "Ingresa tu contrase帽a",
@@ -594,7 +561,7 @@
     "changePassword": "Cambiar contrase帽a",
     "changePasswordHint": "Recomendamos cambiarla regularmente",
     "oldPassword": "Contrase帽a actual",
-    "newPassword": "Nueva contrase帽a (m铆n 6)",
+    "newPassword": "Nueva contrase帽a (m铆n 8 caracteres)",
     "confirmNewPassword": "Confirmar nueva contrase帽a",
     "changeContact": "Actualizar email / tel茅fono",
     "changeContactHint": "Actualiza tu informaci贸n de contacto",

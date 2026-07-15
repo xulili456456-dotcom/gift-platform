@@ -11,12 +11,14 @@ router.get('/eligible', authMiddleware, async (req, res) => {
   const gifts = await giftModel.list(true);
   const { effective } = await invitationModel.getEffectiveCount(req.user.id);
 
-  const eligible = gifts.filter(g => {
-    if (!g.is_active) return false;
-    if (g.required_invites > effective) return false;
-    const existing = userGiftModel.findByUserAndGift(req.user.id, g.id);
-    return !existing;
-  });
+  // Properly await each check
+  const eligible = [];
+  for (const g of gifts) {
+    if (!g.is_active) continue;
+    if (g.required_invites > effective) continue;
+    const existing = await userGiftModel.findByUserAndGift(req.user.id, g.id);
+    if (!existing) eligible.push(g);
+  }
 
   res.json({ eligible, effective_invites: effective });
 });

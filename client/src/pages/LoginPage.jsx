@@ -20,7 +20,7 @@ export default function LoginPage() {
     try {
       await login(email, password);
       toast.success(t('auth.loginSuccess'));
-      navigate('/gifts', { replace: true });
+      navigate('/home', { replace: true });
     } catch (err) {
       toast.error(err.response?.data?.error || t('common.operationFailed'));
     } finally {

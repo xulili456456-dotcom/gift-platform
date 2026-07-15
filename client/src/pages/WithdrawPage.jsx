@@ -19,7 +19,7 @@ export default function WithdrawPage() {
   const [taskBalance, setTaskBalance] = useState({ available: 0, total: 0 });
   const [loading, setLoading] = useState(true);
   const [wallet, setWallet] = useState(null);
-  useEffect(() => { client.get('/wallet').then(({ data }) => data && setWallet(data)).catch(() => {}); }, []);
+  useEffect(() => { client.get('/wallet').then(({ data }) => data && setWallet(data)).catch(() => toast.error(t('common.loadingFailed'))); }, []);
   const [withdrawals, setWithdrawals] = useState([]);
   const [amount, setAmount] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -27,7 +27,7 @@ export default function WithdrawPage() {
   const loadData = () => {
     Promise.all([claimsApi.list(), client.get('/tasks/balance'), client.get('/withdrawals').catch(() => ({ data: [] }))])
       .then(([c, b, w]) => { setClaims(c.data); setTaskBalance(b.data); setWithdrawals(w.data || []); })
-      .catch(() => {})
+      .catch(() => toast.error(t('common.loadingFailed')))
       .finally(() => setLoading(false));
   };
   useEffect(() => { loadData(); window.addEventListener('taskEarning', loadData); return () => window.removeEventListener('taskEarning', loadData); }, []);

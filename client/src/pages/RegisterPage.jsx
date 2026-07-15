@@ -20,12 +20,12 @@ export default function RegisterPage() {
     e.preventDefault();
     if (!form.email || !form.phone || !form.password) { toast.error(t('auth.fillRequired')); return; }
     if (form.password !== form.confirmPassword) { toast.error(t('auth.passNotMatch')); return; }
-    if (form.password.length < 6) { toast.error(t('auth.passMinLength')); return; }
+    if (form.password.length < 8) { toast.error(t('auth.passMinLength')); return; }
     setLoading(true);
     try {
       await register({ email: form.email, phone: form.phone, password: form.password, name: form.name, referral_code: form.referral_code || undefined });
       toast.success(t('auth.registerSuccess'));
-      navigate('/gifts', { replace: true });
+      navigate('/home', { replace: true });
     } catch (err) {
       toast.error(err.response?.data?.error || t('common.operationFailed'));
     } finally { setLoading(false); }

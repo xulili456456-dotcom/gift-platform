@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS user_gifts (
 );
 CREATE INDEX IF NOT EXISTS idx_user_gifts_user ON user_gifts(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_gifts_status ON user_gifts(status);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_user_gifts_uniq ON user_gifts(user_id, gift_id);
 
 -- KYC submissions
 CREATE TABLE IF NOT EXISTS kyc_submissions (

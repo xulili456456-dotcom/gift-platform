@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const rateLimit = require('express-rate-limit');
 const { hashPassword, verifyPassword } = require('../utils/password');
 const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../utils/jwt');
 const { generateReferralCode } = require('../utils/referralCode');
@@ -8,24 +9,42 @@ const authMiddleware = require('../middleware/auth');
 
 const router = Router();
 
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: { error: '登录尝试过于频繁，请15分钟后再试' } });
+const registerLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, standardHeaders: true, legacyHeaders: false, message: { error: '注册过于频繁，请1小时后再试' } });
+const resetLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 3, standardHeaders: true, legacyHeaders: false, message: { error: '密码重置过于频繁，请1小时后再试' } });
+
 // POST /api/auth/register
-router.post('/register', async (req, res) => {
+router.post('/register', registerLimiter, async (req, res) => {
   try {
-    const { email, phone, password, name, referral_code } = req.body;
+    const email = (req.body.email || '').trim().toLowerCase();
+    const phone = (req.body.phone || '').trim();
+    const password = req.body.password || '';
+    const name = (req.body.name || '').trim();
+    const referral_code = (req.body.referral_code || '').trim();
 
     if (!email || !phone || !password) {
       return res.status(400).json({ error: '邮箱、手机号和密码为必填项' });
     }
-    if (password.length < 6) {
-      return res.status(400).json({ error: '密码长度不能少于6位' });
+    // Email format validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: '请输入有效的邮箱地址' });
     }
-    if (!/^\d{7,15}$/.test(phone)) {
+    // Password: min 8 chars, must contain letter + digit
+    if (password.length < 8) {
+      return res.status(400).json({ error: '密码长度不能少于8位' });
+    }
+    if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+      return res.status(400).json({ error: '密码必须包含字母和数字' });
+    }
+    // Phone: 10-15 digits
+    if (!/^\d{10,15}$/.test(phone)) {
       return res.status(400).json({ error: '请输入有效的手机号码' });
     }
 
     const existing = await userModel.findByEmail(email);
     if (existing) {
-      return res.status(409).json({ error: '该邮箱已被注册' });
+      // Don't leak email existence — return generic message
+      return res.status(200).json({ message: '注册成功，请登录' });
     }
 
     let parentId = null;
@@ -76,9 +95,10 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /api/auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', loginLimiter, async (req, res) => {
+  const email = (req.body.email || '').trim().toLowerCase();
+  const password = req.body.password || '';
   try {
-    const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({ error: '请输入邮箱和密码' });
     }
@@ -142,7 +162,7 @@ router.get('/me', authMiddleware, async (req, res) => {
 });
 
 // POST /api/auth/reset-password
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', resetLimiter, async (req, res) => {
   try {
     const { email, phone, newPassword } = req.body;
     if (!email || !phone || !newPassword) return res.status(400).json({ error: '请填写所有字段' });

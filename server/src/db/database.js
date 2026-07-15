@@ -104,4 +104,45 @@ async function exec(sql) {
   await getPool().query(sql);
 }
 
-module.exports = { getDb, saveDb, closeDb, run, insert, all, get, exec };
+/**
+ * Begin a database transaction.
+ * Returns { run, insert, all, get, commit, rollback } operating on a single client.
+ */
+async function tx() {
+  const client = await getPool().connect();
+  await client.query('BEGIN');
+
+  const txRun = async (sql, params = []) => {
+    const [s, p] = toPg(sql, params);
+    const result = await client.query(s, p);
+    return { changes: result.rowCount ?? 0 };
+  };
+  const txInsert = async (sql, params = []) => {
+    const modified = toPgInsert(sql);
+    const [s, p] = toPg(modified, params);
+    const result = await client.query(s, p);
+    return { id: result.rows?.[0]?.id ?? null, changes: result.rowCount ?? 0 };
+  };
+  const txAll = async (sql, params = []) => {
+    const [s, p] = toPg(sql, params);
+    const result = await client.query(s, p);
+    return result.rows;
+  };
+  const txGet = async (sql, params = []) => {
+    const [s, p] = toPg(sql, params);
+    const result = await client.query(s, p);
+    return result.rows.length > 0 ? result.rows[0] : null;
+  };
+  const commit = async () => {
+    await client.query('COMMIT');
+    client.release();
+  };
+  const rollback = async () => {
+    await client.query('ROLLBACK');
+    client.release();
+  };
+
+  return { run: txRun, insert: txInsert, all: txAll, get: txGet, commit, rollback };
+}
+
+module.exports = { getDb, saveDb, closeDb, run, insert, all, get, exec, tx };

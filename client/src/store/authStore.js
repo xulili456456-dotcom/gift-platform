@@ -12,7 +12,7 @@ const useAuthStore = create((set, get) => ({
     const { data } = await authApi.login(email, password);
     localStorage.setItem('access_token', data.access_token);
     localStorage.setItem('refresh_token', data.refresh_token);
-    set({ user: data.user, isAuthenticated: true });
+    set({ user: data.user, isAuthenticated: true, isLoading: false });
     return data.user;
   },
 
@@ -20,7 +20,7 @@ const useAuthStore = create((set, get) => ({
     const { data } = await authApi.register(formData);
     localStorage.setItem('access_token', data.access_token);
     localStorage.setItem('refresh_token', data.refresh_token);
-    set({ user: data.user, isAuthenticated: true });
+    set({ user: data.user, isAuthenticated: true, isLoading: false });
     return data.user;
   },
 

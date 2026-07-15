@@ -1,54 +1,112 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
-const { get, insert, run, all } = require('../db/database');
+const { get, insert, run, all, tx } = require('../db/database');
 
 const router = Router();
 
 const PLANS = {
   basic: { amount: 10, days: 30, bonus: 1.5 },
-  pro: { amount: 50, days: 30, bonus: 2.0 },
-  max: { amount: 200, days: 30, bonus: 3.0 },
+  pro:   { amount: 50, days: 30, bonus: 2.0 },
+  max:   { amount: 200, days: 30, bonus: 3.0 },
 };
 
-// GET /api/staking - my stake
+// GET /api/staking - my active stake
 router.get('/', authMiddleware, async (req, res) => {
   const s = await get('SELECT * FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  res.json(s || null);
+  if (!s) return res.json(null);
+  const daysLeft = Math.max(0, Math.ceil((new Date(s.unlock_at) - Date.now()) / 86400000));
+  res.json({ ...s, daysLeft, bonusMultiplier: PLANS[s.plan_id]?.bonus || 1.5 });
 });
 
-// POST /api/staking - lock stake
+// POST /api/staking - lock stake (deduct from balance)
 router.post('/', authMiddleware, async (req, res) => {
-  const { plan_id, amount } = req.body;
+  const { plan_id } = req.body;
   const plan = PLANS[plan_id];
-  const amt = plan ? plan.amount : (parseFloat(amount) || 0);
-  const bonus = plan ? plan.bonus : 1.5;
-  const days = 30;
-
-  if (!amt || isNaN(amt) || amt < 10) return res.status(400).json({ error: '最低锁仓金额为 $10' });
+  if (!plan) return res.status(400).json({ error: '请选择质押方案: basic/pro/max' });
 
   const existing = await get('SELECT id FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (existing) return res.status(400).json({ error: 'already staking' });
+  if (existing) return res.status(400).json({ error: '您已有活跃质押，请先解锁' });
 
-  const unlockAt = new Date(Date.now() + days * 86400000).toISOString();
-  const result = await insert(
-    'INSERT INTO stakes (user_id, amount, plan_id, bonus, unlock_at) VALUES (?, ?, ?, ?, ?)',
-    [req.user.id, amt, plan_id || 'custom', bonus, unlockAt]
-  );
-  res.status(201).json({ id: result.id, amount: amt, bonus, unlockAt, status: 'active' });
+  const t = await tx();
+  try {
+    // Check balance
+    const taskBal = await t.get(
+      "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
+      [req.user.id, 'delivered']);
+    const available = Number(taskBal?.total || 0);
+
+    if (available < plan.amount) {
+      await t.rollback();
+      return res.status(400).json({ error: `余额不足！需要 $${plan.amount}，当前可用 $${available.toFixed(2)}` });
+    }
+
+    // Deduct from balance (FIFO)
+    let remaining = plan.amount;
+    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC',
+      [req.user.id, 'delivered']);
+    for (const task of tasks) {
+      if (remaining <= 0) break;
+      const deduct = Math.min(Number(task.amount), remaining);
+      await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
+      const rest = Number(task.amount) - deduct;
+      if (rest > 0.001) {
+        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+          [req.user.id, rest, 'bonus', 'delivered']);
+      }
+      remaining -= deduct;
+    }
+
+    if (remaining > 0.001) {
+      await t.rollback();
+      return res.status(400).json({ error: '余额不足，质押失败' });
+    }
+
+    // Create stake record
+    const unlockAt = new Date(Date.now() + plan.days * 86400000).toISOString();
+    const result = await t.insert(
+      'INSERT INTO stakes (user_id, amount, plan_id, bonus, unlock_at) VALUES (?, ?, ?, ?, ?)',
+      [req.user.id, plan.amount, plan_id, plan.bonus, unlockAt]
+    );
+
+    await t.commit();
+    require('./notifications').notify(req.user.id, '🔒 质押成功',
+      `已质押 $${plan.amount}，${plan.days}天后解锁，${plan.bonus}x收益`, 'success');
+    res.status(201).json({ id: result.id, amount: plan.amount, bonus: plan.bonus, unlockAt, status: 'active' });
+  } catch (err) {
+    await t.rollback().catch(() => {});
+    throw err;
+  }
 });
 
-// POST /api/staking/unlock - force unlock
+// POST /api/staking/unlock - unlock stake (return balance minus penalty)
 router.post('/unlock', authMiddleware, async (req, res) => {
   const s = await get('SELECT * FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (!s) return res.status(400).json({ error: 'no active stake' });
+  if (!s) return res.status(400).json({ error: '没有活跃质押' });
 
-  const daysLeft = Math.ceil((new Date(s.unlock_at) - Date.now()) / 86400000);
-  const penalty = daysLeft > 0 ? Number((s.amount * 0.2).toFixed(0)) : 0;
-  const refund = s.amount;
+  const t = await tx();
+  try {
+    const daysLeft = Math.max(0, Math.ceil((new Date(s.unlock_at) - Date.now()) / 86400000));
+    const penalty = daysLeft > 0 ? Math.round(s.amount * 0.2 * 100) / 100 : 0;
+    const refund = Math.round((s.amount - penalty) * 100) / 100;
 
-  await run('DELETE FROM stakes WHERE id = ?', [s.id]);
-  res.json({ refund, penalty, amount: s.amount });
+    // Return refund to balance
+    if (refund > 0) {
+      await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+        [req.user.id, refund, 'bonus', 'delivered']);
+    }
+
+    // Update status instead of deleting
+    await t.run("UPDATE stakes SET status = 'unlocked' WHERE id = ?", [s.id]);
+
+    await t.commit();
+    require('./notifications').notify(req.user.id, '🔓 质押已解锁',
+      `返还 $${refund}${penalty > 0 ? ` (罚金 $${penalty})` : ''}`, 'success');
+    res.json({ refund, penalty, amount: s.amount, daysLeft });
+  } catch (err) {
+    await t.rollback().catch(() => {});
+    throw err;
+  }
 });
 
 // === Admin ===

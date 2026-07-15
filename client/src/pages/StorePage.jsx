@@ -4,8 +4,8 @@ import client from '../api/client';
 import { Crown, ShoppingCart, X, Flame, Store, Search, Star, ChevronRight, ChevronLeft, Truck, Shield, RotateCcw, BadgePercent } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const COST_RATE = 0.8;    // 进货价 = 市场价 × 80%
-const PROFIT_RATE = 0.08; // 利润 = 市场价 × 8%
+const COST_RATE = 0.85;    // 进货价 = 市场价 × 85%
+const PROFIT_RATE = 0.15; // 利润 = 市场价 × 15%
 
 const TIER_INFO = {
   small:  { nameKey: 'store.small',  daily: 10, color: '#F59E0B', tag: 'Lv.1' },
@@ -350,7 +350,7 @@ export default function StorePage() {
     return genProducts(status.store.tier, category, search);
   }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, category, search]);
 
-  const handleOpen = async () => { /* same */ setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success('开店成功！'); } catch (err) { toast.error(err.response?.data?.error || '操作失败'); } finally { setOpening(false); } };
+  const handleOpen = async () => { /* same */ setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || '操作失败'); } finally { setOpening(false); } };
   const handleBuy = async (product) => {
     setProcessingProduct(product);
     setShowProcess(true);
@@ -364,12 +364,12 @@ export default function StorePage() {
       toast.error(err.response?.data?.error || '操作失败');
     }
   };
-  const handleClose = async () => { if (!confirm('确定关店？')) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success('已关店'); } catch (err) { toast.error(err.response?.data?.error || '操作失败'); } };
+  const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success('已关店'); } catch (err) { toast.error(err.response?.data?.error || '操作失败'); } };
   if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" /></div>;
   if (!status?.hasStore) return (
     <div className="min-h-screen bg-bg safe-top safe-bottom flex flex-col items-center justify-center px-6 text-center">
       <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#FF6B00] to-[#FFB800] flex items-center justify-center mb-4 shadow-xl"><Store size={36} className="text-white" /></div>
-      <h1 className="text-2xl font-black text-text mb-2">电商</h1><p className="text-sm text-text-muted mb-6">免费开店 · 选品进货 · 卖出赚差价</p>
+      <h1 className="text-2xl font-black text-text mb-2">{t('store.title')}</h1><p className="text-sm text-text-muted mb-6">{t('store.subtitle')}</p>
       <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-gradient-to-r from-[#FF6B00] to-[#FFB800] text-white font-bold rounded-2xl shadow-xl shadow-orange-500/25 active:scale-[0.98] transition-all text-base">{opening ? '...' : '免费开店'}</button>
     </div>
   );
@@ -453,7 +453,7 @@ export default function StorePage() {
           </div>
           <button onClick={() => handleBuy(p)} disabled={s.balance < p.costPrice || s.remaining <= 0}
             className={`px-8 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-gray-300 text-gray-500' : 'bg-[#FFD814] hover:bg-[#F7CA00] text-gray-900 shadow-md active:scale-95'} transition-all`}>
-            {s.remaining <= 0 ? '今日已满' : s.balance < p.costPrice ? '余额不足' : '立即进货'}
+            {s.remaining <= 0 ? t('store.dailyFull') : s.balance < p.costPrice ? t('store.insufficient') : t('store.buyNow')}
           </button>
         </div>
 
@@ -498,7 +498,7 @@ export default function StorePage() {
       {/* Product list */}
       <div className="flex-1 overflow-y-auto native-scroll" style={{paddingBottom:'100px'}}>
         <div className="px-4 py-2 text-[11px] text-gray-500 flex justify-between">
-          <span>{products.length} 件</span>
+          <span>{products.length} {t('store.items')}</span>
           {/* Affordability checked per-product on buttons */}
         </div>
         {products.map(p => (
@@ -522,12 +522,12 @@ export default function StorePage() {
                   onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
                   disabled={s.balance < p.costPrice || s.remaining <= 0}
                   className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold active:scale-95 ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-gray-300 text-gray-500' : 'bg-[#FFD814] text-gray-900'}`}
-                >{s.remaining <= 0 ? '今日已满' : s.balance < p.costPrice ? '余额不足' : '进货'}</button>
+                >{s.remaining <= 0 ? t('store.dailyFull') : s.balance < p.costPrice ? t('store.insufficient') : t('store.buy')}</button>
               </div>
             </div>
           </div>
         ))}
-        {products.length === 0 && <div className="text-center py-16 text-gray-400 text-sm"><Search size={32} className="mx-auto mb-3 opacity-30" />{search ? '无匹配商品' : '暂无商品'}</div>}
+        {products.length === 0 && <div className="text-center py-16 text-gray-400 text-sm"><Search size={32} className="mx-auto mb-3 opacity-30" />{search ? t('store.noMatch') : t('store.noProducts')}</div>}
       </div>
 
       {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); }} />}

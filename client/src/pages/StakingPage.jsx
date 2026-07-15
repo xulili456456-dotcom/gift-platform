@@ -32,7 +32,7 @@ export default function StakingPage() {
   const loadData = () => {
     Promise.all([referralApi.getStats(), client.get('/staking').catch(()=>({data:null})), client.get('/tasks/balance').catch(()=>({data:{total:0}}))])
       .then(([s, st, b]) => { setBalance(b.data?.total||0); setStake(st.data); })
-      .catch(()=>{})
+      .catch(() => toast.error(t('common.loadingFailed')))
       .finally(()=>setLoading(false));
   };
   useEffect(() => { loadData(); }, []);
