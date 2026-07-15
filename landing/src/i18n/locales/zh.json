@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Gift Haven",
+    "name": "Shopee Shopping Operations",
     "slogan": "电商任务赚钱平台 — 连接全球电商，让每一笔交易都有你的收益",
     "cta_register": "立即注册开始赚钱",
     "cta_download": "下载App",
@@ -16,7 +16,7 @@
   },
   "hero": {
     "title": "Amazon · Shopee · Lazada\n你接任务，平台出货，你赚差价",
-    "subtitle": "不需要囤货、不需要发货、不需要客服。在 Gift Haven 接电商任务，从全球顶级平台选品分销，每一单都是纯利润。",
+    "subtitle": "不需要囤货、不需要发货、不需要客服。在 Shopee Shopping Operations 接电商任务，从全球顶级平台选品分销，每一单都是纯利润。",
     "badge": "🔥 已连接 Amazon、Shopee、Lazada、AliExpress 等 20+ 全球平台"
   },
   "stats": {
@@ -120,7 +120,7 @@
   "download": {
     "label": "下载App",
     "title": "随时随地，轻松赚钱",
-    "desc": "下载 Gift Haven App，享受更流畅的体验。支持Android设备。",
+    "desc": "下载 Shopee Shopping Operations App，享受更流畅的体验。支持Android设备。",
     "version": "版本 1.0.0",
     "size": "约 15MB",
     "features_title": "App 功能亮点",
@@ -143,7 +143,7 @@
   "about": {
     "label": "关于我们",
     "title": "连接全球电商，让每个人都能赚到电商的钱",
-    "desc": "Gift Haven 成立于2024年，致力于打破传统电商的参与门槛——不需要开店、不需要囤货、不需要发货，每个人都能从全球电商交易中分一杯羹。",
+    "desc": "Shopee Shopping Operations 成立于2024年，致力于打破传统电商的参与门槛——不需要开店、不需要囤货、不需要发货，每个人都能从全球电商交易中分一杯羹。",
     "mission_title": "我们的使命",
     "mission": "对接 Amazon、Shopee、Lazada 等全球电商平台的交易数据，将每一笔订单转化为可分配的任务，让普通人也能参与全球电商红利。",
     "vision_title": "我们的愿景",
@@ -172,7 +172,7 @@
       "tech": "技术相关"
     },
     "items": [
-      { "q": "Gift Haven 和 Amazon/Shopee 是什么关系？", "a": "我们对接了 Amazon、Shopee、Lazada、AliExpress 等 20+ 电商平台的商品数据和订单系统。平台上的每个任务都对应这些平台的真实商品——你做任务推广商品，有订单成交后，你赚取差价，平台和品牌方负责发货售后。", "cat": "platform" },
+      { "q": "Shopee Shopping Operations 和 Amazon/Shopee 是什么关系？", "a": "我们对接了 Amazon、Shopee、Lazada、AliExpress 等 20+ 电商平台的商品数据和订单系统。平台上的每个任务都对应这些平台的真实商品——你做任务推广商品，有订单成交后，你赚取差价，平台和品牌方负责发货售后。", "cat": "platform" },
       { "q": "我需要花钱进货吗？", "a": "完全不需要！我们是零库存模式。商品由平台/品牌方直接发货，你不需要进货、囤货、发货。你只需要接任务和推广链接。", "cat": "platform" },
       { "q": "平台是否免费？", "a": "完全免费！注册、接任务、推广全部免费。我们只在你有成交订单后才从差价中抽取少量平台服务费。", "cat": "platform" },
       { "q": "如何赚取收益？", "a": "主要有三种方式：1）接电商任务，推广 Amazon/Shopee 等平台商品赚差价；2）完成每日签到、浏览任务获取积分；3）邀请好友加入，享受团队分润。", "cat": "earning" },
@@ -192,14 +192,14 @@
     "button": "免费注册 — 开始赚第一笔差价"
   },
   "footer": {
-    "description": "Gift Haven — 连接全球顶级电商平台，让每个人都能从电商交易中赚钱。",
+    "description": "Shopee Shopping Operations — 连接全球顶级电商平台，让每个人都能从电商交易中赚钱。",
     "links": "快速链接",
     "legal": "法律信息",
     "terms": "服务条款",
     "privacy": "隐私政策",
     "contact": "联系我们",
     "email": "support@gifthaven.com",
-    "copyright": "© 2025 Gift Haven. All rights reserved."
+    "copyright": "© 2025 Shopee Shopping Operations. All rights reserved."
   },
   "common": {
     "language": "语言",

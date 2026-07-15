@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Gift Haven",
+    "name": "Shopee Shopping Operations",
     "slogan": "友達を招待して、タスクを完了して、報酬をゲット",
     "cta_register": "無料登録",
     "cta_download": "アプリをダウンロード",
@@ -16,7 +16,7 @@
   },
   "hero": {
     "title": "友達を招待して、報酬をゲット",
-    "subtitle": "タスクを完了して現金報酬を獲得し、プレミアムギフトと交換。Gift Havenでシェアするたびに価値が生まれます。",
+    "subtitle": "タスクを完了して現金報酬を獲得し、プレミアムギフトと交換。Shopee Shopping Operationsでシェアするたびに価値が生まれます。",
     "badge": "🔥 50万人以上のユーザーが参加中"
   },
   "stats": {
@@ -96,7 +96,7 @@
   "download": {
     "label": "ダウンロード",
     "title": "いつでもどこでも稼げる",
-    "desc": "Gift Havenアプリをダウンロードして最高の体験を。Android対応。",
+    "desc": "Shopee Shopping Operationsアプリをダウンロードして最高の体験を。Android対応。",
     "version": "バージョン 1.0.0",
     "size": "約15MB",
     "features_title": "アプリの特徴",
@@ -118,7 +118,7 @@
   "about": {
     "label": "会社概要",
     "title": "シェアに価値を",
-    "desc": "Gift Havenは2024年に設立され、誰もがシェアとタスク完了を通じて報酬を得られるプラットフォームを目指しています。",
+    "desc": "Shopee Shopping Operationsは2024年に設立され、誰もがシェアとタスク完了を通じて報酬を得られるプラットフォームを目指しています。",
     "mission_title": "私たちの使命",
     "mission": "シェアを通じて人と人との価値をつなぎ、すべての紹介を具体的な報酬に変えます。口コミは最も強力なマーケティングであり、シェアする人には報酬が与えられるべきです。",
     "vision_title": "私たちのビジョン",
@@ -142,7 +142,7 @@
       "tech": "技術"
     },
     "items": [
-      { "q": "Gift Havenとは？", "a": "Gift Havenは招待・タスクベースの報酬プラットフォームです。ユーザーは毎日のタスク完了と友達紹介でポイントと現金報酬を獲得します。", "cat": "platform" },
+      { "q": "Shopee Shopping Operationsとは？", "a": "Shopee Shopping Operationsは招待・タスクベースの報酬プラットフォームです。ユーザーは毎日のタスク完了と友達紹介でポイントと現金報酬を獲得します。", "cat": "platform" },
       { "q": "無料ですか？", "a": "完全無料です！登録、タスク、友達紹介すべて無料です。", "cat": "platform" },
       { "q": "どうやって報酬を得ますか？", "a": "主に2つの方法：1）毎日のタスクを完了する；2）友達を招待して最大3段階のコミッションを得る。", "cat": "earning" },
       { "q": "3段階コミッションとは？", "a": "あなたが招待した人（1段階）が報酬を得るとコミッションが入ります。その人が招待した人（2段階）と、さらにその人が招待した人（3段階）の報酬からもコミッションが得られます。", "cat": "earning" },
@@ -161,14 +161,14 @@
     "button": "無料登録 — ウェルカムボーナスを受け取る"
   },
   "footer": {
-    "description": "Gift Haven — シェアの価値をつなぎ、すべての努力に報いる。",
+    "description": "Shopee Shopping Operations — シェアの価値をつなぎ、すべての努力に報いる。",
     "links": "クイックリンク",
     "legal": "法的情報",
     "terms": "利用規約",
     "privacy": "プライバシーポリシー",
     "contact": "お問い合わせ",
     "email": "support@haolixiangsong.com",
-    "copyright": "© 2025 Gift Haven. All rights reserved."
+    "copyright": "© 2025 Shopee Shopping Operations. All rights reserved."
   },
   "common": {
     "language": "言語",

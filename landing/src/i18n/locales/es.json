@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Gift Haven",
+    "name": "Shopee Shopping Operations",
     "slogan": "Invita amigos, completa tareas, gana recompensas",
     "cta_register": "Regístrate Gratis",
     "cta_download": "Descargar App",
@@ -16,7 +16,7 @@
   },
   "hero": {
     "title": "Invita Amigos, Gana Premios",
-    "subtitle": "Completa tareas para ganar recompensas en efectivo y canjear regalos premium. Gift Haven hace que cada compartir sea gratificante.",
+    "subtitle": "Completa tareas para ganar recompensas en efectivo y canjear regalos premium. Shopee Shopping Operations hace que cada compartir sea gratificante.",
     "badge": "🔥 Más de 500,000 usuarios ya se unieron"
   },
   "stats": {
@@ -96,7 +96,7 @@
   "download": {
     "label": "Descargar",
     "title": "Gana en cualquier momento y lugar",
-    "desc": "Descarga la app Gift Haven para la mejor experiencia. Disponible para Android.",
+    "desc": "Descarga la app Shopee Shopping Operations para la mejor experiencia. Disponible para Android.",
     "version": "Versión 1.0.0",
     "size": "~15MB",
     "features_title": "Características",
@@ -118,7 +118,7 @@
   "about": {
     "label": "Sobre Nosotros",
     "title": "Haciendo que compartir sea gratificante",
-    "desc": "Gift Haven fue fundada en 2024 con la misión de crear una plataforma donde todos puedan ganar recompensas compartiendo y completando tareas.",
+    "desc": "Shopee Shopping Operations fue fundada en 2024 con la misión de crear una plataforma donde todos puedan ganar recompensas compartiendo y completando tareas.",
     "mission_title": "Nuestra Misión",
     "mission": "Conectar el valor entre las personas a través del compartir — convirtiendo cada recomendación en recompensas tangibles.",
     "vision_title": "Nuestra Visión",
@@ -142,7 +142,7 @@
       "tech": "Técnico"
     },
     "items": [
-      { "q": "¿Qué es Gift Haven?", "a": "Gift Haven es una plataforma de recompensas basada en invitaciones y tareas. Los usuarios ganan puntos y recompensas completando tareas diarias e invitando amigos.", "cat": "platform" },
+      { "q": "¿Qué es Shopee Shopping Operations?", "a": "Shopee Shopping Operations es una plataforma de recompensas basada en invitaciones y tareas. Los usuarios ganan puntos y recompensas completando tareas diarias e invitando amigos.", "cat": "platform" },
       { "q": "¿Es gratis?", "a": "¡Completamente gratis! Registro, tareas e invitaciones son totalmente gratuitos.", "cat": "platform" },
       { "q": "¿Cómo gano recompensas?", "a": "Principalmente: 1) Completando tareas diarias; 2) Invitando amigos con comisión de hasta 3 niveles.", "cat": "earning" },
       { "q": "¿Qué es la comisión de 3 niveles?", "a": "Ganas comisiones de las personas que invitas (Nivel 1), de quienes ellos invitan (Nivel 2) y de los invitados de estos (Nivel 3).", "cat": "earning" },
@@ -161,14 +161,14 @@
     "button": "Regístrate Gratis — Recibe tu Bono"
   },
   "footer": {
-    "description": "Gift Haven — Conectando el valor compartido, haciendo que cada esfuerzo sea gratificante.",
+    "description": "Shopee Shopping Operations — Conectando el valor compartido, haciendo que cada esfuerzo sea gratificante.",
     "links": "Enlaces Rápidos",
     "legal": "Legal",
     "terms": "Términos de Servicio",
     "privacy": "Política de Privacidad",
     "contact": "Contacto",
     "email": "support@haolixiangsong.com",
-    "copyright": "© 2025 Gift Haven. Todos los derechos reservados."
+    "copyright": "© 2025 Shopee Shopping Operations. Todos los derechos reservados."
   },
   "common": {
     "language": "Idioma",

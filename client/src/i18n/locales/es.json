@@ -747,7 +747,17 @@
     "month": "Mes",
     "total": "Total",
     "sports": "Deportes",
-    "auto": "Auto"
+    "auto": "Auto",
+    "all": "Todo",
+    "digital": "Digital",
+    "women": "Mujer",
+    "men": "Hombre",
+    "beauty": "Belleza",
+    "shoes": "Zapatos",
+    "home": "Hogar",
+    "accessories": "Accesorios",
+    "food": "Comida",
+    "toys": "Juguetes"
   },
   "specs": {
     "产地": "Origen",
