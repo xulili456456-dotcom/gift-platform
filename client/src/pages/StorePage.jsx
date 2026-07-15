@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import client from '../api/client';
-import { Crown, ShoppingCart, X, Flame, Store, Search, Star, ChevronRight, ChevronLeft, Truck, Shield, RotateCcw, BadgePercent } from 'lucide-react';
+import { Crown, ShoppingCart, X, Store, Search, Star, ChevronLeft, Truck, Shield, RotateCcw, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const COST_RATE = 0.85;    // 进货价 = 市场价 × 85%
@@ -331,7 +331,6 @@ function ProcessingModal({ product, onDone, t }) {
 
 export default function StorePage() {
   const { t, i18n } = useTranslation();
-  // Direct specs lookup (i18next dot notation unreliable with CJK keys)
   const tSpec = (k) => {
     const bundle = i18n.getResourceBundle(i18n.language, 'translation');
     return bundle?.specs?.[k] || k;
@@ -344,121 +343,116 @@ export default function StorePage() {
   const [catIdx, setCatIdx] = useState(0);
   const [search, setSearch] = useState('');
   const [detail, setDetail] = useState(null);
+  const [showDealBanner, setShowDealBanner] = useState(true);
+  const [notifCount, setNotifCount] = useState(0);
 
   const loadStatus = useCallback(async () => {
     try { const { data } = await client.get('/store/status'); setStatus(data); } catch { /* */ }
     finally { setLoading(false); }
   }, []);
-  useEffect(() => { loadStatus(); }, []);
+  useEffect(() => { loadStatus(); client.get('/notifications').then(({data}) => setNotifCount(data.unread||0)).catch(()=>{}); }, []);
 
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
     return genProducts(status.store.tier, CAT_VALUES[catIdx], search);
   }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, catIdx, search]);
 
-  const handleOpen = async () => { /* same */ setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
+  const handleOpen = async () => { setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
   const handleBuy = async (product) => {
-    setProcessingProduct(product);
-    setShowProcess(true);
+    setProcessingProduct(product); setShowProcess(true);
     try {
       const { data } = await client.post('/store/orders/process', { productPrice: product.price });
-      // Replace product's cost/profit with actual backend values for ProcessingModal
       setProcessingProduct(prev => ({ ...prev, costPrice: data.cost, profit: data.profit }));
-    } catch (err) {
-      setShowProcess(false);
-      setProcessingProduct(null);
-      toast.error(err.response?.data?.error || t('common.operationFailed'));
-    }
+    } catch (err) { setShowProcess(false); setProcessingProduct(null); toast.error(err.response?.data?.error || t('common.operationFailed')); }
   };
   const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
-  if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" /></div>;
+
+  if (loading) return <div className="min-h-screen bg-[#eaeded] flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#FF9900] border-t-transparent rounded-full animate-spin" /></div>;
   if (!status?.hasStore) return (
-    <div className="min-h-screen bg-bg safe-top safe-bottom flex flex-col items-center justify-center px-6 text-center">
-      <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#FF6B00] to-[#FFB800] flex items-center justify-center mb-4 shadow-xl"><Store size={36} className="text-white" /></div>
-      <h1 className="text-2xl font-black text-text mb-2">{t('store.title')}</h1><p className="text-sm text-text-muted mb-6">{t('store.subtitle')}</p>
-      <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-gradient-to-r from-[#FF6B00] to-[#FFB800] text-white font-bold rounded-2xl shadow-xl shadow-orange-500/25 active:scale-[0.98] transition-all text-base">{opening ? '...' : t('store.openFree')}</button>
+    <div className="min-h-screen bg-[#eaeded] safe-top safe-bottom flex flex-col items-center justify-center px-6 text-center">
+      <div className="w-24 h-24 rounded-full bg-[#FF9900] flex items-center justify-center mb-6 shadow-2xl"><Store size={44} className="text-white" /></div>
+      <h1 className="text-2xl font-black text-[#0F1111] mb-1">{t('store.title')}</h1>
+      <p className="text-sm text-[#565959] mb-8">{t('store.subtitle')}</p>
+      <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-bold rounded-full shadow-lg active:scale-[0.98] transition-all text-base border border-[#FCD200]">{opening ? '...' : t('store.openFree')}</button>
     </div>
   );
 
   const s = status.store;
   const ti = TIER_INFO[s.tier];
 
-  // Product detail page
+  // ==== Product Detail Page ====
   if (detail) {
     const p = detail;
+    const savingsPct = Math.round(((p.price - p.costPrice) / p.price) * 100);
     return (
-      <div className="min-h-screen bg-white safe-top safe-bottom flex flex-col page-container">
-        {/* Top nav */}
-        <div className="shrink-0 flex items-center gap-2 px-4 py-3 border-b border-gray-200">
-          <button onClick={() => setDetail(null)} className="text-gray-500"><ChevronLeft size={20} /></button>
-          <span className="text-sm font-medium text-gray-900 truncate">{p.name}</span>
+      <div className="min-h-screen bg-white safe-top safe-bottom flex flex-col">
+        <div className="shrink-0 flex items-center gap-3 px-4 py-3 bg-[#131921] text-white">
+          <button onClick={() => setDetail(null)} className="p-1 -ml-1"><ChevronLeft size={22} /></button>
+          <span className="text-sm font-medium truncate flex-1">{p.name}</span>
+          <button className="p-1"><ShoppingCart size={20} /></button>
         </div>
 
-        <div className="flex-1 overflow-y-auto native-scroll" style={{paddingBottom:'100px'}}>
-          {/* Product image */}
-          <div className="relative">
-            <img src={p.img} alt={p.name} className="w-full aspect-square object-cover bg-gray-50" />
+        <div className="flex-1 overflow-y-auto">
+          <div className="relative bg-[#f8f8f8]">
+            <img src={p.img} alt={p.name} className="w-full aspect-square object-contain" />
+            {savingsPct >= 30 && <span className="absolute top-3 left-3 bg-[#CC0C39] text-white text-xs font-bold px-2 py-1 rounded">-{savingsPct}%</span>}
           </div>
 
-          <div className="px-4 py-3">
-            {/* Title */}
-            <h1 className="text-base font-medium text-gray-900 leading-snug">{p.name}</h1>
-            {/* Rating */}
-            <div className="mt-1 flex items-center gap-2">
+          <div className="px-4">
+            <h1 className="text-base font-medium text-[#0F1111] leading-snug mt-3">{p.name}</h1>
+            <div className="flex items-center gap-2 mt-1.5">
               <Stars rating={p.rating} reviews={p.reviews} />
-              <span className="text-xs text-gray-500">|</span>
-              <span className="text-xs text-[#007185] hover:underline cursor-pointer">{p.sold.toLocaleString()} {t('store.sold')}</span>
-            </div>
-            {/* Limited deal */}
-            <div className="mt-2 flex items-center gap-2">
-              <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded font-bold flex items-center gap-1"><BadgePercent size={12} />{t('store.limitedDeal')}</span>
-            </div>
-            {/* Price */}
-            <div className="mt-2 pb-3 border-b border-gray-200">
-              <div className="flex items-baseline gap-1">
-                <span className="text-xs text-gray-500">{t('store.marketPrice')}</span>
-                <span className="text-3xl font-medium text-gray-900">${p.price}</span>
-              </div>
-              <div className="flex items-center gap-3 mt-1">
-                <span className="text-sm text-gray-500">{t('store.costPrice')} <b className="text-red-500">${p.costPrice.toFixed(2)}</b></span>
-                <span className="text-sm text-green-600 font-bold">{t('store.earn')} +${p.profit.toFixed(2)}</span>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">{t('store.capitalFlow')}</p>
+              <span className="text-xs text-[#565959]">|</span>
+              <span className="text-xs text-[#007185]">{p.sold.toLocaleString()}+ {t('store.sold')}</span>
             </div>
 
-            {/* Specs */}
-            <div className="py-3 border-b border-gray-200">
-              <h3 className="text-sm font-bold text-gray-900 mb-2">{t('store.specs')}</h3>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-                {Object.entries(p.specs || {}).map(([k, v]) => (
-                  <div key={k} className="flex justify-between text-xs"><span className="text-gray-500">{tSpec(k)}</span><span className="text-gray-900 font-medium">{v}</span></div>
-                ))}
+            <div className="my-3 border-t border-[#e7e7e7]" />
+
+            <div className="bg-[#fefaf6] border border-[#f5d6b5] rounded-lg p-3">
+              <div className="flex items-baseline gap-2">
+                {savingsPct > 0 && <span className="text-xs bg-[#CC0C39] text-white px-1.5 py-0.5 rounded font-bold">-{savingsPct}%</span>}
+                <span className="text-[28px] font-normal text-[#B12704]">${p.price.toFixed(2)}</span>
               </div>
+              <div className="text-xs text-[#565959] mt-0.5">
+                {t('store.marketPrice')}: <span className="line-through">${p.price.toFixed(2)}</span>
+              </div>
+              <div className="flex gap-4 mt-2 pt-2 border-t border-[#f5d6b5]">
+                <div><span className="text-[11px] text-[#565959]">{t('store.costPrice')}</span><span className="text-sm font-bold text-[#0F1111] ml-1">${p.costPrice.toFixed(2)}</span></div>
+                <div><span className="text-[11px] text-[#565959]">{t('store.earn')}</span><span className="text-sm font-bold text-[#067D62] ml-1">+${p.profit.toFixed(2)}</span></div>
+              </div>
+              <p className="text-[10px] text-[#565959] mt-1.5">{t('store.capitalFlow')}</p>
             </div>
 
-            {/* Description */}
-            <div className="py-3 border-b border-gray-200">
-              <h3 className="text-sm font-bold text-gray-900 mb-2">{t('store.description')}</h3>
-              <p className="text-xs text-gray-700 leading-relaxed">{p.desc}</p>
+            <div className="flex flex-col gap-1.5 mt-3 mb-2 text-xs text-[#0F1111]">
+              <div className="flex items-center gap-2"><Truck size={14} className="text-[#565959]" />{t('store.freeShipping')}</div>
+              <div className="flex items-center gap-2"><Shield size={14} className="text-[#565959]" />{t('store.capitalGuarantee')}</div>
+              <div className="flex items-center gap-2"><RotateCcw size={14} className="text-[#565959]" />{t('store.profitInstant')}</div>
             </div>
 
-            {/* Delivery info */}
-            <div className="py-3 space-y-2">
-              <div className="flex items-center gap-2 text-xs text-gray-700"><Truck size={14} className="text-gray-500" /> {t('store.freeShipping')}</div>
-              <div className="flex items-center gap-2 text-xs text-gray-700"><Shield size={14} className="text-gray-500" /> {t('store.capitalGuarantee')}</div>
-              <div className="flex items-center gap-2 text-xs text-gray-700"><RotateCcw size={14} className="text-gray-500" /> {t('store.profitInstant')}</div>
-            </div>
+            <div className="my-3 border-t border-[#e7e7e7]" />
+
+            {Object.keys(p.specs || {}).length > 0 && (
+              <div className="mb-3">
+                <h3 className="text-base font-bold text-[#0F1111] mb-2">{t('store.specs')}</h3>
+                <div className="space-y-1.5">
+                  {Object.entries(p.specs || {}).slice(0, 8).map(([k, v]) => (
+                    <div key={k} className="flex justify-between text-xs py-1.5 border-b border-[#e7e7e7] last:border-0"><span className="text-[#565959]">{tSpec(k)}</span><span className="text-[#0F1111] font-medium text-right max-w-[60%]">{v}</span></div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {p.desc && <div className="mb-3"><h3 className="text-base font-bold text-[#0F1111] mb-1">{t('store.description')}</h3><p className="text-xs text-[#0F1111] leading-relaxed">{p.desc}</p></div>}
           </div>
         </div>
 
-        {/* Bottom buy bar */}
-        <div className="shrink-0 px-4 py-3 border-t border-gray-200 bg-white flex items-center gap-3 safe-bottom">
+        <div className="shrink-0 px-4 py-3 border-t border-[#e7e7e7] bg-white flex items-center gap-3 safe-bottom">
           <div className="flex-1">
-            <p className="text-lg font-bold text-gray-900">${p.costPrice.toFixed(2)} <span className="text-xs font-normal text-gray-500">{t('store.costPrice')}</span></p>
-            <p className="text-xs text-green-600">{t('store.sellEarn')} +${p.profit.toFixed(2)}</p>
+            <p className="text-lg font-bold text-[#0F1111]">${p.costPrice.toFixed(2)} <span className="text-xs font-normal text-[#565959]">{t('store.costPrice')}</span></p>
+            <p className="text-xs text-[#067D62] font-bold">{t('store.earn')} +${p.profit.toFixed(2)}</p>
           </div>
           <button onClick={() => handleBuy(p)} disabled={s.balance < p.costPrice || s.remaining <= 0}
-            className={`px-8 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-gray-300 text-gray-500' : 'bg-[#FFD814] hover:bg-[#F7CA00] text-gray-900 shadow-md active:scale-95'} transition-all`}>
+            className={`px-10 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-gray-300 text-gray-500' : 'bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] shadow-md active:scale-95 border border-[#FCD200]'} transition-all`}>
             {s.remaining <= 0 ? t('store.dailyFull') : s.balance < p.costPrice ? t('store.insufficient') : t('store.buyNow')}
           </button>
         </div>
@@ -468,72 +462,119 @@ export default function StorePage() {
     );
   }
 
-  // Product list page
+  // ==== Product List Page (Amazon-style) ====
   return (
-    <div className="bg-[#f5f5f5] safe-top flex flex-col page-container" style={{height:'calc(100dvh - 60px)'}}>
-      {/* Header */}
+    <div className="bg-[#eaeded] safe-top flex flex-col min-h-screen">
+      {/* Top Nav Bar */}
       <div className="shrink-0 bg-[#131921] text-white">
-        <div className="px-4 py-3 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-lg font-black" style={{ background: ti.color }}><Store size={16} /></div>
-          <div className="flex-1"><p className="text-[10px] text-white/60">{t(ti.nameKey)} · {ti.tag} · 日限{s.dailyOrders}单</p><p className="text-[13px] font-bold">{t('store.todayProfit')} ${s.todayEarnings.toFixed(2)}</p></div>
-          <button onClick={handleClose} className="text-[10px] text-white/60 px-2 py-1 rounded border border-white/20">{t('store.closeStore')}</button>
+        <div className="px-3 py-2 flex items-center gap-3">
+          <div className="flex items-center gap-1.5 bg-white/10 rounded-full px-3 py-1">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{background: ti.color}}><Store size={12} className="text-white" /></div>
+            <span className="text-[11px] font-medium">{t(ti.nameKey)}</span>
+          </div>
+          <span className="text-[10px] text-white/60 flex-1">{t('store.today')}: <b className="text-white">${s.todayEarnings.toFixed(2)}</b></span>
+          <button className="relative p-1">
+            <Bell size={18} />
+            {notifCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#CC0C39] text-white text-[9px] font-bold rounded-full flex items-center justify-center">{notifCount}</span>}
+          </button>
         </div>
-        <div className="px-4 pb-3 flex gap-2">
-          <div className="flex-1 flex items-center bg-white rounded-lg overflow-hidden">
-            <Search size={14} className="ml-3 text-gray-400" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('store.searchPlaceholder')} className="flex-1 px-2 py-2 text-[13px] text-gray-800 bg-transparent outline-none" />
-            {search && <button onClick={() => setSearch('')} className="px-2 text-gray-400"><X size={14} /></button>}
+        <div className="px-3 pb-2.5">
+          <div className="flex items-center bg-white rounded-lg overflow-hidden">
+            <Search size={14} className="ml-3 text-[#565959]" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('store.searchPlaceholder')} className="flex-1 px-2 py-2.5 text-[13px] text-[#0F1111] bg-transparent outline-none placeholder:text-[#aaa]" />
+            {search && <button onClick={() => setSearch('')} className="px-3 text-[#565959]"><X size={14} /></button>}
           </div>
         </div>
       </div>
 
-      {/* Categories */}
-      <div className="shrink-0 bg-white border-b border-gray-200 px-2 flex gap-1 overflow-x-auto native-scroll scrollbar-none py-2">
+      {/* Category Chips */}
+      <div className="shrink-0 bg-white border-b border-[#ddd] px-2 flex gap-1.5 overflow-x-auto scrollbar-none py-2.5">
         {CAT_KEYS.map((c, i) => (
-          <button key={c} onClick={() => setCatIdx(i)} className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-medium ${catIdx === i ? 'bg-[#131921] text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{t(c)}</button>
+          <button key={c} onClick={() => setCatIdx(i)}
+            className={`shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-medium transition-colors ${
+              catIdx === i ? 'bg-[#131921] text-white' : 'text-[#0F1111] bg-[#f0f2f2] hover:bg-[#e3e6e6]'
+            }`}>{t(c)}</button>
         ))}
       </div>
 
-      {/* Stats */}
-      <div className="shrink-0 bg-white border-b border-gray-200 px-4 py-2 flex items-center gap-4 text-[10px] text-gray-500">
-        <span>{t('store.today')} <b className="text-gray-800">{s.doneToday}/{s.dailyOrders}</b></span>
-        <span>{t('store.balance')} <b className="text-gray-800">${s.balance.toFixed(2)}</b></span>
-        {s.nextTier && <span className="ml-auto text-amber-600"><Crown size={10} /> {s.totalOrders}/{s.nextTier.threshold}</span>}
-      </div>
-
-      {/* Product list */}
-      <div className="flex-1 overflow-y-auto native-scroll" style={{paddingBottom:'100px'}}>
-        <div className="px-4 py-2 text-[11px] text-gray-500 flex justify-between">
-          <span>{products.length} {t('store.items')}</span>
-          {/* Affordability checked per-product on buttons */}
-        </div>
-        {products.map(p => (
-          <div key={p.id} onClick={() => setDetail(p)} className="bg-white border-b border-gray-200 flex gap-3 px-4 py-3 active:bg-gray-50 cursor-pointer">
-            <div className="w-[110px] h-[110px] shrink-0 bg-gray-50 rounded-lg overflow-hidden relative">
-              <img src={p.img} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
-              {p.sold > 5000 && <span className="absolute top-1 left-1 text-[9px] px-1 py-0.5 rounded bg-red-500 text-white font-bold">Best</span>}
-            </div>
-            <div className="flex-1 min-w-0 flex flex-col justify-between">
-              <div>
-                <p className="text-[13px] text-gray-900 leading-tight line-clamp-2 font-medium">{p.name}</p>
-                <Stars rating={p.rating} reviews={p.reviews} />
-                <p className="text-[10px] text-gray-500 mt-0.5">{p.sold.toLocaleString()}{t('store.sold')}</p>
-              </div>
-              <div className="flex items-end justify-between">
-                <div>
-                  <span className="text-[10px] text-gray-500">{t('store.marketPrice')}: <b className="text-gray-900">${p.price}</b></span>
-                  <div><span className="text-xs text-gray-500">{t('store.costPrice')}</span> <span className="text-base font-bold text-red-500">${p.costPrice.toFixed(2)}</span><span className="ml-2 text-sm font-bold text-green-600">{t('store.earn')} +${p.profit.toFixed(2)}</span></div>
-                </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
-                  disabled={s.balance < p.costPrice || s.remaining <= 0}
-                  className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold active:scale-95 ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-gray-300 text-gray-500' : 'bg-[#FFD814] text-gray-900'}`}
-                >{s.remaining <= 0 ? t('store.dailyFull') : s.balance < p.costPrice ? t('store.insufficient') : t('store.buy')}</button>
-              </div>
-            </div>
+      {/* Deal Banner */}
+      {showDealBanner && (
+        <div className="shrink-0 mx-3 mt-3 bg-gradient-to-r from-[#CC0C39] to-[#E85D36] rounded-lg p-3 flex items-center gap-3 relative overflow-hidden">
+          <div className="text-2xl">⚡</div>
+          <div className="flex-1 text-white">
+            <p className="text-[13px] font-bold">{t('store.limitedDeal')}</p>
+            <p className="text-[10px] text-white/80">{t('store.subtitle')}</p>
           </div>
-        ))}
-        {products.length === 0 && <div className="text-center py-16 text-gray-400 text-sm"><Search size={32} className="mx-auto mb-3 opacity-30" />{search ? t('store.noMatch') : t('store.noProducts')}</div>}
+          <button onClick={() => setShowDealBanner(false)} className="text-white/60 hover:text-white"><X size={14} /></button>
+        </div>
+      )}
+
+      {/* Stats bar */}
+      <div className="shrink-0 bg-white border-b border-[#ddd] px-4 py-2 flex items-center gap-3 text-[11px] text-[#565959]">
+        <span>{t('store.today')} <b className="text-[#0F1111]">{s.doneToday}/{s.dailyOrders}</b></span>
+        <span className="text-[#ddd]">|</span>
+        <span>{t('store.balance')} <b className={s.balance > 0 ? 'text-[#0F1111]' : 'text-[#B12704]'}>${s.balance.toFixed(2)}</b></span>
+        {s.nextTier && <span className="ml-auto text-xs text-[#B12704]"><Crown size={10} className="inline mr-0.5" />{s.totalOrders}/{s.nextTier.threshold}</span>}
+      </div>
+
+      {/* Product Grid - 2 columns */}
+      <div className="flex-1 overflow-y-auto px-2 pt-2">
+        <div className="grid grid-cols-2 gap-2">
+          {products.map(p => (
+            <div key={p.id} onClick={() => setDetail(p)} className="bg-white rounded-lg shadow-sm border border-[#ddd] active:shadow-md cursor-pointer overflow-hidden hover:border-[#aaa] transition-colors">
+              <div className="relative bg-[#f8f8f8] aspect-square">
+                <img src={p.img} alt={p.name} className="w-full h-full object-contain p-3" loading="lazy" />
+                {p.sold > 5000 && <span className="absolute top-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#CC0C39] text-white font-bold uppercase tracking-wide">Best</span>}
+                {p.sold > 1000 && p.sold <= 5000 && <span className="absolute top-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#FF9900] text-white font-bold">Top</span>}
+              </div>
+              <div className="p-2.5">
+                <p className="text-[11px] text-[#0F1111] leading-tight font-medium line-clamp-2 mb-1.5" style={{minHeight:'2.6em'}}>{p.name}</p>
+                <Stars rating={p.rating} reviews={p.reviews} />
+                <div className="flex items-baseline gap-1.5 mt-1">
+                  <span className="text-lg font-normal text-[#B12704] leading-none">${Math.floor(p.price)}<sup className="text-[10px]">{(p.price % 1).toFixed(2).substring(1)}</sup></span>
+                  <span className="text-[10px] text-[#565959] line-through">${p.price.toFixed(2)}</span>
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[10px] text-[#565959]">{t('store.costPrice')} <b className="text-[#0F1111]">${p.costPrice.toFixed(0)}</b></span>
+                  <span className="text-[10px] font-bold text-[#067D62]">+${p.profit.toFixed(2)}</span>
+                </div>
+                <div className="flex items-center justify-between mt-1.5">
+                  <span className="text-[9px] text-[#565959]">{p.sold.toLocaleString()}+ {t('store.sold')}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
+                    disabled={s.balance < p.costPrice || s.remaining <= 0}
+                    className={`text-[10px] px-2.5 py-1 rounded font-medium ${
+                      s.balance < p.costPrice || s.remaining <= 0
+                        ? 'bg-gray-200 text-gray-400'
+                        : 'bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] border border-[#FCD200]'
+                    }`}
+                  >{t('store.buy')}</button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {products.length === 0 && (
+          <div className="text-center py-20 text-[#565959]">
+            <Search size={40} className="mx-auto mb-3 opacity-20" />
+            <p className="text-sm">{search ? t('store.noMatch') : t('store.noProducts')}</p>
+          </div>
+        )}
+        <div className="h-14" />
+      </div>
+
+      {/* Bottom status bar */}
+      <div className="shrink-0 bg-white border-t border-[#ddd] safe-bottom px-4 py-2.5 flex items-center justify-between text-xs">
+        <div>
+          <span className="text-[#565959]">{t('store.todayProfit')} </span>
+          <span className="text-[#0F1111] font-bold">${s.todayEarnings.toFixed(2)}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] bg-[#f0f2f2] px-2 py-0.5 rounded-full text-[#565959]">
+            {t('store.today')} {s.doneToday}/{s.dailyOrders}
+          </span>
+          <button onClick={handleClose} className="text-[10px] text-[#565959] hover:text-[#CC0C39] transition-colors">{t('store.closeStore')}</button>
+        </div>
       </div>
 
       {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); }} t={t} />}

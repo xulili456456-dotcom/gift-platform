@@ -7,7 +7,7 @@ const CAT_ORDER = ['platform', 'earning', 'withdraw', 'invite', 'tech']
 
 export default function FaqPage() {
   const { t } = useTranslation()
-  const faqItems = useMemo(() => t('faq.items', { returnObjects: true }), [t])
+  const faqItems = useMemo(() => t('faq.items', { returnObjects: true }) || [], [t])
   const [openIdx, setOpenIdx] = useState(null)
   const [activeCat, setActiveCat] = useState('platform')
   const [search, setSearch] = useState('')

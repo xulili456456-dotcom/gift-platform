@@ -91,7 +91,7 @@ export default function HomePage() {
     { step: '03', title: t('how.step3_title'), desc: t('how.step3_desc'), icon: '🎁' },
   ]
 
-  const testimonials = t('testimonials.items', { returnObjects: true })
+  const testimonials = t('testimonials.items', { returnObjects: true }) || []
 
   return (
     <>
@@ -143,9 +143,9 @@ export default function HomePage() {
           <div className="container-main">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
               {stats.map((s, i) => (
-                <div key={i} className="reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
-                  <StatItem value={parseInt(s.value)} label={s.label} suffix={s.suffix} start={startCount} />
-                </div>
+                <RevealSection key={i}>
+                  <StatItem value={s.value} label={s.label} suffix={s.suffix} start={startCount} />
+                </RevealSection>
               ))}
             </div>
           </div>
