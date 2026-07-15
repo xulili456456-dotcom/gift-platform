@@ -4,10 +4,13 @@ import client from '../api/client';
 import { Crown, ShoppingCart, X, Flame, Store, Search, Star, ChevronRight, ChevronLeft, Truck, Shield, RotateCcw, BadgePercent } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const COST_RATE = 0.8;    // 进货价 = 市场价 × 80%
+const PROFIT_RATE = 0.08; // 利润 = 市场价 × 8%
+
 const TIER_INFO = {
-  small:  { nameKey: 'store.small',  capital: 1,  daily: 10, min: 0.05, max: 0.3,  color: '#F59E0B', tag: 'Lv.1' },
-  medium: { nameKey: 'store.medium', capital: 3,  daily: 20, min: 0.1,  max: 0.5,  color: '#8B5CF6', tag: 'Lv.2', need: 50 },
-  large:  { nameKey: 'store.large',  capital: 10, daily: 40, min: 0.2,  max: 1.0,  color: '#EF4444', tag: 'Lv.3', need: 200 },
+  small:  { nameKey: 'store.small',  daily: 10, color: '#F59E0B', tag: 'Lv.1' },
+  medium: { nameKey: 'store.medium', daily: 20, color: '#8B5CF6', tag: 'Lv.2', need: 50 },
+  large:  { nameKey: 'store.large',  daily: 40, color: '#EF4444', tag: 'Lv.3', need: 200 },
 };
 
 const CATEGORIES = ['全部', '数码', '女装', '男装', '美妆', '鞋靴', '家居', '配饰', '食品', '潮玩'];
@@ -266,15 +269,13 @@ const PRODUCTS = [
 
 
 function genProducts(tier, cat, search) {
-  const ti = TIER_INFO[tier];
   let filtered = cat === '全部' ? [...PRODUCTS] : PRODUCTS.filter(p => p.cat === cat);
   if (search) filtered = filtered.filter(p => p.name.includes(search) || p.cat.includes(search));
   filtered.sort((a,b) => b.sold - a.sold);
   return filtered.map((p, i) => {
-    const rate = 0.7 + Math.random() * 0.2; // 70%-90%
-    const cost = Math.round(p.price * rate * 100) / 100;
-    const profit = Math.round((p.price - cost) * 100) / 100;
-    return { ...p, id: i, img: p.img, costPrice: cost, capital: cost, profit, dailyOrders: ti.dailyOrders };
+    const cost = Math.round(p.price * COST_RATE * 100) / 100;
+    const profit = Math.round(p.price * PROFIT_RATE * 100) / 100;
+    return { ...p, id: i, costPrice: cost, profit };
   });
 }
 
@@ -303,16 +304,16 @@ function ProcessingModal({ product, onDone }) {
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
   useEffect(() => {
-    if (step >= 3) { setDone(true); const t = setTimeout(onDone, 1000); return () => clearTimeout(t); }
-    const t = setTimeout(() => setStep(s => s + 1), 2000); return () => clearTimeout(t);
+    if (step >= 3) { setDone(true); const t = setTimeout(onDone, 1500); return () => clearTimeout(t); }
+    const t = setTimeout(() => setStep(s => s + 1), 1800); return () => clearTimeout(t);
   }, [step]);
   if (done) return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
       <div className="bg-white rounded-3xl p-8 text-center animate-burst shadow-2xl w-full max-w-sm">
         <div className="w-16 h-16 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
         <p className="text-sm text-text-muted">交易完成</p>
-        <p className="text-3xl font-black text-primary">+${(product.capital + product.profit).toFixed(2)}</p>
-        <div className="flex justify-center gap-4 mt-2 text-xs"><span className="text-text-muted">本金${product.capital}</span><span className="text-green-500 font-bold">+${product.profit}</span></div>
+        <p className="text-3xl font-black text-primary">+${(product.costPrice + product.profit).toFixed(2)}</p>
+        <div className="flex justify-center gap-4 mt-2 text-xs"><span className="text-text-muted">本金${product.costPrice.toFixed(2)}</span><span className="text-green-500 font-bold">+${product.profit.toFixed(2)}</span></div>
       </div>
     </div>
   );
@@ -350,7 +351,19 @@ export default function StorePage() {
   }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, category, search]);
 
   const handleOpen = async () => { /* same */ setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success('开店成功！'); } catch (err) { toast.error(err.response?.data?.error || '操作失败'); } finally { setOpening(false); } };
-  const handleBuy = async (product) => { setProcessingProduct(product); setShowProcess(true); try { await client.post('/store/orders/process'); setTimeout(async () => { setShowProcess(false); setProcessingProduct(null); await loadStatus(); }, 7200); } catch (err) { setShowProcess(false); setProcessingProduct(null); toast.error(err.response?.data?.error || '操作失败'); } };
+  const handleBuy = async (product) => {
+    setProcessingProduct(product);
+    setShowProcess(true);
+    try {
+      const { data } = await client.post('/store/orders/process', { productPrice: product.price });
+      // Replace product's cost/profit with actual backend values for ProcessingModal
+      setProcessingProduct(prev => ({ ...prev, costPrice: data.cost, profit: data.profit }));
+    } catch (err) {
+      setShowProcess(false);
+      setProcessingProduct(null);
+      toast.error(err.response?.data?.error || '操作失败');
+    }
+  };
   const handleClose = async () => { if (!confirm('确定关店？')) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success('已关店'); } catch (err) { toast.error(err.response?.data?.error || '操作失败'); } };
   if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" /></div>;
   if (!status?.hasStore) return (
@@ -438,13 +451,13 @@ export default function StorePage() {
             <p className="text-lg font-bold text-gray-900">${p.costPrice.toFixed(2)} <span className="text-xs font-normal text-gray-500">进货价</span></p>
             <p className="text-xs text-green-600">卖出赚 +${p.profit.toFixed(2)}</p>
           </div>
-          <button onClick={() => handleBuy(p)} disabled={!s.canAfford || s.remaining <= 0}
-            className={`px-8 py-3 rounded-full font-bold text-sm ${!s.canAfford || s.remaining <= 0 ? 'bg-gray-300 text-gray-500' : 'bg-[#FFD814] hover:bg-[#F7CA00] text-gray-900 shadow-md active:scale-95'} transition-all`}>
-            {s.remaining <= 0 ? '今日已满' : !s.canAfford ? '余额不足' : '立即进货'}
+          <button onClick={() => handleBuy(p)} disabled={s.balance < p.costPrice || s.remaining <= 0}
+            className={`px-8 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-gray-300 text-gray-500' : 'bg-[#FFD814] hover:bg-[#F7CA00] text-gray-900 shadow-md active:scale-95'} transition-all`}>
+            {s.remaining <= 0 ? '今日已满' : s.balance < p.costPrice ? '余额不足' : '立即进货'}
           </button>
         </div>
 
-        {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => {}} />}
+        {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); }} />}
       </div>
     );
   }
@@ -486,7 +499,7 @@ export default function StorePage() {
       <div className="flex-1 overflow-y-auto native-scroll" style={{paddingBottom:'100px'}}>
         <div className="px-4 py-2 text-[11px] text-gray-500 flex justify-between">
           <span>{products.length} 件</span>
-          {!s.canAfford && s.remaining > 0 && <span className="text-red-500">余额不足</span>}
+          {/* Affordability checked per-product on buttons */}
         </div>
         {products.map(p => (
           <div key={p.id} onClick={() => setDetail(p)} className="bg-white border-b border-gray-200 flex gap-3 px-4 py-3 active:bg-gray-50 cursor-pointer">
@@ -505,7 +518,11 @@ export default function StorePage() {
                   <span className="text-[10px] text-gray-500">市场价: <b className="text-gray-900">${p.price}</b></span>
                   <div><span className="text-xs text-gray-500">进货价</span> <span className="text-base font-bold text-red-500">${p.costPrice.toFixed(2)}</span><span className="ml-2 text-sm font-bold text-green-600">赚 +${p.profit.toFixed(2)}</span></div>
                 </div>
-                <button onClick={(e) => { e.stopPropagation(); handleBuy(p); }} className="shrink-0 px-4 py-1.5 rounded-full bg-[#FFD814] text-gray-900 text-[11px] font-bold active:scale-95">进货</button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
+                  disabled={s.balance < p.costPrice || s.remaining <= 0}
+                  className={`shrink-0 px-4 py-1.5 rounded-full text-[11px] font-bold active:scale-95 ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-gray-300 text-gray-500' : 'bg-[#FFD814] text-gray-900'}`}
+                >{s.remaining <= 0 ? '今日已满' : s.balance < p.costPrice ? '余额不足' : '进货'}</button>
               </div>
             </div>
           </div>
@@ -513,7 +530,7 @@ export default function StorePage() {
         {products.length === 0 && <div className="text-center py-16 text-gray-400 text-sm"><Search size={32} className="mx-auto mb-3 opacity-30" />{search ? '无匹配商品' : '暂无商品'}</div>}
       </div>
 
-      {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => {}} />}
+      {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); }} />}
     </div>
   );
 }

@@ -5,12 +5,23 @@ const { get, all, run, insert } = require('../db/database');
 const router = Router();
 router.use(authMiddleware);
 
-// Tier definitions + upgrade thresholds
+// Tier definitions — tiers control daily order limits and upgrade thresholds
+// Profit is now product-based: cost = price × 0.8, profit = price × 0.08
 const TIERS = {
-  small:  { name: '小店', capital: 1,  dailyOrders: 10, minReward: 0.05, maxReward: 0.3,  threshold: 0 },
-  medium: { name: '中店', capital: 3,  dailyOrders: 20, minReward: 0.1,  maxReward: 0.5,  threshold: 50 },
-  large:  { name: '大店', capital: 10, dailyOrders: 40, minReward: 0.2,  maxReward: 1.0,  threshold: 200 },
+  small:  { name: '小店', dailyOrders: 10, threshold: 0 },
+  medium: { name: '中店', dailyOrders: 20, threshold: 50 },
+  large:  { name: '大店', dailyOrders: 40, threshold: 200 },
 };
+
+// Product profit formula (shared with frontend)
+const COST_RATE = 0.8;    // 进货价 = 市场价 × 80%
+const PROFIT_RATE = 0.08; // 利润 = 市场价 × 8%
+
+function calcProduct(productPrice) {
+  const cost = Math.round(productPrice * COST_RATE * 100) / 100;
+  const profit = Math.round(productPrice * PROFIT_RATE * 100) / 100;
+  return { cost, profit, totalReturn: Math.round((cost + profit) * 100) / 100 };
+}
 
 function getTier(totalOrders) {
   if (totalOrders >= TIERS.large.threshold) return 'large';
@@ -70,16 +81,14 @@ router.get('/status', async (req, res) => {
     store: {
       ...store,
       tierName: tier.name,
-      capital: tier.capital,
       dailyOrders: tier.dailyOrders,
-      minReward: tier.minReward,
-      maxReward: tier.maxReward,
+      costRate: COST_RATE,
+      profitRate: PROFIT_RATE,
       doneToday: Number(doneToday?.c) || 0,
       todayEarnings: Number(earningsToday?.total) || 0,
       totalOrders,
       totalEarnings: Number(totalEarnings?.total) || 0,
       remaining: Math.max(0, tier.dailyOrders - (Number(doneToday?.c) || 0)),
-      canAfford: Number(taskBal?.total || 0) >= tier.capital,
       balance: Number(taskBal?.total || 0),
       nextTier: next ? { name: next.name, threshold: next.threshold, remaining: next.threshold - totalOrders } : null,
     },
@@ -97,8 +106,8 @@ router.post('/open', async (req, res) => {
       [existing.id]);
     const tier = TIERS.small;
     require('./notifications').notify(req.user.id, '🏪 店铺已重开！',
-      `小店已开业，每单垫付 $${tier.capital}，完成50单可升级中店`, 'success');
-    return res.status(200).json({ id: existing.id, tier: 'small', capital: tier.capital, dailyOrders: tier.dailyOrders });
+      `小店已开业，日限${tier.dailyOrders}单，完成50单可升级中店`, 'success');
+    return res.status(200).json({ id: existing.id, tier: 'small', dailyOrders: tier.dailyOrders });
   }
 
   const result = await insert(
@@ -107,8 +116,8 @@ router.post('/open', async (req, res) => {
   );
   const tier = TIERS.small;
   require('./notifications').notify(req.user.id, '🏪 开店成功！',
-    `小店已开业，每单垫付 $${tier.capital}，完成50单可升级中店`, 'success');
-  res.status(201).json({ id: result.id, tier: 'small', capital: tier.capital, dailyOrders: tier.dailyOrders });
+    `小店已开业，日限${tier.dailyOrders}单，完成50单可升级中店`, 'success');
+  res.status(201).json({ id: result.id, tier: 'small', dailyOrders: tier.dailyOrders });
 });
 
 // POST /api/store/close
@@ -120,8 +129,13 @@ router.post('/close', async (req, res) => {
   res.json({ message: '店铺已关闭' });
 });
 
-// POST /api/store/orders/process
+// POST /api/store/orders/process — product-based profit
 router.post('/orders/process', async (req, res) => {
+  const { productPrice } = req.body;
+  if (!productPrice || productPrice <= 0) {
+    return res.status(400).json({ error: '缺少商品价格' });
+  }
+
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!store) return res.status(400).json({ error: '请先开店' });
 
@@ -146,22 +160,25 @@ router.post('/orders/process', async (req, res) => {
     return res.status(400).json({ error: '今日订单已全部处理完毕！' });
   }
 
-  // Check balance
+  // Product-based pricing
+  const { cost, profit, totalReturn } = calcProduct(productPrice);
+
+  // Check balance against actual product cost
   const taskBal = await get(
     "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
     [req.user.id, 'delivered']
   );
   const available = Number(taskBal?.total || 0);
 
-  if (available < tier.capital) {
+  if (available < cost) {
     return res.status(400).json({
-      error: `余额不足！需要 $${tier.capital} 货款，当前可用 $${available.toFixed(2)}`,
-      need: tier.capital, have: available
+      error: `余额不足！该商品进货价 $${cost}，当前可用 $${available.toFixed(2)}`,
+      need: cost, have: available
     });
   }
 
-  // Deduct capital
-  let remaining = tier.capital;
+  // Deduct product cost from balance (FIFO)
+  let remaining = cost;
   const tasks = await all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC',
     [req.user.id, 'delivered']);
   for (const t of tasks) {
@@ -176,21 +193,20 @@ router.post('/orders/process', async (req, res) => {
     remaining -= deduct;
   }
 
-  const profit = Math.round((tier.minReward + Math.random() * (tier.maxReward - tier.minReward)) * 100) / 100;
-  const totalReturn = tier.capital + profit;
-
+  // Record the order (amount = profit earned)
   const result = await insert(
     "INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'done', NOW())",
     [store.id, req.user.id, profit]
   );
 
+  // Return cost + profit to balance
   await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
     [req.user.id, totalReturn, 'bonus', 'delivered']);
 
   const left = Math.max(0, tier.dailyOrders - (Number(doneToday?.c || 0) + 1));
 
   res.json({
-    id: result.id, capital: tier.capital, profit, totalReturn,
+    id: result.id, cost, profit, totalReturn,
     remaining: left,
     totalDone: Number(doneToday?.c || 0) + 1,
     dailyOrders: tier.dailyOrders,
