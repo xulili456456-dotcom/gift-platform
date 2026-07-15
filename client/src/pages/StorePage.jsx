@@ -505,7 +505,7 @@ export default function StorePage() {
                   <span className="text-[10px] text-gray-500">市场价: <b className="text-gray-900">${p.price}</b></span>
                   <div><span className="text-xs text-gray-500">进货价</span> <span className="text-base font-bold text-red-500">${p.costPrice.toFixed(2)}</span><span className="ml-2 text-sm font-bold text-green-600">赚 +${p.profit.toFixed(2)}</span></div>
                 </div>
-                <button className="shrink-0 px-4 py-1.5 rounded-full bg-[#FFD814] text-gray-900 text-[11px] font-bold active:scale-95">进货</button>
+                <button onClick={(e) => { e.stopPropagation(); handleBuy(p); }} className="shrink-0 px-4 py-1.5 rounded-full bg-[#FFD814] text-gray-900 text-[11px] font-bold active:scale-95">进货</button>
               </div>
             </div>
           </div>

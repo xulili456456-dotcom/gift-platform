@@ -43,7 +43,7 @@ const userModel = {
     if (sets.length === 0) return this.findById(id);
     values.push(id);
     await run(
-      `UPDATE users SET ${sets.join(', ')}, updated_at = NOW() WHERE id = ?`,
+      `UPDATE users SET ${sets.join(', ')}, updated_at = datetime('now') WHERE id = ?`,
       values
     );
     return this.findById(id);

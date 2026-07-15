@@ -93,7 +93,7 @@ router.post('/open', async (req, res) => {
     if (existing.status === 'active') {
       return res.status(400).json({ error: '你已有一家店铺在运营中' });
     }
-    await run("UPDATE stores SET status = 'active', tier = 'small', deposit = 0, opened_at = NOW(), closed_at = NULL WHERE id = ?",
+    await run("UPDATE stores SET status = 'active', tier = 'small', deposit = 0, opened_at = datetime('now'), closed_at = NULL WHERE id = ?",
       [existing.id]);
     const tier = TIERS.small;
     require('./notifications').notify(req.user.id, '🏪 店铺已重开！',
@@ -115,7 +115,7 @@ router.post('/open', async (req, res) => {
 router.post('/close', async (req, res) => {
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!store) return res.status(400).json({ error: '你没有运营中的店铺' });
-  await run("UPDATE stores SET status = 'closed', closed_at = NOW() WHERE id = ?", [store.id]);
+  await run("UPDATE stores SET status = 'closed', closed_at = datetime('now') WHERE id = ?", [store.id]);
   require('./notifications').notify(req.user.id, '🏪 店铺已关闭', '随时可以重开，订单数据保留', 'info');
   res.json({ message: '店铺已关闭' });
 });
@@ -180,7 +180,7 @@ router.post('/orders/process', async (req, res) => {
   const totalReturn = tier.capital + profit;
 
   const result = await insert(
-    "INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'done', NOW())",
+    "INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'done', datetime('now'))",
     [store.id, req.user.id, profit]
   );
 

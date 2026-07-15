@@ -70,7 +70,7 @@ router.put('/me/password', async (req, res) => {
 
     const newHash = await hashPassword(newPassword);
     const { run } = require('../db/database');
-    await run("UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?", [newHash, req.user.id]);
+    await run("UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?", [newHash, req.user.id]);
     res.json({ message: '密码修改成功' });
   } catch (err) {
     res.status(500).json({ error: '修改失败' });
@@ -100,7 +100,7 @@ router.put('/me/contact', async (req, res) => {
 
     const { run } = require('../db/database');
     const sets = Object.keys(updates).map(k => `${k} = ?`).join(', ');
-    await run(`UPDATE users SET ${sets}, updated_at = NOW() WHERE id = ?`,
+    await run(`UPDATE users SET ${sets}, updated_at = datetime('now') WHERE id = ?`,
       [...Object.values(updates), req.user.id]);
     res.json({ message: '更新成功', ...updates });
   } catch (err) {

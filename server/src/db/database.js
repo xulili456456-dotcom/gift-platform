@@ -1,107 +1,160 @@
-const { Pool } = require('pg');
+const path = require('path');
+const fs = require('fs');
 const config = require('../config');
 
-let pool = null;
+const USE_PG = config.DATABASE_URL && config.DATABASE_URL.startsWith('postgres');
 
-/**
- * Convert SQLite-style ? placeholders to PostgreSQL $1, $2, $3...
- */
-let _placeholderIdx = 0;
-function toPg(sql, params) {
-  if (!params || params.length === 0) return [sql, params];
-  let idx = 0;
-  const converted = sql.replace(/\?/g, () => {
-    idx++;
-    return '$' + idx;
-  });
-  return [converted, params];
-}
+let pgPool = null;
+let sqliteDb = null;
 
-function toPgInsert(sql) {
-  // Append RETURNING id — but skip if already present or for ON CONFLICT
-  if (/returning\s/i.test(sql)) return sql;
-  return sql.replace(/;?\s*$/, '') + ' RETURNING id';
-}
+// ─── PostgreSQL Impl ───────────────────────────────────────────────
+if (USE_PG) {
+  var { Pool } = require('pg');
 
-function getPool() {
-  if (!pool) {
-    const connString = config.DATABASE_URL + (config.DATABASE_URL.includes('?') ? '&' : '?') + 'client_encoding=UTF8';
-    pool = new Pool({
-      connectionString: connString,
-      ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-      max: 5,
-      idleTimeoutMillis: 30000,
-    });
-    // Ensure UTF-8 encoding on every new connection
-    pool.on('connect', async (client) => {
-      await client.query("SET client_encoding TO 'UTF8'");
-    });
+  function getPgPool() {
+    if (!pgPool) {
+      const connString = config.DATABASE_URL + (config.DATABASE_URL.includes('?') ? '&' : '?') + 'client_encoding=UTF8';
+      pgPool = new Pool({
+        connectionString: connString,
+        ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+        max: 5,
+        idleTimeoutMillis: 30000,
+      });
+      pgPool.on('connect', async (client) => {
+        await client.query("SET client_encoding TO 'UTF8'");
+      });
+    }
+    return pgPool;
   }
-  return pool;
+
+  function toPg(sql, params) {
+    if (!params || params.length === 0) return [sql, params];
+    let idx = 0;
+    const converted = sql.replace(/\?/g, () => '$' + (++idx));
+    return [converted, params];
+  }
+
+  function toPgInsert(sql) {
+    if (/returning\s/i.test(sql)) return sql;
+    return sql.replace(/;?\s*$/, '') + ' RETURNING id';
+  }
 }
+
+// ─── SQLite Impl ───────────────────────────────────────────────────
+async function getSqlite() {
+  if (!sqliteDb) {
+    const initSqlJs = require('sql.js');
+    const SQL = await initSqlJs();
+    const dbDir = path.join(__dirname, '..', '..', 'data');
+    if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
+    const dbPath = path.join(dbDir, 'gift_platform.db');
+    if (fs.existsSync(dbPath)) {
+      const buf = fs.readFileSync(dbPath);
+      sqliteDb = new SQL.Database(buf);
+    } else {
+      sqliteDb = new SQL.Database();
+    }
+    // Enable WAL mode and foreign keys
+    sqliteDb.run('PRAGMA journal_mode=WAL');
+    sqliteDb.run('PRAGMA foreign_keys=ON');
+  }
+  return sqliteDb;
+}
+
+function saveSqlite() {
+  if (!sqliteDb) return;
+  const data = sqliteDb.export();
+  const buffer = Buffer.from(data);
+  const dbPath = path.join(__dirname, '..', '..', 'data', 'gift_platform.db');
+  fs.writeFileSync(dbPath, buffer);
+}
+
+// ─── Public API ────────────────────────────────────────────────────
 
 async function getDb() {
-  const p = getPool();
-  await p.query('SELECT 1');
-  return p;
+  if (USE_PG) {
+    const p = getPgPool();
+    await p.query('SELECT 1');
+    return p;
+  }
+  return getSqlite();
 }
 
 async function closeDb() {
-  if (pool) {
-    await pool.end();
-    pool = null;
+  if (USE_PG) {
+    if (pgPool) { await pgPool.end(); pgPool = null; }
+  } else {
+    if (sqliteDb) { saveSqlite(); sqliteDb.close(); sqliteDb = null; }
   }
 }
 
 function saveDb() {
-  // no-op: PostgreSQL persists automatically
+  if (!USE_PG) saveSqlite();
 }
 
-/**
- * Execute INSERT/UPDATE/DELETE. Returns { changes: number }.
- */
 async function run(sql, params = []) {
-  const [s, p] = toPg(sql, params);
-  const result = await getPool().query(s, p);
-  return { changes: result.rowCount ?? 0 };
+  if (USE_PG) {
+    const [s, p] = toPg(sql, params);
+    const result = await getPgPool().query(s, p);
+    return { changes: result.rowCount ?? 0 };
+  }
+  const db = await getSqlite();
+  db.run(sql, params);
+  saveSqlite();
+  return { changes: db.getRowsModified() };
 }
 
-/**
- * Execute INSERT and return { id, changes }.
- * Automatically appends RETURNING id to get the inserted row ID.
- */
 async function insert(sql, params = []) {
-  const modified = toPgInsert(sql);
-  const [s, p] = toPg(modified, params);
-  const result = await getPool().query(s, p);
-  const id = result.rows?.[0]?.id ?? null;
-  return { id, changes: result.rowCount ?? 0 };
+  if (USE_PG) {
+    const modified = toPgInsert(sql);
+    const [s, p] = toPg(modified, params);
+    const result = await getPgPool().query(s, p);
+    return { id: result.rows?.[0]?.id ?? null, changes: result.rowCount ?? 0 };
+  }
+  const db = await getSqlite();
+  db.run(sql, params);
+  const id = db.exec("SELECT last_insert_rowid()")[0]?.values[0]?.[0] ?? null;
+  saveSqlite();
+  return { id, changes: db.getRowsModified() };
 }
 
-/**
- * Query all rows as array of objects.
- */
 async function all(sql, params = []) {
-  const [s, p] = toPg(sql, params);
-  const result = await getPool().query(s, p);
-  return result.rows;
+  if (USE_PG) {
+    const [s, p] = toPg(sql, params);
+    const result = await getPgPool().query(s, p);
+    return result.rows;
+  }
+  const db = await getSqlite();
+  const stmt = db.prepare(sql);
+  if (params.length) stmt.bind(params);
+  const rows = [];
+  while (stmt.step()) rows.push(stmt.getAsObject());
+  stmt.free();
+  return rows;
 }
 
-/**
- * Query a single row, or null if not found.
- */
 async function get(sql, params = []) {
-  const [s, p] = toPg(sql, params);
-  const result = await getPool().query(s, p);
-  return result.rows.length > 0 ? result.rows[0] : null;
+  if (USE_PG) {
+    const [s, p] = toPg(sql, params);
+    const result = await getPgPool().query(s, p);
+    return result.rows.length > 0 ? result.rows[0] : null;
+  }
+  const db = await getSqlite();
+  const stmt = db.prepare(sql);
+  if (params.length) stmt.bind(params);
+  const row = stmt.step() ? stmt.getAsObject() : null;
+  stmt.free();
+  return row;
 }
 
-/**
- * Execute raw SQL (for migrations — multi-statement blocks).
- * pg runs each statement separately via the simple query protocol.
- */
 async function exec(sql) {
-  await getPool().query(sql);
+  if (USE_PG) {
+    await getPgPool().query(sql);
+    return;
+  }
+  const db = await getSqlite();
+  db.run(sql);
+  saveSqlite();
 }
 
 module.exports = { getDb, saveDb, closeDb, run, insert, all, get, exec };

@@ -22,8 +22,7 @@ const settingsModel = {
 
   async set(key, value) {
     await run(
-      `INSERT INTO admin_settings (key, value, updated_at) VALUES (?, ?, NOW())
-       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()`,
+      `INSERT OR REPLACE INTO admin_settings (key, value, updated_at) VALUES (?, ?, datetime('now'))`,
       [key, String(value)]
     );
   },
