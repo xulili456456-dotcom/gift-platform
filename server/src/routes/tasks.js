@@ -9,12 +9,15 @@ const CHECKIN_REWARDS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
 const AD_REWARD = 0.5;
 const MAX_ADS = 3;
 
-// Calculate streak: count today + consecutive days backwards from today
-function calcStreak(rows) {
+// Calculate streak: count consecutive days backwards
+// skipToday=true: start from yesterday (for POST /checkin before today's record is inserted)
+// skipToday=false: start from today (for GET /balance where today's record exists)
+function calcStreak(rows, skipToday = false) {
   let streak = 0;
+  const offset = skipToday ? 1 : 0;
   for (let i = 0; i < rows.length; i++) {
     const d = new Date(rows[i].created_at || rows[i].d).toISOString().slice(0, 10);
-    const expected = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    const expected = new Date(Date.now() - (i + offset) * 86400000).toISOString().slice(0, 10);
     if (d === expected) streak++;
     else break;
   }
@@ -39,7 +42,7 @@ router.post('/checkin', async (req, res) => {
     const rows = await t.all(
       "SELECT created_at FROM task_earnings WHERE user_id = ? AND type = ? ORDER BY id DESC LIMIT 7",
       [req.user.id, 'checkin']);
-    const streak = calcStreak(rows);
+    const streak = calcStreak(rows, true); // skip today — today's checkin not yet inserted
 
     const reward = CHECKIN_REWARDS[streak] || 0.1;
     const result = await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
@@ -96,7 +99,7 @@ router.get('/balance', async (req, res) => {
       [req.user.id, 'checkin']);
     streak = calcStreak(rows);
   }
-  nextCheckinReward = CHECKIN_REWARDS[Math.min(streak, CHECKIN_REWARDS.length - 1)];
+  nextCheckinReward = CHECKIN_REWARDS[Math.min(streak, CHECKIN_REWARDS.length - 1)] || 0.1;
 
   const balanceAmount = Math.round((Number(earnings?.available) || 0) * 100) / 100;
   res.json({

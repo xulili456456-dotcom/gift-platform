@@ -25,11 +25,12 @@ router.post('/', authMiddleware, async (req, res) => {
   const plan = PLANS[plan_id];
   if (!plan) return res.status(400).json({ error: '请选择质押方案: basic/pro/max' });
 
-  const existing = await get('SELECT id FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (existing) return res.status(400).json({ error: '您已有活跃质押，请先解锁' });
-
   const t = await tx();
   try {
+    // Check for existing active stake within transaction
+    const existing = await t.get('SELECT id FROM stakes WHERE user_id = ? AND status = ? FOR UPDATE', [req.user.id, 'active']);
+    if (existing) { await t.rollback(); return res.status(400).json({ error: '您已有活跃质押，请先解锁' }); }
+
     // Check balance
     const taskBal = await t.get(
       "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
@@ -43,7 +44,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
     // Deduct from balance (FIFO)
     let remaining = plan.amount;
-    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC',
+    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE',
       [req.user.id, 'delivered']);
     for (const task of tasks) {
       if (remaining <= 0) break;

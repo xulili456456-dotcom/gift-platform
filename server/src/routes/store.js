@@ -152,21 +152,22 @@ router.post('/orders/process', async (req, res) => {
   const tier = TIERS[store.tier];
   const today = new Date().toISOString().slice(0, 10);
 
-  const doneToday = await get(
-    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
-    [store.id, today]
-  );
-
-  if (Number(doneToday?.c || 0) >= tier.dailyOrders) {
-    return res.status(400).json({ error: '今日订单已全部处理完毕！' });
-  }
-
   // Product-based pricing
   const { cost, profit, totalReturn } = calcProduct(productPrice);
 
-  // Transaction: balance check + FIFO deduction + order insert + return
+  // Transaction: daily limit + balance check + FIFO deduction + order insert + return
   const t = await tx();
   try {
+    // Check daily order limit within transaction
+    const doneToday = await t.get(
+      "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+      [store.id, today]
+    );
+
+    if (Number(doneToday?.c || 0) >= tier.dailyOrders) {
+      await t.rollback();
+      return res.status(400).json({ error: '今日订单已全部处理完毕！' });
+    }
     const taskBal = await t.get(
       "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
       [req.user.id, 'delivered']
@@ -183,7 +184,7 @@ router.post('/orders/process', async (req, res) => {
 
     // Deduct product cost from balance (FIFO)
     let remaining = cost;
-    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC',
+    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE',
       [req.user.id, 'delivered']);
     for (const task of tasks) {
       if (remaining <= 0) break;

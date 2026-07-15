@@ -8,11 +8,8 @@ const { getDb } = require('./db/database');
 const migrate = require('./db/migrate');
 const errorHandler = require('./middleware/errorHandler');
 
-// Rate limiters
+// Rate limiter — route-specific limiters are in auth.js
 const globalLimiter = rateLimit({ windowMs: 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false, message: { error: '请求过于频繁，请稍后再试' } });
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: { error: '登录尝试过于频繁，请15分钟后再试' } });
-const registerLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, standardHeaders: true, legacyHeaders: false, message: { error: '注册过于频繁，请1小时后再试' } });
-const resetLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 3, standardHeaders: true, legacyHeaders: false, message: { error: '密码重置过于频繁，请1小时后再试' } });
 
 // Import routes
 const adminPanelRoute = require('./routes/adminPanel');

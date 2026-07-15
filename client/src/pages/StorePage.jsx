@@ -300,7 +300,7 @@ function Stars({ rating, reviews, showCount }) {
   );
 }
 
-function ProcessingModal({ product, onDone }) {
+function ProcessingModal({ product, onDone, t }) {
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
   useEffect(() => {
@@ -311,9 +311,9 @@ function ProcessingModal({ product, onDone }) {
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
       <div className="bg-white rounded-3xl p-8 text-center animate-burst shadow-2xl w-full max-w-sm">
         <div className="w-16 h-16 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <p className="text-sm text-text-muted">交易完成</p>
+        <p className="text-sm text-text-muted">{t('store.tradeDone')}</p>
         <p className="text-3xl font-black text-primary">+${(product.costPrice + product.profit).toFixed(2)}</p>
-        <div className="flex justify-center gap-4 mt-2 text-xs"><span className="text-text-muted">本金${product.costPrice.toFixed(2)}</span><span className="text-green-500 font-bold">+${product.profit.toFixed(2)}</span></div>
+        <div className="flex justify-center gap-4 mt-2 text-xs"><span className="text-text-muted">{t('store.capital')}${product.costPrice.toFixed(2)}</span><span className="text-green-500 font-bold">+${product.profit.toFixed(2)}</span></div>
       </div>
     </div>
   );
@@ -321,7 +321,7 @@ function ProcessingModal({ product, onDone }) {
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
       <div className="bg-white rounded-3xl p-8 text-center animate-scale-in shadow-2xl w-full max-w-sm">
         <div className="w-3 h-3 bg-primary rounded-full mx-auto mb-3 animate-bounce-pulse" />
-        <p className="text-lg font-bold text-text">处理订单中...</p>
+        <p className="text-lg font-bold text-text">{t('store.processing')}</p>
         <div className="w-full h-1.5 bg-gray-100 rounded-full mt-4 overflow-hidden"><div className="h-full bg-primary rounded-full transition-all duration-500" style={{width:`${((step+1)/3)*100}%`}} /></div>
       </div>
     </div>
@@ -350,7 +350,7 @@ export default function StorePage() {
     return genProducts(status.store.tier, category, search);
   }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, category, search]);
 
-  const handleOpen = async () => { /* same */ setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || '操作失败'); } finally { setOpening(false); } };
+  const handleOpen = async () => { /* same */ setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
   const handleBuy = async (product) => {
     setProcessingProduct(product);
     setShowProcess(true);
@@ -361,16 +361,16 @@ export default function StorePage() {
     } catch (err) {
       setShowProcess(false);
       setProcessingProduct(null);
-      toast.error(err.response?.data?.error || '操作失败');
+      toast.error(err.response?.data?.error || t('common.operationFailed'));
     }
   };
-  const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success('已关店'); } catch (err) { toast.error(err.response?.data?.error || '操作失败'); } };
+  const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
   if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" /></div>;
   if (!status?.hasStore) return (
     <div className="min-h-screen bg-bg safe-top safe-bottom flex flex-col items-center justify-center px-6 text-center">
       <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[#FF6B00] to-[#FFB800] flex items-center justify-center mb-4 shadow-xl"><Store size={36} className="text-white" /></div>
       <h1 className="text-2xl font-black text-text mb-2">{t('store.title')}</h1><p className="text-sm text-text-muted mb-6">{t('store.subtitle')}</p>
-      <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-gradient-to-r from-[#FF6B00] to-[#FFB800] text-white font-bold rounded-2xl shadow-xl shadow-orange-500/25 active:scale-[0.98] transition-all text-base">{opening ? '...' : '免费开店'}</button>
+      <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-gradient-to-r from-[#FF6B00] to-[#FFB800] text-white font-bold rounded-2xl shadow-xl shadow-orange-500/25 active:scale-[0.98] transition-all text-base">{opening ? '...' : t('store.openFree')}</button>
     </div>
   );
 
@@ -401,28 +401,28 @@ export default function StorePage() {
             <div className="mt-1 flex items-center gap-2">
               <Stars rating={p.rating} reviews={p.reviews} />
               <span className="text-xs text-gray-500">|</span>
-              <span className="text-xs text-[#007185] hover:underline cursor-pointer">{p.sold.toLocaleString()} 件已售</span>
+              <span className="text-xs text-[#007185] hover:underline cursor-pointer">{p.sold.toLocaleString()} {t('store.sold')}</span>
             </div>
             {/* Limited deal */}
             <div className="mt-2 flex items-center gap-2">
-              <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded font-bold flex items-center gap-1"><BadgePercent size={12} />限时优惠</span>
+              <span className="text-xs bg-red-600 text-white px-2 py-0.5 rounded font-bold flex items-center gap-1"><BadgePercent size={12} />{t('store.limitedDeal')}</span>
             </div>
             {/* Price */}
             <div className="mt-2 pb-3 border-b border-gray-200">
               <div className="flex items-baseline gap-1">
-                <span className="text-xs text-gray-500">市场价</span>
+                <span className="text-xs text-gray-500">{t('store.marketPrice')}</span>
                 <span className="text-3xl font-medium text-gray-900">${p.price}</span>
               </div>
               <div className="flex items-center gap-3 mt-1">
-                <span className="text-sm text-gray-500">进货价 <b className="text-red-500">${p.costPrice.toFixed(2)}</b></span>
-                <span className="text-sm text-green-600 font-bold">赚 +${p.profit.toFixed(2)}</span>
+                <span className="text-sm text-gray-500">{t('store.costPrice')} <b className="text-red-500">${p.costPrice.toFixed(2)}</b></span>
+                <span className="text-sm text-green-600 font-bold">{t('store.earn')} +${p.profit.toFixed(2)}</span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">完成后本金全额退回 + 利润到账</p>
+              <p className="text-xs text-gray-500 mt-1">{t('store.capitalFlow')}</p>
             </div>
 
             {/* Specs */}
             <div className="py-3 border-b border-gray-200">
-              <h3 className="text-sm font-bold text-gray-900 mb-2">技术规格</h3>
+              <h3 className="text-sm font-bold text-gray-900 mb-2">{t('store.specs')}</h3>
               <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                 {Object.entries(p.specs || {}).map(([k, v]) => (
                   <div key={k} className="flex justify-between text-xs"><span className="text-gray-500">{k}</span><span className="text-gray-900 font-medium">{v}</span></div>
@@ -432,15 +432,15 @@ export default function StorePage() {
 
             {/* Description */}
             <div className="py-3 border-b border-gray-200">
-              <h3 className="text-sm font-bold text-gray-900 mb-2">商品描述</h3>
+              <h3 className="text-sm font-bold text-gray-900 mb-2">{t('store.description')}</h3>
               <p className="text-xs text-gray-700 leading-relaxed">{p.desc}</p>
             </div>
 
             {/* Delivery info */}
             <div className="py-3 space-y-2">
-              <div className="flex items-center gap-2 text-xs text-gray-700"><Truck size={14} className="text-gray-500" /> 免费配送 · 处理后7个工作日内到账</div>
-              <div className="flex items-center gap-2 text-xs text-gray-700"><Shield size={14} className="text-gray-500" /> 本金保障 · 100%退还</div>
-              <div className="flex items-center gap-2 text-xs text-gray-700"><RotateCcw size={14} className="text-gray-500" /> 利润即时到账 · 可提现</div>
+              <div className="flex items-center gap-2 text-xs text-gray-700"><Truck size={14} className="text-gray-500" /> {t('store.freeShipping')}</div>
+              <div className="flex items-center gap-2 text-xs text-gray-700"><Shield size={14} className="text-gray-500" /> {t('store.capitalGuarantee')}</div>
+              <div className="flex items-center gap-2 text-xs text-gray-700"><RotateCcw size={14} className="text-gray-500" /> {t('store.profitInstant')}</div>
             </div>
           </div>
         </div>
@@ -448,8 +448,8 @@ export default function StorePage() {
         {/* Bottom buy bar */}
         <div className="shrink-0 px-4 py-3 border-t border-gray-200 bg-white flex items-center gap-3 safe-bottom">
           <div className="flex-1">
-            <p className="text-lg font-bold text-gray-900">${p.costPrice.toFixed(2)} <span className="text-xs font-normal text-gray-500">进货价</span></p>
-            <p className="text-xs text-green-600">卖出赚 +${p.profit.toFixed(2)}</p>
+            <p className="text-lg font-bold text-gray-900">${p.costPrice.toFixed(2)} <span className="text-xs font-normal text-gray-500">{t('store.costPrice')}</span></p>
+            <p className="text-xs text-green-600">{t('store.sellEarn')} +${p.profit.toFixed(2)}</p>
           </div>
           <button onClick={() => handleBuy(p)} disabled={s.balance < p.costPrice || s.remaining <= 0}
             className={`px-8 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-gray-300 text-gray-500' : 'bg-[#FFD814] hover:bg-[#F7CA00] text-gray-900 shadow-md active:scale-95'} transition-all`}>
@@ -457,7 +457,7 @@ export default function StorePage() {
           </button>
         </div>
 
-        {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); }} />}
+        {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); }} t={t} />}
       </div>
     );
   }
@@ -469,13 +469,13 @@ export default function StorePage() {
       <div className="shrink-0 bg-[#131921] text-white">
         <div className="px-4 py-3 flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-lg font-black" style={{ background: ti.color }}><Store size={16} /></div>
-          <div className="flex-1"><p className="text-[10px] text-white/60">{t(ti.nameKey)} · {ti.tag} · 日限{s.dailyOrders}单</p><p className="text-[13px] font-bold">今日利润 ${s.todayEarnings.toFixed(2)}</p></div>
-          <button onClick={handleClose} className="text-[10px] text-white/60 px-2 py-1 rounded border border-white/20">关店</button>
+          <div className="flex-1"><p className="text-[10px] text-white/60">{t(ti.nameKey)} · {ti.tag} · 日限{s.dailyOrders}单</p><p className="text-[13px] font-bold">{t('store.todayProfit')} ${s.todayEarnings.toFixed(2)}</p></div>
+          <button onClick={handleClose} className="text-[10px] text-white/60 px-2 py-1 rounded border border-white/20">{t('store.closeStore')}</button>
         </div>
         <div className="px-4 pb-3 flex gap-2">
           <div className="flex-1 flex items-center bg-white rounded-lg overflow-hidden">
             <Search size={14} className="ml-3 text-gray-400" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="搜索商品..." className="flex-1 px-2 py-2 text-[13px] text-gray-800 bg-transparent outline-none" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('store.searchPlaceholder')} className="flex-1 px-2 py-2 text-[13px] text-gray-800 bg-transparent outline-none" />
             {search && <button onClick={() => setSearch('')} className="px-2 text-gray-400"><X size={14} /></button>}
           </div>
         </div>
@@ -490,8 +490,8 @@ export default function StorePage() {
 
       {/* Stats */}
       <div className="shrink-0 bg-white border-b border-gray-200 px-4 py-2 flex items-center gap-4 text-[10px] text-gray-500">
-        <span>今日 <b className="text-gray-800">{s.doneToday}/{s.dailyOrders}</b></span>
-        <span>余额 <b className="text-gray-800">${s.balance.toFixed(2)}</b></span>
+        <span>{t('store.today')} <b className="text-gray-800">{s.doneToday}/{s.dailyOrders}</b></span>
+        <span>{t('store.balance')} <b className="text-gray-800">${s.balance.toFixed(2)}</b></span>
         {s.nextTier && <span className="ml-auto text-amber-600"><Crown size={10} /> {s.totalOrders}/{s.nextTier.threshold}</span>}
       </div>
 
@@ -511,12 +511,12 @@ export default function StorePage() {
               <div>
                 <p className="text-[13px] text-gray-900 leading-tight line-clamp-2 font-medium">{p.name}</p>
                 <Stars rating={p.rating} reviews={p.reviews} />
-                <p className="text-[10px] text-gray-500 mt-0.5">{p.sold.toLocaleString()}件已售</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">{p.sold.toLocaleString()}{t('store.sold')}</p>
               </div>
               <div className="flex items-end justify-between">
                 <div>
-                  <span className="text-[10px] text-gray-500">市场价: <b className="text-gray-900">${p.price}</b></span>
-                  <div><span className="text-xs text-gray-500">进货价</span> <span className="text-base font-bold text-red-500">${p.costPrice.toFixed(2)}</span><span className="ml-2 text-sm font-bold text-green-600">赚 +${p.profit.toFixed(2)}</span></div>
+                  <span className="text-[10px] text-gray-500">{t('store.marketPrice')}: <b className="text-gray-900">${p.price}</b></span>
+                  <div><span className="text-xs text-gray-500">{t('store.costPrice')}</span> <span className="text-base font-bold text-red-500">${p.costPrice.toFixed(2)}</span><span className="ml-2 text-sm font-bold text-green-600">{t('store.earn')} +${p.profit.toFixed(2)}</span></div>
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
@@ -530,7 +530,7 @@ export default function StorePage() {
         {products.length === 0 && <div className="text-center py-16 text-gray-400 text-sm"><Search size={32} className="mx-auto mb-3 opacity-30" />{search ? t('store.noMatch') : t('store.noProducts')}</div>}
       </div>
 
-      {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); }} />}
+      {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); }} t={t} />}
     </div>
   );
 }

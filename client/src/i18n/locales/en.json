@@ -637,6 +637,26 @@
     "review": "Leave Review",
     "processing": "Processing...",
     "orderDone": "Order Complete!",
-    "rewardAdded": "Reward credited"
+    "rewardAdded": "Reward credited",
+    "openFree": "Open Free Store",
+    "capital": "Capital",
+    "capitalFlow": "Capital returned in full after completion + profit credited",
+    "tradeDone": "Trade Complete",
+    "closed": "Store Closed",
+    "sold": "sold",
+    "limitedDeal": "Limited Deal",
+    "marketPrice": "Market Price",
+    "costPrice": "Cost",
+    "earn": "Earn",
+    "sellEarn": "Sell & Earn",
+    "specs": "Specifications",
+    "description": "Description",
+    "freeShipping": "Free shipping · Credited within 7 business days",
+    "capitalGuarantee": "Capital guarantee · 100% refund",
+    "profitInstant": "Instant profit · Withdrawable",
+    "todayProfit": "Today's Profit",
+    "searchPlaceholder": "Search products...",
+    "today": "Today",
+    "balance": "Balance"
   }
 }

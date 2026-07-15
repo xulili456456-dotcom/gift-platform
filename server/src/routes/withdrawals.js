@@ -35,7 +35,7 @@ router.post('/', async (req, res) => {
 
     // Deduct from task_earnings (FIFO, within transaction)
     let remaining = amount;
-    const tasks = await t.all('SELECT id, amount, type FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC',
+    const tasks = await t.all('SELECT id, amount, type FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE',
       [req.user.id, 'delivered']);
     const deductedIds = [];
 

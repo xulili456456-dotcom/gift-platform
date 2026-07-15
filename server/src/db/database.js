@@ -134,12 +134,10 @@ async function tx() {
     return result.rows.length > 0 ? result.rows[0] : null;
   };
   const commit = async () => {
-    await client.query('COMMIT');
-    client.release();
+    try { await client.query('COMMIT'); } finally { client.release(); }
   };
   const rollback = async () => {
-    await client.query('ROLLBACK');
-    client.release();
+    try { await client.query('ROLLBACK'); } finally { client.release(); }
   };
 
   return { run: txRun, insert: txInsert, all: txAll, get: txGet, commit, rollback };

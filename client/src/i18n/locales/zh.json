@@ -636,7 +636,24 @@
     "processing": "处理中...",
     "orderDone": "订单完成！",
     "rewardAdded": "货款退回+利润已到账",
-    "capital": "垫付货款",
-    "capitalFlow": "货款流转"
+    "capital": "本金",
+    "capitalFlow": "完成后本金全额退回 + 利润到账",
+    "tradeDone": "交易完成",
+    "closed": "已关店",
+    "sold": "件已售",
+    "limitedDeal": "限时优惠",
+    "marketPrice": "市场价",
+    "costPrice": "进货价",
+    "earn": "赚",
+    "sellEarn": "卖出赚",
+    "specs": "技术规格",
+    "description": "商品描述",
+    "freeShipping": "免费配送 · 处理后7个工作日内到账",
+    "capitalGuarantee": "本金保障 · 100%退还",
+    "profitInstant": "利润即时到账 · 可提现",
+    "todayProfit": "今日利润",
+    "searchPlaceholder": "搜索商品...",
+    "today": "今日",
+    "balance": "余额"
   }
 }

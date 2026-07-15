@@ -110,6 +110,7 @@ CREATE TABLE IF NOT EXISTS stakes (
     status          TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'unlocked')),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+CREATE UNIQUE INDEX IF NOT EXISTS idx_stakes_one_active ON stakes(user_id) WHERE status = 'active';
 
 -- Invite verification proofs
 CREATE TABLE IF NOT EXISTS invite_proofs (
