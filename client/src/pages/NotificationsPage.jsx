@@ -34,11 +34,11 @@ export default function NotificationsPage() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
             {t('common.back')}
           </button>
-          <h2 className="text-[16px] font-bold text-text">通知中心</h2>
+          <h2 className="text-[16px] font-bold text-text">{t('notifications.title')}</h2>
           {data.unread > 0 && <span className="bg-primary text-white text-[10px] px-2 py-0.5 rounded-full font-bold">{data.unread}</span>}
         </div>
         {data.unread > 0 && (
-          <button onClick={markAllRead} className="text-xs text-primary font-medium">全部已读</button>
+          <button onClick={markAllRead} className="text-xs text-primary font-medium">{t('notifications.markAllRead')}</button>
         )}
       </div>
       <div className="p-4">
@@ -67,7 +67,7 @@ export default function NotificationsPage() {
         ) : (
           <div className="text-center py-20">
             <Bell size={48} className="text-text-muted mx-auto mb-4 opacity-30" />
-            <p className="text-[14px] font-semibold text-text-muted">暂无通知</p>
+            <p className="text-[14px] font-semibold text-text-muted">{t('notifications.empty')}</p>
           </div>
         )}
       </div>

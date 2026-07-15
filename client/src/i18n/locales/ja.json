@@ -875,5 +875,10 @@
     "App": "アプリ",
     "GPS": "GPS",
     "HDR": "HDR"
+  },
+  "notifications": {
+    "title": "通知",
+    "markAllRead": "全て既読",
+    "empty": "通知なし"
   }
 }

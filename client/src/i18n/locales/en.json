@@ -875,5 +875,10 @@
     "App": "App",
     "GPS": "GPS",
     "HDR": "HDR"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark All Read",
+    "empty": "No notifications"
   }
 }
