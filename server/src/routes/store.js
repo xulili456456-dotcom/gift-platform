@@ -230,5 +230,57 @@ router.post('/orders/process', async (req, res) => {
   }
   });
 
+// GET /api/store/earnings-stats — daily & total profit stats
+router.get('/earnings-stats', async (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
+
+  const todayProfit = await get(
+    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+    [store?.id || 0, today]
+  );
+  const totalProfit = await get(
+    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done'",
+    [store?.id || 0]
+  );
+  const totalOrders = await get(
+    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done'",
+    [store?.id || 0]
+  );
+  const balance = await get(
+    "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
+    [req.user.id, 'delivered']
+  );
+  // Estimate tomorrow's potential: current balance * 1.15 (compound)
+  const bal = Number(balance?.total || 0);
+  const tomorrowEstimate = Math.round(bal * 1.15 * 100) / 100;
+
+  res.json({
+    todayProfit: Number(todayProfit?.total || 0),
+    totalProfit: Number(totalProfit?.total || 0),
+    totalOrders: Number(totalOrders?.c || 0),
+    balance: bal,
+    tomorrowEstimate,
+    dailyGoal: 20, // default daily goal
+  });
+});
+
+// POST /api/store/deposit — inject capital into store balance
+router.post('/deposit', async (req, res) => {
+  const amount = parseFloat(req.body.amount);
+  if (!amount || amount < 1) return res.status(400).json({ error: '最低注入金额为 $1' });
+
+  // Take from user's overall task_earnings or simulate deposit
+  // For now: add as a "deposit" bonus entry
+  const { insert } = require('../db/database');
+  const result = await insert(
+    'INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+    [req.user.id, amount, 'bonus', 'delivered']
+  );
+  require('./notifications').notify(req.user.id, '💰 资金已注入',
+    `已注入 $${amount} 到电商账户`, 'success');
+  res.json({ id: result.id, amount, message: `已注入 $${amount}` });
+});
+
 module.exports = router;
 

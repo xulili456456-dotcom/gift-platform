@@ -693,7 +693,7 @@
     "small": "小店",
     "medium": "中店",
     "large": "大店",
-    "deposit": "开店押金",
+    "deposit": "注入资金",
     "perOrder": "货款/单",
     "dailyMax": "日理论收益",
     "dailyOrders": "每天{{n}}笔订单",
@@ -745,7 +745,17 @@
     "todayProfit": "今日利润",
     "searchPlaceholder": "搜索商品...",
     "today": "今日",
-    "balance": "余额"
+    "balance": "余额",
+    "withdraw": "提现",
+    "affordable": "买得起",
+    "sortProfit": "最高利润",
+    "sortPrice": "最高价格",
+    "sortSales": "热销",
+    "dailyGoal": "今日目标",
+    "totalEarned": "累计",
+    "tomorrowEstimate": "明天预估",
+    "depositDesc": "注入更多本金，交易更大商品，赚更多利润",
+    "confirmDeposit": "确认注入"
   },
   "specs": {
     "产地": "产地",

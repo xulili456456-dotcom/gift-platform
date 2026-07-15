@@ -1,10 +1,10 @@
 {
   "app": {
     "name": "Gift Haven",
-    "slogan": "Invite friends, complete tasks, earn cash rewards",
-    "cta_register": "Sign Up Free",
+    "slogan": "E-commerce Task Platform — Connect to global marketplaces and earn from every transaction",
+    "cta_register": "Start Earning Now",
     "cta_download": "Download App",
-    "cta_share": "Share with Friends",
+    "cta_share": "Share",
     "cta_store": "Open in App"
   },
   "nav": {
@@ -15,67 +15,91 @@
     "faq": "FAQ"
   },
   "hero": {
-    "title": "Invite Friends, Earn Rewards",
-    "subtitle": "Complete tasks to earn cash rewards and redeem premium gifts. Gift Haven makes every share rewarding.",
-    "badge": "🔥 500,000+ users already joined"
+    "title": "Amazon · Shopee · Lazada\nYou promote, we fulfill, you earn",
+    "subtitle": "No inventory. No shipping. No customer support. Pick e-commerce tasks on Gift Haven, promote products from the world's top marketplaces, and pocket the margin on every sale.",
+    "badge": "🔥 Connected to 20+ platforms including Amazon, Shopee, Lazada, AliExpress"
   },
   "stats": {
-    "users": "Registered Users",
-    "gifts": "Gifts Delivered",
-    "invites": "Active Invites",
-    "volume": "Total Volume"
+    "users": "Global Resellers",
+    "gifts": "Product Categories",
+    "invites": "Daily Orders",
+    "volume": "Total Payouts"
+  },
+  "platforms": {
+    "label": "Connected to Global Marketplaces",
+    "title": "Your tasks come from real orders on these platforms",
+    "desc": "We integrate with 20+ global e-commerce APIs — Amazon, Shopee, Lazada, AliExpress, TikTok Shop, and more. Every task represents a real transaction. You earn the margin, we handle supply chain and logistics.",
+    "items": [
+      { "name": "Amazon", "desc": "World's largest marketplace, 300M+ customers", "color": "#FF9900" },
+      { "name": "Shopee", "desc": "#1 in Southeast Asia, 700M+ users", "color": "#EE4D2D" },
+      { "name": "Lazada", "desc": "6 countries across Southeast Asia", "color": "#0F1470" },
+      { "name": "AliExpress", "desc": "Global cross-border retail platform", "color": "#E62E04" },
+      { "name": "TikTok Shop", "desc": "Fastest-growing social commerce", "color": "#000000" },
+      { "name": "eBay", "desc": "Global C2C marketplace giant", "color": "#0064D2" }
+    ]
+  },
+  "value": {
+    "label": "Why Gift Haven",
+    "title": "Earn e-commerce profits without being a seller",
+    "desc": "Traditional e-commerce means sourcing, inventory, operations, support, and shipping. We handle all of that. You just pick tasks and share links — earn a cut from every sale.",
+    "items": [
+      { "icon": "Package", "title": "Zero Inventory", "desc": "No stock, no upfront costs. Direct connection to global supply chain — start with $0." },
+      { "icon": "Truck", "title": "We Handle Logistics", "desc": "Amazon FBA, Shopee Xpress, and partner couriers fulfill every order automatically." },
+      { "icon": "Headphones", "title": "No Customer Support", "desc": "After-sales handled by platforms and brands. You focus purely on promotion." },
+      { "icon": "TrendingUp", "title": "Transparent Margins", "desc": "Cost price, market price, your profit — all visible upfront. What you see is what you earn." }
+    ]
   },
   "how": {
     "label": "How It Works",
-    "title": "Earn money in 3 simple steps",
-    "desc": "Start your earning journey in just three steps.",
-    "step1_title": "Create Account",
-    "step1_desc": "Sign up for free and get your referral code",
-    "step2_title": "Invite Friends",
-    "step2_desc": "Share your link and earn rewards when they join",
-    "step3_title": "Redeem Gifts",
-    "step3_desc": "Accumulate points and redeem for cash or premium gifts"
+    "title": "Start earning in 3 simple steps",
+    "desc": "No experience needed. Register and start earning immediately.",
+    "step1_title": "Pick a Task",
+    "step1_desc": "Browse trending products from Amazon, Shopee, Lazada. Each task shows exactly how much you'll earn per sale.",
+    "step2_title": "Share the Link",
+    "step2_desc": "Post your product link on Instagram, TikTok, WhatsApp, Telegram — wherever your audience is. Every click that converts counts.",
+    "step3_title": "Earn the Margin",
+    "step3_desc": "Once the order completes, your profit lands in your wallet automatically. Cash out anytime, no hidden fees."
   },
   "gifts": {
-    "label": "Premium Gifts",
-    "title": "Amazing rewards waiting for you",
-    "desc": "From cash bonuses to the latest gadgets — we've got it all."
+    "label": "Trending Tasks",
+    "title": "Every product you promote earns you profit",
+    "desc": "From electronics to home goods — our team adds high-margin tasks daily across all categories."
   },
   "testimonials": {
-    "label": "Testimonials",
-    "title": "What our users say",
-    "desc": "Real stories from real users.",
+    "label": "Real Earnings",
+    "title": "They're already making money",
+    "desc": "Verified earnings from resellers worldwide.",
     "items": [
       {
         "name": "Mike",
-        "role": "College Student",
-        "text": "This is amazing! I earned over $200 in my first month just doing tasks in my spare time. Already withdrew to my bank account. My roommates are all using it now.",
-        "earned": "$340"
+        "role": "Student · Part-time · USA",
+        "text": "Posted Amazon headphone links on Instagram and TikTok. Did 30+ orders in my first week, $5-8 profit each. Made $340 in month one. Zero hassle with shipping — perfect for students.",
+        "earned": "$340/mo"
       },
       {
         "name": "Sarah",
-        "role": "Stay-at-home Mom",
-        "text": "Perfect for earning some extra cash while taking care of the kids. The gift selection is great — I got a nice Bluetooth speaker last month.",
-        "earned": "$720"
+        "role": "Stay-at-home Mom · Philippines",
+        "text": "Share Shopee baby products in mom groups and WhatsApp. 30 mins a day, making $700+/month. Way easier than dropshipping — no inventory, no shipping.",
+        "earned": "$720/mo"
       },
       {
-        "name": "David",
-        "role": "Office Worker",
-        "text": "I do tasks during lunch breaks and the earnings add up fast. The 3-tier referral system is genius — my passive income has been very stable.",
-        "earned": "$1,250"
+        "name": "Alex",
+        "role": "Office Worker · Side Hustle · Malaysia",
+        "text": "I post Lazada tech deals on Telegram and Twitter during my commute and lunch breaks. Now pulling $1,250/month in passive income consistently.",
+        "earned": "$1,250/mo"
       },
       {
-        "name": "Lisa",
-        "role": "Freelancer",
-        "text": "A friend recommended this to me and I was skeptical at first. But after my first withdrawal went through, I was hooked. Now it's part of my daily routine.",
-        "earned": "$520"
+        "name": "Maria",
+        "role": "Freelancer · Full-time · Brazil",
+        "text": "Running product videos across TikTok, Instagram Reels, and YouTube Shorts. Built a content matrix — now at $3,200/month, surpassing my previous job.",
+        "earned": "$3,200/mo"
       }
     ]
   },
   "store": {
     "label": "Shop",
-    "title": "Premium products at great prices",
-    "desc": "Use your earned points to redeem electronics, beauty products, home goods and more.",
+    "title": "Premium products, great prices",
+    "desc": "Use your earnings to shop — electronics, beauty, home goods, and more.",
     "all": "All",
     "digital": "Electronics",
     "women": "Women",
@@ -87,49 +111,53 @@
     "food": "Food",
     "toys": "Toys",
     "sold": "sold",
+    "hot": "Hot",
+    "searchPlaceholder": "Search products...",
+    "products": "products",
+    "noResults": "No matching products found",
     "viewApp": "View all products in App →"
   },
   "download": {
     "label": "Download",
     "title": "Earn anytime, anywhere",
-    "desc": "Download the Gift Haven app for the best experience. Available for Android devices.",
+    "desc": "Download the Gift Haven app for the best experience. Available for Android.",
     "version": "Version 1.0.0",
     "size": "~15MB",
     "features_title": "App Features",
     "features": [
-      { "icon": "Zap", "title": "Lightning Fast", "desc": "Native app experience, faster and smoother than web" },
-      { "icon": "Bell", "title": "Real-time Alerts", "desc": "Instant notifications for tasks, referrals, and rewards" },
-      { "icon": "Shield", "title": "Secure & Safe", "desc": "Encrypted data transmission with bank-grade security" },
-      { "icon": "Smartphone", "title": "Offline Ready", "desc": "View tasks and earnings even without internet" }
+      { "icon": "Zap", "title": "Lightning Fast", "desc": "Native experience — faster and smoother than mobile web" },
+      { "icon": "Bell", "title": "Real-time Alerts", "desc": "Instant push notifications for orders, commissions, and payouts" },
+      { "icon": "Shield", "title": "Bank-grade Security", "desc": "Encrypted transmission, secure wallet, multi-factor auth" },
+      { "icon": "Smartphone", "title": "Offline Mode", "desc": "Check tasks and earnings even without internet" }
     ],
     "install_title": "Installation Guide",
     "install_steps": [
-      { "step": "1", "title": "Download APK", "desc": "Tap the download button above to save the APK to your device" },
+      { "step": "1", "title": "Download APK", "desc": "Tap the download button above to save the APK file" },
       { "step": "2", "title": "Allow Installation", "desc": "Enable 'Install from unknown sources' in your device settings" },
-      { "step": "3", "title": "Install & Launch", "desc": "Open the APK, install, then sign up or log in to get started" }
+      { "step": "3", "title": "Install & Launch", "desc": "Open the APK, install, then sign up or log in to start earning" }
     ],
     "coming_soon": "Coming Soon",
-    "apk_placeholder": "APK file is being prepared, stay tuned..."
+    "apk_placeholder": "APK file coming soon — stay tuned!"
   },
   "about": {
     "label": "About Us",
-    "title": "Making sharing rewarding",
-    "desc": "Gift Haven was founded in 2024 with a mission to create a platform where everyone can earn rewards through sharing and completing tasks.",
+    "title": "Connecting global e-commerce, empowering everyone to earn",
+    "desc": "Gift Haven was founded in 2024 to break down the barriers to e-commerce participation. No store setup, no inventory, no shipping — everyone can earn from global e-commerce transactions.",
     "mission_title": "Our Mission",
-    "mission": "Connect the value between people through sharing — turning every recommendation into tangible rewards. We believe word-of-mouth is the most powerful marketing, and sharers deserve to be rewarded.",
+    "mission": "Integrate with Amazon, Shopee, Lazada, and global marketplaces to convert every transaction into a task — enabling ordinary people to participate in the global e-commerce boom.",
     "vision_title": "Our Vision",
-    "vision": "To become the world's leading task-based reward platform, enabling every user to earn substantial passive income through simple sharing and task completion.",
+    "vision": "Become the world's largest e-commerce task distribution platform, connecting 1 billion users to global marketplaces and redefining what it means to 'do e-commerce'.",
     "values_title": "Core Values",
     "values": [
-      { "title": "Users First", "desc": "We always prioritize user interests and ensure every effort is rewarded fairly." },
-      { "title": "Transparency", "desc": "All reward mechanisms are open and transparent — no hidden terms, ever." },
-      { "title": "Continuous Innovation", "desc": "We constantly improve the product and introduce more exciting ways to earn." }
+      { "title": "Transparent Margins", "desc": "Every product's cost and your profit are fully disclosed. We never take hidden cuts." },
+      { "title": "Zero Barrier", "desc": "No experience needed. No capital required. Just register and start." },
+      { "title": "Platform-Powered", "desc": "Supply chain, logistics, and support are all handled. You focus on what matters — promotion." }
     ]
   },
   "faq": {
     "label": "FAQ",
-    "title": "Got questions? We've got answers",
-    "desc": "Can't find what you're looking for? Contact us at support@haolixiangsong.com",
+    "title": "Have questions? We have answers",
+    "desc": "Can't find what you need? Reach us at support@gifthaven.com",
     "categories": {
       "platform": "Platform",
       "earning": "Earnings",
@@ -138,32 +166,33 @@
       "tech": "Technical"
     },
     "items": [
-      { "q": "What is Gift Haven?", "a": "Gift Haven is an invitation and task-based reward platform. Users earn points and cash rewards by completing daily tasks and inviting friends to join. Points can be redeemed for gifts or withdrawn as cash.", "cat": "platform" },
-      { "q": "Is the platform free?", "a": "Completely free! Registration, task completion, and friend invitations are all free. We never charge users any fees.", "cat": "platform" },
-      { "q": "How do I earn rewards?", "a": "There are two main ways: 1) Complete daily tasks (check-ins, watching ads, participating in events, etc.); 2) Invite friends to join and earn up to 3-tier commission.", "cat": "earning" },
-      { "q": "What is 3-tier commission?", "a": "When someone you invited (Tier 1) earns rewards, you get a commission. When people they invite (Tier 2) and their invitees (Tier 3) earn, you also get a share.", "cat": "earning" },
-      { "q": "How much can I earn daily?", "a": "Earnings vary by user. Regular users can earn a few to dozens of dollars daily through tasks. Active referrers can earn significantly more passive income.", "cat": "earning" },
-      { "q": "How do I withdraw?", "a": "Go to 'My Account' → 'Wallet' → 'Withdraw'. We support withdrawals to bank accounts and digital wallets. Minimum withdrawal is $10, typically processed in 1-3 business days.", "cat": "withdraw" },
-      { "q": "Are there withdrawal fees?", "a": "Regular users pay a 1% withdrawal fee. VIP members enjoy fee-free withdrawals.", "cat": "withdraw" },
-      { "q": "How do I invite friends?", "a": "Go to the 'Tasks' page and tap 'Invite Friends'. You can copy your referral link or generate a QR code to share. Anyone who registers through your link counts as your referral.", "cat": "invite" },
-      { "q": "Is there a limit on invitations?", "a": "No limits! The more people you invite, the more you earn.", "cat": "invite" },
-      { "q": "What devices are supported?", "a": "We currently support Android (app) and web (H5). iOS version is in development.", "cat": "tech" },
-      { "q": "Is my data secure?", "a": "We use bank-grade encryption to protect user data. All transaction records are stored securely. We will never sell or leak your personal information.", "cat": "tech" }
+      { "q": "How does Gift Haven work with Amazon/Shopee?", "a": "We integrate with 20+ e-commerce platforms including Amazon, Shopee, Lazada, and AliExpress. Every task on Gift Haven corresponds to a real product listing. You promote the product — when a sale happens, you earn the margin. The platform and brand handle fulfillment and support.", "cat": "platform" },
+      { "q": "Do I need to buy inventory?", "a": "Absolutely not. We operate on a zero-inventory model. Products ship directly from platforms and brands. You never touch inventory — just pick tasks and share links.", "cat": "platform" },
+      { "q": "Is Gift Haven free?", "a": "100% free. Registration, tasks, and promotion all cost nothing. We only take a small platform fee from successful transactions — you only share when you earn.", "cat": "platform" },
+      { "q": "How do I earn?", "a": "Three ways: 1) Pick e-commerce tasks — promote Amazon/Shopee products and earn the price margin; 2) Complete daily check-ins and bonus tasks for points; 3) Invite friends and earn team commissions up to 3 tiers.", "cat": "earning" },
+      { "q": "How much can I earn per sale?", "a": "Varies by product. Electronics: $5-50 per sale. Home goods: $3-15. Beauty: $2-10. Our cost is 85% of market price — you keep the 15% margin on every order.", "cat": "earning" },
+      { "q": "When do I get paid?", "a": "Once the order is confirmed delivered (typically 3-7 days), your profit lands in your wallet instantly. Cash out anytime.", "cat": "earning" },
+      { "q": "How do I withdraw?", "a": "Go to 'My Account' → 'Wallet' → 'Withdraw'. We support bank transfers and digital wallets. Minimum withdrawal is $10, typically processed in 1-3 business days.", "cat": "withdraw" },
+      { "q": "Are there withdrawal fees?", "a": "Regular users pay 1%. VIP members enjoy fee-free withdrawals.", "cat": "withdraw" },
+      { "q": "How do I invite friends?", "a": "Go to the Tasks page, tap 'Invite Friends'. Share your referral link or QR code. You earn a percentage of their earnings up to 3 tiers deep.", "cat": "invite" },
+      { "q": "Is there a limit on invitations?", "a": "No limit. More invites = more team earnings.", "cat": "invite" },
+      { "q": "Which devices are supported?", "a": "Android app and web (H5) currently available. iOS version is in development.", "cat": "tech" },
+      { "q": "Is my data secure?", "a": "Bank-grade encryption. Immutable transaction records. We will never sell or compromise your personal information.", "cat": "tech" }
     ]
   },
   "cta": {
-    "title": "Ready to start earning?",
-    "subtitle": "Sign up now and claim your welcome bonus!",
-    "button": "Sign Up Free — Claim Welcome Bonus"
+    "title": "Ready to earn from global e-commerce?",
+    "subtitle": "Zero inventory. Zero capital. Zero risk. Sign up and claim your welcome bonus task!",
+    "button": "Sign Up Free — Start Earning Margins"
   },
   "footer": {
-    "description": "Gift Haven — Connecting shared value, making every effort rewarding.",
+    "description": "Gift Haven — Connecting global marketplaces, empowering everyone to earn from e-commerce.",
     "links": "Quick Links",
     "legal": "Legal",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
     "contact": "Contact Us",
-    "email": "support@haolixiangsong.com",
+    "email": "support@gifthaven.com",
     "copyright": "© 2025 Gift Haven. All rights reserved."
   },
   "common": {

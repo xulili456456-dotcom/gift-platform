@@ -4,6 +4,7 @@ import { Search, ExternalLink, ShoppingBag, Star } from 'lucide-react'
 import SEO from '../components/SEO'
 import PRODUCTS from '../data/products.json'
 
+// Internal category (matches product data) -> i18n key
 const CAT_KEY_MAP = {
   '全部': 'store.all',
   '数码': 'store.digital',
@@ -17,11 +18,10 @@ const CAT_KEY_MAP = {
   '女装': 'store.women',
 }
 
-// Get unique categories from actual product data
 const ALL_CATS = ['全部', ...new Set(PRODUCTS.map(p => p.cat))]
 
 function formatSold(n) {
-  if (n >= 10000) return `${(n / 10000).toFixed(1)}万`
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k`
   return String(n)
 }
@@ -55,6 +55,11 @@ export default function StorePage() {
   const [activeCat, setActiveCat] = useState('全部')
   const [search, setSearch] = useState('')
 
+  const getCatLabel = (cat) => {
+    const key = CAT_KEY_MAP[cat]
+    return key ? t(key) : cat
+  }
+
   const filtered = useMemo(() => {
     let items = activeCat === '全部' ? [...PRODUCTS] : PRODUCTS.filter(p => p.cat === activeCat)
     if (search.trim()) {
@@ -68,7 +73,6 @@ export default function StorePage() {
     <>
       <SEO title={t('nav.store')} />
       <div className="page-enter">
-        {/* Header */}
         <section className="bg-primary pt-20 pb-20 text-center">
           <div className="container-main">
             <span className="section-label text-accent-light">{t('store.label')}</span>
@@ -79,13 +83,12 @@ export default function StorePage() {
 
         <section className="section bg-bg">
           <div className="container-main">
-            {/* Search & Category */}
             <div className="mb-10 space-y-6">
               <div className="relative max-w-md">
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
                 <input
                   type="text"
-                  placeholder="搜索商品..."
+                  placeholder={t('store.searchPlaceholder')}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-white dark:bg-surface text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 transition-all"
@@ -93,32 +96,28 @@ export default function StorePage() {
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {ALL_CATS.map((cat) => {
-                  const key = CAT_KEY_MAP[cat] || cat
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => setActiveCat(cat)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                        activeCat === cat
-                          ? 'bg-primary text-white shadow-md'
-                          : 'bg-white dark:bg-surface text-text-secondary hover:text-text border border-border hover:border-accent/30'
-                      }`}
-                    >
-                      {cat === '全部' ? t('store.all') : t(key)}
-                    </button>
-                  )
-                })}
+                {ALL_CATS.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCat(cat)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                      activeCat === cat
+                        ? 'bg-primary text-white shadow-md'
+                        : 'bg-white dark:bg-surface text-text-secondary hover:text-text border border-border hover:border-accent/30'
+                    }`}
+                  >
+                    {getCatLabel(cat)}
+                  </button>
+                ))}
               </div>
 
               <p className="text-text-muted text-sm">
-                共 {filtered.length} 件商品
-                {activeCat !== '全部' && ` · ${activeCat}`}
+                {filtered.length} {t('store.products')}
+                {activeCat !== '全部' && ` · ${getCatLabel(activeCat)}`}
                 {search && ` · "${search}"`}
               </p>
             </div>
 
-            {/* Product grid */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {filtered.map((p, i) => (
                 <div key={i} className="product-card card p-0 overflow-hidden cursor-pointer">
@@ -134,11 +133,11 @@ export default function StorePage() {
                   <div className="p-4">
                     <div className="flex items-center gap-1 mb-1.5">
                       <span className="text-[11px] text-text-muted bg-gray-100 dark:bg-white/5 px-1.5 py-0.5 rounded">
-                        {p.cat}
+                        {getCatLabel(p.cat)}
                       </span>
                       {p.sold > 5000 && (
                         <span className="text-[11px] text-accent bg-accent/10 px-1.5 py-0.5 rounded font-semibold">
-                          热卖
+                          {t('store.hot')}
                         </span>
                       )}
                     </div>
@@ -158,11 +157,10 @@ export default function StorePage() {
             {filtered.length === 0 && (
               <div className="text-center py-20">
                 <ShoppingBag size={48} className="text-text-muted mx-auto mb-4" />
-                <p className="text-text-secondary">暂无匹配的商品</p>
+                <p className="text-text-secondary">{t('store.noResults')}</p>
               </div>
             )}
 
-            {/* View all CTA */}
             <div className="text-center mt-12">
               <a
                 href="https://gift-platform-h6um.onrender.com/"

@@ -692,7 +692,7 @@
     "toys": "おもちゃ",
     "medium": "中規模店舗",
     "large": "大規模店舗",
-    "deposit": "保証金",
+    "deposit": "資金追加",
     "perOrder": "注文単価",
     "dailyMax": "1日上限",
     "dailyOrders": "1日{{n}}件",
@@ -744,7 +744,17 @@
     "todayProfit": "本日の利益",
     "searchPlaceholder": "商品を検索...",
     "today": "本日",
-    "balance": "残高"
+    "balance": "残高",
+    "withdraw": "出金",
+    "affordable": "買えるもの",
+    "sortProfit": "最高利益",
+    "sortPrice": "最高価格",
+    "sortSales": "人気",
+    "dailyGoal": "本日目標",
+    "totalEarned": "累計",
+    "tomorrowEstimate": "明日予想",
+    "depositDesc": "より大きな商品を取引するために資金を追加",
+    "confirmDeposit": "確認"
   },
   "specs": {
     "产地": "原産地",

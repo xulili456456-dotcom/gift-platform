@@ -87,6 +87,10 @@
     "food": "Alimentos",
     "toys": "Juguetes",
     "sold": "vendidos",
+    "hot": "Popular",
+    "searchPlaceholder": "Buscar productos...",
+    "products": "productos",
+    "noResults": "No se encontraron productos",
     "viewApp": "Ver todos los productos en App →"
   },
   "download": {

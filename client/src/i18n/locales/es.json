@@ -670,7 +670,7 @@
     "small": "Tienda Pequeña",
     "medium": "Tienda Mediana",
     "large": "Tienda Grande",
-    "deposit": "Depósito",
+    "deposit": "Añadir Fondos",
     "perOrder": "Por Pedido",
     "dailyMax": "Máx Diario",
     "dailyOrders": "{{n}} pedidos/día",
@@ -722,7 +722,17 @@
     "todayProfit": "Ganancia de Hoy",
     "searchPlaceholder": "Buscar productos...",
     "today": "Hoy",
-    "balance": "Saldo"
+    "balance": "Saldo",
+    "withdraw": "Retirar",
+    "affordable": "Asequible",
+    "sortProfit": "Mayor Ganancia",
+    "sortPrice": "Mayor Precio",
+    "sortSales": "Popular",
+    "dailyGoal": "Meta Diaria",
+    "totalEarned": "Total",
+    "tomorrowEstimate": "Est. mañana",
+    "depositDesc": "Añade capital para negociar artículos más grandes",
+    "confirmDeposit": "Confirmar"
   },
   "specs": {
     "产地": "Origen",

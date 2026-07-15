@@ -692,7 +692,7 @@
     "small": "Small Store",
     "medium": "Medium Store",
     "large": "Large Store",
-    "deposit": "Deposit",
+    "deposit": "Add Funds",
     "perOrder": "Per Order",
     "dailyMax": "Daily Max",
     "dailyOrders": "{{n}} orders/day",
@@ -744,7 +744,17 @@
     "todayProfit": "Today's Profit",
     "searchPlaceholder": "Search products...",
     "today": "Today",
-    "balance": "Balance"
+    "balance": "Balance",
+    "withdraw": "Withdraw",
+    "affordable": "Affordable",
+    "sortProfit": "Top Profit",
+    "sortPrice": "Top Price",
+    "sortSales": "Hot",
+    "dailyGoal": "Daily Goal",
+    "totalEarned": "Total",
+    "tomorrowEstimate": "Tomorrow est",
+    "depositDesc": "Add more capital to trade bigger items and earn more",
+    "confirmDeposit": "Confirm"
   },
   "specs": {
     "产地": "Origin",

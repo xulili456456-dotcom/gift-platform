@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Users, Gift, Share2, TrendingUp, ChevronRight, Star } from 'lucide-react'
+import { ArrowRight, Star, TrendingUp, Package, Truck, Headphones, ShoppingCart } from 'lucide-react'
 import SEO from '../components/SEO'
 
-// Animated counter hook
+// Animated counter
 function useCountUp(end, duration = 2000, start = false) {
   const [count, setCount] = useState(0)
   useEffect(() => {
@@ -22,12 +22,12 @@ function useCountUp(end, duration = 2000, start = false) {
   return count
 }
 
-function StatItem({ value, label, suffix = '+', start }) {
-  const count = useCountUp(value, 2000, start)
+function StatItem({ value, label, suffix = '', prefix = '' }) {
+  const count = useCountUp(value, 2000, true)
   return (
-    <div className="text-center animate-count-up" style={{ animationDelay: `${Math.random() * 0.2}s` }}>
-      <div className="stat-number gradient-text mb-2">
-        {count}{suffix}
+    <div className="text-center">
+      <div className="text-3xl md:text-5xl font-extrabold tracking-tight mb-1" style={{ color: '#D4A574' }}>
+        {prefix}{count}{suffix}
       </div>
       <div className="text-text-secondary text-sm font-medium">{label}</div>
     </div>
@@ -43,7 +43,7 @@ function useReveal() {
     if (!el) return
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setVisible(true) },
-      { threshold: 0.15 }
+      { threshold: 0.1 }
     )
     observer.observe(el)
     return () => observer.disconnect()
@@ -51,47 +51,32 @@ function useReveal() {
   return [ref, visible]
 }
 
-function RevealSection({ children, className = '' }) {
+function RevealSection({ children, className = '', style }) {
   const [ref, visible] = useReveal()
   return (
-    <div ref={ref} className={`reveal ${visible ? 'visible' : ''} ${className}`}>
+    <div ref={ref} className={`reveal ${visible ? 'visible' : ''} ${className}`} style={style}>
       {children}
     </div>
   )
 }
 
+const ICON_MAP = { Package, Truck, Headphones, TrendingUp }
+
 export default function HomePage() {
   const { t } = useTranslation()
-  const [startCount, setStartCount] = useState(false)
 
-  useEffect(() => {
-    const timer = setTimeout(() => setStartCount(true), 500)
-    return () => clearTimeout(timer)
-  }, [])
-
-  const stats = [
-    { value: 50, label: t('stats.users'), suffix: '万+' },
-    { value: 120, label: t('stats.gifts'), suffix: '万+' },
-    { value: 8, label: t('stats.invites'), suffix: '万+' },
-    { value: 5000, label: t('stats.volume'), suffix: '万+' },
-  ]
-
-  const giftItems = [
-    { emoji: '🧧', name: '现金红包', value: '$50', color: 'from-red-500 to-orange-500' },
-    { emoji: '🎧', name: '无线耳机', value: '$29', color: 'from-blue-500 to-cyan-500' },
-    { emoji: '⌚', name: '智能手表', value: '$59', color: 'from-purple-500 to-pink-500' },
-    { emoji: '📱', name: '手机配件', value: '$15', color: 'from-green-500 to-teal-500' },
-    { emoji: '🏠', name: '家居好物', value: '$39', color: 'from-yellow-500 to-amber-500' },
-    { emoji: '💄', name: '美妆礼盒', value: '$45', color: 'from-pink-500 to-rose-500' },
-  ]
-
-  const howSteps = [
-    { step: '01', title: t('how.step1_title'), desc: t('how.step1_desc'), icon: '📝' },
-    { step: '02', title: t('how.step2_title'), desc: t('how.step2_desc'), icon: '📨' },
-    { step: '03', title: t('how.step3_title'), desc: t('how.step3_desc'), icon: '🎁' },
-  ]
-
+  const platforms = t('platforms.items', { returnObjects: true }) || []
+  const valueItems = t('value.items', { returnObjects: true }) || []
   const testimonials = t('testimonials.items', { returnObjects: true }) || []
+
+  const profitItems = [
+    { emoji: '🎧', name: 'Sony降噪耳机', cost: '$255', price: '$299', profit: '$44', cat: 'Amazon' },
+    { emoji: '⌚', name: 'Apple Watch', cost: '$340', price: '$399', profit: '$59', cat: 'Amazon' },
+    { emoji: '📱', name: 'Samsung 手机', cost: '$523', price: '$599', profit: '$76', cat: 'Shopee' },
+    { emoji: '💻', name: 'MacBook Air', cost: '$935', price: '$1099', profit: '$164', cat: 'Amazon' },
+    { emoji: '👟', name: 'Nike 跑鞋', cost: '$85', price: '$120', profit: '$35', cat: 'Lazada' },
+    { emoji: '💄', name: 'SK-II 精华', cost: '$196', price: '$245', profit: '$49', cat: 'Shopee' },
+  ]
 
   return (
     <>
@@ -101,38 +86,49 @@ export default function HomePage() {
         <section className="hero-gradient grid-pattern relative overflow-hidden">
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-20 left-[10%] w-72 h-72 bg-accent/10 rounded-full blur-3xl animate-float" />
-            <div className="absolute top-40 right-[10%] w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+            <div className="absolute bottom-20 right-[10%] w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-float" style={{ animationDelay: '1.5s' }} />
           </div>
 
-          <div className="container-main relative z-10 pt-28 pb-20 md:pt-40 md:pb-32">
-            <div className="max-w-3xl mx-auto text-center">
+          <div className="container-main relative z-10 pt-24 pb-16 md:pt-36 md:pb-24">
+            <div className="max-w-4xl mx-auto text-center">
               {/* Badge */}
               <div className="animate-fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-semibold mb-8">
                 <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
                 {t('hero.badge')}
               </div>
 
-              <h1 className="animate-fade-in-up text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight mb-6">
+              <h1 className="animate-fade-in-up text-3xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight mb-4 whitespace-pre-line">
                 {t('hero.title')}
               </h1>
 
-              <p className="animate-fade-in-up text-lg md:text-xl text-text-secondary max-w-xl mx-auto mb-10" style={{ animationDelay: '0.15s' }}>
+              <p className="animate-fade-in-up text-base md:text-xl text-text-secondary max-w-2xl mx-auto mb-10" style={{ animationDelay: '0.1s' }}>
                 {t('hero.subtitle')}
               </p>
 
-              <div className="animate-fade-in-up flex flex-col sm:flex-row items-center justify-center gap-4" style={{ animationDelay: '0.3s' }}>
+              <div className="animate-fade-in-up flex flex-col sm:flex-row items-center justify-center gap-4" style={{ animationDelay: '0.2s' }}>
                 <a
                   href="https://gift-platform-h6um.onrender.com/register"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-primary btn-lg no-underline"
+                  className="btn btn-accent btn-lg no-underline text-base"
                 >
                   {t('app.cta_register')}
                   <ArrowRight size={20} />
                 </a>
-                <Link to="/download" className="btn btn-outline btn-lg no-underline">
-                  {t('app.cta_download')}
+                <Link to="/store" className="btn btn-outline btn-lg no-underline text-base">
+                  <ShoppingCart size={20} />
+                  {t('nav.store')}
                 </Link>
+              </div>
+
+              {/* Platform logos row */}
+              <div className="animate-fade-in-up mt-12 flex flex-wrap items-center justify-center gap-3 md:gap-5 opacity-60" style={{ animationDelay: '0.35s' }}>
+                {platforms.map((p, i) => (
+                  <span key={i} className="text-xs md:text-sm font-bold tracking-wide text-text-secondary hover:text-accent transition-colors cursor-default"
+                    style={{ color: p.color, opacity: 0.7 }}>
+                    {p.name}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
@@ -142,11 +138,10 @@ export default function HomePage() {
         <section className="section bg-white dark:bg-surface">
           <div className="container-main">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-              {stats.map((s, i) => (
-                <RevealSection key={i}>
-                  <StatItem value={s.value} label={s.label} suffix={s.suffix} start={startCount} />
-                </RevealSection>
-              ))}
+              <RevealSection><StatItem value={50} suffix="万+" label={t('stats.users')} /></RevealSection>
+              <RevealSection><StatItem value={20} suffix="万+" label={t('stats.gifts')} /></RevealSection>
+              <RevealSection><StatItem value={15000} suffix="+" label={t('stats.invites')} /></RevealSection>
+              <RevealSection><StatItem prefix="$" value={3800} suffix="万+" label={t('stats.volume')} /></RevealSection>
             </div>
           </div>
         </section>
@@ -161,20 +156,25 @@ export default function HomePage() {
             </RevealSection>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-              {/* Connector line (desktop only) */}
               <div className="hidden md:block step-connector" style={{ top: '56px' }} />
-
-              {howSteps.map((s, i) => (
+              {[
+                { step: '01', title: t('how.step1_title'), desc: t('how.step1_desc'), color: '#FF9900' },
+                { step: '02', title: t('how.step2_title'), desc: t('how.step2_desc'), color: '#EE4D2D' },
+                { step: '03', title: t('how.step3_title'), desc: t('how.step3_desc'), color: '#D4A574' },
+              ].map((s, i) => (
                 <RevealSection key={i} style={{ transitionDelay: `${i * 0.15}s` }}>
-                  <div className="card text-center relative">
-                    <div className="w-16 h-16 rounded-2xl bg-accent/10 text-accent flex items-center justify-center text-2xl mb-5 mx-auto">
-                      {s.icon}
+                  <div className="card text-center relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-1" style={{ background: s.color }} />
+                    <div className="pt-6">
+                      <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center text-3xl mb-5 mx-auto">
+                        {['📋', '📤', '💰'][i]}
+                      </div>
+                      <div className="absolute -top-1 -left-1 text-5xl font-extrabold text-accent/10 select-none">
+                        {s.step}
+                      </div>
+                      <h3 className="text-lg font-bold mb-2">{s.title}</h3>
+                      <p className="text-text-secondary text-sm leading-relaxed">{s.desc}</p>
                     </div>
-                    <div className="absolute -top-3 -left-1 text-5xl font-extrabold text-accent/15 select-none">
-                      {s.step}
-                    </div>
-                    <h3 className="text-lg font-bold mb-2">{s.title}</h3>
-                    <p className="text-text-secondary text-sm">{s.desc}</p>
                   </div>
                 </RevealSection>
               ))}
@@ -182,7 +182,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ═══════ GIFT SHOWCASE ═══════ */}
+        {/* ═══════ PROFIT SHOWCASE ═══════ */}
         <section className="section bg-white dark:bg-surface">
           <div className="container-main">
             <RevealSection className="text-center mb-16">
@@ -191,15 +191,84 @@ export default function HomePage() {
               <p className="section-desc mx-auto">{t('gifts.desc')}</p>
             </RevealSection>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {giftItems.map((g, i) => (
-                <RevealSection key={i} style={{ transitionDelay: `${i * 0.08}s` }}>
-                  <div className="card p-5 text-center cursor-pointer">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${g.color} flex items-center justify-center text-2xl mb-3 mx-auto shadow-sm`}>
-                      {g.emoji}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+              {profitItems.map((g, i) => (
+                <RevealSection key={i} style={{ transitionDelay: `${i * 0.06}s` }}>
+                  <div className="card p-5 hover:border-accent/30 cursor-pointer">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-2xl">{g.emoji}</span>
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent">
+                        {g.cat}
+                      </span>
                     </div>
-                    <h4 className="font-semibold text-sm mb-1">{g.name}</h4>
-                    <p className="text-accent font-bold">{g.value}</p>
+                    <h4 className="font-semibold text-sm mb-3 truncate">{g.name}</h4>
+                    <div className="flex items-center justify-between text-xs mb-3">
+                      <span className="text-text-muted">
+                        成本 <span className="text-text font-semibold">{g.cost}</span>
+                      </span>
+                      <span className="text-text-muted">→</span>
+                      <span className="text-text-muted">
+                        市场价 <span className="text-text font-semibold">{g.price}</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between pt-3 border-t border-border-light">
+                      <span className="text-xs text-text-muted">你的利润</span>
+                      <span className="text-lg font-extrabold text-green-500">{g.profit}</span>
+                    </div>
+                  </div>
+                </RevealSection>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════ VALUE PROPOSITION ═══════ */}
+        <section className="section bg-surface-alt">
+          <div className="container-main">
+            <RevealSection className="text-center mb-16">
+              <span className="section-label">{t('value.label')}</span>
+              <h2 className="section-title">{t('value.title')}</h2>
+              <p className="section-desc mx-auto">{t('value.desc')}</p>
+            </RevealSection>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {valueItems.map((v, i) => {
+                const Icon = ICON_MAP[v.icon] || Package
+                return (
+                  <RevealSection key={i} style={{ transitionDelay: `${i * 0.1}s` }}>
+                    <div className="card p-6 flex gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
+                        <Icon size={24} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold mb-1.5">{v.title}</h4>
+                        <p className="text-text-secondary text-sm leading-relaxed">{v.desc}</p>
+                      </div>
+                    </div>
+                  </RevealSection>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════ PLATFORMS ═══════ */}
+        <section className="section bg-white dark:bg-surface">
+          <div className="container-main">
+            <RevealSection className="text-center mb-16">
+              <span className="section-label">{t('platforms.label')}</span>
+              <h2 className="section-title">{t('platforms.title')}</h2>
+              <p className="section-desc mx-auto max-w-2xl">{t('platforms.desc')}</p>
+            </RevealSection>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {platforms.map((p, i) => (
+                <RevealSection key={i} style={{ transitionDelay: `${i * 0.08}s` }}>
+                  <div className="card p-5 text-center h-full">
+                    <div className="text-2xl font-extrabold mb-2" style={{ color: p.color }}>
+                      {p.name}
+                    </div>
+                    <p className="text-text-muted text-xs leading-relaxed">{p.desc}</p>
                   </div>
                 </RevealSection>
               ))}
@@ -222,7 +291,7 @@ export default function HomePage() {
                   <div className="card p-6">
                     <div className="flex items-center gap-1 mb-4">
                       {[...Array(5)].map((_, j) => (
-                        <Star key={j} size={16} className="fill-accent text-accent" />
+                        <Star key={j} size={14} className="fill-accent text-accent" />
                       ))}
                     </div>
                     <p className="text-text text-sm leading-relaxed mb-5 italic">
@@ -231,11 +300,9 @@ export default function HomePage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-semibold text-sm">{item.name}</p>
-                        <p className="text-text-muted text-xs">{item.role}</p>
+                        <p className="text-text-muted text-[12px]">{item.role}</p>
                       </div>
-                      <div className="text-accent font-bold text-sm">
-                        {item.earned}
-                      </div>
+                      <div className="text-accent font-bold text-sm">{item.earned}</div>
                     </div>
                   </div>
                 </RevealSection>
@@ -248,7 +315,6 @@ export default function HomePage() {
         <section className="section bg-primary relative overflow-hidden">
           <div className="absolute inset-0 grid-pattern opacity-10" />
           <div className="absolute top-10 right-[-10%] w-[500px] h-[500px] bg-accent/10 rounded-full blur-3xl" />
-
           <div className="container-main relative z-10 text-center">
             <RevealSection>
               <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">

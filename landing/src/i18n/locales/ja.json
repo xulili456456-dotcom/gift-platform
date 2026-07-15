@@ -87,6 +87,10 @@
     "food": "食品",
     "toys": "おもちゃ",
     "sold": "販売済",
+    "hot": "人気",
+    "searchPlaceholder": "商品を検索...",
+    "products": "件",
+    "noResults": "該当する商品がありません",
     "viewApp": "アプリで全商品を見る →"
   },
   "download": {

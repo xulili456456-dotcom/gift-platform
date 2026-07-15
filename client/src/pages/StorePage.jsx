@@ -345,17 +345,36 @@ export default function StorePage() {
   const [detail, setDetail] = useState(null);
   const [showDealBanner, setShowDealBanner] = useState(true);
   const [notifCount, setNotifCount] = useState(0);
-
+  const [earnings, setEarnings] = useState({ todayProfit: 0, totalProfit: 0, totalOrders: 0, balance: 0, tomorrowEstimate: 0, dailyGoal: 20 });
+  const [sortMode, setSortMode] = useState('profit'); // 'profit' | 'price' | 'sales'
+  const [affordableOnly, setAffordableOnly] = useState(false);
+  const [showDeposit, setShowDeposit] = useState(false);
+  const [depositAmount, setDepositAmount] = useState('');
   const loadStatus = useCallback(async () => {
     try { const { data } = await client.get('/store/status'); setStatus(data); } catch { /* */ }
     finally { setLoading(false); }
   }, []);
-  useEffect(() => { loadStatus(); client.get('/notifications').then(({data}) => setNotifCount(data.unread||0)).catch(()=>{}); }, []);
+  const loadEarnings = useCallback(async () => {
+    try { const { data } = await client.get('/store/earnings-stats'); setEarnings(data); } catch {}
+  }, []);
+  useEffect(() => { loadStatus(); loadEarnings(); client.get('/notifications').then(({data}) => setNotifCount(data.unread||0)).catch(()=>{}); }, []);
+
+  const handleDeposit = async () => {
+    const amt = parseFloat(depositAmount);
+    if (!amt || amt < 1) return toast.error('Minimum $1');
+    try { await client.post('/store/deposit', { amount: amt }); toast.success('Deposited!'); setShowDeposit(false); setDepositAmount(''); loadStatus(); loadEarnings(); }
+    catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
+  };
 
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
-    return genProducts(status.store.tier, CAT_VALUES[catIdx], search);
-  }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, catIdx, search]);
+    let list = genProducts(status.store.tier, CAT_VALUES[catIdx], search);
+    if (affordableOnly) list = list.filter(p => p.costPrice <= (status.store.balance || 0));
+    if (sortMode === 'profit') list.sort((a, b) => b.profit - a.profit);
+    else if (sortMode === 'price') list.sort((a, b) => b.price - a.price);
+    else list.sort((a, b) => b.sold - a.sold);
+    return list;
+  }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, catIdx, search, sortMode, affordableOnly, status?.store?.balance]);
 
   const handleOpen = async () => { setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
   const handleBuy = async (product) => {
@@ -509,12 +528,46 @@ export default function StorePage() {
         </div>
       )}
 
-      {/* Stats bar */}
-      <div className="shrink-0 bg-white border-b border-[#ddd] px-4 py-2 flex items-center gap-3 text-[11px] text-[#565959]">
-        <span>{t('store.today')} <b className="text-[#0F1111]">{s.doneToday}/{s.dailyOrders}</b></span>
+      {/* Asset Dashboard Card */}
+      <div className="shrink-0 bg-white border-b border-[#ddd] px-4 py-3">
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <span className="text-[11px] text-[#565959]">{t('store.balance')}</span>
+            <p className="text-[28px] font-bold text-[#0F1111] leading-tight">${s.balance.toFixed(2)}</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => window.location.href='/mine/withdraw'} className="text-[11px] px-3 py-1.5 rounded-full bg-[#0F1111] text-white font-medium">{t('store.withdraw')}</button>
+            <button onClick={() => setShowDeposit(true)} className="text-[11px] px-3 py-1.5 rounded-full bg-[#FFD814] text-[#0F1111] font-medium">{t('store.deposit')}</button>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 text-[11px]">
+          <span className="text-[#067D62] font-bold">+${earnings.todayProfit.toFixed(2)} {t('store.today')}</span>
+          <span className="text-[#565959]">{t('store.totalEarned') || 'Total'}: <b className="text-[#0F1111]">${earnings.totalProfit.toFixed(2)}</b></span>
+          <span className="text-[#565959]">{t('store.today')} <b className="text-[#0F1111]">{s.doneToday}/{s.dailyOrders}</b></span>
+          {s.nextTier && <span className="ml-auto text-[#B12704] text-[10px]"><Crown size={10} className="inline mr-0.5" />{s.totalOrders}/{s.nextTier.threshold}</span>}
+        </div>
+        {/* Daily Goal Progress */}
+        <div className="mt-2">
+          <div className="flex justify-between text-[10px] text-[#565959] mb-0.5">
+            <span>{t('store.dailyGoal') || 'Daily Goal'}: ${earnings.dailyGoal.toFixed(0)}</span>
+            <span>{Math.round((earnings.todayProfit / earnings.dailyGoal) * 100)}%</span>
+          </div>
+          <div className="w-full h-1.5 bg-[#f0f2f2] rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-[#067D62] to-[#00A97F] rounded-full transition-all" style={{width: `${Math.min(100, (earnings.todayProfit / earnings.dailyGoal) * 100)}%`}} />
+          </div>
+          {earnings.tomorrowEstimate > s.balance && <p className="text-[9px] text-[#565959] mt-1">🚀 {t('store.tomorrowEstimate') || 'Tomorrow'}: ~${earnings.tomorrowEstimate.toFixed(2)}</p>}
+        </div>
+      </div>
+
+      {/* Sort & Filter Row */}
+      <div className="shrink-0 bg-white border-b border-[#ddd] px-3 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
+        <button onClick={() => setSortMode('profit')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='profit'?'bg-[#0F1111] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>💰 {t('store.sortProfit') || 'Profit'}</button>
+        <button onClick={() => setSortMode('price')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='price'?'bg-[#0F1111] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>📊 {t('store.sortPrice') || 'Price'}</button>
+        <button onClick={() => setSortMode('sales')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='sales'?'bg-[#0F1111] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>🔥 {t('store.sortSales') || 'Top'}</button>
         <span className="text-[#ddd]">|</span>
-        <span>{t('store.balance')} <b className={s.balance > 0 ? 'text-[#0F1111]' : 'text-[#B12704]'}>${s.balance.toFixed(2)}</b></span>
-        {s.nextTier && <span className="ml-auto text-xs text-[#B12704]"><Crown size={10} className="inline mr-0.5" />{s.totalOrders}/{s.nextTier.threshold}</span>}
+        <button onClick={() => setAffordableOnly(!affordableOnly)} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${affordableOnly?'bg-[#067D62] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>
+          {affordableOnly ? '✅' : '💰'} {t('store.affordable') || 'Affordable'}
+        </button>
       </div>
 
       {/* Product Grid - 2 columns */}
@@ -577,7 +630,22 @@ export default function StorePage() {
         </div>
       </div>
 
-      {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); }} t={t} />}
+      {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); loadEarnings(); }} t={t} />}
+
+      {/* Deposit Modal */}
+      {showDeposit && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowDeposit(false)}>
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
+            <h3 className="text-base font-bold text-[#0F1111] mb-1">{t('store.deposit') || 'Add Funds'}</h3>
+            <p className="text-xs text-[#565959] mb-4">{t('store.depositDesc') || 'Add capital to trade bigger items'}</p>
+            <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="$100" className="w-full px-3 py-2.5 border border-[#ddd] rounded-lg text-sm mb-4 outline-none focus:border-[#FF9900]" autoFocus />
+            <div className="flex gap-2">
+              <button onClick={() => setShowDeposit(false)} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#f0f2f2] text-[#0F1111]">{t('common.cancel') || 'Cancel'}</button>
+              <button onClick={handleDeposit} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111] border border-[#FCD200]">{t('store.confirmDeposit') || 'Confirm'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
