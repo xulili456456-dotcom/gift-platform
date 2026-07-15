@@ -182,12 +182,30 @@
     }
   },
   "giftData": {
-    "新人红包": { "name": "Newcomer Bonus", "desc": "Invite 1 friend to claim this newcomer reward" },
-    "初级红包": { "name": "Bronze Reward", "desc": "Invite 5 friends - you're getting started!" },
-    "中级红包": { "name": "Silver Reward", "desc": "Invite 15 friends - keep the momentum!" },
-    "高级红包": { "name": "Gold Reward", "desc": "Invite 50 friends - true hustler status!" },
-    "顶级红包": { "name": "Diamond Reward", "desc": "Invite 150 friends - elite tier achieved!" },
-    "至尊大奖": { "name": "Legendary Jackpot", "desc": "Invite 500 friends - legendary status!" }
+    "新人红包": {
+      "name": "Newcomer Bonus",
+      "desc": "Invite 1 friend to claim this newcomer reward"
+    },
+    "初级红包": {
+      "name": "Bronze Reward",
+      "desc": "Invite 5 friends - you're getting started!"
+    },
+    "中级红包": {
+      "name": "Silver Reward",
+      "desc": "Invite 15 friends - keep the momentum!"
+    },
+    "高级红包": {
+      "name": "Gold Reward",
+      "desc": "Invite 50 friends - true hustler status!"
+    },
+    "顶级红包": {
+      "name": "Diamond Reward",
+      "desc": "Invite 150 friends - elite tier achieved!"
+    },
+    "至尊大奖": {
+      "name": "Legendary Jackpot",
+      "desc": "Invite 500 friends - legendary status!"
+    }
   },
   "home": {
     "greeting": "Hi",
@@ -481,36 +499,99 @@
     "about": "About Us",
     "termsTitle": "Terms of Service",
     "termsContent": [
-      {"title":"1. General","body":"Welcome to Gift Haven. By registering, you agree to all terms of this agreement between you and the platform operator. If you do not agree with any provision, please do not register."},
-      {"title":"2. Account Registration","body":"You must provide true, accurate, and complete information when registering, including email and phone number. You are responsible for maintaining the confidentiality of your account. Each user is limited to one account."},
-      {"title":"3. Invitation & Rewards","body":"The platform uses a multi-level invitation system. Effective invites are calculated as Level 1×1.0 + Level 2×0.5 + Level 3×0.25. Rewards require platform review before distribution."},
-      {"title":"4. Prohibited Conduct","body":"Automated scripts, fake accounts, batch registration, fraud, or coercion to obtain invites are strictly prohibited. Violations may result in account suspension and reward forfeiture."},
-      {"title":"5. Agreement Changes","body":"The platform reserves the right to modify this agreement at any time. Updated terms take effect immediately upon posting. Continued use constitutes acceptance."},
-      {"title":"6. Termination","body":"You may stop using the platform at any time. The platform may terminate services for violations, legal requirements, or business changes."}
+      {
+        "title": "1. General",
+        "body": "Welcome to Gift Haven. By registering, you agree to all terms of this agreement between you and the platform operator. If you do not agree with any provision, please do not register."
+      },
+      {
+        "title": "2. Account Registration",
+        "body": "You must provide true, accurate, and complete information when registering, including email and phone number. You are responsible for maintaining the confidentiality of your account. Each user is limited to one account."
+      },
+      {
+        "title": "3. Invitation & Rewards",
+        "body": "The platform uses a multi-level invitation system. Effective invites are calculated as Level 1×1.0 + Level 2×0.5 + Level 3×0.25. Rewards require platform review before distribution."
+      },
+      {
+        "title": "4. Prohibited Conduct",
+        "body": "Automated scripts, fake accounts, batch registration, fraud, or coercion to obtain invites are strictly prohibited. Violations may result in account suspension and reward forfeiture."
+      },
+      {
+        "title": "5. Agreement Changes",
+        "body": "The platform reserves the right to modify this agreement at any time. Updated terms take effect immediately upon posting. Continued use constitutes acceptance."
+      },
+      {
+        "title": "6. Termination",
+        "body": "You may stop using the platform at any time. The platform may terminate services for violations, legal requirements, or business changes."
+      }
     ],
     "privacyTitle": "Privacy Policy",
     "privacyContent": [
-      {"title":"1. Information Collection","body":"We collect: (1) Registration data: email, phone, nickname; (2) Usage data: invitation records, claim history, login logs; (3) Device data: browser type, OS, IP address."},
-      {"title":"2. Information Usage","body":"Your data is used for: identity verification, invitation tracking, reward distribution, service improvement, and security. We will not use your data for other purposes without consent."},
-      {"title":"3. Data Storage & Security","body":"Data is stored on encrypted servers with SSL/TLS transmission, encrypted database storage, and access controls. No system is 100% secure."},
-      {"title":"4. Information Sharing","body":"We do not sell, trade, or transfer your personal information to third parties without consent, except as required by law or to protect platform rights."},
-      {"title":"5. Your Rights","body":"You have the right to: access your data, correct inaccuracies, delete your account, export your data, and withdraw consent. Contact support to exercise these rights."},
-      {"title":"6. Cookies","body":"We use cookies to remember login state and analyze usage. You can manage cookie preferences in browser settings."}
+      {
+        "title": "1. Information Collection",
+        "body": "We collect: (1) Registration data: email, phone, nickname; (2) Usage data: invitation records, claim history, login logs; (3) Device data: browser type, OS, IP address."
+      },
+      {
+        "title": "2. Information Usage",
+        "body": "Your data is used for: identity verification, invitation tracking, reward distribution, service improvement, and security. We will not use your data for other purposes without consent."
+      },
+      {
+        "title": "3. Data Storage & Security",
+        "body": "Data is stored on encrypted servers with SSL/TLS transmission, encrypted database storage, and access controls. No system is 100% secure."
+      },
+      {
+        "title": "4. Information Sharing",
+        "body": "We do not sell, trade, or transfer your personal information to third parties without consent, except as required by law or to protect platform rights."
+      },
+      {
+        "title": "5. Your Rights",
+        "body": "You have the right to: access your data, correct inaccuracies, delete your account, export your data, and withdraw consent. Contact support to exercise these rights."
+      },
+      {
+        "title": "6. Cookies",
+        "body": "We use cookies to remember login state and analyze usage. You can manage cookie preferences in browser settings."
+      }
     ],
     "liabilityTitle": "Legal Disclaimer",
     "liabilityContent": [
-      {"title":"1. Service Risk","body":"You understand that using the platform involves inherent risks. The service is provided as-is without warranties of timeliness, security, or accuracy."},
-      {"title":"2. Reward Adjustments","body":"Reward mechanisms may be adjusted based on operational needs. The platform reserves final interpretation rights."},
-      {"title":"3. Third-Party Links","body":"The platform may contain links to third-party sites. We are not responsible for third-party content or practices."},
-      {"title":"4. Force Majeure","body":"The platform is not liable for interruptions caused by natural disasters, war, government actions, cyber attacks, or system failures."},
-      {"title":"5. User Disputes","body":"Disputes between users should be resolved between the parties. The platform may assist but assumes no liability."}
+      {
+        "title": "1. Service Risk",
+        "body": "You understand that using the platform involves inherent risks. The service is provided as-is without warranties of timeliness, security, or accuracy."
+      },
+      {
+        "title": "2. Reward Adjustments",
+        "body": "Reward mechanisms may be adjusted based on operational needs. The platform reserves final interpretation rights."
+      },
+      {
+        "title": "3. Third-Party Links",
+        "body": "The platform may contain links to third-party sites. We are not responsible for third-party content or practices."
+      },
+      {
+        "title": "4. Force Majeure",
+        "body": "The platform is not liable for interruptions caused by natural disasters, war, government actions, cyber attacks, or system failures."
+      },
+      {
+        "title": "5. User Disputes",
+        "body": "Disputes between users should be resolved between the parties. The platform may assist but assumes no liability."
+      }
     ],
     "aboutTitle": "About Gift Haven",
     "aboutContent": [
-      {"title":"Platform Overview","body":"Gift Haven is an innovative invitation-based reward platform. Users share invite links, accumulate effective invites, and claim cash rewards at thresholds with a multi-level bonus system."},
-      {"title":"Key Features","body":"Multi-level invites: 3-tier weighted calculation. Rich rewards: from starter bonuses to grand prizes. Transparent tracking: real-time progress, earnings, team structure. Secure & reliable: KYC verification, encryption, review process."},
-      {"title":"Our Mission","body":"Make every share rewarding. We believe everyone's social influence has value. Gift Haven converts your network into real earnings while providing brands with efficient social distribution."},
-      {"title":"Contact Us","body":"For questions, suggestions, or partnerships: WhatsApp +1 (555) 123-4567. We respond within 24 hours."}
+      {
+        "title": "Platform Overview",
+        "body": "Gift Haven is an innovative invitation-based reward platform. Users share invite links, accumulate effective invites, and claim cash rewards at thresholds with a multi-level bonus system."
+      },
+      {
+        "title": "Key Features",
+        "body": "Multi-level invites: 3-tier weighted calculation. Rich rewards: from starter bonuses to grand prizes. Transparent tracking: real-time progress, earnings, team structure. Secure & reliable: KYC verification, encryption, review process."
+      },
+      {
+        "title": "Our Mission",
+        "body": "Make every share rewarding. We believe everyone's social influence has value. Gift Haven converts your network into real earnings while providing brands with efficient social distribution."
+      },
+      {
+        "title": "Contact Us",
+        "body": "For questions, suggestions, or partnerships: WhatsApp +1 (555) 123-4567. We respond within 24 hours."
+      }
     ],
     "version": "Version",
     "platform": "Platform",
@@ -576,10 +657,6 @@
     "level3": "Three Generations",
     "first-claim": "First Bounty",
     "earn-100": "Centurion"
-  },
-  "charts": {
-    "earningsTrend": "Earnings Trend",
-    "inviteGrowth": "Invite Growth"
   },
   "common": {
     "darkMode": "Dark Mode",
@@ -668,5 +745,110 @@
     "searchPlaceholder": "Search products...",
     "today": "Today",
     "balance": "Balance"
+  },
+  "specs": {
+    "产地": "Origin",
+    "亮度": "Brightness",
+    "件数": "Pieces",
+    "传感器": "Sensor",
+    "保修": "Warranty",
+    "保养": "Care",
+    "保护": "Protection",
+    "光圈": "Aperture",
+    "兼容": "Compatibility",
+    "内存": "RAM",
+    "内容": "Contents",
+    "刀片": "Blade",
+    "分辨率": "Resolution",
+    "功率": "Power",
+    "功能": "Functions",
+    "包含": "Includes",
+    "卡口": "Mount",
+    "参数": "Parameters",
+    "吸力": "Suction",
+    "品牌": "Brand",
+    "品质": "Quality",
+    "地毯": "Carpet",
+    "型号": "Model",
+    "处理器": "Processor",
+    "天线": "Antenna",
+    "存储": "Storage",
+    "安全": "Security",
+    "安装": "Installation",
+    "定位": "Positioning",
+    "容量": "Capacity",
+    "密封": "Seal",
+    "对焦": "Focus",
+    "导航": "Navigation",
+    "尺寸": "Dimensions",
+    "屏幕": "Screen",
+    "平台": "Platform",
+    "感应": "Sensor",
+    "手柄": "Handle",
+    "技术": "Technology",
+    "探测": "Detection",
+    "接口": "Interface",
+    "接收": "Reception",
+    "控制": "Control",
+    "摄像头": "Camera",
+    "散热": "Cooling",
+    "数量": "Quantity",
+    "显卡": "GPU",
+    "显存": "VRAM",
+    "显示": "Display",
+    "材质": "Material",
+    "档位": "Levels",
+    "水箱": "Water Tank",
+    "涂层": "Coating",
+    "清洁": "Cleaning",
+    "清洗": "Dishwasher",
+    "温度": "Temperature",
+    "温控": "Temp Control",
+    "灵敏度": "Sensitivity",
+    "特色": "Features",
+    "电压": "Voltage",
+    "电池": "Battery",
+    "直播": "Live Stream",
+    "箭头": "Arrows",
+    "类型": "Type",
+    "系统": "OS",
+    "续航": "Battery Life",
+    "网络": "Network",
+    "翻转": "Rotation",
+    "耐热": "Heat Resistant",
+    "肥皂": "Soap",
+    "自动集尘": "Auto Empty",
+    "自清洁": "Self-Cleaning",
+    "色彩": "Color Depth",
+    "芯片": "Chip",
+    "菜单": "Menus",
+    "蒸汽": "Steam",
+    "视频": "Video",
+    "警报": "Alerts",
+    "越障": "Obstacle",
+    "转向": "Steering",
+    "输出": "Output",
+    "运动": "Sports",
+    "连拍": "Burst",
+    "连接": "Connection",
+    "适用": "Compatible",
+    "通道": "Channels",
+    "重量": "Weight",
+    "锁定": "Lock",
+    "长度": "Length",
+    "防抖": "Stabilization",
+    "防水": "Waterproof",
+    "防缠绕": "Anti-Tangle",
+    "附件": "Accessories",
+    "除味": "Odor Control",
+    "集尘袋": "Dust Bag",
+    "音频": "Audio",
+    "频率": "Frequency",
+    "颜色": "Color",
+    "香味": "Scent",
+    "AI": "AI",
+    "App": "App",
+    "GPS": "GPS",
+    "HDR": "HDR"
   }
 }
