@@ -220,6 +220,25 @@ async function migrate() {
   await getDb();
   await exec(schema);
   await exec(defaultSettings);
+  // One-time cleanup: remove legacy Chinese notifications
+  try {
+    await exec(`DELETE FROM notifications WHERE title ~ '[\\u4e00-\\u9fff]' OR body ~ '[\\u4e00-\\u9fff]'`);
+  } catch (e) { console.log('Notification cleanup skipped:', e.message); }
+  // One-time cleanup: update legacy Chinese platform settings
+  try {
+    await exec(`UPDATE admin_settings SET value = 'Gift Platform' WHERE key = 'platform_name' AND value ~ '[\\u4e00-\\u9fff]'`);
+    await exec(`UPDATE admin_settings SET value = 'Invite friends, win great rewards!' WHERE key = 'platform_share_title' AND value ~ '[\\u4e00-\\u9fff]'`);
+    await exec(`UPDATE admin_settings SET value = 'Complete tasks to earn cash and prizes. Join now!' WHERE key = 'platform_share_desc' AND value ~ '[\\u4e00-\\u9fff]'`);
+  } catch (e) { console.log('Settings cleanup skipped:', e.message); }
+  // One-time cleanup: update legacy Chinese gift names to English
+  try {
+    await exec(`UPDATE gifts SET name = 'Newcomer Red Packet', description = 'Invite 1 friend to claim, newcomer exclusive' WHERE name ~ '新人'`);
+    await exec(`UPDATE gifts SET name = 'Starter Red Packet', description = 'Invite 5 friends to claim' WHERE name ~ '初级'`);
+    await exec(`UPDATE gifts SET name = 'Intermediate Red Packet', description = 'Invite 15 friends to claim' WHERE name ~ '中级'`);
+    await exec(`UPDATE gifts SET name = 'Advanced Red Packet', description = 'Invite 50 friends to claim' WHERE name ~ '高级'`);
+    await exec(`UPDATE gifts SET name = 'Elite Red Packet', description = 'Invite 150 friends to claim' WHERE name ~ '顶级'`);
+    await exec(`UPDATE gifts SET name = 'Supreme Grand Prize', description = 'Invite 500 friends to claim, legendary achievement' WHERE name ~ '至尊'`);
+  } catch (e) { console.log('Gifts cleanup skipped:', e.message); }
   console.log('Migrations complete.');
 }
 
