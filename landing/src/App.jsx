@@ -8,6 +8,7 @@ import AboutPage from './pages/AboutPage'
 import DownloadPage from './pages/DownloadPage'
 import StorePage from './pages/StorePage'
 import FaqPage from './pages/FaqPage'
+import LegalPage from './pages/LegalPage'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -26,6 +27,7 @@ function AppLayout() {
           <Route path="/download" element={<DownloadPage />} />
           <Route path="/store" element={<StorePage />} />
           <Route path="/faq" element={<FaqPage />} />
+          <Route path="/legal" element={<LegalPage />} />
           <Route path="*" element={<HomePage />} />
         </Routes>
       </main>

@@ -347,8 +347,6 @@ export default function StorePage() {
   const [earnings, setEarnings] = useState({ todayProfit: 0, totalProfit: 0, totalOrders: 0, balance: 0, tomorrowEstimate: 0, dailyGoal: 20 });
   const [sortMode, setSortMode] = useState('profit'); // 'profit' | 'price' | 'sales'
   const [affordableOnly, setAffordableOnly] = useState(false);
-  const [showDeposit, setShowDeposit] = useState(false);
-  const [depositAmount, setDepositAmount] = useState('');
   const loadStatus = useCallback(async () => {
     try { const { data } = await client.get('/store/status'); setStatus(data); } catch { /* */ }
     finally { setLoading(false); }
@@ -357,13 +355,6 @@ export default function StorePage() {
     try { const { data } = await client.get('/store/earnings-stats'); setEarnings(data); } catch {}
   }, []);
   useEffect(() => { loadStatus(); loadEarnings(); client.get('/notifications').then(({data}) => setNotifCount(data.unread||0)).catch(()=>{}); }, []);
-
-  const handleDeposit = async () => {
-    const amt = parseFloat(depositAmount);
-    if (!amt || amt < 1) return toast.error('Minimum $1');
-    try { await client.post('/store/deposit', { amount: amt }); toast.success('Deposited!'); setShowDeposit(false); setDepositAmount(''); loadStatus(); loadEarnings(); }
-    catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
-  };
 
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
@@ -522,10 +513,6 @@ export default function StorePage() {
             <span className="text-[11px] text-[#565959]">{t('store.balance')}</span>
             <p className="text-[28px] font-bold text-[#0F1111] leading-tight">${s.balance.toFixed(2)}</p>
           </div>
-          <div className="flex gap-2">
-            <button onClick={() => window.location.href='/mine/withdraw'} className="text-[11px] px-3 py-1.5 rounded-full bg-[#0F1111] text-white font-medium">{t('store.withdraw')}</button>
-            <button onClick={() => setShowDeposit(true)} className="text-[11px] px-3 py-1.5 rounded-full bg-[#FFD814] text-[#0F1111] font-medium">{t('store.deposit')}</button>
-          </div>
         </div>
         <div className="flex items-center gap-4 text-[11px]">
           <span className="text-[#067D62] font-bold">+${earnings.todayProfit.toFixed(2)} {t('store.today')}</span>
@@ -618,21 +605,6 @@ export default function StorePage() {
       </div>
 
       {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); loadEarnings(); }} t={t} />}
-
-      {/* Deposit Modal */}
-      {showDeposit && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowDeposit(false)}>
-          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
-            <h3 className="text-base font-bold text-[#0F1111] mb-1">{t('store.deposit') || 'Add Funds'}</h3>
-            <p className="text-xs text-[#565959] mb-4">{t('store.depositDesc') || 'Add capital to trade bigger items'}</p>
-            <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="$100" className="w-full px-3 py-2.5 border border-[#ddd] rounded-lg text-sm mb-4 outline-none focus:border-[#FF9900]" autoFocus />
-            <div className="flex gap-2">
-              <button onClick={() => setShowDeposit(false)} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#f0f2f2] text-[#0F1111]">{t('common.cancel') || 'Cancel'}</button>
-              <button onClick={handleDeposit} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111] border border-[#FCD200]">{t('store.confirmDeposit') || 'Confirm'}</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

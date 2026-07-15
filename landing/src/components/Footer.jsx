@@ -60,19 +60,19 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2">
               <li>
-                <span className="text-text-secondary text-sm cursor-pointer hover:text-accent transition-colors">
+                <Link to="/legal?tab=terms" className="text-text-secondary hover:text-accent transition-colors text-sm no-underline">
                   {t('footer.terms')}
-                </span>
+                </Link>
               </li>
               <li>
-                <span className="text-text-secondary text-sm cursor-pointer hover:text-accent transition-colors">
+                <Link to="/legal?tab=privacy" className="text-text-secondary hover:text-accent transition-colors text-sm no-underline">
                   {t('footer.privacy')}
-                </span>
+                </Link>
               </li>
               <li>
-                <span className="text-text-secondary text-sm cursor-pointer hover:text-accent transition-colors">
+                <a href="mailto:support@gifthaven.com" className="text-text-secondary hover:text-accent transition-colors text-sm no-underline">
                   {t('footer.contact')}
-                </span>
+                </a>
               </li>
             </ul>
           </div>
