@@ -135,7 +135,7 @@ export default function HomePage() {
               <div key={gift.id} onClick={() => navigate(`/gift/${gift.id}`)}
                 className={`rounded-2xl p-3.5 border-2 transition-all press-active cursor-pointer card-tilt ${done ? 'glow-border' : ''} ${
                   done
-                    ? 'bg-gradient-to-b from-[#FFF9E6] to-[#FFF3CC] border-gold shadow-md shadow-gold/15'
+                    ? 'bg-gradient-to-b from-[#1E1E32] to-[#262636] border-gold shadow-md shadow-gold/15'
                     : 'bg-white border-separator shadow-sm'
                 }`}>
                 <div className="flex items-center justify-between mb-1.5">

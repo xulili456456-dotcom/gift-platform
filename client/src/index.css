@@ -408,3 +408,16 @@ body.dark .bg-gray-50 { background: #1E1E32 !important; }
 body.dark .bg-gray-100 { background: #262636 !important; }
 body.dark input, body.dark textarea, body.dark select { background: #1E1E32; color: #f8f7f4; border-color: #262636; }
 body.dark input::placeholder { color: #6e6e7a; }
+
+/* Light tint backgrounds → dark equivalents */
+body.dark .bg-yellow-50 { background: #1e1a10 !important; }
+body.dark .text-yellow-600 { color: #e0c78e; }
+body.dark .text-amber-600 { color: #e0c78e; }
+body.dark .text-amber-500 { color: #c8a06e; }
+body.dark .bg-purple-50 { background: #1e1a2a !important; }
+body.dark .text-purple-600 { color: #b8a0d8; }
+body.dark .bg-red-100 { background: #2a1518 !important; }
+body.dark .text-red-500 { color: #ff6568; }
+body.dark .border-amber-200 { border-color: #a07840; }
+body.dark .bg-green-100 { background: #0d2418 !important; }
+body.dark .bg-success\/5 { background: #0d2418 !important; }

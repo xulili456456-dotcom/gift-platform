@@ -63,7 +63,7 @@ export default function GiftDetailPage() {
         {/* Gift Hero */}
         <div className={`rounded-2xl p-6 text-center shadow-xl ${
           canClaim
-            ? 'bg-gradient-to-br from-[#FFF9E6] to-[#FFF3CC] border-2 border-gold'
+            ? 'bg-gradient-to-br from-[#1E1E32] to-[#262636] border-2 border-gold'
             : 'bg-white border border-separator'
         }`}>
           <div className="text-6xl mb-4">{gift.gift_type === 'cash' ? '🧧' : '🎁'}</div>

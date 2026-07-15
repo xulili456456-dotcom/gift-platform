@@ -139,7 +139,7 @@ export default function TasksPage() {
             {gifts.map(gift => {
               const done = effective >= gift.required_invites;
               return (
-                <div key={gift.id} className={`px-4 py-3 flex items-center gap-3 ${done ? 'bg-gradient-to-r from-[#FFF9E6]/50' : ''}`}>
+                <div key={gift.id} className={`px-4 py-3 flex items-center gap-3 ${done ? 'bg-gradient-to-r from-[#1E1E32]/50' : ''}`}>
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg ${done ? 'bg-gold/10' : 'bg-bg'}`}>{done ? '✅' : '🧧'}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline mb-1"><span className="text-[13px] font-semibold text-text">{tg(gift).name}</span><span className={`text-[14px] font-black ${done ? 'text-gold' : 'text-primary'}`}>${gift.value}</span></div>

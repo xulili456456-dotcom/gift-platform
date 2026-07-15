@@ -127,7 +127,7 @@ export default function MinePage() {
         {/* ═══ Claimable ═══ */}
         {eligibleGifts.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-separator">
-            <div className="px-4 py-3 border-b border-separator bg-gradient-to-r from-[#FFF9E6]/50 to-transparent flex items-center gap-2">
+            <div className="px-4 py-3 border-b border-separator bg-gradient-to-r from-[#1E1E32]/50 to-transparent flex items-center gap-2">
               <span className="text-lg">🎁</span>
               <span className="text-[14px] font-bold text-text">{t('claim.available')}</span>
               <span className="text-[12px] bg-gold text-white px-2 py-0.5 rounded-full font-bold animate-bounce-pulse">{eligibleGifts.length}</span>
