@@ -1,0 +1,174 @@
+{
+  "app": {
+    "name": "Gift Haven",
+    "slogan": "Invita amigos, completa tareas, gana recompensas",
+    "cta_register": "Regístrate Gratis",
+    "cta_download": "Descargar App",
+    "cta_share": "Compartir",
+    "cta_store": "Abrir en App"
+  },
+  "nav": {
+    "home": "Inicio",
+    "about": "Nosotros",
+    "download": "Descargar",
+    "store": "Tienda",
+    "faq": "Preguntas"
+  },
+  "hero": {
+    "title": "Invita Amigos, Gana Premios",
+    "subtitle": "Completa tareas para ganar recompensas en efectivo y canjear regalos premium. Gift Haven hace que cada compartir sea gratificante.",
+    "badge": "🔥 Más de 500,000 usuarios ya se unieron"
+  },
+  "stats": {
+    "users": "Usuarios",
+    "gifts": "Regalos Entregados",
+    "invites": "Invitaciones Activas",
+    "volume": "Volumen Total"
+  },
+  "how": {
+    "label": "Cómo Funciona",
+    "title": "Gana dinero en 3 simples pasos",
+    "desc": "Comienza tu viaje de ganancias en solo tres pasos.",
+    "step1_title": "Crea tu Cuenta",
+    "step1_desc": "Regístrate gratis y obtén tu código de referido",
+    "step2_title": "Invita Amigos",
+    "step2_desc": "Comparte tu enlace y gana cuando se unan",
+    "step3_title": "Canjea Regalos",
+    "step3_desc": "Acumula puntos y canjea por efectivo o regalos premium"
+  },
+  "gifts": {
+    "label": "Regalos Premium",
+    "title": "Increíbles recompensas te esperan",
+    "desc": "Desde bonos en efectivo hasta los últimos gadgets — lo tenemos todo."
+  },
+  "testimonials": {
+    "label": "Testimonios",
+    "title": "Lo que dicen nuestros usuarios",
+    "desc": "Historias reales de usuarios reales.",
+    "items": [
+      {
+        "name": "Carlos",
+        "role": "Estudiante",
+        "text": "¡Esto es increíble! Gané más de $200 en mi primer mes haciendo tareas en mi tiempo libre. Mis compañeros también lo están usando ahora.",
+        "earned": "$340"
+      },
+      {
+        "name": "María",
+        "role": "Ama de Casa",
+        "text": "Perfecto para ganar dinero extra mientras cuido a los niños. La selección de regalos es genial — conseguí un altavoz Bluetooth el mes pasado.",
+        "earned": "$720"
+      },
+      {
+        "name": "Roberto",
+        "role": "Oficinista",
+        "text": "Hago tareas durante el almuerzo y las ganancias se acumulan rápido. El sistema de referidos de 3 niveles es genial.",
+        "earned": "$1,250"
+      },
+      {
+        "name": "Ana",
+        "role": "Freelancer",
+        "text": "Un amigo me lo recomendó y al principio era escéptica. Pero después de mi primer retiro, me enganché. Ahora es parte de mi rutina diaria.",
+        "earned": "$520"
+      }
+    ]
+  },
+  "store": {
+    "label": "Tienda",
+    "title": "Productos premium a excelentes precios",
+    "desc": "Usa tus puntos ganados para canjear electrónicos, belleza, hogar y más.",
+    "all": "Todos",
+    "digital": "Electrónicos",
+    "women": "Mujer",
+    "men": "Hombre",
+    "beauty": "Belleza",
+    "shoes": "Calzado",
+    "home": "Hogar",
+    "accessories": "Accesorios",
+    "food": "Alimentos",
+    "toys": "Juguetes",
+    "sold": "vendidos",
+    "viewApp": "Ver todos los productos en App →"
+  },
+  "download": {
+    "label": "Descargar",
+    "title": "Gana en cualquier momento y lugar",
+    "desc": "Descarga la app Gift Haven para la mejor experiencia. Disponible para Android.",
+    "version": "Versión 1.0.0",
+    "size": "~15MB",
+    "features_title": "Características",
+    "features": [
+      { "icon": "Zap", "title": "Súper Rápido", "desc": "Experiencia nativa, más rápida que la web" },
+      { "icon": "Bell", "title": "Alertas en Vivo", "desc": "Notificaciones instantáneas de tareas y recompensas" },
+      { "icon": "Shield", "title": "Seguro", "desc": "Datos encriptados con seguridad bancaria" },
+      { "icon": "Smartphone", "title": "Sin Conexión", "desc": "Ve tareas y ganancias incluso sin internet" }
+    ],
+    "install_title": "Guía de Instalación",
+    "install_steps": [
+      { "step": "1", "title": "Descarga el APK", "desc": "Toca el botón de descarga para guardar el APK en tu dispositivo" },
+      { "step": "2", "title": "Permitir Instalación", "desc": "Activa 'Instalar de fuentes desconocidas' en ajustes" },
+      { "step": "3", "title": "Instalar y Abrir", "desc": "Abre el APK, instala, regístrate o inicia sesión" }
+    ],
+    "coming_soon": "Próximamente",
+    "apk_placeholder": "El archivo APK se está preparando, estate atento..."
+  },
+  "about": {
+    "label": "Sobre Nosotros",
+    "title": "Haciendo que compartir sea gratificante",
+    "desc": "Gift Haven fue fundada en 2024 con la misión de crear una plataforma donde todos puedan ganar recompensas compartiendo y completando tareas.",
+    "mission_title": "Nuestra Misión",
+    "mission": "Conectar el valor entre las personas a través del compartir — convirtiendo cada recomendación en recompensas tangibles.",
+    "vision_title": "Nuestra Visión",
+    "vision": "Convertirnos en la plataforma líder mundial de recompensas basada en tareas.",
+    "values_title": "Valores Fundamentales",
+    "values": [
+      { "title": "Usuarios Primero", "desc": "Siempre priorizamos los intereses de nuestros usuarios." },
+      { "title": "Transparencia", "desc": "Todos los mecanismos de recompensa son abiertos y transparentes." },
+      { "title": "Innovación Continua", "desc": "Mejoramos constantemente el producto con nuevas formas de ganar." }
+    ]
+  },
+  "faq": {
+    "label": "Preguntas",
+    "title": "¿Tienes dudas? Tenemos respuestas",
+    "desc": "¿No encuentras lo que buscas? Escríbenos a support@haolixiangsong.com",
+    "categories": {
+      "platform": "Plataforma",
+      "earning": "Ganancias",
+      "withdraw": "Retiros",
+      "invite": "Referidos",
+      "tech": "Técnico"
+    },
+    "items": [
+      { "q": "¿Qué es Gift Haven?", "a": "Gift Haven es una plataforma de recompensas basada en invitaciones y tareas. Los usuarios ganan puntos y recompensas completando tareas diarias e invitando amigos.", "cat": "platform" },
+      { "q": "¿Es gratis?", "a": "¡Completamente gratis! Registro, tareas e invitaciones son totalmente gratuitos.", "cat": "platform" },
+      { "q": "¿Cómo gano recompensas?", "a": "Principalmente: 1) Completando tareas diarias; 2) Invitando amigos con comisión de hasta 3 niveles.", "cat": "earning" },
+      { "q": "¿Qué es la comisión de 3 niveles?", "a": "Ganas comisiones de las personas que invitas (Nivel 1), de quienes ellos invitan (Nivel 2) y de los invitados de estos (Nivel 3).", "cat": "earning" },
+      { "q": "¿Cuánto puedo ganar?", "a": "Varía por usuario. Usuarios regulares ganan algunos dólares al día. Los referidores activos ganan mucho más.", "cat": "earning" },
+      { "q": "¿Cómo retiro?", "a": "Ve a 'Mi Cuenta' → 'Billetera' → 'Retirar'. Retiro mínimo de $10, procesado en 1-3 días.", "cat": "withdraw" },
+      { "q": "¿Hay comisiones por retiro?", "a": "Usuarios regulares pagan 1%. Miembros VIP tienen retiros gratuitos.", "cat": "withdraw" },
+      { "q": "¿Cómo invito amigos?", "a": "En la página 'Tareas', toca 'Invitar Amigos'. Copia tu enlace o comparte tu código QR.", "cat": "invite" },
+      { "q": "¿Hay límite de invitaciones?", "a": "¡Sin límites! Cuantos más invites, más ganas.", "cat": "invite" },
+      { "q": "¿Qué dispositivos son compatibles?", "a": "Actualmente Android (app) y web (H5). Versión iOS en desarrollo.", "cat": "tech" },
+      { "q": "¿Están seguros mis datos?", "a": "Usamos encriptación de nivel bancario. Nunca venderemos tu información personal.", "cat": "tech" }
+    ]
+  },
+  "cta": {
+    "title": "¿Listo para empezar a ganar?",
+    "subtitle": "¡Regístrate ahora y reclama tu bono de bienvenida!",
+    "button": "Regístrate Gratis — Recibe tu Bono"
+  },
+  "footer": {
+    "description": "Gift Haven — Conectando el valor compartido, haciendo que cada esfuerzo sea gratificante.",
+    "links": "Enlaces Rápidos",
+    "legal": "Legal",
+    "terms": "Términos de Servicio",
+    "privacy": "Política de Privacidad",
+    "contact": "Contacto",
+    "email": "support@haolixiangsong.com",
+    "copyright": "© 2025 Gift Haven. Todos los derechos reservados."
+  },
+  "common": {
+    "language": "Idioma",
+    "darkMode": "Modo Oscuro",
+    "lightMode": "Modo Claro"
+  }
+}

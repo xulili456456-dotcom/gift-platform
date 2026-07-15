@@ -1,0 +1,174 @@
+{
+  "app": {
+    "name": "Gift Haven",
+    "slogan": "Invite friends, complete tasks, earn cash rewards",
+    "cta_register": "Sign Up Free",
+    "cta_download": "Download App",
+    "cta_share": "Share with Friends",
+    "cta_store": "Open in App"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "download": "Download",
+    "store": "Store",
+    "faq": "FAQ"
+  },
+  "hero": {
+    "title": "Invite Friends, Earn Rewards",
+    "subtitle": "Complete tasks to earn cash rewards and redeem premium gifts. Gift Haven makes every share rewarding.",
+    "badge": "🔥 500,000+ users already joined"
+  },
+  "stats": {
+    "users": "Registered Users",
+    "gifts": "Gifts Delivered",
+    "invites": "Active Invites",
+    "volume": "Total Volume"
+  },
+  "how": {
+    "label": "How It Works",
+    "title": "Earn money in 3 simple steps",
+    "desc": "Start your earning journey in just three steps.",
+    "step1_title": "Create Account",
+    "step1_desc": "Sign up for free and get your referral code",
+    "step2_title": "Invite Friends",
+    "step2_desc": "Share your link and earn rewards when they join",
+    "step3_title": "Redeem Gifts",
+    "step3_desc": "Accumulate points and redeem for cash or premium gifts"
+  },
+  "gifts": {
+    "label": "Premium Gifts",
+    "title": "Amazing rewards waiting for you",
+    "desc": "From cash bonuses to the latest gadgets — we've got it all."
+  },
+  "testimonials": {
+    "label": "Testimonials",
+    "title": "What our users say",
+    "desc": "Real stories from real users.",
+    "items": [
+      {
+        "name": "Mike",
+        "role": "College Student",
+        "text": "This is amazing! I earned over $200 in my first month just doing tasks in my spare time. Already withdrew to my bank account. My roommates are all using it now.",
+        "earned": "$340"
+      },
+      {
+        "name": "Sarah",
+        "role": "Stay-at-home Mom",
+        "text": "Perfect for earning some extra cash while taking care of the kids. The gift selection is great — I got a nice Bluetooth speaker last month.",
+        "earned": "$720"
+      },
+      {
+        "name": "David",
+        "role": "Office Worker",
+        "text": "I do tasks during lunch breaks and the earnings add up fast. The 3-tier referral system is genius — my passive income has been very stable.",
+        "earned": "$1,250"
+      },
+      {
+        "name": "Lisa",
+        "role": "Freelancer",
+        "text": "A friend recommended this to me and I was skeptical at first. But after my first withdrawal went through, I was hooked. Now it's part of my daily routine.",
+        "earned": "$520"
+      }
+    ]
+  },
+  "store": {
+    "label": "Shop",
+    "title": "Premium products at great prices",
+    "desc": "Use your earned points to redeem electronics, beauty products, home goods and more.",
+    "all": "All",
+    "digital": "Electronics",
+    "women": "Women",
+    "men": "Men",
+    "beauty": "Beauty",
+    "shoes": "Shoes",
+    "home": "Home",
+    "accessories": "Accessories",
+    "food": "Food",
+    "toys": "Toys",
+    "sold": "sold",
+    "viewApp": "View all products in App →"
+  },
+  "download": {
+    "label": "Download",
+    "title": "Earn anytime, anywhere",
+    "desc": "Download the Gift Haven app for the best experience. Available for Android devices.",
+    "version": "Version 1.0.0",
+    "size": "~15MB",
+    "features_title": "App Features",
+    "features": [
+      { "icon": "Zap", "title": "Lightning Fast", "desc": "Native app experience, faster and smoother than web" },
+      { "icon": "Bell", "title": "Real-time Alerts", "desc": "Instant notifications for tasks, referrals, and rewards" },
+      { "icon": "Shield", "title": "Secure & Safe", "desc": "Encrypted data transmission with bank-grade security" },
+      { "icon": "Smartphone", "title": "Offline Ready", "desc": "View tasks and earnings even without internet" }
+    ],
+    "install_title": "Installation Guide",
+    "install_steps": [
+      { "step": "1", "title": "Download APK", "desc": "Tap the download button above to save the APK to your device" },
+      { "step": "2", "title": "Allow Installation", "desc": "Enable 'Install from unknown sources' in your device settings" },
+      { "step": "3", "title": "Install & Launch", "desc": "Open the APK, install, then sign up or log in to get started" }
+    ],
+    "coming_soon": "Coming Soon",
+    "apk_placeholder": "APK file is being prepared, stay tuned..."
+  },
+  "about": {
+    "label": "About Us",
+    "title": "Making sharing rewarding",
+    "desc": "Gift Haven was founded in 2024 with a mission to create a platform where everyone can earn rewards through sharing and completing tasks.",
+    "mission_title": "Our Mission",
+    "mission": "Connect the value between people through sharing — turning every recommendation into tangible rewards. We believe word-of-mouth is the most powerful marketing, and sharers deserve to be rewarded.",
+    "vision_title": "Our Vision",
+    "vision": "To become the world's leading task-based reward platform, enabling every user to earn substantial passive income through simple sharing and task completion.",
+    "values_title": "Core Values",
+    "values": [
+      { "title": "Users First", "desc": "We always prioritize user interests and ensure every effort is rewarded fairly." },
+      { "title": "Transparency", "desc": "All reward mechanisms are open and transparent — no hidden terms, ever." },
+      { "title": "Continuous Innovation", "desc": "We constantly improve the product and introduce more exciting ways to earn." }
+    ]
+  },
+  "faq": {
+    "label": "FAQ",
+    "title": "Got questions? We've got answers",
+    "desc": "Can't find what you're looking for? Contact us at support@haolixiangsong.com",
+    "categories": {
+      "platform": "Platform",
+      "earning": "Earnings",
+      "withdraw": "Withdrawals",
+      "invite": "Referrals",
+      "tech": "Technical"
+    },
+    "items": [
+      { "q": "What is Gift Haven?", "a": "Gift Haven is an invitation and task-based reward platform. Users earn points and cash rewards by completing daily tasks and inviting friends to join. Points can be redeemed for gifts or withdrawn as cash.", "cat": "platform" },
+      { "q": "Is the platform free?", "a": "Completely free! Registration, task completion, and friend invitations are all free. We never charge users any fees.", "cat": "platform" },
+      { "q": "How do I earn rewards?", "a": "There are two main ways: 1) Complete daily tasks (check-ins, watching ads, participating in events, etc.); 2) Invite friends to join and earn up to 3-tier commission.", "cat": "earning" },
+      { "q": "What is 3-tier commission?", "a": "When someone you invited (Tier 1) earns rewards, you get a commission. When people they invite (Tier 2) and their invitees (Tier 3) earn, you also get a share.", "cat": "earning" },
+      { "q": "How much can I earn daily?", "a": "Earnings vary by user. Regular users can earn a few to dozens of dollars daily through tasks. Active referrers can earn significantly more passive income.", "cat": "earning" },
+      { "q": "How do I withdraw?", "a": "Go to 'My Account' → 'Wallet' → 'Withdraw'. We support withdrawals to bank accounts and digital wallets. Minimum withdrawal is $10, typically processed in 1-3 business days.", "cat": "withdraw" },
+      { "q": "Are there withdrawal fees?", "a": "Regular users pay a 1% withdrawal fee. VIP members enjoy fee-free withdrawals.", "cat": "withdraw" },
+      { "q": "How do I invite friends?", "a": "Go to the 'Tasks' page and tap 'Invite Friends'. You can copy your referral link or generate a QR code to share. Anyone who registers through your link counts as your referral.", "cat": "invite" },
+      { "q": "Is there a limit on invitations?", "a": "No limits! The more people you invite, the more you earn.", "cat": "invite" },
+      { "q": "What devices are supported?", "a": "We currently support Android (app) and web (H5). iOS version is in development.", "cat": "tech" },
+      { "q": "Is my data secure?", "a": "We use bank-grade encryption to protect user data. All transaction records are stored securely. We will never sell or leak your personal information.", "cat": "tech" }
+    ]
+  },
+  "cta": {
+    "title": "Ready to start earning?",
+    "subtitle": "Sign up now and claim your welcome bonus!",
+    "button": "Sign Up Free — Claim Welcome Bonus"
+  },
+  "footer": {
+    "description": "Gift Haven — Connecting shared value, making every effort rewarding.",
+    "links": "Quick Links",
+    "legal": "Legal",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "contact": "Contact Us",
+    "email": "support@haolixiangsong.com",
+    "copyright": "© 2025 Gift Haven. All rights reserved."
+  },
+  "common": {
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
+  }
+}
