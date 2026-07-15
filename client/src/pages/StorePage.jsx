@@ -330,8 +330,12 @@ function ProcessingModal({ product, onDone, t }) {
 }
 
 export default function StorePage() {
-  const { t } = useTranslation();
-  const tSpec = (k) => { const r = t('specs.'+k); return r.startsWith('specs.') ? k : r; };
+  const { t, i18n } = useTranslation();
+  // Direct specs lookup (i18next dot notation unreliable with CJK keys)
+  const tSpec = (k) => {
+    const bundle = i18n.getResourceBundle(i18n.language, 'translation');
+    return bundle?.specs?.[k] || k;
+  };
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [opening, setOpening] = useState(false);
