@@ -301,34 +301,6 @@ function Stars({ rating, reviews, showCount }) {
   );
 }
 
-function ProcessingModal({ product, onDone, t }) {
-  const [step, setStep] = useState(0);
-  const [done, setDone] = useState(false);
-  useEffect(() => {
-    if (step >= 3) { setDone(true); const t = setTimeout(onDone, 1500); return () => clearTimeout(t); }
-    const t = setTimeout(() => setStep(s => s + 1), 1800); return () => clearTimeout(t);
-  }, [step]);
-  if (done) return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-      <div className="bg-white rounded-3xl p-8 text-center animate-burst shadow-2xl w-full max-w-sm">
-        <div className="w-16 h-16 mx-auto mb-3 bg-green-100 rounded-full flex items-center justify-center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16A34A" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <p className="text-sm text-text-muted">{t('store.tradeDone')}</p>
-        <p className="text-3xl font-black text-primary">+${(product.costPrice + product.profit).toFixed(2)}</p>
-        <div className="flex justify-center gap-4 mt-2 text-xs"><span className="text-text-muted">{t('store.capital')}${product.costPrice.toFixed(2)}</span><span className="text-green-500 font-bold">+${product.profit.toFixed(2)}</span></div>
-      </div>
-    </div>
-  );
-  return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
-      <div className="bg-white rounded-3xl p-8 text-center animate-scale-in shadow-2xl w-full max-w-sm">
-        <div className="w-3 h-3 bg-primary rounded-full mx-auto mb-3 animate-bounce-pulse" />
-        <p className="text-lg font-bold text-text">{t('store.processing')}</p>
-        <div className="w-full h-1.5 bg-gray-100 rounded-full mt-4 overflow-hidden"><div className="h-full bg-primary rounded-full transition-all duration-500" style={{width:`${((step+1)/3)*100}%`}} /></div>
-      </div>
-    </div>
-  );
-}
-
 export default function StorePage() {
   const { t, i18n } = useTranslation();
   const tSpec = (k) => {
@@ -338,8 +310,8 @@ export default function StorePage() {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [opening, setOpening] = useState(false);
-  const [showProcess, setShowProcess] = useState(false);
-  const [processingProduct, setProcessingProduct] = useState(null);
+  const [holdings, setHoldings] = useState([]);
+  const [showInsufficient, setShowInsufficient] = useState(null); // {need, have, shortage}
   const [catIdx, setCatIdx] = useState(0);
   const [search, setSearch] = useState('');
   const [detail, setDetail] = useState(null);
@@ -358,7 +330,10 @@ export default function StorePage() {
   const loadEarnings = useCallback(async () => {
     try { const { data } = await client.get('/store/earnings-stats'); setEarnings(data); } catch {}
   }, []);
-  useEffect(() => { loadStatus(); loadEarnings(); client.get('/notifications').then(({data}) => setNotifCount(data.unread||0)).catch(()=>{}); }, []);
+  const checkSell = useCallback(async () => { try { const { data } = await client.post('/store/check-sell'); if (data.settled?.length > 0) { toast.success(`${data.settled.length} item(s) sold!`); loadStatus(); loadEarnings(); } } catch {} }, []);
+  const loadHoldings = useCallback(async () => { try { const { data } = await client.get('/store/holdings'); setHoldings(data); } catch {} }, []);
+
+  useEffect(() => { loadStatus(); loadEarnings(); checkSell(); loadHoldings(); client.get('/notifications').then(({data}) => setNotifCount(data.unread||0)).catch(()=>{}); }, []);
   useEffect(() => { client.get('/store/analytics').then(({data}) => setAnalytics(data)).catch(()=>{}); }, [status?.store?.doneToday]);
   useEffect(() => { client.get(`/store/orders-history?period=${orderPeriod}`).then(({data}) => setOrderHistory(data)).catch(()=>{}); }, [orderPeriod, status?.store?.doneToday]);
 
@@ -374,11 +349,15 @@ export default function StorePage() {
 
   const handleOpen = async () => { setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
   const handleBuy = async (product) => {
-    setProcessingProduct(product); setShowProcess(true);
     try {
-      const { data } = await client.post('/store/orders/process', { productPrice: product.price });
-      setProcessingProduct(prev => ({ ...prev, costPrice: data.cost, profit: data.profit }));
-    } catch (err) { setShowProcess(false); setProcessingProduct(null); toast.error(err.response?.data?.error || t('common.operationFailed')); }
+      const { data } = await client.post('/store/orders/process', { productPrice: product.price, productName: product.name });
+      toast.success(`Bought! Expected to sell by ${new Date(data.sellBy).toLocaleDateString()}`);
+      loadStatus(); loadHoldings(); loadEarnings();
+    } catch (err) {
+      const d = err.response?.data;
+      if (d?.shortage) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage });
+      else toast.error(d?.error || t('common.operationFailed'));
+    }
   };
   const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
 
@@ -472,7 +451,24 @@ export default function StorePage() {
           </button>
         </div>
 
-        {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); }} t={t} />}
+        {showInsufficient && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowInsufficient(null)}>
+            <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
+              <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {t('store.insufficient') || 'Insufficient Balance'}</p>
+              <div className="space-y-1.5 mb-4 text-sm">
+                <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#B12704]">${showInsufficient.need?.toFixed(2)}</b></p>
+                <p className="text-[#565959]">{t('store.have') || 'Available'}: <b className="text-[#0F1111]">${showInsufficient.have?.toFixed(2)}</b></p>
+                <p className="text-[#565959]">{t('store.shortage') || 'Shortage'}: <b className="text-[#B12704]">${showInsufficient.shortage?.toFixed(2)}</b></p>
+              </div>
+              <div className="bg-[#fefaf6] rounded-lg p-3 mb-4 text-xs text-[#565959] space-y-1">
+                <p className="font-bold text-[#0F1111]">💡 {t('store.howToEarn') || 'How to get funds'}:</p>
+                <p>• {t('store.tipCheckin') || 'Daily check-in: $0.10-$0.70'}</p>
+                <p>• {t('store.tipHolding') || 'Holdings auto-sell and return funds'}</p>
+              </div>
+              <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111]">{t('common.ok') || 'OK'}</button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -578,6 +574,24 @@ export default function StorePage() {
                   <span className="text-[#0F1111] font-medium">#{i+1} {t('store.orderLabel') || 'Order'}</span>
                   <span className="text-[#067D62] font-bold">+${o.profit.toFixed(2)}</span>
                   <span className="text-[#aaa] text-[9px]">{new Date(o.time).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Holdings */}
+            <div className="bg-white rounded-lg p-3 border border-[#ddd]">
+              <p className="text-[11px] font-bold text-[#0F1111] mb-2">📦 {t('store.holdings') || 'My Holdings'} ({holdings.length})</p>
+              {holdings.length === 0 && <p className="text-[11px] text-[#aaa] text-center py-4">{t('store.noHoldings') || 'No active holdings'}</p>}
+              {holdings.map(h => (
+                <div key={h.id} className="flex items-center gap-3 py-2 border-b border-[#f0f2f2] last:border-0">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] font-medium text-[#0F1111] truncate">{t('store.orderLabel')} #{h.id}</p>
+                    <p className="text-[10px] text-[#565959]">Cost ${h.cost.toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</p>
+                    <div className="w-full h-1 bg-[#f0f2f2] rounded-full mt-1 overflow-hidden">
+                      <div className="h-full bg-[#FF9900] rounded-full transition-all" style={{width: `${h.progress}%`}} />
+                    </div>
+                  </div>
+                  <span className="text-[11px] text-[#565959] shrink-0">{h.progress}%</span>
                 </div>
               ))}
             </div>
@@ -737,7 +751,24 @@ export default function StorePage() {
         </div>
       </div>
 
-      {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); loadEarnings(); }} t={t} />}
+      {showInsufficient && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowInsufficient(null)}>
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
+            <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {t('store.insufficient') || 'Insufficient Balance'}</p>
+            <div className="space-y-1.5 mb-4 text-sm">
+              <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#B12704]">${showInsufficient.need?.toFixed(2)}</b></p>
+              <p className="text-[#565959]">{t('store.have') || 'Available'}: <b className="text-[#0F1111]">${showInsufficient.have?.toFixed(2)}</b></p>
+              <p className="text-[#565959]">{t('store.shortage') || 'Shortage'}: <b className="text-[#B12704]">${showInsufficient.shortage?.toFixed(2)}</b></p>
+            </div>
+            <div className="bg-[#fefaf6] rounded-lg p-3 mb-4 text-xs text-[#565959] space-y-1">
+              <p className="font-bold text-[#0F1111]">💡 {t('store.howToEarn') || 'How to get funds'}:</p>
+              <p>• {t('store.tipCheckin') || 'Daily check-in: $0.10-$0.70'}</p>
+              <p>• {t('store.tipHolding') || 'Holdings auto-sell and return funds'}</p>
+            </div>
+            <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111]">{t('common.ok') || 'OK'}</button>
+          </div>
+        </div>
+      )}
       </>)}
     </div>
   );

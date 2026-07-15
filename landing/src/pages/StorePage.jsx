@@ -39,6 +39,8 @@ export default function StorePage() {
   const [activeCat, setActiveCat] = useState('全部')
   const [search, setSearch] = useState('')
   const [hoveredCard, setHoveredCard] = useState(-1)
+  const [page, setPage] = useState(1)
+  const PER_PAGE = 24
 
   const getCatLabel = (cat) => {
     const k = CAT_KEY_MAP[cat]
@@ -53,6 +55,13 @@ export default function StorePage() {
     }
     return items.sort((a, b) => b.sold - a.sold)
   }, [activeCat, search])
+
+  // Reset page when filter changes
+  const handleCatChange = (cat) => { setActiveCat(cat); setPage(1) }
+  const handleSearch = (e) => { setSearch(e.target.value); setPage(1) }
+
+  const visible = useMemo(() => filtered.slice(0, page * PER_PAGE), [filtered, page])
+  const hasMore = visible.length < filtered.length
 
   return (
     <>
@@ -86,7 +95,7 @@ export default function StorePage() {
                   type="text"
                   placeholder={t('store.searchPlaceholder')}
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={handleSearch}
                   className="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-border bg-white dark:bg-surface text-text placeholder:text-text-muted focus:outline-none focus:ring-1 focus:ring-accent/30 focus:border-accent/30 transition-all shadow-sm"
                 />
               </div>
@@ -94,7 +103,7 @@ export default function StorePage() {
                 {ALL_CATS.map(cat => (
                   <button
                     key={cat}
-                    onClick={() => setActiveCat(cat)}
+                    onClick={() => handleCatChange(cat)}
                     className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ${
                       activeCat === cat
                         ? 'bg-primary text-white shadow-lg shadow-primary/10 scale-105'
@@ -113,7 +122,7 @@ export default function StorePage() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {filtered.map((p, i) => (
+              {visible.map((p, i) => (
                 <div
                   key={i}
                   className="product-card card-accent card p-0 overflow-hidden cursor-pointer border-0 shadow-sm"
@@ -154,6 +163,14 @@ export default function StorePage() {
                 </div>
               ))}
             </div>
+
+            {hasMore && (
+              <div className="text-center mt-8">
+                <button onClick={() => setPage(p => p + 1)} className="btn btn-outline text-sm">
+                  Load More ({filtered.length - visible.length} remaining)
+                </button>
+              </div>
+            )}
 
             {filtered.length === 0 && (
               <div className="text-center py-20">

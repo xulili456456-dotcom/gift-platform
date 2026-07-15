@@ -69,7 +69,7 @@ export default function FaqPage() {
             <div className="relative mb-8 reveal-enhanced visible">
               <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
               <input
-                type="text" placeholder="Search questions..." value={search}
+                type="text" placeholder={t('faq.searchPlaceholder')} value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 rounded-xl border border-border bg-white dark:bg-surface text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent/40 transition-all shadow-md"
               />
@@ -119,18 +119,18 @@ export default function FaqPage() {
             ) : (
               <div className="text-center py-20">
                 <MessageCircle size={48} className="text-text-muted mx-auto mb-4 opacity-30" />
-                <p className="text-text-secondary text-lg font-medium">No matching questions</p>
-                <p className="text-text-muted text-sm mt-1">Try a different search or category</p>
+                <p className="text-text-secondary text-lg font-medium">{t('faq.noResults')}</p>
+                <p className="text-text-muted text-sm mt-1">{t('faq.noResultsHint')}</p>
               </div>
             )}
 
             {/* Contact CTA */}
             <div className="text-center mt-16 p-8 rounded-3xl bg-accent/5 border border-accent/10 reveal-enhanced visible">
               <MessageCircle size={28} className="text-accent mx-auto mb-3" />
-              <p className="text-text font-semibold mb-1">Still have questions?</p>
+              <p className="text-text font-semibold mb-1">{t('faq.contactPrompt')}</p>
               <p className="text-text-secondary text-sm mb-4">{t('faq.desc')}</p>
               <a href="mailto:support@gifthaven.com" className="btn btn-accent no-underline text-sm">
-                Contact Support
+                {t('faq.contactButton')}
               </a>
             </div>
           </div>

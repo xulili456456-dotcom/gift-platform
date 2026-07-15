@@ -137,7 +137,8 @@
       { "step": "3", "title": "安装完成", "desc": "打开App，注册或登录你的账号即可使用" }
     ],
     "coming_soon": "即将上线",
-    "apk_placeholder": "APK 文件准备中，敬请期待..."
+    "apk_placeholder": "APK 文件准备中，敬请期待...",
+    "scanQr": "扫描二维码下载"
   },
   "about": {
     "label": "关于我们",
@@ -158,6 +159,11 @@
     "label": "常见问题",
     "title": "有疑问？我们帮你解答",
     "desc": "找不到答案？请联系客服 support@gifthaven.com",
+    "searchPlaceholder": "搜索问题...",
+    "noResults": "没有找到匹配的问题",
+    "noResultsHint": "试试其他搜索词或分类",
+    "contactPrompt": "还有疑问？",
+    "contactButton": "联系客服",
     "categories": {
       "platform": "平台相关",
       "earning": "收益相关",

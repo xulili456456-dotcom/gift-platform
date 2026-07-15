@@ -1,14 +1,14 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import DownloadPage from './pages/DownloadPage'
-import StorePage from './pages/StorePage'
 import FaqPage from './pages/FaqPage'
 import LegalPage from './pages/LegalPage'
+
+const StorePage = lazy(() => import('./pages/StorePage'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -25,7 +25,7 @@ function AppLayout() {
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/download" element={<DownloadPage />} />
-          <Route path="/store" element={<StorePage />} />
+          <Route path="/store" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" /></div>}><StorePage /></Suspense>} />
           <Route path="/faq" element={<FaqPage />} />
           <Route path="/legal" element={<LegalPage />} />
           <Route path="*" element={<HomePage />} />

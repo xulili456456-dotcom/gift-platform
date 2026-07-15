@@ -24,7 +24,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 glass border-b border-border-light shadow-sm">
+    <nav className="sticky top-0 z-50 bg-white/95 dark:bg-[#08080F]/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.4)]">
       <div className="container-main flex items-center justify-between h-16">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 font-bold text-xl no-underline" style={{ color: 'var(--color-text)' }}>

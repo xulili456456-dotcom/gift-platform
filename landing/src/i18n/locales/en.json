@@ -137,7 +137,8 @@
       { "step": "3", "title": "Install & Launch", "desc": "Open the APK, install, then sign up or log in to start earning" }
     ],
     "coming_soon": "Coming Soon",
-    "apk_placeholder": "APK file coming soon — stay tuned!"
+    "apk_placeholder": "APK file coming soon — stay tuned!",
+    "scanQr": "Scan QR to download"
   },
   "about": {
     "label": "About Us",
@@ -158,6 +159,11 @@
     "label": "FAQ",
     "title": "Have questions? We have answers",
     "desc": "Can't find what you need? Reach us at support@gifthaven.com",
+    "searchPlaceholder": "Search questions...",
+    "noResults": "No matching questions found",
+    "noResultsHint": "Try a different search or category",
+    "contactPrompt": "Still have questions?",
+    "contactButton": "Contact Support",
     "categories": {
       "platform": "Platform",
       "earning": "Earnings",

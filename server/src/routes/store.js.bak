@@ -130,95 +130,105 @@ router.post('/close', async (req, res) => {
   res.json({ message: '店铺已关闭' });
 });
 
-// POST /api/store/orders/process — buy & hold (capital locked until sell)
+// POST /api/store/orders/process — product-based profit
 router.post('/orders/process', async (req, res) => {
-  const { productPrice, productName } = req.body;
-  if (!productPrice || productPrice <= 0) return res.status(400).json({ error: 'Missing product price' });
+  const { productPrice } = req.body;
+  if (!productPrice || productPrice <= 0) {
+    return res.status(400).json({ error: '缺少商品价格' });
+  }
 
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (!store) return res.status(400).json({ error: 'Please open a store first' });
+  if (!store) return res.status(400).json({ error: '请先开店' });
+
+  // Auto-upgrade tier
+  const totalOrdersRow = await get("SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done'", [store.id]);
+  const totalOrders = Number(totalOrdersRow?.c) || 0;
+  const newTier = getTier(totalOrders);
+  if (newTier !== store.tier) {
+    await run('UPDATE stores SET tier = ? WHERE id = ?', [newTier, store.id]);
+    store.tier = newTier;
+  }
 
   const tier = TIERS[store.tier];
   const today = new Date().toISOString().slice(0, 10);
+
+  // Product-based pricing
   const { cost, profit, totalReturn } = calcProduct(productPrice);
 
-  // Check available balance (exclude locked in holdings)
-  const availBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
-  const lockedBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = ?", [store.id, 'holding']);
-  const available = Number(availBal?.total || 0) - Number(lockedBal?.total || 0);
-
-  if (available < cost) {
-    return res.status(400).json({
-      error: 'Insufficient balance',
-      need: cost, have: Math.max(0, available), shortage: Math.max(0, Math.round((cost - available) * 100) / 100)
-    });
-  }
-
-  // Daily limit
-  const doneToday = await get("SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND created_at::date = ?::date", [store.id, today]);
-  if (Number(doneToday?.c || 0) >= tier.dailyOrders) return res.status(400).json({ error: 'Daily order limit reached' });
-
-  // Transaction: deduct + create holding
+  // Transaction: daily limit + balance check + FIFO deduction + order insert + return
   const t = await tx();
   try {
+    // Check daily order limit within transaction
+    const doneToday = await t.get(
+      "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+      [store.id, today]
+    );
+
+    if (Number(doneToday?.c || 0) >= tier.dailyOrders) {
+      await t.rollback();
+      return res.status(400).json({ error: '今日订单已全部处理完毕！' });
+    }
+    const taskBal = await t.get(
+      "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
+      [req.user.id, 'delivered']
+    );
+    const available = Number(taskBal?.total || 0);
+
+    if (available < cost) {
+      await t.rollback();
+      return res.status(400).json({
+        error: `余额不足！该商品进货价 $${cost}，当前可用 $${available.toFixed(2)}`,
+        need: cost, have: available
+      });
+    }
+
+    // Deduct product cost from balance (FIFO)
     let remaining = cost;
-    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE', [req.user.id, 'delivered']);
+    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE',
+      [req.user.id, 'delivered']);
     for (const task of tasks) {
       if (remaining <= 0) break;
       const deduct = Math.min(Number(task.amount), remaining);
       await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
       const rest = Number(task.amount) - deduct;
-      if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, rest, 'bonus', 'delivered']);
+      if (rest > 0.001) {
+        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+          [req.user.id, rest, 'bonus', 'delivered']);
+      }
       remaining -= deduct;
     }
 
-    // Random sell time: 6-30 hours from now
-    const sellHours = 6 + Math.random() * 24;
-    const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
+    if (remaining > 0.001) {
+      await t.rollback();
+      return res.status(400).json({ error: '余额不足，进货失败' });
+    }
 
-    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'holding', ?)", [store.id, req.user.id, cost, sellBy]);
+    // Record the order (amount = profit earned)
+    const result = await t.insert(
+      "INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'done', NOW())",
+      [store.id, req.user.id, profit]
+    );
+
+    // Return cost + profit to balance
+    await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+      [req.user.id, totalReturn, 'bonus', 'delivered']);
+
     await t.commit();
-    res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', remaining: Math.max(0, tier.dailyOrders - Number(doneToday?.c || 0) - 1) });
-  } catch (err) { await t.rollback().catch(() => {}); throw err; }
-});
 
-// GET /api/store/holdings — current inventory
-router.get('/holdings', async (req, res) => {
-  const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
-  if (!store) return res.json([]);
-  const holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
-  const now = Date.now();
-  res.json(holdings.map(h => {
-    const sellBy = new Date(h.sell_by).getTime();
-    const total = sellBy - new Date(h.created_at).getTime();
-    const elapsed = now - new Date(h.created_at).getTime();
-    const progress = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
-    return { ...h, cost: Number(h.cost), progress, sellBy: h.sell_by };
-  }));
-});
+    const left = Math.max(0, tier.dailyOrders - (Number(doneToday?.c || 0) + 1));
 
-// POST /api/store/check-sell — settle due holdings
-router.post('/check-sell', async (req, res) => {
-  const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
-  if (!store) return res.json({ settled: [] });
-  const due = await all("SELECT id, amount as cost, user_id FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
-  const settled = [];
-  for (const order of due) {
-    const price = order.cost / COST_RATE;
-    const { profit, totalReturn } = calcProduct(price);
-    const t = await tx();
-    try {
-      await t.run("UPDATE store_orders SET status = 'done', amount = ? WHERE id = ?", [profit, order.id]);
-      await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, totalReturn, 'bonus', 'delivered']);
-      await t.commit();
-      settled.push({ id: order.id, cost: Number(order.cost), profit, totalReturn });
-    } catch (err) { await t.rollback().catch(() => {}); }
+    res.json({
+      id: result.id, cost, profit, totalReturn,
+      remaining: left,
+      totalDone: Number(doneToday?.c || 0) + 1,
+      dailyOrders: tier.dailyOrders,
+      tier: store.tier,
+    });
+  } catch (err) {
+    await t.rollback().catch(() => {});
+    throw err;
   }
-  if (settled.length > 0) {
-    try { require('./notifications').notify(req.user.id, 'Item Sold', settled.length + ' item(s) sold, profit credited', 'success'); } catch {}
-  }
-  res.json({ settled });
-});
+  });
 
 // GET /api/store/earnings-stats — daily & total profit stats
 router.get('/earnings-stats', async (req, res) => {

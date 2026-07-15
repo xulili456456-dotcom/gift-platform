@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Download, Smartphone, Shield, Zap, Bell, ChevronRight, QrCode, Play } from 'lucide-react'
+import { Download, Smartphone, Shield, Zap, Bell, ChevronRight, QrCode } from 'lucide-react'
 import SEO from '../components/SEO'
 
 const ICON_MAP = { Zap, Bell, Shield, Smartphone }
@@ -74,7 +74,7 @@ export default function DownloadPage() {
                   <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 dark:bg-white/5 rounded-2xl flex items-center justify-center">
                     <QrCode size={40} className="text-text-muted opacity-30" />
                   </div>
-                  <p className="text-text-muted text-xs mb-4">Scan QR to download</p>
+                  <p className="text-text-muted text-xs mb-4">{t('download.scanQr')}</p>
 
                   <button className="btn btn-outline w-full justify-center text-sm py-3">
                     {t('app.cta_share')}
