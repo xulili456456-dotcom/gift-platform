@@ -11,7 +11,7 @@ router.use(authMiddleware);
 router.get('/code', async (req, res) => {
   const user = await userModel.findById(req.user.id);
   if (!user) {
-    return res.status(404).json({ error: '用户不存在' });
+    return res.status(404).json({ error: 'User not found' });
   }
 
   const shareLink = `${req.protocol}://${req.get('host')}/register?ref=${user.referral_code}`;

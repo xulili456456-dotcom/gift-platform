@@ -60,7 +60,7 @@ export default function AdminDashboardPage() {
           { to: '/admin/users', icon: '👥', title: t('admin.userMgmt'), desc: t('admin.userMgmt') },
           { to: '/admin/gifts', icon: '🎁', title: t('admin.giftMgmt'), desc: t('admin.giftMgmt') },
           { to: '/admin/claims', icon: '📋', title: t('admin.claimMgmt'), desc: t('admin.claimMgmt') },
-          { to: '/admin/withdrawals', icon: '💸', title: '提现管理', desc: '审核提现申请' },
+          { to: '/admin/withdrawals', icon: '💸', title: 'Withdrawal Management', desc: 'Review withdrawal requests' },
           { to: '/gifts', icon: '🏠', title: t('admin.backToHome'), desc: t('admin.backToHome') },
         ].map((item) => (
           <button key={item.to} onClick={() => navigate(item.to)} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 text-left hover:border-primary/30 transition-colors">

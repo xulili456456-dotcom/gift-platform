@@ -118,7 +118,7 @@ export default function WithdrawPage() {
                     </span>
                     {w.status === 'pending' && (
                       <button onClick={async () => { if (confirm('Cancel this withdrawal?')) { await client.delete('/withdrawals/' + w.id); loadData(); toast.success('Cancelled'); } }}
-                        className="text-[10px] text-red-400 underline font-medium">取消</button>
+                        className="text-[10px] text-red-400 underline font-medium">Cancel</button>
                     )}
                   </div>
                 </div>

@@ -35,9 +35,9 @@ export default function TasksPage() {
     setSubmitting(true);
     try {
       const { data } = await client.post('/tasks/checkin');
-      toast.success(`✅ +$${data.amount} 签到成功`);
+      toast.success(`✅ +$${data.amount} Check-in successful`);
       loadAll();
-    } catch (err) { toast.error(err.response?.data?.error || '签到失败'); }
+    } catch (err) { toast.error(err.response?.data?.error || 'Check-in failed'); }
     finally { setSubmitting(false); }
   };
 

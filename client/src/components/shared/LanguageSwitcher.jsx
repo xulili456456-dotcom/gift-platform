@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 
 const langs = [
-  { code: 'zh', label: '中文', flag: '🇨🇳' },
   { code: 'en', label: 'English', flag: '🇺🇸' },
   { code: 'es', label: 'Español', flag: '🇪🇸' },
   { code: 'ja', label: '日本語', flag: '🇯🇵' },

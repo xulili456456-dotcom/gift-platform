@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const gift = await giftModel.findById(parseInt(req.params.id));
   if (!gift) {
-    return res.status(404).json({ error: '礼物不存在' });
+    return res.status(404).json({ error: 'Gift not found' });
   }
   res.json(gift);
 });

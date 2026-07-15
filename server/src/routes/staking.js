@@ -23,13 +23,13 @@ router.get('/', authMiddleware, async (req, res) => {
 router.post('/', authMiddleware, async (req, res) => {
   const { plan_id } = req.body;
   const plan = PLANS[plan_id];
-  if (!plan) return res.status(400).json({ error: '请选择质押方案: basic/pro/max' });
+  if (!plan) return res.status(400).json({ error: 'Please select a staking plan: basic/pro/max' });
 
   const t = await tx();
   try {
     // Check for existing active stake within transaction
     const existing = await t.get('SELECT id FROM stakes WHERE user_id = ? AND status = ? FOR UPDATE', [req.user.id, 'active']);
-    if (existing) { await t.rollback(); return res.status(400).json({ error: '您已有活跃质押，请先解锁' }); }
+    if (existing) { await t.rollback(); return res.status(400).json({ error: 'You already have an active stake, please unlock it first' }); }
 
     // Check balance
     const taskBal = await t.get(
@@ -39,7 +39,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
     if (available < plan.amount) {
       await t.rollback();
-      return res.status(400).json({ error: `余额不足！需要 $${plan.amount}，当前可用 $${available.toFixed(2)}` });
+      return res.status(400).json({ error: `Insufficient balance! Required: $${plan.amount}, available: $${available.toFixed(2)}` });
     }
 
     // Deduct from balance (FIFO)
@@ -60,7 +60,7 @@ router.post('/', authMiddleware, async (req, res) => {
 
     if (remaining > 0.001) {
       await t.rollback();
-      return res.status(400).json({ error: '余额不足，质押失败' });
+      return res.status(400).json({ error: 'Insufficient balance, staking failed' });
     }
 
     // Create stake record
@@ -83,7 +83,7 @@ router.post('/', authMiddleware, async (req, res) => {
 // POST /api/staking/unlock - unlock stake (return balance minus penalty)
 router.post('/unlock', authMiddleware, async (req, res) => {
   const s = await get('SELECT * FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (!s) return res.status(400).json({ error: '没有活跃质押' });
+  if (!s) return res.status(400).json({ error: 'No active stake' });
 
   const t = await tx();
   try {

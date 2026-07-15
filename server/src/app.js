@@ -10,7 +10,7 @@ const errorHandler = require('./middleware/errorHandler');
 
 // Rate limiter — only applies to API routes; static assets are unlimited
 // Route-specific stricter limiters are in auth.js
-const apiLimiter = rateLimit({ windowMs: 60 * 1000, max: 500, standardHeaders: true, legacyHeaders: false, message: { error: '请求过于频繁，请稍后再试' } });
+const apiLimiter = rateLimit({ windowMs: 60 * 1000, max: 500, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many requests, please try again later' } });
 
 // Import routes
 const adminPanelRoute = require('./routes/adminPanel');

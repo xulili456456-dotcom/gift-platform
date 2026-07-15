@@ -52,7 +52,7 @@ router.get('/users', async (req, res) => {
 router.get('/users/:id', async (req, res) => {
   const user = await userModel.findById(parseInt(req.params.id));
   if (!user) {
-    return res.status(404).json({ error: '用户不存在' });
+    return res.status(404).json({ error: 'User not found' });
   }
   const stats = await invitationModel.getStats(user.id);
   const effective = await invitationModel.getEffectiveCount(user.id);
@@ -88,7 +88,7 @@ router.post('/gifts', async (req, res) => {
   const { name, description, image_url, required_invites, gift_type, value, stock, sort_order } = req.body;
 
   if (!name || !gift_type || required_invites == null) {
-    return res.status(400).json({ error: '名称、类型和所需邀请人数为必填' });
+    return res.status(400).json({ error: 'Name, type, and required invites are required' });
   }
 
   const gift = await giftModel.create({
@@ -110,7 +110,7 @@ router.put('/gifts/:id', async (req, res) => {
   const id = parseInt(req.params.id);
   const gift = await giftModel.findById(id);
   if (!gift) {
-    return res.status(404).json({ error: '礼物不存在' });
+    return res.status(404).json({ error: 'Gift not found' });
   }
 
   const fields = {};
@@ -127,7 +127,7 @@ router.put('/gifts/:id', async (req, res) => {
 router.delete('/gifts/:id', async (req, res) => {
   const id = parseInt(req.params.id);
   await giftModel.deactivate(id);
-  res.json({ message: '礼物已下架' });
+  res.json({ message: 'Gift has been removed' });
 });
 
 // ========== Claim Management ==========
@@ -149,12 +149,12 @@ router.put('/claims/:id', async (req, res) => {
   const { status, admin_note } = req.body;
 
   if (!status || !['claimed', 'delivered', 'rejected'].includes(status)) {
-    return res.status(400).json({ error: '状态值无效，可选: claimed, delivered, rejected' });
+    return res.status(400).json({ error: 'Invalid status. Valid options: claimed, delivered, rejected' });
   }
 
   const claim = await userGiftModel.findById(id);
   if (!claim) {
-    return res.status(404).json({ error: '领取记录不存在' });
+    return res.status(404).json({ error: 'Claim record not found' });
   }
 
   const updated = await userGiftModel.updateStatus(id, status, admin_note || '');
@@ -215,11 +215,11 @@ router.put('/withdrawals/:id', async (req, res) => {
 // DELETE /api/admin/users/:id
 router.delete('/users/:id', async (req, res) => {
   const id = parseInt(req.params.id);
-  if (id === 1) return res.status(400).json({ error: '不能删除主管理员' });
+  if (id === 1) return res.status(400).json({ error: 'Cannot delete the primary admin' });
   const user = await userModel.findById(id);
-  if (!user) return res.status(404).json({ error: '用户不存在' });
+  if (!user) return res.status(404).json({ error: 'User not found' });
   await run('DELETE FROM users WHERE id = ?', [id]);
-  res.json({ ok: true, message: '用户已删除' });
+  res.json({ ok: true, message: 'User deleted' });
 });
 
 // ========== Settings ==========

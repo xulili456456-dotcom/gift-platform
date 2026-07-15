@@ -6,7 +6,7 @@ export default function AdminRedirect() {
   }, []);
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg">
-      <p className="text-text-muted">跳转到管理后台...</p>
+      <p className="text-text-muted">Redirecting to admin panel...</p>
     </div>
   );
 }

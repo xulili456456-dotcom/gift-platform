@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>好礼相送 - 后台管理</title>
+<title>Gift Platform - Admin Panel</title>
 <style>
 :root {
   --red: #C41E3A; --red-dark: #8B0000; --gold: #D4A574;
@@ -100,31 +100,31 @@ tr:hover td { background:#fefaf5; }
 <!-- ========== LOGIN ========== -->
 <div id="loginPage">
   <div class="login-box">
-    <h1>🧧 好礼相送</h1>
-    <p class="sub">后台管理系统</p>
-    <input id="loginEmail" type="email" placeholder="管理员邮箱" value="admin@gift.com">
-    <input id="loginPass" type="password" placeholder="密码" value="admin888">
+    <h1>🧧 Gift Platform</h1>
+    <p class="sub">Admin Management System</p>
+    <input id="loginEmail" type="email" placeholder="Admin email" value="admin@gift.com">
+    <input id="loginPass" type="password" placeholder="Password" value="admin888">
     <p id="loginErr" class="err"></p>
-    <button onclick="doLogin()">登 录</button>
+    <button onclick="doLogin()">Log In</button>
   </div>
 </div>
 
 <!-- ========== MAIN ========== -->
 <div id="mainPage" class="hidden">
   <header>
-    <h1>🧧 好礼相送 · 后台管理</h1>
-    <button class="logout" onclick="doLogout()">退出</button>
+    <h1>🧧 Gift Platform · Admin</h1>
+    <button class="logout" onclick="doLogout()">Logout</button>
   </header>
   <nav>
-    <button id="tabDash" class="active" onclick="switchTab('dash')">📊 仪表盘</button>
-    <button id="tabUsers" onclick="switchTab('users')">👥 用户管理</button>
-    <button id="tabGifts" onclick="switchTab('gifts')">🎁 礼物管理</button>
-    <button id="tabKyc" onclick="switchTab('kyc')">🛂 实名认证</button>
-    <button id="tabProofs" onclick="switchTab('proofs')">📸 邀请验证</button>
-    <button id="tabNotifs" onclick="switchTab('notifs')">🔔 通知记录</button>
-    <button id="tabClaims" onclick="switchTab('claims')">📋 领取审批</button>
-    <button id="tabWithdrawals" onclick="switchTab('withdrawals')">💸 提现管理</button>
-    <button id="tabStores" onclick="switchTab('stores')">🏪 店铺管理</button>
+    <button id="tabDash" class="active" onclick="switchTab('dash')">📊 Dashboard</button>
+    <button id="tabUsers" onclick="switchTab('users')">👥 Users</button>
+    <button id="tabGifts" onclick="switchTab('gifts')">🎁 Gifts</button>
+    <button id="tabKyc" onclick="switchTab('kyc')">🛂 KYC</button>
+    <button id="tabProofs" onclick="switchTab('proofs')">📸 Invite Proofs</button>
+    <button id="tabNotifs" onclick="switchTab('notifs')">🔔 Notifications</button>
+    <button id="tabClaims" onclick="switchTab('claims')">📋 Claims</button>
+    <button id="tabWithdrawals" onclick="switchTab('withdrawals')">💸 Withdrawals</button>
+    <button id="tabStores" onclick="switchTab('stores')">🏪 Stores</button>
   </nav>
   <main id="content"></main>
 </div>
@@ -137,7 +137,7 @@ async function api(path, opts = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = 'Bearer ' + token;
   const res = await fetch(API + path, { headers, ...opts });
-  if (res.status === 401) { doLogout(); throw new Error('未登录'); }
+  if (res.status === 401) { doLogout(); throw new Error('Not logged in'); }
   return res.json();
 }
 
@@ -154,15 +154,15 @@ async function doLogin() {
       body: JSON.stringify({ email, password })
     });
     const data = await res.json();
-    if (!res.ok) { errEl.textContent = data.error || '登录失败'; return; }
-    if (!data.user.is_admin) { errEl.textContent = '需要管理员账号'; return; }
+    if (!res.ok) { errEl.textContent = data.error || 'Login failed'; return; }
+    if (!data.user.is_admin) { errEl.textContent = 'Admin account required'; return; }
     token = data.access_token;
     localStorage.setItem('admin_token', token);
     document.getElementById('loginPage').classList.add('hidden');
     document.getElementById('mainPage').classList.remove('hidden');
     document.body.classList.remove('login-body');
     switchTab('dash');
-  } catch(e) { errEl.textContent = '网络错误'; }
+  } catch(e) { errEl.textContent = 'Network error'; }
 }
 
 function doLogout() {
@@ -182,7 +182,7 @@ async function switchTab(tab) {
   var btn = document.getElementById('tab' + tab[0].toUpperCase() + tab.slice(1));
   if (btn) btn.classList.add('active');
   var c = document.getElementById('content');
-  c.innerHTML = '<div class="empty">加载中...</div>';
+  c.innerHTML = '<div class="empty">Loading...</div>';
   try {
     if (tab === 'dash') await loadDash(c);
     else if (tab === 'users') await loadUsers(c);
@@ -194,7 +194,7 @@ async function switchTab(tab) {
     else if (tab === 'withdrawals') await loadWithdrawals(c);
     else if (tab === 'stores') await loadStores(c);
   } catch(e) {
-    c.innerHTML = '<div class="empty" style="color:red">⚠️ 加载失败: ' + (e.message || '未知错误') + '<br><small>请检查网络后刷新重试</small></div>';
+    c.innerHTML = '<div class="empty" style="color:red">⚠️ Load failed: ' + (e.message || 'Unknown error') + '<br><small>Check your network and refresh to retry</small></div>';
   }
 }
 
@@ -203,19 +203,19 @@ async function loadDash(c) {
   const stats = await (await fetch(API + '/api/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } })).json();
   c.innerHTML = `
     <div class="stats-grid">
-      <div class="stat-card"><div class="icon" style="background:#EBF5FF;color:#2563EB;">👥</div><div><div class="val">${stats.total_users||0}</div><div class="lbl">总用户数</div></div></div>
-      <div class="stat-card"><div class="icon" style="background:#DCFCE7;color:#16A34A;">🔗</div><div><div class="val">${stats.total_invites||0}</div><div class="lbl">总邀请数</div></div></div>
-      <div class="stat-card"><div class="icon" style="background:#FEF3C7;color:#D97706;">⏳</div><div><div class="val">${stats.pending_claims||0}</div><div class="lbl">待审批</div></div></div>
-      <div class="stat-card"><div class="icon" style="background:#F3E8FF;color:#9333EA;">🎁</div><div><div class="val">${stats.active_gifts||0}</div><div class="lbl">活跃礼物</div></div></div>
+      <div class="stat-card"><div class="icon" style="background:#EBF5FF;color:#2563EB;">👥</div><div><div class="val">${stats.total_users||0}</div><div class="lbl">Total Users</div></div></div>
+      <div class="stat-card"><div class="icon" style="background:#DCFCE7;color:#16A34A;">🔗</div><div><div class="val">${stats.total_invites||0}</div><div class="lbl">Total Invites</div></div></div>
+      <div class="stat-card"><div class="icon" style="background:#FEF3C7;color:#D97706;">⏳</div><div><div class="val">${stats.pending_claims||0}</div><div class="lbl">Pending Approvals</div></div></div>
+      <div class="stat-card"><div class="icon" style="background:#F3E8FF;color:#9333EA;">🎁</div><div><div class="val">${stats.active_gifts||0}</div><div class="lbl">Active Gifts</div></div></div>
     </div>
     ${stats.top_inviters && stats.top_inviters.length > 0 ? `
-    <div class="panel"><h2>🏆 邀请排行榜</h2>
+    <div class="panel"><h2>🏆 Top Inviters</h2>
       <div style="padding:16px;" class="top-list">
         ${stats.top_inviters.slice(0,10).map((u,i) => `
           <div class="top-item">
             <span class="rank">${['🥇','🥈','🥉'][i]||(i+1)}</span>
             <span>${u.name||u.email}</span>
-            <span class="cnt">${u.invite_count}人</span>
+            <span class="cnt">${u.invite_count}</span>
           </div>`).join('')}
       </div>
     </div>` : ''}
@@ -227,44 +227,44 @@ async function loadUsers(c, page = 1, search = '') {
   try {
   const params = new URLSearchParams({ page, limit: 20, search });
   const res = await fetch(API + '/api/admin/users?' + params, { headers: { 'Authorization': 'Bearer ' + token } });
-  if (!res.ok) { c.innerHTML = '<div class="empty">请求失败: ' + res.status + '</div>'; return; }
+  if (!res.ok) { c.innerHTML = '<div class="empty">Request failed: ' + res.status + '</div>'; return; }
   const data = await res.json();
   const { users, total } = data || {};
   const totalPages = Math.ceil((total||0) / 20);
 
   c.innerHTML = `
     <div class="panel">
-      <h2>👥 用户列表 <span style="font-weight:400;font-size:13px;color:var(--muted)">共 ${total||0} 人</span></h2>
+      <h2>👥 User List <span style="font-weight:400;font-size:13px;color:var(--muted)">${total||0} total</span></h2>
       <div style="padding:16px 20px">
         <div class="search-bar">
-          <input id="userSearch" placeholder="搜索邮箱/手机/昵称..." value="${search||''}" onkeydown="if(event.key==='Enter')loadUsers(document.getElementById('content'),1,document.getElementById('userSearch').value)">
-          <button onclick="loadUsers(document.getElementById('content'),1,document.getElementById('userSearch').value)">搜索</button>
+          <input id="userSearch" placeholder="Search email/phone/name..." value="${search||''}" onkeydown="if(event.key==='Enter')loadUsers(document.getElementById('content'),1,document.getElementById('userSearch').value)">
+          <button onclick="loadUsers(document.getElementById('content'),1,document.getElementById('userSearch').value)">Search</button>
         </div>
       </div>
       <div style="overflow-x:auto">
         <table>
-          <thead><tr><th>ID</th><th>邮箱</th><th>邀请</th><th>收益</th><th>注册时间</th><th>操作</th></tr></thead>
+          <thead><tr><th>ID</th><th>Email</th><th>Invites</th><th>Earnings</th><th>Registered</th><th>Actions</th></tr></thead>
           <tbody>
             ${(users||[]).map(u => `
               <tr>
-                <td>${u.id}</td><td>${u.email}<br><span style="font-size:11px;color:var(--muted)">${u.phone}</span></td><td style="font-weight:600">${u.invite_count||0}人</td><td style="font-weight:700;color:var(--red)">$${Number(u.balance||0).toFixed(0)}</td>
+                <td>${u.id}</td><td>${u.email}<br><span style="font-size:11px;color:var(--muted)">${u.phone}</span></td><td style="font-weight:600">${u.invite_count||0}</td><td style="font-weight:700;color:var(--red)">$${Number(u.balance||0).toFixed(0)}</td>
                 <td style="font-size:12px">${(u.created_at||"").slice(0,10)}</td>
-                <td><button class="btn-sm btn-gray" onclick="viewUserDetail(${u.id})">详情</button></td>
+                <td><button class="btn-sm btn-gray" onclick="viewUserDetail(${u.id})">Details</button></td>
               </tr>`).join('')}
-            ${(!users||users.length===0) ? '<tr><td colspan="6" class="empty">暂无数据</td></tr>' : ''}
+            ${(!users||users.length===0) ? '<tr><td colspan="6" class="empty">No data</td></tr>' : ''}
           </tbody>
         </table>
       </div>
       ${totalPages > 1 ? `
       <div class="pagination">
-        <button ${page<=1?'disabled':''} onclick="loadUsers(document.getElementById('content'),${page-1},'${search}')">上一页</button>
+        <button ${page<=1?'disabled':''} onclick="loadUsers(document.getElementById('content'),${page-1},'${search}')">Prev</button>
         <span>${page} / ${totalPages}</span>
-        <button ${page>=totalPages?'disabled':''} onclick="loadUsers(document.getElementById('content'),${page+1},'${search}')">下一页</button>
+        <button ${page>=totalPages?'disabled':''} onclick="loadUsers(document.getElementById('content'),${page+1},'${search}')">Next</button>
       </div>` : ''}
     </div>
   `;
   } catch(e) {
-    c.innerHTML = '<div class="empty" style="color:red">加载失败: ' + (e.message || '未知错误') + '<br><small>请刷新页面重试</small></div>';
+    c.innerHTML = '<div class="empty" style="color:red">Load failed: ' + (e.message || 'Unknown error') + '<br><small>Please refresh and try again</small></div>';
   }
 }
 
@@ -277,26 +277,26 @@ async function viewUserDetail(userId) {
     <div class="modal">
       <h3>👤 ${u.name||u.email}</h3>
       <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:14px;font-size:13px;line-height:2;">
-        <div><b>ID:</b> ${u.id} &nbsp; <b>邮箱:</b> ${u.email} &nbsp; <b>手机:</b> ${u.phone}</div>
-        <div><b>邀请码:</b> <code>${u.referral_code}</code> &nbsp; <b>上级:</b> ${u.parent_id||'无'}</div>
-        <div><b>注册时间:</b> ${u.created_at}</div>
+        <div><b>ID:</b> ${u.id} &nbsp; <b>Email:</b> ${u.email} &nbsp; <b>Phone:</b> ${u.phone}</div>
+        <div><b>Referral code:</b> <code>${u.referral_code}</code> &nbsp; <b>Upline:</b> ${u.parent_id||'None'}</div>
+        <div><b>Registered:</b> ${u.created_at}</div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;">
         <div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center">
           <div style="font-size:28px;font-weight:700;color:var(--red)">${u.stats?.level1||0}</div>
-          <div style="font-size:12px;color:var(--muted)">一级邀请</div>
+          <div style="font-size:12px;color:var(--muted)">Level 1 Invites</div>
         </div>
         <div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center">
           <div style="font-size:28px;font-weight:700;color:var(--red)">${u.stats?.level2||0}</div>
-          <div style="font-size:12px;color:var(--muted)">二级邀请</div>
+          <div style="font-size:12px;color:var(--muted)">Level 2 Invites</div>
         </div>
         <div style="background:var(--bg);border-radius:12px;padding:14px;text-align:center">
           <div style="font-size:28px;font-weight:700;color:var(--red)">${u.stats?.level3||0}</div>
-          <div style="font-size:12px;color:var(--muted)">三级邀请</div>
+          <div style="font-size:12px;color:var(--muted)">Level 3 Invites</div>
         </div>
       </div>
-      <p style="font-size:13px;margin-bottom:14px"><b>有效邀请:</b> ${u.effective?.effective||0} &nbsp; <b>领取数:</b> ${u.claims?.length||0}</p>
-      <button class="primary" onclick="this.closest('.modal-overlay').remove()">关闭</button>
+      <p style="font-size:13px;margin-bottom:14px"><b>Valid invites:</b> ${u.effective?.effective||0} &nbsp; <b>Claims:</b> ${u.claims?.length||0}</p>
+      <button class="primary" onclick="this.closest('.modal-overlay').remove()">Close</button>
     </div>`;
   document.body.appendChild(overlay);
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
@@ -313,23 +313,23 @@ async function loadGifts(c) {
 function renderGiftTable(c) {
   c.innerHTML = `
     <div class="panel">
-      <h2>🎁 礼物列表 <button onclick="showGiftForm()">+ 添加礼物</button></h2>
+      <h2>🎁 Gift List <button onclick="showGiftForm()">+ Add Gift</button></h2>
       <div style="overflow-x:auto">
         <table>
-          <thead><tr><th>ID</th><th>名称</th><th>类型</th><th>金额</th><th>需邀请</th><th>库存</th><th>状态</th><th>操作</th></tr></thead>
+          <thead><tr><th>ID</th><th>Name</th><th>Type</th><th>Value</th><th>Invites Req.</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody>
             ${giftList.map(g => `
               <tr>
                 <td>${g.id}</td>
                 <td><b>${g.name}</b></td>
-                <td>${g.gift_type==='cash'?'🧧 现金':'🎁 实物'}</td>
+                <td>${g.gift_type==='cash'?'🧧 Cash':'🎁 Physical'}</td>
                 <td style="font-weight:700;color:var(--red)">¥${g.value}</td>
-                <td>${g.required_invites} 人</td>
-                <td>${g.stock===-1?'无限':g.stock}</td>
-                <td><span class="badge ${g.is_active?'badge-delivered':'badge-rejected'}">${g.is_active?'上架':'已下架'}</span></td>
+                <td>${g.required_invites}</td>
+                <td>${g.stock===-1?'Unlimited':g.stock}</td>
+                <td><span class="badge ${g.is_active?'badge-delivered':'badge-rejected'}">${g.is_active?'Active':'Inactive'}</span></td>
                 <td>
-                  <button class="btn-sm btn-gray" onclick="showGiftForm(${g.id})">编辑</button>
-                  ${g.is_active ? `<button class="btn-sm btn-red" onclick="deactivateGift(${g.id})">下架</button>` : ''}
+                  <button class="btn-sm btn-gray" onclick="showGiftForm(${g.id})">Edit</button>
+                  ${g.is_active ? `<button class="btn-sm btn-red" onclick="deactivateGift(${g.id})">Deactivate</button>` : ''}
                 </td>
               </tr>`).join('')}
           </tbody>
@@ -345,20 +345,20 @@ function showGiftForm(editId) {
   overlay.className = 'modal-overlay';
   overlay.innerHTML = `
     <div class="modal">
-      <h3>${editId ? '编辑礼物' : '添加礼物'}</h3>
-      <input id="gfName" placeholder="名称" value="${g.name||''}">
-      <input id="gfDesc" placeholder="描述" value="${g.description||''}">
+      <h3>${editId ? 'Edit Gift' : 'Add Gift'}</h3>
+      <input id="gfName" placeholder="Name" value="${g.name||''}">
+      <input id="gfDesc" placeholder="Description" value="${g.description||''}">
       <div class="row">
-        <select id="gfType"><option value="cash" ${g.gift_type==='cash'?'selected':''}>现金红包</option><option value="physical" ${g.gift_type==='physical'?'selected':''}>实物礼品</option></select>
-        <input id="gfValue" type="number" placeholder="金额" value="${g.value||0}" step="0.01">
+        <select id="gfType"><option value="cash" ${g.gift_type==='cash'?'selected':''}>Cash Red Packet</option><option value="physical" ${g.gift_type==='physical'?'selected':''}>Physical Gift</option></select>
+        <input id="gfValue" type="number" placeholder="Value" value="${g.value||0}" step="0.01">
       </div>
       <div class="row">
-        <input id="gfReq" type="number" placeholder="所需邀请人数" value="${g.required_invites||1}" min="1">
-        <input id="gfStock" type="number" placeholder="库存(-1无限)" value="${g.stock??-1}" min="-1">
+        <input id="gfReq" type="number" placeholder="Required invites" value="${g.required_invites||1}" min="1">
+        <input id="gfStock" type="number" placeholder="Stock (-1 = unlimited)" value="${g.stock??-1}" min="-1">
       </div>
-      <input id="gfSort" type="number" placeholder="排序" value="${g.sort_order||0}">
-      <button class="primary" id="gfSubmit">${editId ? '保存修改' : '创建礼物'}</button>
-      <button class="primary" style="background:#6B7280;margin-top:8px;" onclick="this.closest('.modal-overlay').remove()">取消</button>
+      <input id="gfSort" type="number" placeholder="Sort order" value="${g.sort_order||0}">
+      <button class="primary" id="gfSubmit">${editId ? 'Save Changes' : 'Create Gift'}</button>
+      <button class="primary" style="background:#6B7280;margin-top:8px;" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
     </div>`;
   document.body.appendChild(overlay);
   overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
@@ -382,7 +382,7 @@ function showGiftForm(editId) {
 }
 
 async function deactivateGift(id) {
-  if (!confirm('确定下架该礼物？')) return;
+  if (!confirm('Deactivate this gift?')) return;
   await fetch(API + '/api/admin/gifts/' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
   await loadGifts(document.getElementById('content'));
 }
@@ -398,15 +398,15 @@ async function loadClaims(c, page = 1, filter = '') {
 
   c.innerHTML = `
     <div class="panel">
-      <h2>📋 领取审批 <span style="font-weight:400;font-size:13px;color:var(--muted)">共 ${total||0} 条</span></h2>
+      <h2>📋 Claim Approvals <span style="font-weight:400;font-size:13px;color:var(--muted)">${total||0} total</span></h2>
       <div style="padding:16px 20px;display:flex;gap:8px;flex-wrap:wrap">
         ${['','pending','delivered','rejected'].map(s => `
-          <button class="btn-sm ${filter===s?'btn-green':'btn-gray'}" onclick="loadClaims(document.getElementById('content'),1,'${s}')">${s===''?'全部':s==='pending'?'⏳ 待审核':s==='delivered'?'✅ 已发放':'❌ 已拒绝'}</button>
+          <button class="btn-sm ${filter===s?'btn-green':'btn-gray'}" onclick="loadClaims(document.getElementById('content'),1,'${s}')">${s===''?'All':s==='pending'?'⏳ Pending':s==='delivered'?'✅ Delivered':'❌ Rejected'}</button>
         `).join('')}
       </div>
       <div style="overflow-x:auto">
         <table>
-          <thead><tr><th>ID</th><th>用户</th><th>礼物</th><th>金额</th><th>状态</th><th>申请时间</th><th>操作</th></tr></thead>
+          <thead><tr><th>ID</th><th>User</th><th>Gift</th><th>Amount</th><th>Status</th><th>Requested</th><th>Actions</th></tr></thead>
           <tbody>
             ${(claims||[]).map(c => `
               <tr>
@@ -414,24 +414,24 @@ async function loadClaims(c, page = 1, filter = '') {
                 <td><b>${c.user_name||c.user_email}</b><br><span style="font-size:11px;color:var(--muted)">${c.user_phone}</span></td>
                 <td>${c.gift_name}</td>
                 <td style="font-weight:700;color:var(--red)">¥${c.value}</td>
-                <td><span class="badge badge-${c.status}">${c.status==='pending'?'待审核':c.status==='delivered'?'已发放':c.status==='rejected'?'已拒绝':c.status}</span></td>
+                <td><span class="badge badge-${c.status}">${c.status==='pending'?'Pending':c.status==='delivered'?'Delivered':c.status==='rejected'?'Rejected':c.status}</span></td>
                 <td style="font-size:12px">${(c.claimed_at||'').slice(0,16)}</td>
                 <td>
                   ${c.status==='pending' ? `
-                    <button class="btn-sm btn-green" onclick="updateClaim(${c.id},'delivered')">✅ 发放</button>
-                    <button class="btn-sm btn-red" onclick="updateClaim(${c.id},'rejected')" style="margin-top:4px">❌ 拒绝</button>
+                    <button class="btn-sm btn-green" onclick="updateClaim(${c.id},'delivered')">✅ Deliver</button>
+                    <button class="btn-sm btn-red" onclick="updateClaim(${c.id},'rejected')" style="margin-top:4px">❌ Reject</button>
                   ` : '-'}
                 </td>
               </tr>`).join('')}
-            ${(!claims||claims.length===0) ? '<tr><td colspan="7" class="empty">暂无数据</td></tr>' : ''}
+            ${(!claims||claims.length===0) ? '<tr><td colspan="7" class="empty">No data</td></tr>' : ''}
           </tbody>
         </table>
       </div>
       ${totalPages > 1 ? `
       <div class="pagination">
-        <button ${page<=1?'disabled':''} onclick="loadClaims(document.getElementById('content'),${page-1},'${filter}')">上一页</button>
+        <button ${page<=1?'disabled':''} onclick="loadClaims(document.getElementById('content'),${page-1},'${filter}')">Prev</button>
         <span>${page} / ${totalPages}</span>
-        <button ${page>=totalPages?'disabled':''} onclick="loadClaims(document.getElementById('content'),${page+1},'${filter}')">下一页</button>
+        <button ${page>=totalPages?'disabled':''} onclick="loadClaims(document.getElementById('content'),${page+1},'${filter}')">Next</button>
       </div>` : ''}
     </div>
   `;
@@ -457,15 +457,15 @@ async function loadWithdrawals(c, page = 1, filter = '') {
 
   c.innerHTML = `
     <div class="panel">
-      <h2>💸 提现管理 <span style="font-weight:400;font-size:13px;color:var(--muted)">共 ${total||0} 条</span></h2>
+      <h2>💸 Withdrawal Management <span style="font-weight:400;font-size:13px;color:var(--muted)">${total||0} total</span></h2>
       <div style="padding:16px 20px;display:flex;gap:8px;flex-wrap:wrap">
         ${['','pending','completed','rejected'].map(s => `
-          <button class="btn-sm ${filter===s?'btn-green':'btn-gray'}" onclick="loadWithdrawals(document.getElementById('content'),1,'${s}')">${s===''?'全部':s==='pending'?'⏳ 待处理':s==='completed'?'✅ 已完成':'❌ 已拒绝'}</button>
+          <button class="btn-sm ${filter===s?'btn-green':'btn-gray'}" onclick="loadWithdrawals(document.getElementById('content'),1,'${s}')">${s===''?'All':s==='pending'?'⏳ Pending':s==='completed'?'✅ Completed':'❌ Rejected'}</button>
         `).join('')}
       </div>
       <div style="overflow-x:auto">
         <table>
-          <thead><tr><th>ID</th><th>用户</th><th>金额</th><th>网络</th><th>钱包地址</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+          <thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Network</th><th>Wallet Address</th><th>Status</th><th>Time</th><th>Actions</th></tr></thead>
           <tbody>
             ${(withdrawals||[]).map(w => `
               <tr>
@@ -474,24 +474,24 @@ async function loadWithdrawals(c, page = 1, filter = '') {
                 <td style="font-weight:700;color:var(--red)">$${w.amount}</td>
                 <td>${(w.network||'').toUpperCase()}</td>
                 <td style="font-size:12px;font-family:monospace">${(w.wallet_address||'').slice(0,8)}...${(w.wallet_address||'').slice(-6)}</td>
-                <td><span class="badge badge-${w.status==='completed'?'delivered':w.status==='rejected'?'rejected':'pending'}">${w.status==='pending'?'待处理':w.status==='completed'?'已完成':'已拒绝'}</span></td>
+                <td><span class="badge badge-${w.status==='completed'?'delivered':w.status==='rejected'?'rejected':'pending'}">${w.status==='pending'?'Pending':w.status==='completed'?'Completed':'Rejected'}</span></td>
                 <td style="font-size:12px">${(w.created_at||'').slice(0,16)}</td>
                 <td>
                   ${w.status==='pending' ? `
-                    <button class="btn-sm btn-green" onclick="updateWithdrawal(${w.id},'completed')">✅ 通过</button>
-                    <button class="btn-sm btn-red" onclick="updateWithdrawal(${w.id},'rejected')" style="margin-top:4px">❌ 拒绝</button>
+                    <button class="btn-sm btn-green" onclick="updateWithdrawal(${w.id},'completed')">✅ Approve</button>
+                    <button class="btn-sm btn-red" onclick="updateWithdrawal(${w.id},'rejected')" style="margin-top:4px">❌ Reject</button>
                   ` : '-'}
                 </td>
               </tr>`).join('')}
-            ${(!withdrawals||withdrawals.length===0) ? '<tr><td colspan="6" class="empty">暂无数据</td></tr>' : ''}
+            ${(!withdrawals||withdrawals.length===0) ? '<tr><td colspan="6" class="empty">No data</td></tr>' : ''}
           </tbody>
         </table>
       </div>
       ${totalPages > 1 ? `
       <div class="pagination">
-        <button ${page<=1?'disabled':''} onclick="loadWithdrawals(document.getElementById('content'),${page-1},'${filter}')">上一页</button>
+        <button ${page<=1?'disabled':''} onclick="loadWithdrawals(document.getElementById('content'),${page-1},'${filter}')">Prev</button>
         <span>${page} / ${totalPages}</span>
-        <button ${page>=totalPages?'disabled':''} onclick="loadWithdrawals(document.getElementById('content'),${page+1},'${filter}')">下一页</button>
+        <button ${page>=totalPages?'disabled':''} onclick="loadWithdrawals(document.getElementById('content'),${page+1},'${filter}')">Next</button>
       </div>` : ''}
     </div>
   `;
@@ -507,25 +507,25 @@ async function updateWithdrawal(id, status) {
 }
 
 
-async function loadKyc(c){var r=await fetch(API+"/api/kyc/admin/list",{headers:{"Authorization":"Bearer "+token}});var d=await r.json();var h='<div class=panel><h2>🛂 KYC认证</h2><table><thead><tr><th>ID</th><th>用户</th><th>姓名</th><th>证件号</th><th>状态</th><th>操作</th></tr></thead><tbody>';for(var i=0;i<d.length;i++){var x=d[i];h+='<tr><td>'+x.id+'</td><td>'+(x.user_name||x.user_email)+'</td><td>'+x.real_name+'</td><td>'+x.id_number+'</td><td><span class="badge badge-'+(x.status=="approved"?"delivered":x.status=="rejected"?"rejected":"pending")+'">'+(x.status=="pending"?"待审":x.status=="approved"?"通过":"拒绝")+'</span></td><td>'+(x.status=="pending"?'<button class="btn-sm btn-green" onclick=updateKyc('+x.id+',"approved")>通过</button> <button class="btn-sm btn-red" onclick=updateKyc('+x.id+',"rejected")>拒绝</button>':'-')+'</td></tr>'}if(d.length==0)h+='<tr><td colspan=6 class=empty>暂无数据</td></tr>';h+='</tbody></table></div>';c.innerHTML=h}
+async function loadKyc(c){var r=await fetch(API+"/api/kyc/admin/list",{headers:{"Authorization":"Bearer "+token}});var d=await r.json();var h='<div class=panel><h2>🛂 KYC Verification</h2><table><thead><tr><th>ID</th><th>User</th><th>Name</th><th>ID Number</th><th>Status</th><th>Actions</th></tr></thead><tbody>';for(var i=0;i<d.length;i++){var x=d[i];h+='<tr><td>'+x.id+'</td><td>'+(x.user_name||x.user_email)+'</td><td>'+x.real_name+'</td><td>'+x.id_number+'</td><td><span class="badge badge-'+(x.status=="approved"?"delivered":x.status=="rejected"?"rejected":"pending")+'">'+(x.status=="pending"?"Pending":x.status=="approved"?"Approved":"Rejected")+'</span></td><td>'+(x.status=="pending"?'<button class="btn-sm btn-green" onclick=updateKyc('+x.id+',"approved")>Approve</button> <button class="btn-sm btn-red" onclick=updateKyc('+x.id+',"rejected")>Reject</button>':'-')+'</td></tr>'}if(d.length==0)h+='<tr><td colspan=6 class=empty>No data</td></tr>';h+='</tbody></table></div>';c.innerHTML=h}
 function updateKyc(id,s){fetch(API+"/api/kyc/admin/"+id,{method:"PUT",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({status:s})}).then(()=>loadKyc(document.getElementById("content")))}
-async function loadProofs(c){var r=await fetch(API+"/api/proofs/admin/list",{headers:{"Authorization":"Bearer "+token}});var d=await r.json();var h='<div class=panel><h2>📸 邀请验证截图</h2><div style=display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:16px>';for(var i=0;i<d.length;i++){var x=d[i];h+='<div style=background:#faf7f2;border-radius:12px;padding:12px;text-align:center><img src='+x.image+' style=max-width:100%;max-height:160px;border-radius:8px><p style=font-size:13px;font-weight:600>'+(x.user_name||x.user_email)+'</p><span class="badge badge-'+(x.status=="approved"?"delivered":x.status=="rejected"?"rejected":"pending")+'">'+(x.status=="pending"?"待审":x.status=="approved"?"通过":"拒绝")+'</span><p style=font-size:11px;color:var(--muted)>'+(x.submitted_at||"").slice(0,10)+'</p>'+(x.status=="pending"?'<div style=margin-top:8px><button class="btn-sm btn-green" onclick=updateProof('+x.id+',"approved")>通过</button> <button class="btn-sm btn-red" onclick=updateProof('+x.id+',"rejected")>拒绝</button></div>':'')+'</div>'}if(d.length==0)h+='<div class=empty>暂无数据</div>';h+='</div></div>';c.innerHTML=h}
+async function loadProofs(c){var r=await fetch(API+"/api/proofs/admin/list",{headers:{"Authorization":"Bearer "+token}});var d=await r.json();var h='<div class=panel><h2>📸 Invite Verification Screenshots</h2><div style=display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:16px>';for(var i=0;i<d.length;i++){var x=d[i];h+='<div style=background:#faf7f2;border-radius:12px;padding:12px;text-align:center><img src='+x.image+' style=max-width:100%;max-height:160px;border-radius:8px><p style=font-size:13px;font-weight:600>'+(x.user_name||x.user_email)+'</p><span class="badge badge-'+(x.status=="approved"?"delivered":x.status=="rejected"?"rejected":"pending")+'">'+(x.status=="pending"?"Pending":x.status=="approved"?"Approved":"Rejected")+'</span><p style=font-size:11px;color:var(--muted)>'+(x.submitted_at||"").slice(0,10)+'</p>'+(x.status=="pending"?'<div style=margin-top:8px><button class="btn-sm btn-green" onclick=updateProof('+x.id+',"approved")>Approve</button> <button class="btn-sm btn-red" onclick=updateProof('+x.id+',"rejected")>Reject</button></div>':'')+'</div>'}if(d.length==0)h+='<div class=empty>No data</div>';h+='</div></div>';c.innerHTML=h}
 function updateProof(id,s){fetch(API+"/api/proofs/admin/"+id,{method:"PUT",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify({status:s})}).then(()=>loadProofs(document.getElementById("content")))}
 
 async function loadNotifs(c){
   var r=await fetch(API+'/api/admin/notifications',{headers:{'Authorization':'Bearer '+token}});
   var d=await r.json();
-  var h='<div class=panel><h2>🔔 通知记录</h2><table><thead><tr><th>ID</th><th>用户</th><th>标题</th><th>内容</th><th>类型</th><th>时间</th></tr></thead><tbody>';
+  var h='<div class=panel><h2>🔔 Notification Log</h2><table><thead><tr><th>ID</th><th>User</th><th>Title</th><th>Body</th><th>Type</th><th>Time</th></tr></thead><tbody>';
   for(var i=0;i<d.length;i++){var x=d[i];h+='<tr><td>'+x.id+'</td><td>'+(x.user_name||x.user_email)+'</td><td>'+x.title+'</td><td>'+(x.body||'')+'</td><td>'+x.type+'</td><td style=font-size:12px>'+(x.created_at||'').slice(0,16)+'</td></tr>';}
-  if(d.length==0)h+='<tr><td colspan=6 class=empty>暂无通知</td></tr>';
+  if(d.length==0)h+='<tr><td colspan=6 class=empty>No notifications</td></tr>';
   h+='</tbody></table></div>';c.innerHTML=h;
 }
 async function loadStores(c){
   var r=await fetch(API+'/api/admin/stores',{headers:{'Authorization':'Bearer '+token}});
   var d=await r.json();
-  var h='<div class=panel><h2>🏪 店铺管理 <span style=font-weight:400;font-size:13px;color:var(--muted)>共 '+(d||[]).length+' 家</span></h2><table><thead><tr><th>ID</th><th>用户</th><th>等级</th><th>押金</th><th>状态</th><th>开店时间</th></tr></thead><tbody>';
-  for(var i=0;i<d.length;i++){var x=d[i];h+='<tr><td>'+x.id+'</td><td>'+(x.user_name||x.user_email)+'</td><td>'+x.tier+'</td><td style=font-weight:700;color:var(--red)>$'+x.deposit+'</td><td><span class="badge badge-'+(x.status==='active'?'delivered':'rejected')+'">'+(x.status==='active'?'运营中':'已关闭')+'</span></td><td style=font-size:12px>'+(x.opened_at||'').slice(0,16)+'</td></tr>';}
-  if(d.length===0)h+='<tr><td colspan=6 class=empty>暂无店铺</td></tr>';
+  var h='<div class=panel><h2>🏪 Store Management <span style=font-weight:400;font-size:13px;color:var(--muted)>'+(d||[]).length+' total</span></h2><table><thead><tr><th>ID</th><th>User</th><th>Tier</th><th>Deposit</th><th>Status</th><th>Opened</th></tr></thead><tbody>';
+  for(var i=0;i<d.length;i++){var x=d[i];h+='<tr><td>'+x.id+'</td><td>'+(x.user_name||x.user_email)+'</td><td>'+x.tier+'</td><td style=font-weight:700;color:var(--red)>$'+x.deposit+'</td><td><span class="badge badge-'+(x.status==='active'?'delivered':'rejected')+'">'+(x.status==='active'?'Active':'Closed')+'</span></td><td style=font-size:12px>'+(x.opened_at||'').slice(0,16)+'</td></tr>';}
+  if(d.length===0)h+='<tr><td colspan=6 class=empty>No stores</td></tr>';
   h+='</tbody></table></div>';c.innerHTML=h;
 }
 

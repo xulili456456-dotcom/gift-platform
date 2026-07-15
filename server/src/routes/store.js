@@ -8,15 +8,15 @@ router.use(authMiddleware);
 // Tier definitions — tiers control daily order limits and upgrade thresholds
 // Profit is now product-based: cost = price × 0.8, profit = price × 0.08
 const TIERS = {
-  small:  { name: '小店', dailyOrders: 10, threshold: 0 },
-  medium: { name: '中店', dailyOrders: 20, threshold: 50 },
-  large:  { name: '大店', dailyOrders: 40, threshold: 200 },
+  small:  { name: 'Small Store', dailyOrders: 10, threshold: 0 },
+  medium: { name: 'Medium Store', dailyOrders: 20, threshold: 50 },
+  large:  { name: 'Large Store', dailyOrders: 40, threshold: 200 },
 };
 
 // Product profit formula (shared with frontend)
 // cost + profit = price × 100% — no money vanishes
-const COST_RATE = 0.85;   // 进货价 = 市场价 × 85%
-const PROFIT_RATE = 0.15; // 利润 = 市场价 × 15%
+const COST_RATE = 0.85;   // Cost price = market price × 85%
+const PROFIT_RATE = 0.15; // Profit = market price × 15%
 
 function calcProduct(productPrice) {
   const cost = Math.round(productPrice * COST_RATE * 100) / 100;
@@ -101,7 +101,7 @@ router.post('/open', async (req, res) => {
   const existing = await get('SELECT * FROM stores WHERE user_id = ?', [req.user.id]);
   if (existing) {
     if (existing.status === 'active') {
-      return res.status(400).json({ error: '你已有一家店铺在运营中' });
+      return res.status(400).json({ error: 'You already have a store in operation' });
     }
     await run("UPDATE stores SET status = 'active', tier = 'small', deposit = 0, opened_at = NOW(), closed_at = NULL WHERE id = ?",
       [existing.id]);
@@ -124,10 +124,10 @@ router.post('/open', async (req, res) => {
 // POST /api/store/close
 router.post('/close', async (req, res) => {
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (!store) return res.status(400).json({ error: '你没有运营中的店铺' });
+  if (!store) return res.status(400).json({ error: 'You do not have an active store' });
   await run("UPDATE stores SET status = 'closed', closed_at = NOW() WHERE id = ?", [store.id]);
   require('./notifications').notify(req.user.id, '🏪 Store Closed', 'You can reopen anytime, order data is preserved', 'info');
-  res.json({ message: '店铺已关闭' });
+  res.json({ message: 'Store closed' });
 });
 
 // POST /api/store/orders/process — buy & hold (capital locked until sell)
@@ -258,7 +258,7 @@ router.get('/earnings-stats', async (req, res) => {
 // POST /api/store/deposit — inject capital into store balance
 router.post('/deposit', async (req, res) => {
   const amount = parseFloat(req.body.amount);
-  if (!amount || amount < 1) return res.status(400).json({ error: '最低注入金额为 $1' });
+  if (!amount || amount < 1) return res.status(400).json({ error: 'Minimum deposit amount is $1' });
 
   // Take from user's overall task_earnings or simulate deposit
   // For now: add as a "deposit" bonus entry
@@ -269,7 +269,7 @@ router.post('/deposit', async (req, res) => {
   );
   require('./notifications').notify(req.user.id, '💰 Capital Added',
     `$${amount} added to your trading account`, 'success');
-  res.json({ id: result.id, amount, message: `已注入 $${amount}` });
+  res.json({ id: result.id, amount, message: `Deposited $${amount}` });
 });
 
 // GET /api/store/analytics — dashboard data

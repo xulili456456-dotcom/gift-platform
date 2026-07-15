@@ -51,7 +51,7 @@ export default function PullToRefresh({ onRefresh, children }) {
           {refreshing.current ? (
             <>
               <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              刷新中...
+              Refreshing...
             </>
           ) : (
             <>
@@ -60,7 +60,7 @@ export default function PullToRefresh({ onRefresh, children }) {
                 style={{ transform: `rotate(${Math.min(height * 3, 180)}deg)` }}>
                 <polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
               </svg>
-              <span>{height > THRESHOLD ? '松手刷新' : '下拉刷新'}</span>
+              <span>{height > THRESHOLD ? 'Release to refresh' : 'Pull to refresh'}</span>
             </>
           )}
         </div>

@@ -12,19 +12,19 @@ router.use(authMiddleware);
 router.post('/', async (req, res) => {
   const { gift_id } = req.body;
   if (!gift_id) {
-    return res.status(400).json({ error: '请指定礼物ID' });
+    return res.status(400).json({ error: 'Please specify a gift ID' });
   }
 
   const gift = await giftModel.findById(parseInt(gift_id));
   if (!gift || !gift.is_active) {
-    return res.status(404).json({ error: '礼物不存在或已下架' });
+    return res.status(404).json({ error: 'Gift not found or no longer available' });
   }
 
   // Check eligibility (read-only, outside tx)
   const { effective } = await invitationModel.getEffectiveCount(req.user.id);
   if (effective < gift.required_invites) {
     return res.status(400).json({
-      error: `邀请人数不足，当前有效邀请: ${effective}，需要: ${gift.required_invites}`,
+      error: `Not enough invites. Current valid invites: ${effective}, required: ${gift.required_invites}`,
       current: effective,
       required: gift.required_invites,
     });
@@ -35,13 +35,13 @@ router.post('/', async (req, res) => {
   try {
     // Re-read gift within transaction for stock check
     const g = await t.get('SELECT * FROM gifts WHERE id = ?', [gift.id]);
-    if (!g || !g.is_active) { await t.rollback(); return res.status(404).json({ error: '礼物不存在或已下架' }); }
-    if (g.stock === 0) { await t.rollback(); return res.status(400).json({ error: '该礼物已被领完' }); }
+    if (!g || !g.is_active) { await t.rollback(); return res.status(404).json({ error: 'Gift not found or no longer available' }); }
+    if (g.stock === 0) { await t.rollback(); return res.status(400).json({ error: 'This gift is out of stock' }); }
 
     // Check duplicate within transaction
     const existing = await t.get('SELECT id FROM user_gifts WHERE user_id = ? AND gift_id = ?',
       [req.user.id, gift.id]);
-    if (existing) { await t.rollback(); return res.status(409).json({ error: '您已领取过该礼物' }); }
+    if (existing) { await t.rollback(); return res.status(409).json({ error: 'You have already claimed this gift' }); }
 
     // Create claim
     const result = await t.insert(
@@ -72,10 +72,10 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const claim = await userGiftModel.findById(parseInt(req.params.id));
   if (!claim) {
-    return res.status(404).json({ error: '领取记录不存在' });
+    return res.status(404).json({ error: 'Claim record not found' });
   }
   if (claim.user_id !== req.user.id && !req.user.is_admin) {
-    return res.status(403).json({ error: '无权查看' });
+    return res.status(403).json({ error: 'Not authorized to view this' });
   }
   res.json(claim);
 });

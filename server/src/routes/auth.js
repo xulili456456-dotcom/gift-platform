@@ -9,9 +9,9 @@ const authMiddleware = require('../middleware/auth');
 
 const router = Router();
 
-const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: { error: '登录尝试过于频繁，请15分钟后再试' } });
-const registerLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, standardHeaders: true, legacyHeaders: false, message: { error: '注册过于频繁，请1小时后再试' } });
-const resetLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 3, standardHeaders: true, legacyHeaders: false, message: { error: '密码重置过于频繁，请1小时后再试' } });
+const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many login attempts, please try again in 15 minutes' } });
+const registerLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many registration attempts, please try again in 1 hour' } });
+const resetLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 3, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many password reset attempts, please try again in 1 hour' } });
 
 // POST /api/auth/register
 router.post('/register', registerLimiter, async (req, res) => {
@@ -23,28 +23,28 @@ router.post('/register', registerLimiter, async (req, res) => {
     const referral_code = (req.body.referral_code || '').trim();
 
     if (!email || !phone || !password) {
-      return res.status(400).json({ error: '邮箱、手机号和密码为必填项' });
+      return res.status(400).json({ error: 'Email, phone number, and password are required' });
     }
     // Email format validation
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return res.status(400).json({ error: '请输入有效的邮箱地址' });
+      return res.status(400).json({ error: 'Please enter a valid email address' });
     }
     // Password: min 8 chars, must contain letter + digit
     if (password.length < 8) {
-      return res.status(400).json({ error: '密码长度不能少于8位' });
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
     }
     if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
-      return res.status(400).json({ error: '密码必须包含字母和数字' });
+      return res.status(400).json({ error: 'Password must contain both letters and numbers' });
     }
     // Phone: 10-15 digits
     if (!/^\d{10,15}$/.test(phone)) {
-      return res.status(400).json({ error: '请输入有效的手机号码' });
+      return res.status(400).json({ error: 'Please enter a valid phone number' });
     }
 
     const existing = await userModel.findByEmail(email);
     if (existing) {
       // Don't leak email existence — return generic message
-      return res.status(200).json({ message: '注册成功，请登录' });
+      return res.status(200).json({ message: 'Registration successful, please log in' });
     }
 
     let parentId = null;
@@ -52,7 +52,7 @@ router.post('/register', registerLimiter, async (req, res) => {
     if (referral_code) {
       inviter = await userModel.findByReferralCode(referral_code);
       if (!inviter) {
-        return res.status(400).json({ error: '邀请码无效' });
+        return res.status(400).json({ error: 'Invalid referral code' });
       }
       parentId = inviter.id;
     }
@@ -90,7 +90,7 @@ router.post('/register', registerLimiter, async (req, res) => {
     });
   } catch (err) {
     console.error('Register error:', err);
-    res.status(500).json({ error: '注册失败，请稍后重试' });
+    res.status(500).json({ error: 'Registration failed, please try again later' });
   }
 });
 
@@ -100,15 +100,15 @@ router.post('/login', loginLimiter, async (req, res) => {
   const password = req.body.password || '';
   try {
     if (!email || !password) {
-      return res.status(400).json({ error: '请输入邮箱和密码' });
+      return res.status(400).json({ error: 'Please enter your email and password' });
     }
     const user = await userModel.findByEmail(email);
     if (!user) {
-      return res.status(401).json({ error: '邮箱或密码错误' });
+      return res.status(401).json({ error: 'Incorrect email or password' });
     }
     const valid = await verifyPassword(password, user.password_hash);
     if (!valid) {
-      return res.status(401).json({ error: '邮箱或密码错误' });
+      return res.status(401).json({ error: 'Incorrect email or password' });
     }
     const tokenPayload = { id: user.id, email: user.email, is_admin: user.is_admin };
     const accessToken = signAccessToken(tokenPayload);
@@ -123,7 +123,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     });
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ error: '登录失败，请稍后重试' });
+    res.status(500).json({ error: 'Login failed, please try again later' });
   }
 });
 
@@ -132,19 +132,19 @@ router.post('/refresh', async (req, res) => {
   try {
     const { refresh_token } = req.body;
     if (!refresh_token) {
-      return res.status(400).json({ error: '缺少refresh_token' });
+      return res.status(400).json({ error: 'Missing refresh_token' });
     }
     const decoded = verifyRefreshToken(refresh_token);
     const user = await userModel.findById(decoded.id);
     if (!user) {
-      return res.status(401).json({ error: '用户不存在' });
+      return res.status(401).json({ error: 'User not found' });
     }
     const tokenPayload = { id: user.id, email: user.email, is_admin: user.is_admin };
     const accessToken = signAccessToken(tokenPayload);
     const newRefreshToken = signRefreshToken(tokenPayload);
     res.json({ access_token: accessToken, refresh_token: newRefreshToken });
   } catch (err) {
-    return res.status(401).json({ error: 'refresh_token无效或已过期' });
+    return res.status(401).json({ error: 'refresh_token is invalid or expired' });
   }
 });
 
@@ -152,7 +152,7 @@ router.post('/refresh', async (req, res) => {
 router.get('/me', authMiddleware, async (req, res) => {
   const user = await userModel.findById(req.user.id);
   if (!user) {
-    return res.status(404).json({ error: '用户不存在' });
+    return res.status(404).json({ error: 'User not found' });
   }
   res.json({
     id: user.id, email: user.email, phone: user.phone, name: user.name,
@@ -165,22 +165,22 @@ router.get('/me', authMiddleware, async (req, res) => {
 router.post('/reset-password', resetLimiter, async (req, res) => {
   try {
     const { email, phone, newPassword } = req.body;
-    if (!email || !phone || !newPassword) return res.status(400).json({ error: '请填写所有字段' });
-    if (newPassword.length < 6) return res.status(400).json({ error: '密码至少6位' });
+    if (!email || !phone || !newPassword) return res.status(400).json({ error: 'Please fill in all fields' });
+    if (newPassword.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
     const user = await userModel.findByEmail(email);
-    if (!user || user.phone !== phone) return res.status(400).json({ error: '邮箱或手机号不匹配' });
+    if (!user || user.phone !== phone) return res.status(400).json({ error: 'Email or phone number does not match' });
     const newHash = await hashPassword(newPassword);
     const { run } = require('../db/database');
     await run("UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?", [newHash, user.id]);
-    res.json({ message: '密码重置成功' });
+    res.json({ message: 'Password reset successful' });
   } catch (err) {
-    res.status(500).json({ error: '重置失败' });
+    res.status(500).json({ error: 'Reset failed' });
   }
 });
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => {
-  res.json({ message: '已退出登录' });
+  res.json({ message: 'Logged out' });
 });
 
 module.exports = router;

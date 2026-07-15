@@ -9,16 +9,16 @@ router.use(authMiddleware);
 router.post('/', async (req, res) => {
   let { amount, network, wallet_address } = req.body;
   amount = parseFloat(amount);
-  if (!amount || amount < 1) return res.status(400).json({ error: '最低提现金额为 $1' });
-  if (!network || !wallet_address) return res.status(400).json({ error: '请填写网络和钱包地址' });
+  if (!amount || amount < 1) return res.status(400).json({ error: 'Minimum withdrawal amount is $1' });
+  if (!network || !wallet_address) return res.status(400).json({ error: 'Please provide the network and wallet address' });
 
   // Wallet address format validation
   const addr = wallet_address.trim();
   if (network === 'trc20' && !/^T[A-Za-z0-9]{33}$/.test(addr)) {
-    return res.status(400).json({ error: 'TRC20地址格式不正确，应以T开头，34位' });
+    return res.status(400).json({ error: 'Invalid TRC20 address: must start with T and be 34 characters' });
   }
   if ((network === 'erc20' || network === 'bep20') && !/^0x[A-Fa-f0-9]{40}$/.test(addr)) {
-    return res.status(400).json({ error: '地址格式不正确，应以0x开头，42位' });
+    return res.status(400).json({ error: 'Invalid address: must start with 0x and be 42 characters' });
   }
 
   const t = await tx();
@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
 
     if (amount > available) {
       await t.rollback();
-      return res.status(400).json({ error: `余额不足！可用 $${available.toFixed(2)}，申请 $${amount.toFixed(2)}` });
+      return res.status(400).json({ error: `Insufficient balance! Available: $${available.toFixed(2)}, requested: $${amount.toFixed(2)}` });
     }
 
     // Deduct from task_earnings (FIFO, within transaction)
@@ -56,7 +56,7 @@ router.post('/', async (req, res) => {
     // Shortfall check
     if (remaining > 0.001) {
       await t.rollback();
-      return res.status(400).json({ error: '余额不足，提现失败' });
+      return res.status(400).json({ error: 'Insufficient balance, withdrawal failed' });
     }
 
     // Store all deducted IDs (original + fragments) as JSON array
@@ -89,7 +89,7 @@ router.delete('/:id', async (req, res) => {
   try {
     const w = await t.get('SELECT * FROM withdrawals WHERE id = ? AND user_id = ? AND status = ?',
       [req.params.id, req.user.id, 'pending']);
-    if (!w) { await t.rollback(); return res.status(404).json({ error: '未找到该提现申请或已处理' }); }
+    if (!w) { await t.rollback(); return res.status(404).json({ error: 'Withdrawal request not found or already processed' }); }
 
     await t.run('UPDATE withdrawals SET status = ? WHERE id = ?', ['rejected', req.params.id]);
 
@@ -106,7 +106,7 @@ router.delete('/:id', async (req, res) => {
       }
     }
     await t.commit();
-    res.json({ ok: true, message: '已取消，余额已退回' });
+    res.json({ ok: true, message: 'Cancelled, balance has been refunded' });
   } catch (err) {
     await t.rollback().catch(() => {});
     throw err;

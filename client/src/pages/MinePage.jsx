@@ -11,7 +11,6 @@ import { Users, CreditCard, Bell, Globe, Lock, Shield, LogOut, SunMoon, Crown, S
 import toast from 'react-hot-toast';
 
 const langs = [
-  { code: 'zh', label: '中文', flag: '🇨🇳' },
   { code: 'en', label: 'English', flag: '🇺🇸' },
   { code: 'es', label: 'Español', flag: '🇪🇸' },
   { code: 'ja', label: '日本語', flag: '🇯🇵' },
@@ -125,7 +124,7 @@ export default function MinePage() {
         <MembershipCard effectiveInvites={effectiveInvites} t={t} /></div>
 
       <div className="mx-4 space-y-4">
-        {/* ═══ 可领取 ═══ */}
+        {/* ═══ Claimable ═══ */}
         {eligibleGifts.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-separator">
             <div className="px-4 py-3 border-b border-separator bg-gradient-to-r from-[#FFF9E6]/50 to-transparent flex items-center gap-2">
@@ -150,7 +149,7 @@ export default function MinePage() {
           </div>
         )}
 
-        {/* ═══ 审核中 ═══ */}
+        {/* ═══ Under Review ═══ */}
         {pendingClaims.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-separator">
             <div className="px-4 py-3 border-b border-separator flex items-center gap-2">
@@ -263,8 +262,8 @@ export default function MinePage() {
           className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm border border-separator active:bg-bg transition-colors">
           <Bell size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
-            <p className="text-[14px] font-bold text-text">通知中心</p>
-            <p className="text-[12px] text-text-muted">查看系统通知和消息</p>
+            <p className="text-[14px] font-bold text-text">Notification Center</p>
+            <p className="text-[12px] text-text-muted">View system notifications and messages</p>
           </div>
           <ChevronRight size={16} className="text-text-muted shrink-0" />
         </button>

@@ -18,17 +18,17 @@ async function seed() {
   const adminCode = generateReferralCode();
   await run(
     'INSERT INTO users (email, phone, password_hash, name, referral_code, is_admin) VALUES (?, ?, ?, ?, ?, ?)',
-    ['admin@gift.com', '13800000000', adminHash, '管理员', adminCode, true]
+    ['admin@gift.com', '13800000000', adminHash, 'Admin', adminCode, true]
   );
   console.log('Admin user created: admin@gift.com / admin888');
 
   const gifts = [
-    { name: '新人红包', description: '邀请1位好友即可领取，新人专享福利', gift_type: 'cash', required_invites: 1, value: 5, stock: -1, sort_order: 1 },
-    { name: '初级红包', description: '邀请5位好友即可领取，小试牛刀', gift_type: 'cash', required_invites: 5, value: 28, stock: -1, sort_order: 2 },
-    { name: '中级红包', description: '邀请15位好友即可领取，越战越勇', gift_type: 'cash', required_invites: 15, value: 88, stock: -1, sort_order: 3 },
-    { name: '高级红包', description: '邀请50位好友即可领取，实力见证', gift_type: 'cash', required_invites: 50, value: 288, stock: 500, sort_order: 4 },
-    { name: '顶级红包', description: '邀请150位好友即可领取，巅峰荣耀', gift_type: 'cash', required_invites: 150, value: 888, stock: 100, sort_order: 5 },
-    { name: '至尊大奖', description: '邀请500位好友即可领取，传奇成就', gift_type: 'cash', required_invites: 500, value: 2888, stock: 50, sort_order: 6 },
+    { name: 'Newcomer Red Packet', description: 'Invite 1 friend to claim. Exclusive newcomer bonus', gift_type: 'cash', required_invites: 1, value: 5, stock: -1, sort_order: 1 },
+    { name: 'Starter Red Packet', description: 'Invite 5 friends to claim. A great warm-up', gift_type: 'cash', required_invites: 5, value: 28, stock: -1, sort_order: 2 },
+    { name: 'Intermediate Red Packet', description: 'Invite 15 friends to claim. Keep the momentum going', gift_type: 'cash', required_invites: 15, value: 88, stock: -1, sort_order: 3 },
+    { name: 'Advanced Red Packet', description: 'Invite 50 friends to claim. Proof of real skill', gift_type: 'cash', required_invites: 50, value: 288, stock: 500, sort_order: 4 },
+    { name: 'Elite Red Packet', description: 'Invite 150 friends to claim. Peak glory', gift_type: 'cash', required_invites: 150, value: 888, stock: 100, sort_order: 5 },
+    { name: 'Supreme Grand Prize', description: 'Invite 500 friends to claim. A legendary achievement', gift_type: 'cash', required_invites: 500, value: 2888, stock: 50, sort_order: 6 },
   ];
 
   for (const gift of gifts) {

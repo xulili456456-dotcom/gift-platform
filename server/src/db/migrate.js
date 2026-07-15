@@ -207,11 +207,11 @@ INSERT INTO admin_settings (key, value) VALUES ('level_2_rate', '0.5')
 ON CONFLICT (key) DO NOTHING;
 INSERT INTO admin_settings (key, value) VALUES ('level_3_rate', '0.25')
 ON CONFLICT (key) DO NOTHING;
-INSERT INTO admin_settings (key, value) VALUES ('platform_name', '好礼相送')
+INSERT INTO admin_settings (key, value) VALUES ('platform_name', 'Gift Platform')
 ON CONFLICT (key) DO NOTHING;
-INSERT INTO admin_settings (key, value) VALUES ('platform_share_title', '邀请好友，赢取好礼！')
+INSERT INTO admin_settings (key, value) VALUES ('platform_share_title', 'Invite friends, win great gifts!')
 ON CONFLICT (key) DO NOTHING;
-INSERT INTO admin_settings (key, value) VALUES ('platform_share_desc', '完成任务免费领现金和实物，快来加入！')
+INSERT INTO admin_settings (key, value) VALUES ('platform_share_desc', 'Complete tasks to earn free cash and prizes. Join now!')
 ON CONFLICT (key) DO NOTHING;
 `;
 

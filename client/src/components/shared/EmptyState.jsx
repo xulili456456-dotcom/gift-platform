@@ -1,4 +1,4 @@
-export default function EmptyState({ icon = '📭', title = '暂无数据', desc = '', action = null }) {
+export default function EmptyState({ icon = '📭', title = 'No data', desc = '', action = null }) {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center animate-fade-in">
       <span className="text-5xl mb-4 opacity-50">{icon}</span>

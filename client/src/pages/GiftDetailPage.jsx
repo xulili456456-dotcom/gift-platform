@@ -32,10 +32,10 @@ export default function GiftDetailPage() {
     setClaiming(true);
     try {
       await claimsApi.create(gift.id);
-      toast.success('领取成功，等待审核');
+      toast.success('Claimed successfully, pending review');
       navigate(-1);
     } catch (err) {
-      toast.error(err.response?.data?.error || '领取失败');
+      toast.error(err.response?.data?.error || 'Claim failed');
     } finally { setClaiming(false); }
   };
 

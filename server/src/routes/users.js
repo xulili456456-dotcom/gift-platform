@@ -13,7 +13,7 @@ router.use(authMiddleware);
 router.get('/me', async (req, res) => {
   const user = await userModel.findById(req.user.id);
   if (!user) {
-    return res.status(404).json({ error: '用户不存在' });
+    return res.status(404).json({ error: 'User not found' });
   }
   res.json({
     id: user.id,
@@ -57,23 +57,23 @@ router.put('/me/password', async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword) {
-      return res.status(400).json({ error: '请输入旧密码和新密码' });
+      return res.status(400).json({ error: 'Please enter your old and new passwords' });
     }
     if (newPassword.length < 6) {
-      return res.status(400).json({ error: '新密码长度不能少于6位' });
+      return res.status(400).json({ error: 'New password must be at least 6 characters' });
     }
     const user = await userModel.findById(req.user.id);
-    if (!user) return res.status(404).json({ error: '用户不存在' });
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
     const valid = await verifyPassword(oldPassword, user.password_hash);
-    if (!valid) return res.status(403).json({ error: '旧密码错误' });
+    if (!valid) return res.status(403).json({ error: 'Old password is incorrect' });
 
     const newHash = await hashPassword(newPassword);
     const { run } = require('../db/database');
     await run("UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?", [newHash, req.user.id]);
-    res.json({ message: '密码修改成功' });
+    res.json({ message: 'Password changed successfully' });
   } catch (err) {
-    res.status(500).json({ error: '修改失败' });
+    res.status(500).json({ error: 'Password change failed' });
   }
 });
 
@@ -81,30 +81,30 @@ router.put('/me/password', async (req, res) => {
 router.put('/me/contact', async (req, res) => {
   try {
     const { email, phone, password } = req.body;
-    if (!password) return res.status(400).json({ error: '请输入当前密码确认身份' });
+    if (!password) return res.status(400).json({ error: 'Please enter your current password to confirm your identity' });
 
     const user = await userModel.findById(req.user.id);
-    if (!user) return res.status(404).json({ error: '用户不存在' });
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
     const valid = await verifyPassword(password, user.password_hash);
-    if (!valid) return res.status(403).json({ error: '密码错误' });
+    if (!valid) return res.status(403).json({ error: 'Incorrect password' });
 
     const updates = {};
     if (email && email !== user.email) {
       const existing = await userModel.findByEmail(email);
-      if (existing) return res.status(409).json({ error: '该邮箱已被使用' });
+      if (existing) return res.status(409).json({ error: 'This email is already in use' });
       updates.email = email;
     }
     if (phone && phone !== user.phone) updates.phone = phone;
-    if (Object.keys(updates).length === 0) return res.json({ message: '无需更改' });
+    if (Object.keys(updates).length === 0) return res.json({ message: 'No changes needed' });
 
     const { run } = require('../db/database');
     const sets = Object.keys(updates).map(k => `${k} = ?`).join(', ');
     await run(`UPDATE users SET ${sets}, updated_at = NOW() WHERE id = ?`,
       [...Object.values(updates), req.user.id]);
-    res.json({ message: '更新成功', ...updates });
+    res.json({ message: 'Updated successfully', ...updates });
   } catch (err) {
-    res.status(500).json({ error: '更新失败' });
+    res.status(500).json({ error: 'Update failed' });
   }
 });
 

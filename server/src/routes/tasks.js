@@ -33,7 +33,7 @@ router.post('/checkin', async (req, res) => {
 
     if (last) {
       const lastDate = new Date(last.created_at).toISOString().slice(0, 10);
-      if (lastDate === today) { await t.rollback(); return res.status(400).json({ error: '今日已签到' }); }
+      if (lastDate === today) { await t.rollback(); return res.status(400).json({ error: 'Already checked in today' }); }
     }
 
     // Calculate streak from checkin history

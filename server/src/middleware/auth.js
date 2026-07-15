@@ -3,7 +3,7 @@ const { verifyAccessToken } = require('../utils/jwt');
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: '未登录，请先登录' });
+    return res.status(401).json({ error: 'Not logged in, please log in first' });
   }
 
   const token = authHeader.split(' ')[1];
@@ -13,9 +13,9 @@ function authMiddleware(req, res, next) {
     next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: '登录已过期，请重新登录', code: 'TOKEN_EXPIRED' });
+      return res.status(401).json({ error: 'Session expired, please log in again', code: 'TOKEN_EXPIRED' });
     }
-    return res.status(401).json({ error: '无效的登录凭证' });
+    return res.status(401).json({ error: 'Invalid login credentials' });
   }
 }
 

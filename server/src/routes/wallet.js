@@ -7,11 +7,11 @@ router.use(authMiddleware);
 
 function validateAddress(address, network) {
   const addr = (address || '').trim();
-  if (!addr) return '请输入钱包地址';
+  if (!addr) return 'Please enter a wallet address';
   if (network === 'trc20') {
-    if (!/^T[A-Za-z0-9]{33}$/.test(addr)) return 'TRC20地址格式不正确（应以T开头，34位字符）';
+    if (!/^T[A-Za-z0-9]{33}$/.test(addr)) return 'Invalid TRC20 address (must start with T, 34 characters)';
   } else if (network === 'erc20' || network === 'bep20') {
-    if (!/^0x[A-Fa-f0-9]{40}$/.test(addr)) return '地址格式不正确（应以0x开头，42位字符）';
+    if (!/^0x[A-Fa-f0-9]{40}$/.test(addr)) return 'Invalid address (must start with 0x, 42 characters)';
   }
   return null; // valid
 }

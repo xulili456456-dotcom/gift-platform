@@ -11,7 +11,7 @@ export default function GiftHallPage() {
 
   // Translate gift name/description using i18n giftData
   const tg = (gift) => {
-    const key = gift.name; // e.g. "新人红包"
+    const key = gift.name; // raw gift name from server, used as giftData translation key
     const gd = i18n.getResource(i18n.language, 'translation', 'giftData');
     if (gd && gd[key]) return gd[key];
     return { name: gift.name, desc: gift.description };
