@@ -6,8 +6,6 @@ const router = Router();
 router.use(authMiddleware);
 
 const CHECKIN_REWARDS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
-const AD_REWARD = 0.5;
-const MAX_ADS = 3;
 
 // Calculate streak: count consecutive days backwards
 // skipToday=true: start from yesterday (for POST /checkin before today's record is inserted)
@@ -57,28 +55,6 @@ router.post('/checkin', async (req, res) => {
   }
 });
 
-// POST /api/tasks/ad — transaction-protected
-router.post('/ad', async (req, res) => {
-  const t = await tx();
-  try {
-    const today = new Date().toISOString().slice(0, 10);
-    const count = await t.get(
-      'SELECT COUNT(*) as c FROM task_earnings WHERE user_id = ? AND type = ? AND created_at >= ?',
-      [req.user.id, 'ad', today]);
-
-    if (Number(count.c) >= MAX_ADS) { await t.rollback(); return res.status(400).json({ error: '今日广告已完成' }); }
-
-    const result = await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
-      [req.user.id, AD_REWARD, 'ad', 'delivered']);
-
-    await t.commit();
-    res.json({ id: result.id, amount: AD_REWARD, remaining: MAX_ADS - Number(count.c) - 1 });
-  } catch (err) {
-    await t.rollback().catch(() => {});
-    throw err;
-  }
-});
-
 // GET /api/tasks/balance
 router.get('/balance', async (req, res) => {
   const earnings = await get(
@@ -87,9 +63,6 @@ router.get('/balance', async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
   const checkins = await get('SELECT COUNT(*) as c FROM task_earnings WHERE user_id = ? AND type = ? AND created_at >= ?',
     [req.user.id, 'checkin', today]);
-  const ads = await get('SELECT COUNT(*) as c FROM task_earnings WHERE user_id = ? AND type = ? AND created_at >= ?',
-    [req.user.id, 'ad', today]);
-
   // Calculate streak
   let streak = 0;
   let nextCheckinReward = CHECKIN_REWARDS[0];
@@ -106,7 +79,6 @@ router.get('/balance', async (req, res) => {
     available: balanceAmount,
     total: balanceAmount,
     checkedToday: Number(checkins.c) > 0,
-    adsToday: Number(ads.c),
     streak,
     nextCheckinReward,
   });

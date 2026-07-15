@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Download, Smartphone, Shield, Zap, Bell, ChevronRight, Android } from 'lucide-react'
+import { Download, Smartphone, Shield, Zap, Bell, ChevronRight } from 'lucide-react'
 import SEO from '../components/SEO'
 
 const ICON_MAP = { Zap, Bell, Shield, Smartphone }
@@ -28,7 +28,7 @@ export default function DownloadPage() {
               {/* Left: APK Download Card */}
               <div className="card p-8 text-center order-2 lg:order-1">
                 <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
-                  <Android size={44} className="text-white" />
+                  <Smartphone size={44} className="text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">{t('app.name')}</h3>
                 <p className="text-text-secondary text-sm mb-4">

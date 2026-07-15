@@ -4,7 +4,7 @@ import { referralApi } from '../api/referral';
 import { giftsApi } from '../api/gifts';
 import client from '../api/client';
 import PullToRefresh from '../components/shared/PullToRefresh';
-import { CheckCircle, Play, Flame, Copy, Info } from 'lucide-react';
+import { CheckCircle, Flame, Copy, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function TasksPage() {
@@ -14,7 +14,7 @@ export default function TasksPage() {
   const [inviteData, setInviteData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [balance, setBalance] = useState({ available: 0, total: 0, checkedToday: false, adsToday: 0, streak: 0 });
+  const [balance, setBalance] = useState({ available: 0, total: 0, checkedToday: false, streak: 0 });
   const [submitting, setSubmitting] = useState(false);
   const [showExplain, setShowExplain] = useState(false);
 
@@ -38,17 +38,6 @@ export default function TasksPage() {
       toast.success(`✅ +$${data.amount} 签到成功`);
       loadAll();
     } catch (err) { toast.error(err.response?.data?.error || '签到失败'); }
-    finally { setSubmitting(false); }
-  };
-
-  const watchAd = async () => {
-    setSubmitting(true);
-    toast.success('正在播放广告...');
-    try {
-      const { data } = await client.post('/tasks/ad');
-      toast.success(`+$${data.amount} 广告奖励已到账`);
-      loadAll();
-    } catch (err) { toast.error(err.response?.data?.error || '失败'); }
     finally { setSubmitting(false); }
   };
 
@@ -99,25 +88,6 @@ export default function TasksPage() {
               {balance.checkedToday ? `✅ ${t('tasks.checkedIn')}` : `${t('tasks.checkinNow')} +$${balance.nextCheckinReward || 0.1}`}
             </button>
           </div>
-        </div>
-
-        {/* Watch Ad */}
-        <div className="bg-white rounded-2xl border border-separator shadow-sm p-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2"><Play size={20} className="text-primary" /><span className="text-[14px] font-bold text-text">{t('tasks.watchAd')}</span></div>
-            <span className="text-[11px] text-text-muted">{balance.adsToday}/3</span>
-          </div>
-          <div className="flex gap-2 mb-3">
-            {[1,2,3].map(i => (
-              <div key={i} className={`flex-1 py-2 rounded-lg text-center text-[11px] font-semibold ${balance.adsToday >= i ? 'bg-success/10 text-success' : 'bg-bg text-text-muted'}`}>
-                {balance.adsToday >= i ? '✅' : '📺'} $0.5
-              </div>
-            ))}
-          </div>
-          <button onClick={watchAd} disabled={balance.adsToday >= 3 || submitting}
-            className={`w-full py-2.5 rounded-xl text-[13px] font-bold ${balance.adsToday >= 3 ? 'bg-bg text-text-muted' : 'bg-primary text-white active:scale-[0.98]'}`}>
-            {balance.adsToday >= 3 ? t('tasks.adDone') : `${t('tasks.watchAdNow')} +$0.5`}
-          </button>
         </div>
 
         {/* Explanation Tooltip */}
