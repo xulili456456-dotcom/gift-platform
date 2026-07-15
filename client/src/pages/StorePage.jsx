@@ -343,7 +343,6 @@ export default function StorePage() {
   const [catIdx, setCatIdx] = useState(0);
   const [search, setSearch] = useState('');
   const [detail, setDetail] = useState(null);
-  const [showDealBanner, setShowDealBanner] = useState(true);
   const [notifCount, setNotifCount] = useState(0);
   const [earnings, setEarnings] = useState({ todayProfit: 0, totalProfit: 0, totalOrders: 0, balance: 0, tomorrowEstimate: 0, dailyGoal: 20 });
   const [sortMode, setSortMode] = useState('profit'); // 'profit' | 'price' | 'sales'
@@ -515,18 +514,6 @@ export default function StorePage() {
             }`}>{t(c)}</button>
         ))}
       </div>
-
-      {/* Deal Banner */}
-      {showDealBanner && (
-        <div className="shrink-0 mx-3 mt-3 bg-gradient-to-r from-[#CC0C39] to-[#E85D36] rounded-lg p-3 flex items-center gap-3 relative overflow-hidden">
-          <div className="text-2xl">⚡</div>
-          <div className="flex-1 text-white">
-            <p className="text-[13px] font-bold">{t('store.limitedDeal')}</p>
-            <p className="text-[10px] text-white/80">{t('store.subtitle')}</p>
-          </div>
-          <button onClick={() => setShowDealBanner(false)} className="text-white/60 hover:text-white"><X size={14} /></button>
-        </div>
-      )}
 
       {/* Asset Dashboard Card */}
       <div className="shrink-0 bg-white border-b border-[#ddd] px-4 py-3">
