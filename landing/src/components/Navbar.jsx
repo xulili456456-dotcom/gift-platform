@@ -24,7 +24,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/95 dark:bg-[#0A0A0F]/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-md">
+    <nav className="sticky top-0 z-50 glass border-b border-border-light shadow-sm">
       <div className="container-main flex items-center justify-between h-16">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 font-bold text-xl no-underline" style={{ color: 'var(--color-text)' }}>
@@ -70,7 +70,7 @@ export default function Navbar() {
       {/* Mobile nav overlay */}
       {mobileOpen && (
         <div className="md:hidden mobile-nav-overlay">
-          <div className="container-main py-4 border-t border-border-light bg-white dark:bg-[#0A0A0F] flex flex-col gap-1">
+          <div className="container-main py-4 border-t border-border bg-white/95 dark:bg-[#0A0A0F]/95 backdrop-blur-xl flex flex-col gap-1">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.path}

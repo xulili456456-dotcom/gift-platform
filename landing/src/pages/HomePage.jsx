@@ -1,22 +1,19 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Star, TrendingUp, Package, Truck, Headphones, ShoppingCart, ChevronDown, DollarSign, Shield, Zap, Users, X, BadgeCheck, CreditCard, Lock, Wallet } from 'lucide-react'
+import { ArrowRight, Star, TrendingUp, Package, Truck, Headphones, ShoppingCart, DollarSign, Shield, X, BadgeCheck, CreditCard, Lock, Wallet } from 'lucide-react'
 import SEO from '../components/SEO'
 
-// ══════════════════════════════════════
-// Hooks
-// ══════════════════════════════════════
+// ═══════ Hooks ═══════
 function useCountUp(end, duration = 2000, start = false) {
   const [count, setCount] = useState(0)
   useEffect(() => {
     if (!start) return
-    const startTime = performance.now()
+    const st = performance.now()
     const step = (now) => {
-      const progress = Math.min((now - startTime) / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      setCount(Math.floor(eased * end))
-      if (progress < 1) requestAnimationFrame(step)
+      const p = Math.min((now - st) / duration, 1)
+      setCount(Math.floor((1 - Math.pow(1 - p, 3)) * end))
+      if (p < 1) requestAnimationFrame(step)
     }
     requestAnimationFrame(step)
   }, [end, duration, start])
@@ -25,113 +22,99 @@ function useCountUp(end, duration = 2000, start = false) {
 
 function useReveal(threshold = 0.1) {
   const ref = useRef(null)
-  const [visible, setVisible] = useState(false)
+  const [v, sv] = useState(false)
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setVisible(true) }, { threshold })
-    obs.observe(el)
-    return () => obs.disconnect()
+    const el = ref.current; if (!el) return
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) sv(true) }, { threshold })
+    obs.observe(el); return () => obs.disconnect()
   }, [threshold])
-  return [ref, visible]
+  return [ref, v]
+}
+
+function useMouseGlow() {
+  const [pos, setPos] = useState({ x: typeof window !== 'undefined' ? window.innerWidth / 2 : 0, y: typeof window !== 'undefined' ? window.innerHeight / 2 : 0, active: false })
+  useEffect(() => {
+    let raf, mx = 0, my = 0
+    const move = (e) => { mx = e.clientX; my = e.clientY; setPos(p => ({ ...p, active: true })) }
+    const leave = () => setPos(p => ({ ...p, active: false }))
+    const tick = () => { setPos(p => ({ ...p, x: mx, y: my })); raf = requestAnimationFrame(tick) }
+    window.addEventListener('mousemove', move, { passive: true })
+    document.addEventListener('mouseleave', leave)
+    raf = requestAnimationFrame(tick)
+    return () => { window.removeEventListener('mousemove', move); document.removeEventListener('mouseleave', leave); cancelAnimationFrame(raf) }
+  }, [])
+  return pos
 }
 
 function RevealSection({ children, className = '', style, enhanced = false }) {
   const [ref, visible] = useReveal()
-  const cls = enhanced ? 'reveal-enhanced' : 'reveal'
-  return <div ref={ref} className={`${cls} ${visible ? 'visible' : ''} ${className}`} style={style}>{children}</div>
+  return <div ref={ref} className={`${enhanced ? 'reveal-enhanced' : 'reveal'} ${visible ? 'visible' : ''} ${className}`} style={style}>{children}</div>
 }
 
-// ══════════════════════════════════════
-// Live Activity Ticker
-// ══════════════════════════════════════
+// ═══════ Live Ticker ═══════
 const LIVE_EVENTS = [
-  { name: 'Maria S.', country: '🇧🇷', action: 'earned', amount: '$47.50', product: 'Sony Headphones', platform: 'Amazon', delay: 0 },
-  { name: 'Ahmed K.', country: '🇲🇾', action: 'earned', amount: '$89.00', product: 'Samsung Galaxy', platform: 'Shopee', delay: 4 },
-  { name: 'Lisa T.', country: '🇵🇭', action: 'earned', amount: '$23.80', product: 'Nike Shoes', platform: 'Lazada', delay: 8 },
-  { name: 'John D.', country: '🇺🇸', action: 'earned', amount: '$156.00', product: 'MacBook Air', platform: 'Amazon', delay: 12 },
-  { name: 'Priya R.', country: '🇮🇩', action: 'earned', amount: '$34.20', product: 'SK-II Essence', platform: 'Shopee', delay: 16 },
-  { name: 'Carlos M.', country: '🇲🇽', action: 'earned', amount: '$62.00', product: 'iPad Case', platform: 'Amazon', delay: 20 },
-  { name: 'Yuki T.', country: '🇯🇵', action: 'earned', amount: '$41.30', product: 'Wireless Earbuds', platform: 'AliExpress', delay: 24 },
-  { name: 'Sarah W.', country: '🇹🇭', action: 'earned', amount: '$78.50', product: 'Smart Watch', platform: 'Lazada', delay: 28 },
+  { name: 'Maria S.', country: '🇧🇷', amount: '$47.50', product: 'Sony Headphones', platform: 'Amazon', delay: 0 },
+  { name: 'Ahmed K.', country: '🇲🇾', amount: '$89.00', product: 'Samsung Galaxy', platform: 'Shopee', delay: 4 },
+  { name: 'Lisa T.', country: '🇵🇭', amount: '$23.80', product: 'Nike Shoes', platform: 'Lazada', delay: 8 },
+  { name: 'John D.', country: '🇺🇸', amount: '$156.00', product: 'MacBook Air', platform: 'Amazon', delay: 12 },
+  { name: 'Priya R.', country: '🇮🇩', amount: '$34.20', product: 'SK-II Essence', platform: 'Shopee', delay: 16 },
+  { name: 'Carlos M.', country: '🇲🇽', amount: '$62.00', product: 'iPad Case', platform: 'Amazon', delay: 20 },
+  { name: 'Yuki T.', country: '🇯🇵', amount: '$41.30', product: 'Wireless Earbuds', platform: 'AliExpress', delay: 24 },
+  { name: 'Sarah W.', country: '🇹🇭', amount: '$78.50', product: 'Smart Watch', platform: 'Lazada', delay: 28 },
 ]
 
 function LiveTicker() {
   const [visible, setVisible] = useState(null)
   const [dismissed, setDismissed] = useState(new Set())
   const idxRef = useRef(0)
-
   const showNext = useCallback(() => {
-    const event = LIVE_EVENTS[idxRef.current % LIVE_EVENTS.length]
-    idxRef.current++
-    if (!dismissed.has(idxRef.current)) {
-      setVisible({ ...event, id: idxRef.current })
-      setTimeout(() => setVisible(null), 5000)
-    }
+    const event = LIVE_EVENTS[idxRef.current % LIVE_EVENTS.length]; idxRef.current++
+    if (!dismissed.has(idxRef.current)) { setVisible({ ...event, id: idxRef.current }); setTimeout(() => setVisible(null), 5000) }
   }, [dismissed])
-
-  useEffect(() => {
-    showNext()
-    const interval = setInterval(showNext, 4000)
-    return () => clearInterval(interval)
-  }, [showNext])
-
+  useEffect(() => { showNext(); const iv = setInterval(showNext, 4000); return () => clearInterval(iv) }, [showNext])
   if (!visible) return null
-
   return (
-    <div className="fixed bottom-6 left-4 md:left-6 z-50 animate-slide-up max-w-[340px]">
-      <div className="bg-white dark:bg-[#1E1E32] border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl p-4 flex items-center gap-3 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-1 h-full bg-green-500" />
-        <button onClick={() => { setDismissed(prev => new Set([...prev, visible.id])); setVisible(null) }}
-          className="absolute top-2 right-2 text-text-muted hover:text-text transition-colors">
-          <X size={14} />
-        </button>
-        <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-500/10 flex items-center justify-center text-lg shrink-0">
-          {visible.country}
-        </div>
+    <div className="fixed bottom-6 left-6 z-50 animate-slide-up max-w-[340px]">
+      <div className="glass-card p-4 flex items-center gap-3 relative overflow-hidden shadow-2xl">
+        <div className="absolute top-0 left-0 w-1 h-full bg-green-500/60" />
+        <button onClick={() => { setDismissed(p => new Set([...p, visible.id])); setVisible(null) }} className="absolute top-2 right-2 text-text-muted hover:text-text"><X size={14} /></button>
+        <div className="w-9 h-9 rounded-full bg-green-500/10 flex items-center justify-center text-base shrink-0">{visible.country}</div>
         <div className="min-w-0">
           <p className="text-sm font-semibold text-text truncate">{visible.name}</p>
-          <p className="text-xs text-text-muted">
-            earned <span className="text-green-500 font-bold">{visible.amount}</span> from {visible.product}
-          </p>
-          <p className="text-[10px] text-text-muted mt-0.5 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-            via {visible.platform} · Just now
-          </p>
+          <p className="text-xs text-text-secondary">earned <span className="text-green-500 font-bold">{visible.amount}</span> from {visible.product}</p>
+          <p className="text-[10px] text-text-muted mt-0.5 flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />via {visible.platform} · Just now</p>
         </div>
       </div>
     </div>
   )
 }
 
-// ══════════════════════════════════════
-// Main Component
-// ══════════════════════════════════════
+// ═══════ Main ═══════
 function StatItem({ value, label, suffix = '', prefix = '', start }) {
   const count = useCountUp(value, 2000, start)
   return (
     <div className="text-center stat-glow">
-      <div className="text-3xl md:text-5xl font-extrabold tracking-tight mb-1" style={{ color: '#D4A574' }}>{prefix}{count}{suffix}</div>
+      <div className="text-3xl md:text-5xl font-extrabold tracking-tight mb-1 text-metallic">{prefix}{count}{suffix}</div>
       <div className="text-text-secondary text-sm font-medium">{label}</div>
     </div>
   )
 }
 
-const GLOW_CLASSES = ['platform-glow-amazon', 'platform-glow-shopee', 'platform-glow-lazada', 'platform-glow-aliexpress', 'platform-glow-tiktok', 'platform-glow-ebay']
+const GLOW_CLASSES = ['pg-amazon', 'pg-shopee', 'pg-lazada', 'pg-aliexpress', 'pg-tiktok', 'pg-ebay']
 const ICON_MAP = { Package, Truck, Headphones, TrendingUp }
 
-const PARTICLES = Array.from({ length: 30 }, (_, i) => ({
+const PARTICLES = Array.from({ length: 25 }, (_, i) => ({
   id: i, x: `${5 + Math.random() * 90}%`, delay: `${Math.random() * 6}s`, dur: `${4 + Math.random() * 6}s`, size: 1 + Math.random() * 2,
 }))
 
 export default function HomePage() {
   const { t } = useTranslation()
+  const mouse = useMouseGlow()
   const [startCount, setStartCount] = useState(false)
   const [calcTasks, setCalcTasks] = useState(10)
   const [calcProfit, setCalcProfit] = useState(5)
 
-  useEffect(() => { const timer = setTimeout(() => setStartCount(true), 300); return () => clearTimeout(timer) }, [])
-
+  useEffect(() => { const t = setTimeout(() => setStartCount(true), 300); return () => clearTimeout(t) }, [])
   const calcMonthly = useMemo(() => calcTasks * calcProfit * 30, [calcTasks, calcProfit])
 
   const platforms = t('platforms.items', { returnObjects: true }) || []
@@ -156,92 +139,108 @@ export default function HomePage() {
     { aspect: 'Scale', traditional: 'Limited by capital', haven: 'Unlimited tasks', icon: TrendingUp },
   ]
 
+  // Mouse-follow parallax for hero orbs
+  const orbStyle = useMemo(() => ({
+    '--mx': mouse.x, '--my': mouse.y,
+  }), [mouse.x, mouse.y])
+
   return (
     <>
       <SEO />
+      {/* Global mouse glow */}
+      <div className={`mouse-glow ${mouse.active ? 'active' : ''}`} style={{ left: mouse.x, top: mouse.y }} />
+
       <div className="page-enter">
         {/* ═══════ HERO ═══════ */}
-        <section className="hero-gradient grid-pattern relative overflow-hidden min-h-[90vh] flex items-center">
+        <section className="hero-mesh relative overflow-hidden min-h-screen flex items-center">
+          <div className="grain-overlay" />
+
+          {/* Floating orbs with parallax */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="orb absolute -top-20 -left-20 w-[500px] h-[500px] rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #FF9900, transparent 70%)' }} />
-            <div className="orb-slow absolute top-1/3 -right-32 w-[400px] h-[400px] rounded-full opacity-15" style={{ background: 'radial-gradient(circle, #EE4D2D, transparent 70%)' }} />
-            <div className="orb-reverse absolute -bottom-20 left-1/3 w-[350px] h-[350px] rounded-full opacity-12" style={{ background: 'radial-gradient(circle, #0F1470, transparent 70%)' }} />
-            <div className="orb absolute top-1/2 left-1/2 w-[300px] h-[300px] rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #D4A574, transparent 70%)', animationDelay: '-4s' }} />
+            <div className="orb orb-1" style={{
+              top: '10%', left: '5%', width: '45vw', height: '45vw', maxWidth: '600px', maxHeight: '600px',
+              background: 'radial-gradient(circle, rgba(255,153,0,0.12), transparent 70%)',
+              transform: `translate(${(mouse.x - window.innerWidth/2) * -0.015}px, ${(mouse.y - window.innerHeight/2) * -0.015}px)`,
+            }} />
+            <div className="orb orb-2" style={{
+              top: '40%', right: '-10%', width: '40vw', height: '40vw', maxWidth: '500px', maxHeight: '500px',
+              background: 'radial-gradient(circle, rgba(238,77,45,0.08), transparent 70%)',
+              transform: `translate(${(mouse.x - window.innerWidth/2) * 0.01}px, ${(mouse.y - window.innerHeight/2) * 0.01}px)`,
+            }} />
+            <div className="orb orb-3" style={{
+              bottom: '10%', left: '30%', width: '35vw', height: '35vw', maxWidth: '400px', maxHeight: '400px',
+              background: 'radial-gradient(circle, rgba(15,20,112,0.06), transparent 70%)',
+              transform: `translate(${(mouse.x - window.innerWidth/2) * -0.02}px, ${(mouse.y - window.innerHeight/2) * -0.02}px)`,
+            }} />
           </div>
+
           <div className="hero-particles">
             {PARTICLES.map((p) => (
-              <div key={p.id} className="hero-particle" style={{ left: p.x, animationDelay: p.delay, '--dur': p.dur, '--delay': p.delay, width: p.size, height: p.size }} />
+              <div key={p.id} className="hero-particle" style={{ left: p.x, '--delay': p.delay, '--dur': p.dur, width: p.size, height: p.size }} />
             ))}
           </div>
 
-          <div className="container-main relative z-10 py-20 md:py-28">
+          <div className="container-main relative z-10 py-24 md:py-32">
             <div className="max-w-4xl mx-auto text-center">
-              <div className="animate-fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-semibold mb-8 border border-accent/20">
-                <span className="w-2 h-2 rounded-full bg-accent glow-dot" />
+              <div className="animate-fade-in inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-text-secondary text-xs font-semibold mb-10 tracking-wider uppercase" style={{ letterSpacing: '0.1em' }}>
+                <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
                 {t('hero.badge')}
               </div>
 
-              <h1 className="animate-fade-in-up text-3xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight mb-4 whitespace-pre-line">
+              <h1 className="animate-fade-in-up text-4xl md:text-6xl lg:text-7xl font-extrabold leading-none tracking-tight mb-6 whitespace-pre-line" style={{ letterSpacing: '-0.03em' }}>
                 {t('hero.title')}
               </h1>
 
-              <p className="animate-fade-in-up text-base md:text-xl text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed" style={{ animationDelay: '0.1s' }}>
+              <p className="animate-fade-in-up text-lg md:text-xl text-text-secondary max-w-xl mx-auto mb-12 leading-relaxed font-normal" style={{ animationDelay: '0.1s', letterSpacing: '-0.01em' }}>
                 {t('hero.subtitle')}
               </p>
 
               <div className="animate-fade-in-up flex flex-col sm:flex-row items-center justify-center gap-4" style={{ animationDelay: '0.2s' }}>
-                <a href="https://gift-platform-h6um.onrender.com/register" target="_blank" rel="noopener noreferrer"
-                  className="btn btn-accent btn-lg no-underline text-base glow-pulse">
-                  {t('app.cta_register')}
-                  <ArrowRight size={20} />
+                <a href="https://gift-platform-h6um.onrender.com/register" target="_blank" rel="noopener noreferrer" className="btn btn-accent btn-lg no-underline">
+                  {t('app.cta_register')}<ArrowRight size={18} />
                 </a>
-                <Link to="/store" className="btn btn-outline btn-lg no-underline text-base">
-                  <ShoppingCart size={20} />{t('nav.store')}
-                </Link>
+                <Link to="/store" className="btn btn-outline btn-lg no-underline"><ShoppingCart size={18} />{t('nav.store')}</Link>
               </div>
 
-              <div className="animate-fade-in-up mt-14 flex flex-wrap items-center justify-center gap-6 opacity-70" style={{ animationDelay: '0.4s' }}>
+              <div className="animate-fade-in-up mt-16 flex flex-wrap items-center justify-center gap-8" style={{ animationDelay: '0.35s' }}>
                 {platforms.map((p, i) => (
-                  <span key={i} className="text-sm md:text-base font-extrabold tracking-wide hover:opacity-100 transition-all duration-300 cursor-default hover:scale-110" style={{ color: p.color, opacity: 0.65 }}>{p.name}</span>
+                  <span key={i} className="text-sm md:text-base font-bold tracking-wide opacity-50 hover:opacity-100 transition-all duration-500 cursor-default hover:scale-110" style={{ color: p.color }}>{p.name}</span>
                 ))}
               </div>
             </div>
           </div>
 
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-text-muted">
-            <span className="text-[11px] uppercase tracking-widest font-semibold opacity-50">Scroll</span>
-            <ChevronDown size={20} className="scroll-indicator" />
+          {/* Scroll indicator */}
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+            <div className="scroll-indicator">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-text-muted mb-2 opacity-40">Scroll</span>
+              <div className="scroll-dot" /><div className="scroll-dot" /><div className="scroll-dot" />
+            </div>
           </div>
         </section>
 
         {/* ═══════ TRUST BAR ═══════ */}
-        <section className="border-b border-border-light bg-white dark:bg-surface">
-          <div className="container-main py-5 flex flex-wrap items-center justify-center gap-6 md:gap-12">
+        <section className="border-b border-border bg-white/50 dark:bg-surface/50 backdrop-blur-sm">
+          <div className="container-main py-5 flex flex-wrap items-center justify-center gap-8 md:gap-14">
             {[
               { icon: BadgeCheck, text: 'Verified Platform', color: '#22c55e' },
               { icon: Lock, text: '256-bit SSL Encrypted', color: '#3b82f6' },
               { icon: CreditCard, text: 'Secure Payments', color: '#8b5cf6' },
               { icon: Shield, text: 'Buyer Protection', color: '#f59e0b' },
-              { icon: Wallet, text: 'Instant Withdrawals', color: '#D4A574' },
+              { icon: Wallet, text: 'Instant Withdrawals', color: '#C8A06E' },
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs md:text-sm text-text-secondary font-medium">
-                <item.icon size={16} style={{ color: item.color }} />
-                <span>{item.text}</span>
+              <div key={i} className="flex items-center gap-2 text-xs md:text-sm text-text-secondary font-medium opacity-70 hover:opacity-100 transition-opacity">
+                <item.icon size={15} style={{ color: item.color }} /><span>{item.text}</span>
               </div>
             ))}
           </div>
         </section>
 
         {/* ═══════ STATS ═══════ */}
-        <section className="section bg-white dark:bg-surface section-wave">
+        <section className="section bg-white dark:bg-surface">
           <div className="container-main">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-              {[
-                { value: 50, suffix: 'K+', label: t('stats.users') },
-                { value: 20, suffix: 'K+', label: t('stats.gifts') },
-                { value: 15, suffix: 'K+', label: t('stats.invites') },
-                { value: 38, prefix: '$', suffix: 'M+', label: t('stats.volume') },
-              ].map((s, i) => (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-16">
+              {[{ value: 50, suffix: 'K+', label: t('stats.users') },{ value: 20, suffix: 'K+', label: t('stats.gifts') },{ value: 15, suffix: 'K+', label: t('stats.invites') },{ value: 38, prefix: '$', suffix: 'M+', label: t('stats.volume') }].map((s, i) => (
                 <RevealSection key={i} enhanced><StatItem value={s.value} prefix={s.prefix || ''} label={s.label} suffix={s.suffix} start={startCount} /></RevealSection>
               ))}
             </div>
@@ -256,41 +255,21 @@ export default function HomePage() {
               <h2 className="section-title">Traditional E-Commerce vs Gift Haven</h2>
               <p className="section-desc mx-auto">See why thousands are switching to task-based earning.</p>
             </RevealSection>
-
             <div className="max-w-4xl mx-auto">
-              {/* Header row */}
               <div className="hidden md:grid grid-cols-[1fr,1fr,1fr] gap-4 mb-4 px-4">
-                <div />
-                <div className="text-center text-sm font-semibold text-red-400 bg-red-50 dark:bg-red-500/5 rounded-xl py-3">❌ Traditional E-Commerce</div>
-                <div className="text-center text-sm font-semibold text-green-500 bg-green-50 dark:bg-green-500/5 rounded-xl py-3">✅ Gift Haven</div>
+                <div /><div className="text-center text-sm font-semibold text-red-500/70 bg-red-50 dark:bg-red-500/3 rounded-xl py-3">❌ Traditional E-Commerce</div><div className="text-center text-sm font-semibold text-green-600 bg-green-50 dark:bg-green-500/3 rounded-xl py-3">✅ Gift Haven</div>
               </div>
-
               {comparisons.map((row, i) => (
-                <RevealSection key={i} enhanced style={{ transitionDelay: `${i * 0.08}s` }}>
-                  <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,1fr] gap-2 md:gap-4 items-center py-3 md:py-4 px-4 rounded-xl hover:bg-white dark:hover:bg-white/3 transition-colors">
-                    <div className="flex items-center gap-3 font-semibold text-sm text-text">
-                      <div className="w-9 h-9 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0">
-                        <row.icon size={18} />
-                      </div>
-                      {row.aspect}
-                    </div>
-                    <div className="text-sm text-red-500/80 dark:text-red-400/80 pl-12 md:pl-0 md:text-center font-medium">
-                      <span className="md:hidden text-[10px] uppercase text-text-muted mr-2">Traditional: </span>
-                      {row.traditional}
-                    </div>
-                    <div className="text-sm text-green-600 dark:text-green-400 font-semibold pl-12 md:pl-0 md:text-center">
-                      <span className="md:hidden text-[10px] uppercase text-text-muted mr-2">Gift Haven: </span>
-                      {row.haven}
-                    </div>
+                <RevealSection key={i} enhanced style={{ transitionDelay: `${i * 0.06}s` }}>
+                  <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,1fr] gap-2 md:gap-4 items-center py-4 px-4 rounded-xl hover:bg-white/50 dark:hover:bg-white/3 transition-colors">
+                    <div className="flex items-center gap-3 font-semibold text-sm text-text"><div className="w-9 h-9 rounded-lg bg-accent/5 text-accent flex items-center justify-center shrink-0"><row.icon size={17} /></div>{row.aspect}</div>
+                    <div className="text-sm text-red-500/70 dark:text-red-400/70 pl-12 md:pl-0 md:text-center font-medium"><span className="md:hidden text-[10px] uppercase text-text-muted mr-2">Traditional: </span>{row.traditional}</div>
+                    <div className="text-sm text-green-600 dark:text-green-400 font-semibold pl-12 md:pl-0 md:text-center"><span className="md:hidden text-[10px] uppercase text-text-muted mr-2">Gift Haven: </span>{row.haven}</div>
                   </div>
                 </RevealSection>
               ))}
-
-              <RevealSection enhanced className="text-center mt-8">
-                <a href="https://gift-platform-h6um.onrender.com/register" target="_blank" rel="noopener noreferrer"
-                  className="btn btn-accent no-underline">
-                  Start Earning — $0 Risk <ArrowRight size={16} />
-                </a>
+              <RevealSection enhanced className="text-center mt-10">
+                <a href="https://gift-platform-h6um.onrender.com/register" target="_blank" rel="noopener noreferrer" className="btn btn-accent no-underline">Start Earning — $0 Risk <ArrowRight size={16} /></a>
               </RevealSection>
             </div>
           </div>
@@ -304,45 +283,29 @@ export default function HomePage() {
               <h2 className="section-title">How much can you earn?</h2>
               <p className="section-desc mx-auto">Drag the sliders to see your potential monthly income.</p>
             </RevealSection>
-
             <RevealSection enhanced>
-              <div className="card border-0 shadow-xl p-8 md:p-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                  <div>
-                    <label className="block text-sm font-semibold text-text mb-2">
-                      Tasks per day: <span className="text-accent text-lg">{calcTasks}</span>
-                    </label>
-                    <input type="range" min="1" max="40" value={calcTasks} onChange={(e) => setCalcTasks(Number(e.target.value))}
-                      className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                      style={{ accentColor: '#D4A574', background: 'linear-gradient(to right, #D4A574 0%, #D4A574 ' + (calcTasks/40*100) + '%, #E5E7EB ' + (calcTasks/40*100) + '%, #E5E7EB 100%)' }} />
-                    <div className="flex justify-between text-xs text-text-muted mt-1"><span>1</span><span>40</span></div>
+              <div className="gradient-border-wrap">
+                <div className="p-8 md:p-10">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                      <label className="block text-sm font-semibold text-text mb-2">Tasks per day: <span className="text-accent text-xl font-bold">{calcTasks}</span></label>
+                      <input type="range" min="1" max="40" value={calcTasks} onChange={(e) => setCalcTasks(Number(e.target.value))} className="w-full" />
+                      <div className="flex justify-between text-xs text-text-muted mt-1"><span>1</span><span>40</span></div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-text mb-2">Avg. profit per task: <span className="text-accent text-xl font-bold">${calcProfit}</span></label>
+                      <input type="range" min="1" max="50" value={calcProfit} onChange={(e) => setCalcProfit(Number(e.target.value))} className="w-full" />
+                      <div className="flex justify-between text-xs text-text-muted mt-1"><span>$1</span><span>$50</span></div>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-text mb-2">
-                      Avg. profit per task: <span className="text-accent text-lg">${calcProfit}</span>
-                    </label>
-                    <input type="range" min="1" max="50" value={calcProfit} onChange={(e) => setCalcProfit(Number(e.target.value))}
-                      className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                      style={{ accentColor: '#D4A574', background: 'linear-gradient(to right, #D4A574 0%, #D4A574 ' + (calcProfit/50*100) + '%, #E5E7EB ' + (calcProfit/50*100) + '%, #E5E7EB 100%)' }} />
-                    <div className="flex justify-between text-xs text-text-muted mt-1"><span>$1</span><span>$50</span></div>
+                  <div className="bg-accent/5 rounded-2xl p-6 text-center">
+                    <p className="text-text-muted text-sm mb-1">Estimated Monthly Earnings</p>
+                    <div className="text-5xl md:text-6xl font-extrabold tracking-tight mb-2 text-metallic">${calcMonthly.toLocaleString()}</div>
+                    <p className="text-text-muted text-sm">{calcTasks} tasks/day × ${calcProfit}/task × 30 days</p>
                   </div>
-                </div>
-
-                <div className="bg-accent/5 rounded-2xl p-6 text-center">
-                  <p className="text-text-muted text-sm mb-1">Estimated Monthly Earnings</p>
-                  <div className="text-5xl md:text-6xl font-extrabold tracking-tight mb-2" style={{ color: '#22c55e' }}>
-                    ${calcMonthly.toLocaleString()}
+                  <div className="text-center mt-6">
+                    <a href="https://gift-platform-h6um.onrender.com/register" target="_blank" rel="noopener noreferrer" className="btn btn-accent btn-lg no-underline">Start Earning ${calcMonthly.toLocaleString()}/mo <ArrowRight size={18} /></a>
                   </div>
-                  <p className="text-text-muted text-sm">
-                    {calcTasks} tasks/day × ${calcProfit}/task × 30 days
-                  </p>
-                </div>
-
-                <div className="text-center mt-6">
-                  <a href="https://gift-platform-h6um.onrender.com/register" target="_blank" rel="noopener noreferrer"
-                    className="btn btn-accent btn-lg no-underline">
-                    Start Earning ${calcMonthly.toLocaleString()}/mo <ArrowRight size={18} />
-                  </a>
                 </div>
               </div>
             </RevealSection>
@@ -358,21 +321,19 @@ export default function HomePage() {
               <p className="section-desc mx-auto">{t('how.desc')}</p>
             </RevealSection>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative max-w-4xl mx-auto">
-              <div className="hidden md:block step-connector" style={{ top: '64px' }} />
+              <div className="hidden md:block step-connector" />
               {[
                 { step: '01', title: t('how.step1_title'), desc: t('how.step1_desc'), emoji: '🎯', color: '#FF9900' },
                 { step: '02', title: t('how.step2_title'), desc: t('how.step2_desc'), emoji: '🚀', color: '#EE4D2D' },
-                { step: '03', title: t('how.step3_title'), desc: t('how.step3_desc'), emoji: '💎', color: '#D4A574' },
+                { step: '03', title: t('how.step3_title'), desc: t('how.step3_desc'), emoji: '💎', color: '#C8A06E' },
               ].map((s, i) => (
                 <RevealSection key={i} enhanced style={{ transitionDelay: `${i * 0.15}s` }}>
                   <div className="tilt-card card text-center relative overflow-hidden border-0 shadow-md">
-                    <div className="absolute top-0 left-0 w-full h-1.5" style={{ background: `linear-gradient(90deg, ${s.color}, ${s.color}88)` }} />
+                    <div className="absolute top-0 left-0 w-full h-0.5 opacity-30" style={{ background: `linear-gradient(90deg, transparent, ${s.color}, transparent)` }} />
                     <div className="pt-6">
-                      <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-5 mx-auto relative" style={{ background: `${s.color}15` }}>
+                      <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-5 mx-auto relative" style={{ background: `${s.color}10` }}>
                         {s.emoji}
-                        <div className="absolute inset-0 rounded-2xl opacity-20" style={{ background: `radial-gradient(circle at center, ${s.color}, transparent)` }} />
                       </div>
-                      <div className="absolute -top-2 left-0 text-6xl font-extrabold opacity-[0.04] select-none" style={{ color: s.color }}>{s.step}</div>
                       <h3 className="text-lg font-bold mb-2">{s.title}</h3>
                       <p className="text-text-secondary text-sm leading-relaxed px-2">{s.desc}</p>
                     </div>
@@ -395,13 +356,13 @@ export default function HomePage() {
               {profitItems.map((g, i) => (
                 <RevealSection key={i} enhanced style={{ transitionDelay: `${i * 0.06}s` }}>
                   <div className="tilt-card card p-5 cursor-pointer border-0 shadow-md relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full opacity-10" style={{ background: g.color }} />
+                    <div className="absolute top-0 right-0 w-24 h-24 rounded-bl-full opacity-[0.04]" style={{ background: g.color }} />
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-3xl">{g.emoji}</span>
-                      <span className="text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: `${g.color}18`, color: g.color }}>{g.cat}</span>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wide" style={{ background: `${g.color}12`, color: g.color }}>{g.cat}</span>
                     </div>
                     <h4 className="font-semibold text-sm mb-3 truncate">{g.name}</h4>
-                    <div className="flex items-center justify-between text-xs mb-3 bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+                    <div className="flex items-center justify-between text-xs mb-3 bg-gray-50 dark:bg-white/3 rounded-xl p-3">
                       <div className="text-center"><div className="text-text-muted mb-0.5">Cost</div><div className="text-text font-bold">{g.cost}</div></div>
                       <span className="text-text-muted text-lg">→</span>
                       <div className="text-center"><div className="text-text-muted mb-0.5">Market</div><div className="text-text font-bold">{g.price}</div></div>
@@ -430,10 +391,8 @@ export default function HomePage() {
                 const Icon = ICON_MAP[v.icon] || Package
                 return (
                   <RevealSection key={i} enhanced style={{ transitionDelay: `${i * 0.1}s` }}>
-                    <div className="card p-6 flex gap-5 border-0 shadow-md hover:border-accent/20">
-                      <div className="w-14 h-14 rounded-2xl bg-accent/10 text-accent flex items-center justify-center shrink-0 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-accent/5" /><Icon size={26} className="relative z-10" />
-                      </div>
+                    <div className="card p-6 flex gap-5 border-0 shadow-md hover:border-accent/15">
+                      <div className="w-14 h-14 rounded-2xl bg-accent/5 text-accent flex items-center justify-center shrink-0"><Icon size={24} /></div>
                       <div><h4 className="font-bold mb-1.5 text-base">{v.title}</h4><p className="text-text-secondary text-sm leading-relaxed">{v.desc}</p></div>
                     </div>
                   </RevealSection>
@@ -453,7 +412,7 @@ export default function HomePage() {
             </RevealSection>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-5xl mx-auto">
               {platforms.map((p, i) => (
-                <RevealSection key={i} enhanced style={{ transitionDelay: `${i * 0.08}s` }}>
+                <RevealSection key={i} enhanced style={{ transitionDelay: `${i * 0.06}s` }}>
                   <div className={`platform-card ${GLOW_CLASSES[i % GLOW_CLASSES.length]} card p-6 text-center h-full border-0 shadow-md cursor-default`}>
                     <div className="text-3xl font-extrabold mb-3 tracking-tight" style={{ color: p.color }}>{p.name}</div>
                     <p className="text-text-muted text-xs leading-relaxed">{p.desc}</p>
@@ -474,17 +433,12 @@ export default function HomePage() {
             </RevealSection>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               {testimonials.map((item, i) => (
-                <RevealSection key={i} enhanced style={{ transitionDelay: `${i * 0.1}s` }}>
+                <RevealSection key={i} enhanced style={{ transitionDelay: `${i * 0.08}s` }}>
                   <div className="card p-6 border-0 shadow-md relative">
-                    <div className="absolute top-4 right-6 text-6xl font-serif text-accent/10 select-none leading-none">"</div>
-                    <div className="flex items-center gap-1 mb-4">
-                      {[...Array(5)].map((_, j) => (<Star key={j} size={14} className="fill-accent text-accent" />))}
-                    </div>
+                    <div className="absolute top-4 right-6 text-7xl font-serif text-accent/[0.04] select-none leading-none">"</div>
+                    <div className="flex items-center gap-1 mb-4">{[...Array(5)].map((_, j) => (<Star key={j} size={13} className="fill-accent/60 text-accent/60" />))}</div>
                     <p className="text-text text-sm leading-relaxed mb-5 relative z-10">{item.text}</p>
-                    <div className="flex items-center justify-between">
-                      <div><p className="font-semibold text-sm">{item.name}</p><p className="text-text-muted text-[12px]">{item.role}</p></div>
-                      <div className="text-accent font-bold text-sm">{item.earned}</div>
-                    </div>
+                    <div className="flex items-center justify-between"><div><p className="font-semibold text-sm">{item.name}</p><p className="text-text-muted text-[12px]">{item.role}</p></div><div className="text-accent font-bold text-sm">{item.earned}</div></div>
                   </div>
                 </RevealSection>
               ))}
@@ -494,24 +448,19 @@ export default function HomePage() {
 
         {/* ═══════ BOTTOM CTA ═══════ */}
         <section className="section bg-primary relative overflow-hidden">
+          <div className="grain-overlay" />
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="orb absolute -top-20 right-[20%] w-[400px] h-[400px] rounded-full opacity-15" style={{ background: 'radial-gradient(circle, #D4A574, transparent 70%)' }} />
-            <div className="orb-slow absolute bottom-0 left-[10%] w-[350px] h-[350px] rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #E8C99B, transparent 70%)' }} />
+            <div className="orb orb-1" style={{ top: '10%', right: '15%', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(200,160,110,0.15), transparent 70%)' }} />
           </div>
-          <div className="absolute inset-0 grid-pattern opacity-5" />
           <div className="container-main relative z-10 text-center py-8">
             <RevealSection enhanced>
               <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">{t('cta.title')}</h2>
-              <p className="text-white/60 text-lg mb-10 max-w-xl mx-auto">{t('cta.subtitle')}</p>
-              <a href="https://gift-platform-h6um.onrender.com/register" target="_blank" rel="noopener noreferrer"
-                className="btn btn-accent btn-lg no-underline text-lg glow-pulse">
-                {t('cta.button')}<ArrowRight size={22} />
-              </a>
+              <p className="text-white/50 text-lg mb-10 max-w-xl mx-auto font-normal">{t('cta.subtitle')}</p>
+              <a href="https://gift-platform-h6um.onrender.com/register" target="_blank" rel="noopener noreferrer" className="btn btn-accent btn-lg no-underline text-lg">{t('cta.button')}<ArrowRight size={20} /></a>
             </RevealSection>
           </div>
         </section>
 
-        {/* ═══════ LIVE TICKER ═══════ */}
         <LiveTicker />
       </div>
     </>
