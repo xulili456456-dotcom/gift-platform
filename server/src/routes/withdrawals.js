@@ -66,7 +66,7 @@ router.post('/', async (req, res) => {
     );
 
     await t.commit();
-    try { require('./notifications').notify(req.user.id, '提现申请已提交', `$${amount} 提现申请正在审核中`, 'info'); } catch {}
+    try { require('./notifications').notify(req.user.id, '💸 Withdrawal Submitted', `$${amount} withdrawal is under review`, 'info'); } catch {}
     res.status(201).json({ id: result.id, status: 'pending' });
   } catch (err) {
     await t.rollback().catch(() => {});

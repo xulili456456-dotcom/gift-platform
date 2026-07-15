@@ -54,7 +54,7 @@ router.post('/', async (req, res) => {
     }
 
     await t.commit();
-    require('./notifications').notify(req.user.id, '🎁 领取成功', `已领取: ${g.name}`, 'success');
+    require('./notifications').notify(req.user.id, '🎁 Gift Claimed', `Claimed: ${g.name}`, 'success');
     res.status(201).json({ id: result.id, gift_id: gift.id, status: 'pending' });
   } catch (err) {
     await t.rollback().catch(() => {});

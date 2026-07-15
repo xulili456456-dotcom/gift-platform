@@ -106,8 +106,8 @@ router.post('/open', async (req, res) => {
     await run("UPDATE stores SET status = 'active', tier = 'small', deposit = 0, opened_at = NOW(), closed_at = NULL WHERE id = ?",
       [existing.id]);
     const tier = TIERS.small;
-    require('./notifications').notify(req.user.id, '🏪 店铺已重开！',
-      `小店已开业，日限${tier.dailyOrders}单，完成50单可升级中店`, 'success');
+    require('./notifications').notify(req.user.id, '🏪 Store Reopened',
+      `Your store is back! ${tier.dailyOrders} orders/day. Complete 50 more to upgrade`, 'success');
     return res.status(200).json({ id: existing.id, tier: 'small', dailyOrders: tier.dailyOrders });
   }
 
@@ -116,8 +116,8 @@ router.post('/open', async (req, res) => {
     [req.user.id, 'small', 0]
   );
   const tier = TIERS.small;
-  require('./notifications').notify(req.user.id, '🏪 开店成功！',
-    `小店已开业，日限${tier.dailyOrders}单，完成50单可升级中店`, 'success');
+  require('./notifications').notify(req.user.id, '🏪 Store Opened!',
+    `Your store is open! ${tier.dailyOrders} orders/day. Complete 50 more to upgrade`, 'success');
   res.status(201).json({ id: result.id, tier: 'small', dailyOrders: tier.dailyOrders });
 });
 
@@ -126,7 +126,7 @@ router.post('/close', async (req, res) => {
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!store) return res.status(400).json({ error: '你没有运营中的店铺' });
   await run("UPDATE stores SET status = 'closed', closed_at = NOW() WHERE id = ?", [store.id]);
-  require('./notifications').notify(req.user.id, '🏪 店铺已关闭', '随时可以重开，订单数据保留', 'info');
+  require('./notifications').notify(req.user.id, '🏪 Store Closed', 'You can reopen anytime, order data is preserved', 'info');
   res.json({ message: '店铺已关闭' });
 });
 
@@ -267,8 +267,8 @@ router.post('/deposit', async (req, res) => {
     'INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
     [req.user.id, amount, 'bonus', 'delivered']
   );
-  require('./notifications').notify(req.user.id, '💰 资金已注入',
-    `已注入 $${amount} 到电商账户`, 'success');
+  require('./notifications').notify(req.user.id, '💰 Capital Added',
+    `$${amount} added to your trading account`, 'success');
   res.json({ id: result.id, amount, message: `已注入 $${amount}` });
 });
 

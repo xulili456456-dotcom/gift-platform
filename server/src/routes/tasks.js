@@ -47,7 +47,7 @@ router.post('/checkin', async (req, res) => {
       [req.user.id, reward, 'checkin', 'delivered']);
 
     await t.commit();
-    try { require('./notifications').notify(req.user.id, '签到成功', `+$${reward} 已到账`, 'success'); } catch {}
+    try { require('./notifications').notify(req.user.id, '✅ Check-in', `+$${reward} credited`, 'success'); } catch {}
     res.json({ id: result.id, amount: reward, streak: streak + 1 });
   } catch (err) {
     await t.rollback().catch(() => {});

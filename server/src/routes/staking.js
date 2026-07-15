@@ -71,8 +71,8 @@ router.post('/', authMiddleware, async (req, res) => {
     );
 
     await t.commit();
-    require('./notifications').notify(req.user.id, '🔒 质押成功',
-      `已质押 $${plan.amount}，${plan.days}天后解锁，${plan.bonus}x收益`, 'success');
+    require('./notifications').notify(req.user.id, '🔒 Staked',
+      `$${plan.amount} locked for ${plan.days} days, ${plan.bonus}x bonus`, 'success');
     res.status(201).json({ id: result.id, amount: plan.amount, bonus: plan.bonus, unlockAt, status: 'active' });
   } catch (err) {
     await t.rollback().catch(() => {});
@@ -101,8 +101,8 @@ router.post('/unlock', authMiddleware, async (req, res) => {
     await t.run("UPDATE stakes SET status = 'unlocked' WHERE id = ?", [s.id]);
 
     await t.commit();
-    require('./notifications').notify(req.user.id, '🔓 质押已解锁',
-      `返还 $${refund}${penalty > 0 ? ` (罚金 $${penalty})` : ''}`, 'success');
+    require('./notifications').notify(req.user.id, '🔓 Stake Unlocked',
+      `Refund $${refund}${penalty > 0 ? ` (penalty $${penalty})` : ''}`, 'success');
     res.json({ refund, penalty, amount: s.amount, daysLeft });
   } catch (err) {
     await t.rollback().catch(() => {});
