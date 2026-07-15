@@ -13,7 +13,8 @@ const TIER_INFO = {
   large:  { nameKey: 'store.large',  daily: 40, color: '#EF4444', tag: 'Lv.3', need: 200 },
 };
 
-const CATEGORIES = ['全部', '数码', '女装', '男装', '美妆', '鞋靴', '家居', '配饰', '食品', '潮玩'];
+const CAT_KEYS = ['store.all', 'store.digital', 'store.women', 'store.men', 'store.beauty', 'store.shoes', 'store.home', 'store.accessories', 'store.food', 'store.toys'];
+const CAT_VALUES = ['全部', '数码', '女装', '男装', '美妆', '鞋靴', '家居', '配饰', '食品', '潮玩'];
 
 // 商品列表 — 亮哥逐个添加
 // 格式: { img:'图片URL', name:'商品名称', price:市场价, sold:销量, cat:'分类', rating:评分, reviews:评论数, specs:{'参数':'值'}, desc:'描述' }
@@ -335,7 +336,7 @@ export default function StorePage() {
   const [opening, setOpening] = useState(false);
   const [showProcess, setShowProcess] = useState(false);
   const [processingProduct, setProcessingProduct] = useState(null);
-  const [category, setCategory] = useState('全部');
+  const [catIdx, setCatIdx] = useState(0);
   const [search, setSearch] = useState('');
   const [detail, setDetail] = useState(null);
 
@@ -347,8 +348,8 @@ export default function StorePage() {
 
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
-    return genProducts(status.store.tier, category, search);
-  }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, category, search]);
+    return genProducts(status.store.tier, CAT_VALUES[catIdx], search);
+  }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, catIdx, search]);
 
   const handleOpen = async () => { /* same */ setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
   const handleBuy = async (product) => {
@@ -483,8 +484,8 @@ export default function StorePage() {
 
       {/* Categories */}
       <div className="shrink-0 bg-white border-b border-gray-200 px-2 flex gap-1 overflow-x-auto native-scroll scrollbar-none py-2">
-        {CATEGORIES.map(c => (
-          <button key={c} onClick={() => setCategory(c)} className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-medium ${category === c ? 'bg-[#131921] text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{c}</button>
+        {CAT_KEYS.map((c, i) => (
+          <button key={c} onClick={() => setCatIdx(i)} className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-medium ${catIdx === i ? 'bg-[#131921] text-white' : 'text-gray-600 hover:bg-gray-100'}`}>{t(c)}</button>
         ))}
       </div>
 
