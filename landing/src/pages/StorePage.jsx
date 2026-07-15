@@ -40,7 +40,7 @@ export default function StorePage() {
   const [search, setSearch] = useState('')
   const [hoveredCard, setHoveredCard] = useState(-1)
   const [page, setPage] = useState(1)
-  const PER_PAGE = 24
+  const PER_PAGE = 12
 
   const getCatLabel = (cat) => {
     const k = CAT_KEY_MAP[cat]

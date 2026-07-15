@@ -7,7 +7,7 @@ import DarkToggle from './DarkToggle'
 
 const NAV_ITEMS = [
   { path: '/', key: 'nav.home' },
-  { path: '/store', key: 'nav.store' },
+  { path: '/store', key: 'nav.store', preload: () => import('../pages/StorePage.jsx') },
   { path: '/download', key: 'nav.download' },
   { path: '/about', key: 'nav.about' },
   { path: '/faq', key: 'nav.faq' },
@@ -40,6 +40,7 @@ export default function Navbar() {
             <Link
               key={item.path}
               to={item.path}
+              onMouseEnter={item.preload}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors no-underline ${
                 isActive(item.path)
                   ? 'text-accent bg-accent/10 font-semibold'
@@ -75,6 +76,7 @@ export default function Navbar() {
               <Link
                 key={item.path}
                 to={item.path}
+                onMouseEnter={item.preload}
                 onClick={() => setMobileOpen(false)}
                 className={`px-4 py-3 rounded-xl text-base font-medium transition-colors no-underline ${
                   isActive(item.path)
