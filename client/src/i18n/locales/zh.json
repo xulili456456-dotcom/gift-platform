@@ -755,7 +755,20 @@
     "totalEarned": "累计",
     "tomorrowEstimate": "明天预估",
     "depositDesc": "注入更多本金，交易更大商品，赚更多利润",
-    "confirmDeposit": "确认注入"
+    "confirmDeposit": "确认注入",
+    "dashboard": "数据",
+    "products": "进货",
+    "orders": "订单",
+    "profitTrend": "利润趋势(7天)",
+    "topProducts": "最赚商品",
+    "noOrders": "暂无订单",
+    "orderLabel": "订单",
+    "metrics": "运营指标",
+    "profitRate": "利润率",
+    "tier": "店铺等级",
+    "week": "本周",
+    "month": "本月",
+    "total": "合计"
   },
   "specs": {
     "产地": "产地",

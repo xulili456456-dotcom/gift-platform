@@ -732,7 +732,20 @@
     "totalEarned": "Total",
     "tomorrowEstimate": "Est. mañana",
     "depositDesc": "Añade capital para negociar artículos más grandes",
-    "confirmDeposit": "Confirmar"
+    "confirmDeposit": "Confirmar",
+    "dashboard": "Panel",
+    "products": "Productos",
+    "orders": "Pedidos",
+    "profitTrend": "Tendencia (7d)",
+    "topProducts": "Más Rentables",
+    "noOrders": "Sin pedidos",
+    "orderLabel": "Pedido",
+    "metrics": "Métricas",
+    "profitRate": "Tasa Ganancia",
+    "tier": "Nivel Tienda",
+    "week": "Semana",
+    "month": "Mes",
+    "total": "Total"
   },
   "specs": {
     "产地": "Origen",

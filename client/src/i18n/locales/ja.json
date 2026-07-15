@@ -754,7 +754,20 @@
     "totalEarned": "累計",
     "tomorrowEstimate": "明日予想",
     "depositDesc": "より大きな商品を取引するために資金を追加",
-    "confirmDeposit": "確認"
+    "confirmDeposit": "確認",
+    "dashboard": "ダッシュボード",
+    "products": "商品",
+    "orders": "注文",
+    "profitTrend": "利益推移(7日)",
+    "topProducts": "トップ商品",
+    "noOrders": "注文なし",
+    "orderLabel": "注文",
+    "metrics": "指標",
+    "profitRate": "利益率",
+    "tier": "店舗ランク",
+    "week": "今週",
+    "month": "今月",
+    "total": "合計"
   },
   "specs": {
     "产地": "原産地",

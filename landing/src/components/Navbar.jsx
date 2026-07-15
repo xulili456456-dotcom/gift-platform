@@ -24,14 +24,14 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 dark:bg-[#0A0A0F]/80 backdrop-blur-xl border-b border-border-light">
+    <nav className="sticky top-0 z-50 bg-white/95 dark:bg-[#0A0A0F]/95 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 shadow-md">
       <div className="container-main flex items-center justify-between h-16">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 font-bold text-xl text-text no-underline">
-          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
+        <Link to="/" className="flex items-center gap-2.5 font-bold text-xl no-underline" style={{ color: 'var(--color-text)' }}>
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-md" style={{ background: 'linear-gradient(135deg, #D4A574, #B8864E)' }}>
             <Gift size={18} className="text-white" />
           </div>
-          <span>{t('app.name')}</span>
+          <span style={{ color: 'var(--color-text)' }}>{t('app.name')}</span>
         </Link>
 
         {/* Desktop nav */}
@@ -42,8 +42,8 @@ export default function Navbar() {
               to={item.path}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors no-underline ${
                 isActive(item.path)
-                  ? 'text-accent bg-accent/10'
-                  : 'text-text-secondary hover:text-text hover:bg-gray-50 dark:hover:bg-white/5'
+                  ? 'text-accent bg-accent/10 font-semibold'
+                  : 'text-gray-700 dark:text-gray-300 hover:text-accent hover:bg-accent/5'
               }`}
             >
               {t(item.key)}
@@ -59,7 +59,7 @@ export default function Navbar() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+            className="md:hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-700 dark:text-gray-300"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
@@ -78,8 +78,8 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(false)}
                 className={`px-4 py-3 rounded-xl text-base font-medium transition-colors no-underline ${
                   isActive(item.path)
-                    ? 'text-accent bg-accent/10'
-                    : 'text-text-secondary hover:text-text hover:bg-gray-50 dark:hover:bg-white/5'
+                    ? 'text-accent bg-accent/10 font-semibold'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-accent hover:bg-accent/5'
                 }`}
               >
                 {t(item.key)}

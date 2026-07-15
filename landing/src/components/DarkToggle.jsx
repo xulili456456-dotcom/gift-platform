@@ -17,7 +17,7 @@ export default function DarkToggle() {
   return (
     <button
       onClick={() => setDark(!dark)}
-      className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+      className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-gray-700 dark:text-gray-300"
       aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {dark ? <Sun size={18} /> : <Moon size={18} />}

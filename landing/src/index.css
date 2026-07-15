@@ -615,3 +615,42 @@ body.dark .glass-card {
 .platform-glow-aliexpress:hover { box-shadow: 0 0 30px rgba(230, 46, 4, 0.25); }
 .platform-glow-tiktok:hover { box-shadow: 0 0 30px rgba(0, 0, 0, 0.25); }
 .platform-glow-ebay:hover { box-shadow: 0 0 30px rgba(0, 100, 210, 0.25); }
+
+/* Live ticker slide-up */
+@keyframes slideUpIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up { animation: slideUpIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Range slider custom styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #D4A574;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(212, 165, 116, 0.4);
+  transition: transform 0.15s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #D4A574;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(212, 165, 116, 0.4);
+}

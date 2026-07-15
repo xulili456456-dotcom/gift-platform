@@ -754,7 +754,20 @@
     "totalEarned": "Total",
     "tomorrowEstimate": "Tomorrow est",
     "depositDesc": "Add more capital to trade bigger items and earn more",
-    "confirmDeposit": "Confirm"
+    "confirmDeposit": "Confirm",
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "orders": "Orders",
+    "profitTrend": "Profit Trend (7d)",
+    "topProducts": "Top Earners",
+    "noOrders": "No orders yet",
+    "orderLabel": "Order",
+    "metrics": "Metrics",
+    "profitRate": "Profit Rate",
+    "tier": "Store Tier",
+    "week": "Week",
+    "month": "Month",
+    "total": "Total"
   },
   "specs": {
     "产地": "Origin",

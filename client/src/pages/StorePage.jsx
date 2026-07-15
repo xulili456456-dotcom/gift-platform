@@ -347,6 +347,10 @@ export default function StorePage() {
   const [earnings, setEarnings] = useState({ todayProfit: 0, totalProfit: 0, totalOrders: 0, balance: 0, tomorrowEstimate: 0, dailyGoal: 20 });
   const [sortMode, setSortMode] = useState('profit'); // 'profit' | 'price' | 'sales'
   const [affordableOnly, setAffordableOnly] = useState(false);
+  const [tab, setTab] = useState('products'); // 'dashboard' | 'products' | 'orders'
+  const [analytics, setAnalytics] = useState(null);
+  const [orderHistory, setOrderHistory] = useState(null);
+  const [orderPeriod, setOrderPeriod] = useState('today');
   const loadStatus = useCallback(async () => {
     try { const { data } = await client.get('/store/status'); setStatus(data); } catch { /* */ }
     finally { setLoading(false); }
@@ -355,6 +359,8 @@ export default function StorePage() {
     try { const { data } = await client.get('/store/earnings-stats'); setEarnings(data); } catch {}
   }, []);
   useEffect(() => { loadStatus(); loadEarnings(); client.get('/notifications').then(({data}) => setNotifCount(data.unread||0)).catch(()=>{}); }, []);
+  useEffect(() => { client.get('/store/analytics').then(({data}) => setAnalytics(data)).catch(()=>{}); }, [s?.doneToday]);
+  useEffect(() => { client.get(`/store/orders-history?period=${orderPeriod}`).then(({data}) => setOrderHistory(data)).catch(()=>{}); }, [orderPeriod, s?.doneToday]);
 
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
@@ -506,6 +512,133 @@ export default function StorePage() {
         ))}
       </div>
 
+      {/* Tab Bar */}
+      <div className="shrink-0 bg-white border-b border-[#ddd] flex">
+        {[
+          ['dashboard', '📊', t('store.dashboard') || 'Dashboard'],
+          ['products', '🛒', t('store.products') || 'Products'],
+          ['orders', '📋', t('store.orders') || 'Orders'],
+        ].map(([key, icon, label]) => (
+          <button key={key} onClick={() => setTab(key)}
+            className={`flex-1 py-2.5 text-[11px] font-bold text-center border-b-2 transition-colors ${
+              tab === key ? 'border-[#131921] text-[#131921]' : 'border-transparent text-[#565959]'
+            }`}>{icon} {label}</button>
+        ))}
+      </div>
+
+      {/* Dashboard Tab */}
+      {tab === 'dashboard' && analytics && (
+        <div className="flex-1 overflow-y-auto bg-[#eaeded]">
+          <div className="p-3 space-y-3">
+            {/* Key Metrics */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-white rounded-lg p-3 border border-[#ddd]">
+                <p className="text-[10px] text-[#565959]">{t('store.balance')}</p>
+                <p className="text-xl font-bold text-[#0F1111]">${analytics.balance.toFixed(2)}</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-[#ddd]">
+                <p className="text-[10px] text-[#565959]">{t('store.todayProfit')}</p>
+                <p className="text-xl font-bold text-[#067D62]">+${analytics.todayProfit.toFixed(2)}</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-[#ddd]">
+                <p className="text-[10px] text-[#565959]">{t('store.totalEarned') || 'Total'}</p>
+                <p className="text-xl font-bold text-[#0F1111]">${analytics.totalProfit.toFixed(2)}</p>
+              </div>
+              <div className="bg-white rounded-lg p-3 border border-[#ddd]">
+                <p className="text-[10px] text-[#565959]">{t('store.dailyGoal') || 'Goal'}</p>
+                <p className="text-xl font-bold text-[#B12704]">{Math.round((analytics.todayProfit / analytics.dailyGoal) * 100)}%</p>
+              </div>
+            </div>
+
+            {/* Profit Trend Mini Chart */}
+            <div className="bg-white rounded-lg p-3 border border-[#ddd]">
+              <p className="text-[11px] font-bold text-[#0F1111] mb-2">📈 {t('store.profitTrend') || 'Profit Trend (7d)'}</p>
+              <div className="flex items-end gap-1 h-20">
+                {analytics.trend.map((d, i) => {
+                  const maxH = Math.max(...analytics.trend.map(d => d.profit), 1);
+                  const h = (d.profit / maxH) * 100;
+                  const isToday = i === analytics.trend.length - 1;
+                  return (
+                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                      <span className="text-[8px] text-[#565959]">{d.profit > 0 ? '$'+d.profit.toFixed(0) : ''}</span>
+                      <div className={`w-full rounded-t ${isToday ? 'bg-[#067D62]' : 'bg-[#ddd]'}`} style={{height: `${Math.max(h, 4)}%`}} />
+                      <span className="text-[8px] text-[#565959]">{d.date}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Top Products */}
+            <div className="bg-white rounded-lg p-3 border border-[#ddd]">
+              <p className="text-[11px] font-bold text-[#0F1111] mb-2">🏆 {t('store.topProducts') || 'Top Products'}</p>
+              {analytics.topProducts.length === 0 && <p className="text-[11px] text-[#aaa] text-center py-4">{t('store.noOrders') || 'No orders yet'}</p>}
+              {analytics.topProducts.map((o, i) => (
+                <div key={i} className="flex items-center justify-between py-1.5 border-b border-[#f0f2f2] last:border-0 text-[11px]">
+                  <span className="text-[#0F1111] font-medium">#{i+1} {t('store.orderLabel') || 'Order'}</span>
+                  <span className="text-[#067D62] font-bold">+${o.profit.toFixed(2)}</span>
+                  <span className="text-[#aaa] text-[9px]">{new Date(o.time).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Operating Metrics */}
+            <div className="bg-white rounded-lg p-3 border border-[#ddd]">
+              <p className="text-[11px] font-bold text-[#0F1111] mb-2">📊 {t('store.metrics') || 'Metrics'}</p>
+              <div className="space-y-1.5 text-[11px]">
+                <div className="flex justify-between"><span className="text-[#565959]">{t('store.profitRate') || 'Profit Rate'}</span><span className="font-bold text-[#0F1111]">{analytics.profitRate}%</span></div>
+                <div className="flex justify-between"><span className="text-[#565959]">{t('store.today')}</span><span className="font-bold text-[#0F1111]">{analytics.todayOrders} {t('store.orders')}</span></div>
+                <div className="flex justify-between"><span className="text-[#565959]">{t('store.tier') || 'Tier'}</span><span className="font-bold text-[#0F1111]">{analytics.tier || '-'}</span></div>
+              </div>
+            </div>
+            <div className="h-4" />
+          </div>
+        </div>
+      )}
+
+      {/* Orders Tab */}
+      {tab === 'orders' && (
+        <div className="flex-1 overflow-y-auto bg-[#eaeded]">
+          <div className="p-3">
+            {/* Period filter */}
+            <div className="flex gap-2 mb-3">
+              {['today','week','month'].map(p => (
+                <button key={p} onClick={() => setOrderPeriod(p)}
+                  className={`text-[10px] px-3 py-1 rounded-full font-medium ${orderPeriod===p?'bg-[#131921] text-white':'bg-white text-[#565959] border border-[#ddd]'}`}>
+                  {p === 'today' ? (t('store.today')||'Today') : p === 'week' ? (t('store.week')||'Week') : (t('store.month')||'Month')}
+                </button>
+              ))}
+            </div>
+
+            {orderHistory?.summary && (
+              <div className="bg-white rounded-lg p-3 border border-[#ddd] mb-3 text-[11px] flex justify-between">
+                <span>{t('store.total') || 'Total'}: <b>{orderHistory.summary.count}</b> {t('store.orders')}</span>
+                <span className="text-[#067D62] font-bold">+${orderHistory.summary.totalProfit.toFixed(2)}</span>
+              </div>
+            )}
+
+            {(!orderHistory?.orders || orderHistory.orders.length === 0) && (
+              <div className="text-center py-16 text-[#aaa] text-sm">{t('store.noOrders') || 'No orders yet'}</div>
+            )}
+
+            {orderHistory?.orders?.map(o => (
+              <div key={o.id} className="bg-white rounded-lg p-3 border border-[#ddd] mb-2">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-[11px] text-[#0F1111] font-medium">{t('store.orderLabel') || 'Order'} #{o.id}</p>
+                    <p className="text-[9px] text-[#aaa]">{new Date(o.created_at).toLocaleString()}</p>
+                  </div>
+                  <span className="text-sm font-bold text-[#067D62]">+${o.profit.toFixed(2)}</span>
+                </div>
+              </div>
+            ))}
+            <div className="h-4" />
+          </div>
+        </div>
+      )}
+
+      {/* Products Tab */}
+      {tab === 'products' && (<>
       {/* Asset Dashboard Card */}
       <div className="shrink-0 bg-white border-b border-[#ddd] px-4 py-3">
         <div className="flex items-start justify-between mb-2">
@@ -605,6 +738,7 @@ export default function StorePage() {
       </div>
 
       {showProcess && processingProduct && <ProcessingModal product={processingProduct} onDone={() => { setShowProcess(false); setProcessingProduct(null); loadStatus(); loadEarnings(); }} t={t} />}
+      </>)}
     </div>
   );
 }

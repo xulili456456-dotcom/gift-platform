@@ -282,5 +282,86 @@ router.post('/deposit', async (req, res) => {
   res.json({ id: result.id, amount, message: `已注入 $${amount}` });
 });
 
+// GET /api/store/analytics — dashboard data
+router.get('/analytics', async (req, res) => {
+  const store = await get('SELECT id, tier FROM stores WHERE user_id = ?', [req.user.id]);
+  const today = new Date().toISOString().slice(0, 10);
+
+  // 7-day profit trend
+  const trend = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+    const r = await get(
+      "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+      [store?.id || 0, d]);
+    trend.push({ date: d.slice(5), profit: Number(r?.total || 0) });
+  }
+
+  // Top 5 products by profit
+  const topProducts = [];
+  if (store) {
+    const allOrders = await all(
+      "SELECT amount, created_at FROM store_orders WHERE store_id = ? AND status = 'done' ORDER BY amount DESC LIMIT 5",
+      [store.id]);
+    topProducts.push(...allOrders.map(o => ({ profit: Number(o.amount), time: o.created_at })));
+  }
+
+  // Today's stats
+  const todayProfit = await get(
+    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+    [store?.id || 0, today]);
+  const todayOrders = await get(
+    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+    [store?.id || 0, today]);
+
+  const totalProfit = await get(
+    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done'",
+    [store?.id || 0]);
+  const totalOrders = await get(
+    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done'",
+    [store?.id || 0]);
+
+  const balance = await get(
+    "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
+    [req.user.id, 'delivered']);
+
+  res.json({
+    trend, topProducts,
+    todayProfit: Number(todayProfit?.total || 0),
+    todayOrders: Number(todayOrders?.c || 0),
+    totalProfit: Number(totalProfit?.total || 0),
+    totalOrders: Number(totalOrders?.c || 0),
+    balance: Number(balance?.total || 0),
+    tier: store?.tier || null,
+    profitRate: PROFIT_RATE * 100,
+    dailyGoal: 20,
+  });
+});
+
+// GET /api/store/orders-history
+router.get('/orders-history', async (req, res) => {
+  const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
+  if (!store) return res.json({ orders: [], summary: { count: 0, totalProfit: 0 } });
+
+  const period = req.query.period || 'today';
+  let dateFilter = '';
+  if (period === 'today') dateFilter = "AND created_at::date = CURRENT_DATE";
+  else if (period === 'week') dateFilter = "AND created_at >= CURRENT_DATE - INTERVAL '7 days'";
+  else if (period === 'month') dateFilter = "AND created_at >= CURRENT_DATE - INTERVAL '30 days'";
+
+  const orders = await all(
+    `SELECT id, amount as profit, created_at, status FROM store_orders WHERE store_id = ? AND status = 'done' ${dateFilter} ORDER BY created_at DESC LIMIT 50`,
+    [store.id]);
+
+  const summary = await get(
+    `SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as totalProfit FROM store_orders WHERE store_id = ? AND status = 'done' ${dateFilter}`,
+    [store.id]);
+
+  res.json({
+    orders: orders.map(o => ({ ...o, profit: Number(o.profit) })),
+    summary: { count: Number(summary?.count || 0), totalProfit: Number(summary?.totalProfit || 0) },
+  });
+});
+
 module.exports = router;
 
