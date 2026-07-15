@@ -47,10 +47,8 @@ export default function App() {
   const loadUser = useAuthStore((s) => s.loadUser);
   useEffect(() => {
     loadUser();
-    // Apply dark mode on startup
-    if (localStorage.getItem('darkMode') === '1') {
-      document.body.classList.add('dark');
-    }
+    // Dark gold theme is always on
+    document.body.classList.add('dark');
   }, []);
 
   return (
