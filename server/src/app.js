@@ -8,8 +8,9 @@ const { getDb } = require('./db/database');
 const migrate = require('./db/migrate');
 const errorHandler = require('./middleware/errorHandler');
 
-// Rate limiter — route-specific limiters are in auth.js
-const globalLimiter = rateLimit({ windowMs: 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false, message: { error: '请求过于频繁，请稍后再试' } });
+// Rate limiter — only applies to API routes; static assets are unlimited
+// Route-specific stricter limiters are in auth.js
+const apiLimiter = rateLimit({ windowMs: 60 * 1000, max: 500, standardHeaders: true, legacyHeaders: false, message: { error: '请求过于频繁，请稍后再试' } });
 
 // Import routes
 const adminPanelRoute = require('./routes/adminPanel');
@@ -51,7 +52,7 @@ async function start() {
   app.use(express.urlencoded({ extended: true }));
 
   // Global rate limit
-  app.use(globalLimiter);
+  app.use('/api', apiLimiter);
 
   // Admin Panel Page (backend standalone)
   app.use('/admin-panel', adminPanelRoute);
