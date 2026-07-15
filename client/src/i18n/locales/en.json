@@ -767,7 +767,9 @@
     "tier": "Store Tier",
     "week": "Week",
     "month": "Month",
-    "total": "Total"
+    "total": "Total",
+    "sports": "Sports",
+    "auto": "Auto"
   },
   "specs": {
     "产地": "Origin",

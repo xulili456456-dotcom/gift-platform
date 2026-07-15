@@ -745,7 +745,9 @@
     "tier": "Nivel Tienda",
     "week": "Semana",
     "month": "Mes",
-    "total": "Total"
+    "total": "Total",
+    "sports": "Deportes",
+    "auto": "Auto"
   },
   "specs": {
     "产地": "Origen",
