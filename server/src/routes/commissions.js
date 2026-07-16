@@ -21,10 +21,11 @@ router.post('/claim', authMiddleware, async (req, res) => {
     [req.user.id, productName || 'Unknown', price, commission]
   );
 
-  // Generate share link with tracking
+  // Generate share link with tracking — include image path
   const user = await get('SELECT referral_code FROM users WHERE id = ?', [req.user.id]);
   const baseUrl = process.env.BASE_URL || 'https://gift-platform-h6um.onrender.com';
-  const shareUrl = `${baseUrl}/buy?ref=${user.referral_code}&pid=${result.id}&p=${productId || 0}`;
+  const imgParam = encodeURIComponent(productImg || `/products/${productId || 1}.jpg`);
+  const shareUrl = `${baseUrl}/buy?ref=${user.referral_code}&pid=${result.id}&img=${imgParam}`;
 
   res.json({
     id: result.id, productName, productPrice: price, productImg: img,
@@ -42,14 +43,13 @@ router.get('/public-product/:pid', async (req, res) => {
   );
   if (!record) return res.status(404).json({ error: 'Product not found or already sold' });
 
-  // Determine image from product ID in the share link
-  const pId = req.query.p || '1';
-  const img = `/products/${pId}.jpg`;
+  // Use image from share link params
+  const img = req.query.img || `/products/1.jpg`;
 
   res.json({
     productName: record.product_name,
     productPrice: Number(record.product_price),
-    productImg: img,
+    productImg: decodeURIComponent(img),
     commission: Number(record.commission),
     sharerName: record.sharer_name,
     status: 'available'
