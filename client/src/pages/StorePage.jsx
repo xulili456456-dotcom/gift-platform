@@ -363,7 +363,10 @@ export default function StorePage() {
     navigator.clipboard.writeText(url);
     toast.success('Link copied! Share it with friends.');
   };
+  const [showDailyFull, setShowDailyFull] = useState(false);
   const handleBuy = async (product) => {
+    // Pre-check locally first, then let backend verify
+    if (s.remaining <= 0) { setShowDailyFull(true); return; }
     try {
       const { data } = await client.post('/store/orders/process', { productPrice: product.price, productName: product.name });
       toast.success(`Bought! Expected to sell by ${new Date(data.sellBy).toLocaleDateString()}`);
@@ -371,6 +374,7 @@ export default function StorePage() {
     } catch (err) {
       const d = err.response?.data;
       if (d?.shortage) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage });
+      else if (d?.error?.includes('daily') || d?.error?.includes('limit')) setShowDailyFull(true);
       else toast.error(d?.error || t('common.operationFailed'));
     }
   };
@@ -473,9 +477,9 @@ export default function StorePage() {
               🔗 {t('store.shareEarn') || 'Share & Earn'} 3%
             </button>
           ) : (
-            <button onClick={() => handleBuy(p)} disabled={s.balance < p.costPrice || s.remaining <= 0}
-              className={`px-10 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-[#f0f2f2] text-[#999999]' : 'bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] shadow-md active:scale-95 border border-[#FCD200]'} transition-all`}>
-              {s.remaining <= 0 ? t('store.dailyFull') : s.balance < p.costPrice ? t('store.insufficient') : t('store.buyNow')}
+            <button onClick={() => handleBuy(p)}
+              className="px-10 py-3 rounded-full font-bold text-sm bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] shadow-md active:scale-95 border border-[#FCD200] transition-all">
+              {t('store.buyNow')}
             </button>
           )}
         </div>
@@ -764,12 +768,7 @@ export default function StorePage() {
                   ) : (
                     <button
                       onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
-                      disabled={s.balance < p.costPrice || s.remaining <= 0}
-                      className={`text-[12px] px-4 py-2 rounded font-bold active:scale-95 transition-all ${
-                        s.balance < p.costPrice || s.remaining <= 0
-                          ? 'bg-gray-200 text-gray-400'
-                          : 'bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] border border-[#FCD200] shadow-sm'
-                      }`}
+                      className="text-[12px] px-4 py-2 rounded font-bold active:scale-95 transition-all bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] border border-[#FCD200] shadow-sm"
                     >{t('store.buy')}</button>
                   )}
                 </div>
@@ -838,6 +837,18 @@ export default function StorePage() {
             </div>
             <p className="text-[9px] text-[#999999] text-center mb-3">Share this link. When someone buys, you earn the commission.</p>
             <button onClick={() => setShareProduct(null)} className="w-full py-2.5 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">Close</button>
+          </div>
+        </div>
+      )}
+
+      {/* Daily Limit Reached Modal */}
+      {showDailyFull && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowDailyFull(false)}>
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in text-center" onClick={e => e.stopPropagation()}>
+            <span className="text-5xl mb-3 block">📅</span>
+            <h3 className="text-lg font-bold text-[#0F1111] mb-1">Daily Limit Reached</h3>
+            <p className="text-sm text-[#565959] mb-4">You have completed all orders for today. Come back tomorrow for more!</p>
+            <button onClick={() => setShowDailyFull(false)} className="w-full py-2.5 bg-[#FFD814] text-[#0F1111] font-bold rounded-xl text-sm">Got it</button>
           </div>
         </div>
       )}
