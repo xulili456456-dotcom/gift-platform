@@ -668,17 +668,24 @@ export default function StorePage() {
               <div className="text-center py-16 text-[#999999] text-sm">{t('store.noOrders') || 'No orders yet'}</div>
             )}
 
-            {orderHistory?.orders?.map(o => (
-              <div key={o.id} className="bg-white rounded-lg p-3 border border-[#e7e7e7] mb-2">
+            {orderHistory?.orders?.map(o => {
+              const cost = s.dailyOrders > 0 ? Math.round((Number(o.profit) / PROFIT_RATE * COST_RATE) * 100) / 100 : null;
+              return (
+              <div key={o.id} className="bg-white rounded-lg p-3 border border-[#e7e7e7] mb-2 cursor-pointer active:bg-gray-50" onClick={() => { const el = document.getElementById('order-detail-'+o.id); if(el) el.classList.toggle('hidden'); }}>
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-[11px] text-[#0F1111] font-medium">{t('store.orderLabel') || 'Order'} #{o.id}</p>
                     <p className="text-[9px] text-[#999999]">{new Date(o.created_at).toLocaleString()}</p>
                   </div>
-                  <span className="text-sm font-bold text-[#067D62]">+${o.profit.toFixed(2)}</span>
+                  <span className="text-sm font-bold text-[#067D62]">+${Number(o.profit).toFixed(2)}</span>
+                </div>
+                <div id={'order-detail-'+o.id} className="hidden mt-2 pt-2 border-t border-[#e7e7e7] text-[10px] space-y-1 text-[#565959]">
+                  <div className="flex justify-between"><span>{t('store.costPrice')}</span><span className="text-[#0F1111] font-medium">${cost?.toFixed(2) || '-'}</span></div>
+                  <div className="flex justify-between"><span>{t('store.earn')}</span><span className="text-[#067D62] font-bold">+${Number(o.profit).toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>{t('store.totalReturn') || 'Total Return'}</span><span className="text-[#0F1111] font-bold">${(cost ? (cost + Number(o.profit)).toFixed(2) : '-')}</span></div>
                 </div>
               </div>
-            ))}
+            )})}
             <div className="h-4" />
           </div>
         </div>
