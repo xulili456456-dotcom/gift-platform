@@ -829,7 +829,11 @@
     "order": "Pilih dan pesan",
     "review": "Semak dan sahkan",
     "orderDone": "Pesanan selesai!",
-    "rewardAdded": "Ganjaran ditambah ke baki"
+    "rewardAdded": "Ganjaran ditambah ke baki",
+    "holdingMode": "Pegangan",
+    "shareMode": "Kongsi",
+    "share": "Kongsi",
+    "shareEarn": "Kongsi & Dapat"
   },
   "notifications": {
     "title": "Notifikasi",

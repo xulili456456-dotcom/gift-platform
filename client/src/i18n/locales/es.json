@@ -758,7 +758,11 @@
     "accessories": "Accesorios",
     "food": "Comida",
     "toys": "Juguetes",
-    "depositSuccess": "¡Depositado!"
+    "depositSuccess": "¡Depositado!",
+    "holdingMode": "Inventario",
+    "shareMode": "Compartir",
+    "share": "Compartir",
+    "shareEarn": "Compartir y Ganar"
   },
   "specs": {
     "产地": "Origen",

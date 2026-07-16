@@ -239,11 +239,26 @@ CREATE INDEX IF NOT EXISTS idx_deposits_user ON deposits(user_id);
 CREATE INDEX IF NOT EXISTS idx_deposits_status ON deposits(status);
 `;
 
+const commissionsSchema = `
+CREATE TABLE IF NOT EXISTS share_commissions (
+    id              SERIAL PRIMARY KEY,
+    sharer_id       INTEGER NOT NULL,
+    product_name    TEXT NOT NULL DEFAULT '',
+    product_price   NUMERIC(10,2) NOT NULL,
+    commission      NUMERIC(10,2) NOT NULL,
+    status          TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','credited')),
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    FOREIGN KEY (sharer_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_share_commissions_user ON share_commissions(sharer_id);
+`;
+
 async function migrate() {
   console.log('Running database migrations...');
   await getDb();
   await exec(schema);
   await exec(depositsSchema);
+  await exec(commissionsSchema);
   await exec(defaultSettings);
   // One-time cleanup: remove legacy Chinese notifications
   try {

@@ -347,7 +347,19 @@ export default function StorePage() {
     return list;
   }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, catIdx, search, sortMode, affordableOnly, status?.store?.balance]);
 
+  const [tradeMode, setTradeMode] = useState('holding'); // 'holding' | 'share'
+  const [shareProduct, setShareProduct] = useState(null);
+  const [shareMsg, setShareMsg] = useState('');
   const handleOpen = async () => { setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
+  const handleShare = async (product) => {
+    try {
+      const { data } = await client.post('/commissions/claim', { productPrice: product.price, productName: product.name });
+      setShareProduct(product);
+      setShareMsg(`Shared! $${data.commission} commission will be credited shortly.`);
+      toast.success(data.message);
+      setTimeout(() => { setShareProduct(null); setShareMsg(''); }, 8000);
+    } catch (err) { toast.error(err.response?.data?.error || 'Share failed'); }
+  };
   const handleBuy = async (product) => {
     try {
       const { data } = await client.post('/store/orders/process', { productPrice: product.price, productName: product.name });
@@ -453,10 +465,16 @@ export default function StorePage() {
             <p className="text-lg font-bold text-[#f8f7f4]">${p.costPrice.toFixed(2)} <span className="text-xs font-normal text-[#9e9eaa]">{t('store.costPrice')}</span></p>
             <p className="text-xs text-[#00c758] font-bold">{t('store.earn')} +${p.profit.toFixed(2)}</p>
           </div>
-          <button onClick={() => handleBuy(p)} disabled={s.balance < p.costPrice || s.remaining <= 0}
-            className={`px-10 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-[#262636] text-[#6e6e7a]' : 'bg-[#c8a06e] hover:bg-[#e0c78e] text-[#0d0d1a] shadow-md active:scale-95 border border-[#a07840]'} transition-all`}>
-            {s.remaining <= 0 ? t('store.dailyFull') : s.balance < p.costPrice ? t('store.insufficient') : t('store.buyNow')}
-          </button>
+          {tradeMode === 'share' ? (
+            <button onClick={() => handleShare(p)} className="px-10 py-3 rounded-full font-bold text-sm bg-[#00c758] hover:bg-[#00e060] text-white shadow-md active:scale-95 transition-all">
+              🔗 {t('store.shareEarn') || 'Share & Earn'} 3%
+            </button>
+          ) : (
+            <button onClick={() => handleBuy(p)} disabled={s.balance < p.costPrice || s.remaining <= 0}
+              className={`px-10 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-[#262636] text-[#6e6e7a]' : 'bg-[#c8a06e] hover:bg-[#e0c78e] text-[#0d0d1a] shadow-md active:scale-95 border border-[#a07840]'} transition-all`}>
+              {s.remaining <= 0 ? t('store.dailyFull') : s.balance < p.costPrice ? t('store.insufficient') : t('store.buyNow')}
+            </button>
+          )}
         </div>
 
         {showInsufficient && (
@@ -689,6 +707,18 @@ export default function StorePage() {
         </div>
       </div>
 
+      {/* Trade Mode Toggle */}
+      <div className="shrink-0 bg-[#141420] border-b border-[#262636] px-3 py-2 flex items-center gap-2">
+        <button onClick={() => setTradeMode('holding')}
+          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='holding'?'bg-[#c8a06e] text-[#0d0d1a]':'bg-[#262636] text-[#9e9eaa]'}`}>
+          📦 {t('store.holdingMode') || 'Holding'} <span className="text-[9px] ml-0.5 opacity-60">15%</span>
+        </button>
+        <button onClick={() => setTradeMode('share')}
+          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='share'?'bg-[#00c758] text-white':'bg-[#262636] text-[#9e9eaa]'}`}>
+          🔗 {t('store.shareMode') || 'Share'} <span className="text-[9px] ml-0.5 opacity-60">3%</span>
+        </button>
+      </div>
+
       {/* Sort & Filter Row */}
       <div className="shrink-0 bg-[#141420] border-b border-[#262636] px-3 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
         <button onClick={() => setSortMode('profit')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='profit'?'bg-[#f8f7f4] text-white':'bg-[#262636] text-[#f8f7f4]'}`}>💰 {t('store.sortProfit') || 'Profit'}</button>
@@ -723,15 +753,22 @@ export default function StorePage() {
                 </div>
                 <div className="flex items-center justify-between mt-1.5">
                   <span className="text-[9px] text-[#9e9eaa]">{p.sold.toLocaleString()}+ {t('store.sold')}</span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
-                    disabled={s.balance < p.costPrice || s.remaining <= 0}
-                    className={`text-[10px] px-2.5 py-1 rounded font-medium ${
-                      s.balance < p.costPrice || s.remaining <= 0
-                        ? 'bg-[#262636] text-[#6e6e7a]'
-                        : 'bg-[#c8a06e] hover:bg-[#e0c78e] text-[#0d0d1a] border border-[#a07840]'
-                    }`}
-                  >{t('store.buy')}</button>
+                  {tradeMode === 'share' ? (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleShare(p); }}
+                      className="text-[10px] px-2.5 py-1 rounded font-medium bg-[#00c758] hover:bg-[#00e060] text-white"
+                    >🔗 {t('store.share') || 'Share'} 3%</button>
+                  ) : (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
+                      disabled={s.balance < p.costPrice || s.remaining <= 0}
+                      className={`text-[10px] px-2.5 py-1 rounded font-medium ${
+                        s.balance < p.costPrice || s.remaining <= 0
+                          ? 'bg-[#262636] text-[#6e6e7a]'
+                          : 'bg-[#c8a06e] hover:bg-[#e0c78e] text-[#0d0d1a] border border-[#a07840]'
+                      }`}
+                    >{t('store.buy')}</button>
+                  )}
                 </div>
               </div>
             </div>

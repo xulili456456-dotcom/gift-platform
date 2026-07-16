@@ -71,6 +71,7 @@ async function start() {
   app.use('/api/withdrawals', require('./routes/withdrawals'));
   app.use('/api/store', require('./routes/store'));
 app.use('/api/deposits', require('./routes/deposits'));
+app.use('/api/commissions', require('./routes/commissions'));
   app.use('/api/referral', referralRoutes);
   app.use('/api/admin', adminRoutes);
 

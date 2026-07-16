@@ -770,7 +770,11 @@
     "total": "Total",
     "sports": "Sports",
     "auto": "Auto",
-    "depositSuccess": "Deposited!"
+    "depositSuccess": "Deposited!",
+    "holdingMode": "Holding",
+    "shareMode": "Share",
+    "share": "Share",
+    "shareEarn": "Share & Earn"
   },
   "specs": {
     "产地": "Origin",

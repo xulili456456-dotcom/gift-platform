@@ -770,7 +770,11 @@
     "total": "合計",
     "sports": "スポーツ",
     "auto": "自動車",
-    "depositSuccess": "入金完了！"
+    "depositSuccess": "入金完了！",
+    "holdingMode": "保有",
+    "shareMode": "共有",
+    "share": "共有",
+    "shareEarn": "共有して稼ぐ"
   },
   "specs": {
     "产地": "原産地",
