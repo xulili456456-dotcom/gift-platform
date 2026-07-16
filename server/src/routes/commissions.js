@@ -8,13 +8,14 @@ const COMMISSION_RATE = 0.03;
 
 // POST /api/commissions/claim — share a product, get a unique tracking link
 router.post('/claim', authMiddleware, async (req, res) => {
-  const { productId, productPrice, productName } = req.body;
+  const { productId, productPrice, productName, productImg } = req.body;
   const price = parseFloat(productPrice);
   if (!price || price <= 0) return res.status(400).json({ error: 'Invalid product price' });
 
   const commission = Math.round(price * COMMISSION_RATE * 100) / 100;
 
-  // Create a pending commission record
+  // Create a pending commission record with image
+  const img = productImg || `/products/${productId || 1}.jpg`;
   const result = await insert(
     'INSERT INTO share_commissions (sharer_id, product_name, product_price, commission) VALUES (?, ?, ?, ?)',
     [req.user.id, productName || 'Unknown', price, commission]
@@ -26,7 +27,7 @@ router.post('/claim', authMiddleware, async (req, res) => {
   const shareUrl = `${baseUrl}/buy?ref=${user.referral_code}&pid=${result.id}&p=${productId || 0}`;
 
   res.json({
-    id: result.id, productName, productPrice: price,
+    id: result.id, productName, productPrice: price, productImg: img,
     commission, rate: '3%', status: 'pending',
     shareUrl,
     message: `Share this link! When someone buys, you earn $${commission}`
@@ -41,9 +42,14 @@ router.get('/public-product/:pid', async (req, res) => {
   );
   if (!record) return res.status(404).json({ error: 'Product not found or already sold' });
 
+  // Determine image from product ID in the share link
+  const pId = req.query.p || '1';
+  const img = `/products/${pId}.jpg`;
+
   res.json({
     productName: record.product_name,
     productPrice: Number(record.product_price),
+    productImg: img,
     commission: Number(record.commission),
     sharerName: record.sharer_name,
     status: 'available'

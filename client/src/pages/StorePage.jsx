@@ -353,7 +353,7 @@ export default function StorePage() {
   const handleOpen = async () => { setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
   const handleShare = async (product) => {
     try {
-      const { data } = await client.post('/commissions/claim', { productId: product.id, productPrice: product.price, productName: product.name });
+      const { data } = await client.post('/commissions/claim', { productId: product.id, productPrice: product.price, productName: product.name, productImg: product.img });
       setShareProduct({ ...product, shareUrl: data.shareUrl, commission: data.commission });
       setShareMsg('');
       toast.success('Share link generated!');
