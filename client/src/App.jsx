@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { useEffect, lazy, Suspense } from 'react';
+import { useEffect, lazy, Suspense, useState } from 'react';
 import useAuthStore from './store/authStore';
 import AppLayout from './components/Layout/AppLayout';
 import ProtectedRoute from './components/shared/ProtectedRoute';
@@ -45,10 +45,13 @@ const Lazy = ({ Comp }) => (
 
 export default function App() {
   const loadUser = useAuthStore((s) => s.loadUser);
+  const [showContact, setShowContact] = useState(false);
   useEffect(() => {
     loadUser();
-    // Dark gold theme is always on
     document.body.classList.add('dark');
+    const handler = () => setShowContact(true);
+    document.addEventListener('showContactSupport', handler);
+    return () => document.removeEventListener('showContactSupport', handler);
   }, []);
 
   return (
@@ -57,6 +60,32 @@ export default function App() {
         duration: 2500,
         style: { background: '#2D2D2D', color: '#FFF', borderRadius: '12px', fontSize: '14px', padding: '10px 16px' },
       }} />
+
+      {/* Contact Support Modal */}
+      {showContact && (
+        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={() => setShowContact(false)}>
+          <div className="bg-[#141420] rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in border border-[#262636]" onClick={e => e.stopPropagation()}>
+            <div className="text-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-[#c8a06e]/20 flex items-center justify-center mx-auto mb-3">
+                <span className="text-3xl">💬</span>
+              </div>
+              <h3 className="text-lg font-bold text-[#f8f7f4]">Contact Support</h3>
+              <p className="text-xs text-[#9e9eaa] mt-1">Reach our team for deposit assistance</p>
+            </div>
+            <div className="space-y-3 mb-5">
+              <a href="https://t.me/ShopeeSupport" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-[#1E1E32] border border-[#262636] hover:border-[#c8a06e] transition-colors">
+                <span className="text-2xl">📱</span>
+                <div><p className="text-[13px] font-bold text-[#f8f7f4]">Telegram</p><p className="text-[10px] text-[#6e6e7a]">@ShopeeSupport</p></div>
+              </a>
+              <a href="mailto:support@shopee-ops.com" className="flex items-center gap-3 p-3 rounded-xl bg-[#1E1E32] border border-[#262636] hover:border-[#c8a06e] transition-colors">
+                <span className="text-2xl">📧</span>
+                <div><p className="text-[13px] font-bold text-[#f8f7f4]">Email</p><p className="text-[10px] text-[#6e6e7a]">support@shopee-ops.com</p></div>
+              </a>
+            </div>
+            <button onClick={() => setShowContact(false)} className="w-full py-3 bg-[#262636] text-[#f8f7f4] font-medium rounded-xl text-sm">Close</button>
+          </div>
+        </div>
+      )}
 
       <Routes>
         <Route path="/login" element={<LoginPage />} />

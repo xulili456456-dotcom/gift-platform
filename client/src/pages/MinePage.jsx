@@ -185,7 +185,7 @@ export default function MinePage() {
 
 
         {/* Deposit */}
-        <button onClick={() => navigate('/mine/support')}
+        <button onClick={() => document.dispatchEvent(new CustomEvent('showContactSupport'))}
           className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm border border-separator active:bg-bg transition-colors">
           <CreditCard size={22} className="text-[#c8a06e] shrink-0" />
           <div className="flex-1 text-left">
@@ -280,7 +280,7 @@ export default function MinePage() {
         </button>
 
         {/* Support */}
-        <button onClick={() => navigate('/mine/support')}
+        <button onClick={() => document.dispatchEvent(new CustomEvent('showContactSupport'))}
           className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm border border-separator active:bg-bg transition-colors">
           <MessageCircle size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
