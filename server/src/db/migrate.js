@@ -182,7 +182,7 @@ CREATE TABLE IF NOT EXISTS store_orders (
     store_id        INTEGER NOT NULL,
     user_id         INTEGER NOT NULL,
     amount          NUMERIC(10,2) NOT NULL DEFAULT 0,
-    status          TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'done')),
+    status          TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'done', 'holding')),
     processed_at    TIMESTAMP DEFAULT NULL,
     created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
@@ -259,6 +259,9 @@ async function migrate() {
   await exec(schema);
   try { await exec(depositsSchema); } catch (e) { console.log('Deposits migration skipped:', e.message); }
   try { await exec(commissionsSchema); } catch (e) { console.log('Commissions migration skipped:', e.message); }
+  // Fix: add 'holding' to store_orders status CHECK constraint
+  try { await exec(`ALTER TABLE store_orders DROP CONSTRAINT IF EXISTS store_orders_status_check`); } catch (e) {}
+  try { await exec(`ALTER TABLE store_orders ADD CONSTRAINT store_orders_status_check CHECK(status IN ('pending', 'done', 'holding'))`); } catch (e) { console.log('Store orders constraint update skipped:', e.message); }
   await exec(defaultSettings);
   // One-time cleanup: remove legacy Chinese notifications
   try {
