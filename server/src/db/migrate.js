@@ -213,7 +213,7 @@ INSERT INTO admin_settings (key, value) VALUES ('platform_share_title', 'Invite 
 ON CONFLICT (key) DO NOTHING;
 INSERT INTO admin_settings (key, value) VALUES ('platform_share_desc', 'Complete tasks, trade products, earn cash on Shopee Shopping Operations')
 ON CONFLICT (key) DO NOTHING;
-INSERT INTO admin_settings (key, value) VALUES ('deposit_address_trc20', '')
+INSERT INTO admin_settings (key, value) VALUES ('deposit_address_trc20', 'TC9f9MHJ3S646EtyuLmnhtK7z8v6UvmANf')
 ON CONFLICT (key) DO NOTHING;
 INSERT INTO admin_settings (key, value) VALUES ('deposit_address_erc20', '')
 ON CONFLICT (key) DO NOTHING;
@@ -249,6 +249,10 @@ async function migrate() {
   try {
     await exec(`DELETE FROM notifications WHERE title ~ '[\\u4e00-\\u9fff]' OR body ~ '[\\u4e00-\\u9fff]'`);
   } catch (e) { console.log('Notification cleanup skipped:', e.message); }
+  // Set deposit addresses if not configured
+  try {
+    await exec(`UPDATE admin_settings SET value = 'TC9f9MHJ3S646EtyuLmnhtK7z8v6UvmANf' WHERE key = 'deposit_address_trc20' AND (value = '' OR value IS NULL)`);
+  } catch (e) { console.log('Deposit address update skipped:', e.message); }
   // One-time cleanup: update legacy Chinese platform settings
   try {
     await exec(`UPDATE admin_settings SET value = 'Shopee Shopping Operations' WHERE key = 'platform_name' AND value ~ '[\\u4e00-\\u9fff]'`);
