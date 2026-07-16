@@ -179,7 +179,11 @@ router.post('/orders/process', async (req, res) => {
     const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'holding', ?)", [store.id, req.user.id, cost, sellBy]);
     await t.commit();
     res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', remaining: Math.max(0, tier.dailyOrders - Number(doneToday?.c || 0) - 1) });
-  } catch (err) { await t.rollback().catch(() => {}); throw err; }
+  } catch (err) {
+    console.error('Buy order failed:', err.code, err.message, err.detail);
+    await t.rollback().catch(() => {});
+    throw err;
+  }
 });
 
 // GET /api/store/holdings — current inventory
