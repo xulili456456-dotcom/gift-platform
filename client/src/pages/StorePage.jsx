@@ -390,7 +390,7 @@ export default function StorePage() {
       <div className="w-24 h-24 rounded-full bg-[#FFD814] flex items-center justify-center mb-6 shadow-2xl"><Store size={44} className="text-white" /></div>
       <h1 className="text-2xl font-black text-[#0F1111] mb-1">{t('store.title')}</h1>
       <p className="text-sm text-[#565959] mb-8">{t('store.subtitle')}</p>
-      <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-[#FFD814] hover:bg-[#FFB84D] text-[#eaeded] font-bold rounded-full shadow-lg active:scale-[0.98] transition-all text-base border border-[#e47911]">{opening ? '...' : t('store.openFree')}</button>
+      <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-bold rounded-full shadow-lg active:scale-[0.98] transition-all text-base border border-[#FCD200]">{opening ? '...' : t('store.openFree')}</button>
     </div>
   );
 
@@ -425,7 +425,7 @@ export default function StorePage() {
 
             <div className="my-3 border-t border-[#e7e7e7]" />
 
-            <div className="bg-[#f0f2f2] border border-[#e47911] rounded-lg p-3">
+            <div className="bg-[#f0f2f2] border border-[#FCD200] rounded-lg p-3">
               <div className="flex items-baseline gap-2">
                 {savingsPct > 0 && <span className="text-xs bg-[#CC0C39] text-white px-1.5 py-0.5 rounded font-bold">-{savingsPct}%</span>}
                 <span className="text-[28px] font-normal text-[#FFB84D]">${p.price.toFixed(2)}</span>
@@ -433,7 +433,7 @@ export default function StorePage() {
               <div className="text-xs text-[#565959] mt-0.5">
                 {t('store.marketPrice')}: <span className="line-through">${p.price.toFixed(2)}</span>
               </div>
-              <div className="flex gap-4 mt-2 pt-2 border-t border-[#e47911]">
+              <div className="flex gap-4 mt-2 pt-2 border-t border-[#FCD200]">
                 <div><span className="text-[11px] text-[#565959]">{t('store.costPrice')}</span><span className="text-sm font-bold text-[#0F1111] ml-1">${p.costPrice.toFixed(2)}</span></div>
                 <div><span className="text-[11px] text-[#565959]">{t('store.earn')}</span><span className="text-sm font-bold text-[#067D62] ml-1">+${p.profit.toFixed(2)}</span></div>
               </div>
@@ -474,7 +474,7 @@ export default function StorePage() {
             </button>
           ) : (
             <button onClick={() => handleBuy(p)} disabled={s.balance < p.costPrice || s.remaining <= 0}
-              className={`px-10 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-[#f0f2f2] text-[#999999]' : 'bg-[#FFD814] hover:bg-[#FFB84D] text-[#eaeded] shadow-md active:scale-95 border border-[#e47911]'} transition-all`}>
+              className={`px-10 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-[#f0f2f2] text-[#999999]' : 'bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] shadow-md active:scale-95 border border-[#FCD200]'} transition-all`}>
               {s.remaining <= 0 ? t('store.dailyFull') : s.balance < p.costPrice ? t('store.insufficient') : t('store.buyNow')}
             </button>
           )}
@@ -494,7 +494,7 @@ export default function StorePage() {
                 <p>• {t('store.tipCheckin') || 'Daily check-in: $0.10-$0.70'}</p>
                 <p>• {t('store.tipHolding') || 'Holdings auto-sell and return funds'}</p>
               </div>
-              <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#eaeded]">{t('common.ok') || 'OK'}</button>
+              <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111]">{t('common.ok') || 'OK'}</button>
             </div>
           </div>
         )}
@@ -689,7 +689,7 @@ export default function StorePage() {
             <span className="text-[11px] text-[#565959]">{t('store.balance')}</span>
             <p className="text-[28px] font-bold text-[#0F1111] leading-tight">${s.balance.toFixed(2)}</p>
           </div>
-          <button onClick={() => window.location.href="/mine/deposit"} className="text-[11px] px-3 py-1.5 rounded-full bg-[#FFD814] text-[#eaeded] font-medium">{t('store.deposit') || 'Deposit'}</button>
+          <button onClick={() => window.location.href="/mine/deposit"} className="text-[11px] px-3 py-1.5 rounded-full bg-[#FFD814] text-[#0F1111] font-medium">{t('store.deposit') || 'Deposit'}</button>
         </div>
         <div className="flex items-center gap-4 text-[11px]">
           <span className="text-[#067D62] font-bold">+${earnings.todayProfit.toFixed(2)} {t('store.today')}</span>
@@ -713,7 +713,7 @@ export default function StorePage() {
       {/* Trade Mode Toggle */}
       <div className="shrink-0 bg-white border-b border-[#e7e7e7] px-3 py-2 flex items-center gap-2">
         <button onClick={() => setTradeMode('holding')}
-          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='holding'?'bg-[#FFD814] text-[#eaeded]':'bg-[#f0f2f2] text-[#565959]'}`}>
+          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='holding'?'bg-[#FFD814] text-[#0F1111]':'bg-[#f0f2f2] text-[#565959]'}`}>
           📦 {t('store.holdingMode') || 'Holding'} <span className="text-[9px] ml-0.5 opacity-60">15%</span>
         </button>
         <button onClick={() => setTradeMode('share')}
@@ -768,7 +768,7 @@ export default function StorePage() {
                       className={`text-[10px] px-2.5 py-1 rounded font-medium ${
                         s.balance < p.costPrice || s.remaining <= 0
                           ? 'bg-[#f0f2f2] text-[#999999]'
-                          : 'bg-[#FFD814] hover:bg-[#FFB84D] text-[#eaeded] border border-[#e47911]'
+                          : 'bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] border border-[#FCD200]'
                       }`}
                     >{t('store.buy')}</button>
                   )}
@@ -814,7 +814,7 @@ export default function StorePage() {
               <p>• {t('store.tipCheckin') || 'Daily check-in: $0.10-$0.70'}</p>
               <p>• {t('store.tipHolding') || 'Holdings auto-sell and return funds'}</p>
             </div>
-            <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#eaeded]">{t('common.ok') || 'OK'}</button>
+            <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111]">{t('common.ok') || 'OK'}</button>
           </div>
         </div>
       )}
@@ -834,7 +834,7 @@ export default function StorePage() {
             </div>
             <div className="bg-[#f0f2f2] rounded-lg p-3 mb-3 flex items-center justify-between">
               <p className="text-[10px] text-[#565959] break-all flex-1 mr-2 font-mono">{shareProduct.shareUrl || ""}</p>
-              <button onClick={() => copyShareLink(shareProduct.shareUrl)} className="shrink-0 px-3 py-1.5 bg-[#FFD814] text-[#eaeded] text-[10px] font-bold rounded-lg">Copy</button>
+              <button onClick={() => copyShareLink(shareProduct.shareUrl)} className="shrink-0 px-3 py-1.5 bg-[#FFD814] text-[#0F1111] text-[10px] font-bold rounded-lg">Copy</button>
             </div>
             <p className="text-[9px] text-[#999999] text-center mb-3">Share this link. When someone buys, you earn the commission.</p>
             <button onClick={() => setShareProduct(null)} className="w-full py-2.5 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">Close</button>
@@ -853,7 +853,7 @@ export default function StorePage() {
             <div className="text-[10px] text-[#999999] mb-3">Min $1 · Max $10,000</div>
             <div className="flex gap-2">
               <button onClick={() => setShowDeposit(false)} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#f0f2f2] text-[#0F1111]">{t('common.cancel') || 'Cancel'}</button>
-              <button onClick={handleDeposit} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#eaeded]">{t('store.confirmDeposit') || 'Confirm'}</button>
+              <button onClick={handleDeposit} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111]">{t('store.confirmDeposit') || 'Confirm'}</button>
             </div>
           </div>
         </div>
