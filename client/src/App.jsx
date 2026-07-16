@@ -73,9 +73,9 @@ export default function App() {
               <p className="text-xs text-[#9e9eaa] mt-1">Reach our team for deposit assistance</p>
             </div>
             <div className="space-y-3 mb-5">
-              <a href="https://t.me/ShopeeSupport" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-[#1E1E32] border border-[#262636] hover:border-[#c8a06e] transition-colors">
+              <a href="https://t.me/Shopping_Operations" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-[#1E1E32] border border-[#262636] hover:border-[#c8a06e] transition-colors">
                 <span className="text-2xl">📱</span>
-                <div><p className="text-[13px] font-bold text-[#f8f7f4]">Telegram</p><p className="text-[10px] text-[#6e6e7a]">@ShopeeSupport</p></div>
+                <div><p className="text-[13px] font-bold text-[#f8f7f4]">Telegram</p><p className="text-[10px] text-[#6e6e7a]">@Shopping_Operations</p></div>
               </a>
               <a href="mailto:support@shopee-ops.com" className="flex items-center gap-3 p-3 rounded-xl bg-[#1E1E32] border border-[#262636] hover:border-[#c8a06e] transition-colors">
                 <span className="text-2xl">📧</span>
