@@ -365,6 +365,7 @@ export default function StorePage() {
   };
   const [showDailyFull, setShowDailyFull] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState(null);
+  const [expandedHolding, setExpandedHolding] = useState(null);
   const handleBuy = async (product) => {
     // Pre-check locally first, then let backend verify
     if (s.remaining <= 0) { setShowDailyFull(true); return; }
@@ -616,18 +617,30 @@ export default function StorePage() {
             <div className="bg-white rounded-lg p-3 border border-[#e7e7e7]">
               <p className="text-[11px] font-bold text-[#0F1111] mb-2">📦 {t('store.holdings') || 'My Holdings'} ({holdings.length})</p>
               {holdings.length === 0 && <p className="text-[11px] text-[#999999] text-center py-4">{t('store.noHoldings') || 'No active holdings'}</p>}
-              {holdings.map(h => (
-                <div key={h.id} className="flex items-center gap-3 py-2 border-b border-[#e7e7e7] last:border-0">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-medium text-[#0F1111] truncate">{t('store.orderLabel')} #{h.id}</p>
-                    <p className="text-[10px] text-[#565959]">Cost ${h.cost.toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</p>
-                    <div className="w-full h-1 bg-[#f0f2f2] rounded-full mt-1 overflow-hidden">
-                      <div className="h-full bg-[#FFD814] rounded-full transition-all" style={{width: `${h.progress}%`}} />
+              {holdings.map(h => {
+                const profit = Math.round((Number(h.cost) / COST_RATE * PROFIT_RATE) * 100) / 100;
+                const isOpen = expandedHolding === h.id;
+                return (
+                <div key={h.id} className="border-b border-[#e7e7e7] last:border-0">
+                  <div className="flex items-center gap-3 py-2 cursor-pointer active:bg-gray-50" onClick={() => setExpandedHolding(isOpen ? null : h.id)}>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[11px] font-medium text-[#0F1111] truncate">{t('store.orderLabel')} #{h.id}</p>
+                      <p className="text-[10px] text-[#565959]">Cost ${Number(h.cost).toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</p>
+                      <div className="w-full h-1 bg-[#f0f2f2] rounded-full mt-1 overflow-hidden">
+                        <div className="h-full bg-[#FFD814] rounded-full transition-all" style={{width: `${h.progress}%`}} />
+                      </div>
                     </div>
+                    <span className="text-[11px] text-[#565959] shrink-0">{h.progress}%</span>
                   </div>
-                  <span className="text-[11px] text-[#565959] shrink-0">{h.progress}%</span>
+                  {isOpen && (
+                  <div className="pb-2 text-[10px] space-y-1 text-[#565959]">
+                    <div className="flex justify-between"><span>{t('store.costPrice')}</span><span className="text-[#0F1111] font-medium">${Number(h.cost).toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>{t('store.earn')}</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${(Number(h.cost) + profit).toFixed(2)}</span></div>
+                  </div>
+                  )}
                 </div>
-              ))}
+              )})}
             </div>
 
             {/* Operating Metrics */}
