@@ -203,25 +203,34 @@ router.get('/holdings', async (req, res) => {
 
 // POST /api/store/check-sell — settle due holdings
 router.post('/check-sell', async (req, res) => {
-  const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
-  if (!store) return res.json({ settled: [] });
-  const due = await all("SELECT id, amount as cost, user_id FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
-  const settled = [];
-  for (const order of due) {
-    const price = order.cost / COST_RATE;
-    const { profit, totalReturn } = calcProduct(price);
-    const t = await tx();
-    try {
-      await t.run("UPDATE store_orders SET status = 'done', amount = ? WHERE id = ?", [profit, order.id]);
-      await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, totalReturn, 'bonus', 'delivered']);
-      await t.commit();
-      settled.push({ id: order.id, cost: Number(order.cost), profit, totalReturn });
-    } catch (err) { await t.rollback().catch(() => {}); }
+  try {
+    const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
+    if (!store) return res.json({ settled: [] });
+    const due = await all("SELECT id, amount as cost, user_id FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
+    const settled = [];
+    for (const order of due) {
+      const price = Number(order.cost) / COST_RATE;
+      const { profit, totalReturn } = calcProduct(price);
+      const t = await tx();
+      try {
+        await t.run("UPDATE store_orders SET status = 'done', amount = ? WHERE id = ?", [profit, order.id]);
+        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, totalReturn, 'bonus', 'delivered']);
+        await t.commit();
+        settled.push({ id: order.id, cost: Number(order.cost), profit, totalReturn });
+      } catch (err) {
+        console.error('Check-sell order failed:', err.code, err.message, 'order:', JSON.stringify(order));
+        await t.rollback().catch(() => {});
+        return res.status(500).json({ error: 'Settlement failed: ' + (err.message || 'unknown'), code: err.code });
+      }
+    }
+    if (settled.length > 0) {
+      try { require('./notifications').notify(req.user.id, 'Item Sold', settled.length + ' item(s) sold, profit credited', 'success'); } catch {}
+    }
+    res.json({ settled });
+  } catch (err) {
+    console.error('Check-sell failed:', err.code, err.message);
+    res.status(500).json({ error: 'Check-sell error: ' + (err.message || 'unknown') });
   }
-  if (settled.length > 0) {
-    try { require('./notifications').notify(req.user.id, 'Item Sold', settled.length + ' item(s) sold, profit credited', 'success'); } catch {}
-  }
-  res.json({ settled });
 });
 
 // GET /api/store/earnings-stats — daily & total profit stats
