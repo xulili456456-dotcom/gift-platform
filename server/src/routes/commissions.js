@@ -22,7 +22,8 @@ router.post('/claim', authMiddleware, async (req, res) => {
 
   // Generate share link with tracking
   const user = await get('SELECT referral_code FROM users WHERE id = ?', [req.user.id]);
-  const shareUrl = `${config.CORS_ORIGIN || 'https://gift-platform-h6um.onrender.com'}/buy?ref=${user.referral_code}&pid=${result.id}&p=${productId || 0}`;
+  const baseUrl = process.env.BASE_URL || 'https://gift-platform-h6um.onrender.com';
+  const shareUrl = `${baseUrl}/buy?ref=${user.referral_code}&pid=${result.id}&p=${productId || 0}`;
 
   res.json({
     id: result.id, productName, productPrice: price,
