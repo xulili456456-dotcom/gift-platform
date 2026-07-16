@@ -364,6 +364,7 @@ export default function StorePage() {
     toast.success('Link copied! Share it with friends.');
   };
   const [showDailyFull, setShowDailyFull] = useState(false);
+  const [expandedOrder, setExpandedOrder] = useState(null);
   const handleBuy = async (product) => {
     // Pre-check locally first, then let backend verify
     if (s.remaining <= 0) { setShowDailyFull(true); return; }
@@ -671,21 +672,23 @@ export default function StorePage() {
             {orderHistory?.orders?.map(o => {
               const profit = Number(o.profit) || 0;
               const cost = profit > 0 ? Math.round((profit / PROFIT_RATE * COST_RATE) * 100) / 100 : 0;
-              const detailId = 'od-' + o.id;
+              const isOpen = expandedOrder === o.id;
               return (
               <div key={o.id} className="bg-white rounded-lg border border-[#e7e7e7] mb-2 overflow-hidden">
-                <div className="p-3 cursor-pointer active:bg-gray-50 flex justify-between items-center" onClick={() => { const el = document.getElementById(detailId); if(el) el.classList.toggle('hidden'); }}>
+                <div className="p-3 cursor-pointer active:bg-gray-50 flex justify-between items-center" onClick={() => setExpandedOrder(isOpen ? null : o.id)}>
                   <div>
                     <p className="text-[11px] text-[#0F1111] font-medium">{t('store.orderLabel') || 'Order'} #{o.id}</p>
                     <p className="text-[9px] text-[#999999]">{new Date(o.created_at).toLocaleString()}</p>
                   </div>
                   <span className="text-sm font-bold text-[#067D62]">+${profit.toFixed(2)}</span>
                 </div>
-                <div id={detailId} className="hidden px-3 pb-3 border-t border-[#e7e7e7] text-[10px] space-y-1.5 text-[#565959]">
+                {isOpen && (
+                <div className="px-3 pb-3 border-t border-[#e7e7e7] text-[10px] space-y-1.5 text-[#565959]">
                   <div className="flex justify-between pt-2"><span>{t('store.costPrice')}</span><span className="text-[#0F1111] font-medium">${cost.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>{t('store.earn')}</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${(cost + profit).toFixed(2)}</span></div>
                 </div>
+                )}
               </div>
             )})}
             <div className="h-4" />
