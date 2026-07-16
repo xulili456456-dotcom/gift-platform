@@ -75,8 +75,26 @@ export default function DownloadPage() {
                 </div>
               </div>
 
-              {/* Right: Features */}
-              <div className="order-1 lg:order-2">
+              {/* Right: Video Tutorial + Features */}
+              <div className="order-1 lg:order-2 space-y-8">
+                {/* Video Tutorial */}
+                <div className="card border-0 shadow-xl overflow-hidden p-0">
+                  <video
+                    src="/download-tutorial.mp4"
+                    controls
+                    poster=""
+                    className="w-full aspect-video object-cover"
+                    preload="metadata"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                  <div className="p-4">
+                    <h3 className="font-bold text-sm">Installation Tutorial</h3>
+                    <p className="text-text-muted text-xs mt-1">Watch how to download and install the app</p>
+                  </div>
+                </div>
+
+                {/* Features */}
                 <h3 className="text-xl font-bold mb-6">{t('download.features_title')}</h3>
                 <div className="space-y-4">
                   {features.map((f, i) => {

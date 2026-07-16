@@ -406,7 +406,7 @@ export default function StorePage() {
     const p = detail;
     const savingsPct = Math.round(((p.price - p.costPrice) / p.price) * 100);
     return (
-      <div className="min-h-screen bg-white safe-top safe-bottom flex flex-col">
+      <div className="min-h-screen bg-white safe-top flex flex-col" style={{paddingBottom:'70px'}}>
         <div className="shrink-0 flex items-center gap-3 px-4 py-3 bg-[#131921] text-white">
           <button onClick={() => setDetail(null)} className="p-1 -ml-1"><ChevronLeft size={22} /></button>
           <span className="text-sm font-medium truncate flex-1">{p.name}</span>
