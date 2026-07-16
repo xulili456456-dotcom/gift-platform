@@ -185,12 +185,12 @@ export default function MinePage() {
 
 
         {/* Deposit */}
-        <button onClick={() => navigate('/mine/deposit')}
+        <button onClick={() => navigate('/mine/support')}
           className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm border border-separator active:bg-bg transition-colors">
           <CreditCard size={22} className="text-[#c8a06e] shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">Deposit</p>
-            <p className="text-[12px] text-text-muted">Top up via USDT</p>
+            <p className="text-[12px] text-text-muted">Contact support to deposit</p>
           </div>
           <ChevronRight size={16} className="text-text-muted shrink-0" />
         </button>
