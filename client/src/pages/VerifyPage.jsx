@@ -18,8 +18,7 @@ export default function VerifyPage() {
     client.get('/proofs').then(({ data }) => setProofs(data || [])).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  const handleFile = (e) => {
-    const file = e.target.files[0];
+  const uploadFile = (file) => {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = async () => {
@@ -28,9 +27,13 @@ export default function VerifyPage() {
         setProofs(prev => [{ id: data.id, image: reader.result, status: 'pending', submitted_at: new Date().toISOString() }, ...prev]);
         setBurst(true); setTimeout(() => setBurst(false), 1200);
         toast.success(t('verify.uploaded'));
-      } catch (err) { toast.error('Upload failed'); }
+      } catch (err) { toast.error(err.response?.data?.error || 'Upload failed'); }
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleFile = (e) => {
+    uploadFile(e.target.files[0]);
     e.target.value = '';
   };
 
@@ -58,7 +61,7 @@ export default function VerifyPage() {
           </div>
         </div>
         <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
-        <button onClick={() => fileRef.current?.click()} onDragOver={e => { e.preventDefault(); setIsDragOver(true); }} onDragLeave={() => setIsDragOver(false)} onDrop={e => { e.preventDefault(); setIsDragOver(false); if (e.dataTransfer.files[0]) { const dt = new DataTransfer(); dt.items.add(e.dataTransfer.files[0]); fileRef.current.files = dt.files; fileRef.current.dispatchEvent(new Event('change')); } }}
+        <button onClick={() => fileRef.current?.click()} onDragOver={e => { e.preventDefault(); setIsDragOver(true); }} onDragLeave={() => setIsDragOver(false)} onDrop={e => { e.preventDefault(); setIsDragOver(false); if (e.dataTransfer.files[0]) { uploadFile(e.dataTransfer.files[0]); } }}
           className={`w-full bg-white rounded-2xl border-2 border-dashed p-10 text-center transition-all duration-300 ${isDragOver ? 'border-primary bg-primary/5 scale-[1.02] shadow-lg' : 'border-primary/30 hover:border-primary/50'}`}>
           <Upload size={40} className="text-primary mx-auto mb-3" /><p className="text-[15px] font-bold text-text">{isDragOver ? t('verify.releaseHere') : t('verify.dropHere')}</p><p className="text-[12px] text-text-muted mt-1">{t('verify.dropHint')}</p>
         </button>
