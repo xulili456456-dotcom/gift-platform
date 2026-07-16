@@ -101,16 +101,9 @@ export default function DepositPage() {
                 <div className="bg-[#0d0d1a] rounded-lg p-3 mb-3">
                   <p className="text-[11px] text-[#f8f7f4] font-mono break-all leading-relaxed">{addr || 'Not configured yet'}</p>
                 </div>
-                {/* QR Code */}
-                {addr ? (
-                  <div className="w-36 h-36 mx-auto bg-white rounded-lg p-2">
-                    <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(addr)}`} alt="QR" className="w-full h-full" />
-                  </div>
-                ) : (
-                  <div className="w-32 h-32 mx-auto bg-[#1E1E32] rounded-lg flex items-center justify-center border border-[#262636]">
-                    <span className="text-[10px] text-[#6e6e7a] text-center">Not configured</span>
-                  </div>
-                )}
+                <div className="w-32 h-32 mx-auto bg-[#1E1E32] rounded-lg flex items-center justify-center border border-[#262636]">
+                  <span className="text-[10px] text-[#6e6e7a] text-center">{addr ? 'Copy address to pay' : 'Not configured'}</span>
+                </div>
               </div>
               <div className="px-4 py-3 bg-[#1E1E32]/50 border-t border-[#262636] flex items-start gap-2">
                 <AlertTriangle size={14} className="text-[#c8a06e] shrink-0 mt-0.5" />
