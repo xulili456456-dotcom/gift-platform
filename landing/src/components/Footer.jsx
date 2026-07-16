@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Gift, Mail } from 'lucide-react'
+import { Gift, Send } from 'lucide-react'
 
 export default function Footer() {
   const { t } = useTranslation()
@@ -29,8 +29,8 @@ export default function Footer() {
               {t('footer.description')}
             </p>
             <div className="flex items-center gap-2 text-sm text-text-muted">
-              <Mail size={14} />
-              <span>{t('footer.email')}</span>
+              <Send size={14} />
+              <span>@Shopping_Operations</span>
             </div>
           </div>
 
@@ -70,7 +70,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:support@gifthaven.com" className="text-text-secondary hover:text-accent transition-colors text-sm no-underline">
+                <a href="https://t.me/Shopping_Operations" className="text-text-secondary hover:text-accent transition-colors text-sm no-underline">
                   {t('footer.contact')}
                 </a>
               </li>

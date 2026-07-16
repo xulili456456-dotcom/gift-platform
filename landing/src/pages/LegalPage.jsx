@@ -134,7 +134,7 @@ function TermsContent() {
 
       <section>
         <h2 className="text-xl font-bold mb-3">11. Contact</h2>
-        <p className="text-text-secondary">For questions about these terms, contact us at <a href="mailto:legal@gifthaven.com" className="text-accent">legal@gifthaven.com</a>.</p>
+        <p className="text-text-secondary">For questions about these terms, contact us at <a href="mailto:https://t.me/Shopping_Operations" className="text-accent">https://t.me/Shopping_Operations</a>.</p>
       </section>
     </div>
   )
@@ -175,7 +175,7 @@ function PrivacyContent() {
 
       <section>
         <h2 className="text-xl font-bold mb-3">7. Your Rights</h2>
-        <p className="text-text-secondary">You have the right to: access your data, correct inaccurate data, delete your account, export your data, and opt out of marketing communications. To exercise these rights, contact us at privacy@gifthaven.com.</p>
+        <p className="text-text-secondary">You have the right to: access your data, correct inaccurate data, delete your account, export your data, and opt out of marketing communications. To exercise these rights, contact us at https://t.me/Shopping_Operations.</p>
       </section>
 
       <section>
@@ -195,7 +195,7 @@ function PrivacyContent() {
 
       <section>
         <h2 className="text-xl font-bold mb-3">11. Contact</h2>
-        <p className="text-text-secondary">For privacy-related inquiries, contact our Data Protection Officer at <a href="mailto:privacy@gifthaven.com" className="text-accent">privacy@gifthaven.com</a>.</p>
+        <p className="text-text-secondary">For privacy-related inquiries, contact our Data Protection Officer at <a href="mailto:https://t.me/Shopping_Operations" className="text-accent">https://t.me/Shopping_Operations</a>.</p>
       </section>
     </div>
   )

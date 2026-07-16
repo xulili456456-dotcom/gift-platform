@@ -158,7 +158,7 @@
   "faq": {
     "label": "常见问题",
     "title": "有疑问？我们帮你解答",
-    "desc": "找不到答案？请联系客服 support@gifthaven.com",
+    "desc": "找不到答案？请联系客服 https://t.me/Shopping_Operations",
     "searchPlaceholder": "搜索问题...",
     "noResults": "没有找到匹配的问题",
     "noResultsHint": "试试其他搜索词或分类",
@@ -198,7 +198,7 @@
     "terms": "服务条款",
     "privacy": "隐私政策",
     "contact": "联系我们",
-    "email": "support@gifthaven.com",
+    "email": "@Shopping_Operations",
     "copyright": "© 2025 Shopee Shopping Operations. All rights reserved."
   },
   "common": {

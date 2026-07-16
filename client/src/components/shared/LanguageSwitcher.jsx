@@ -6,6 +6,7 @@ const langs = [
   { code: 'en', label: 'English', flag: '🇺🇸' },
   { code: 'es', label: 'Español', flag: '🇪🇸' },
   { code: 'ja', label: '日本語', flag: '🇯🇵' },
+  { code: 'ms', label: 'Bahasa Melayu', flag: '🇲🇾' },
 ];
 
 export default function LanguageSwitcher() {

@@ -129,7 +129,7 @@ export default function FaqPage() {
               <MessageCircle size={28} className="text-accent mx-auto mb-3" />
               <p className="text-text font-semibold mb-1">{t('faq.contactPrompt')}</p>
               <p className="text-text-secondary text-sm mb-4">{t('faq.desc')}</p>
-              <a href="mailto:support@gifthaven.com" className="btn btn-accent no-underline text-sm">
+              <a href="https://t.me/Shopping_Operations" className="btn btn-accent no-underline text-sm">
                 {t('faq.contactButton')}
               </a>
             </div>
