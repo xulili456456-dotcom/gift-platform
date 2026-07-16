@@ -98,11 +98,8 @@ export default function DepositPage() {
                   <span className="text-[11px] font-bold text-[#9e9eaa] uppercase tracking-wider">{network.toUpperCase()} Address</span>
                   <button onClick={copyAddr} className="flex items-center gap-1 text-[11px] text-[#c8a06e] font-medium"><Copy size={12} /> Copy</button>
                 </div>
-                <div className="bg-[#0d0d1a] rounded-lg p-3 mb-3">
+                <div className="bg-[#0d0d1a] rounded-lg p-3">
                   <p className="text-[11px] text-[#f8f7f4] font-mono break-all leading-relaxed">{addr || 'Not configured yet'}</p>
-                </div>
-                <div className="w-32 h-32 mx-auto bg-[#1E1E32] rounded-lg flex items-center justify-center border border-[#262636]">
-                  <span className="text-[10px] text-[#6e6e7a] text-center">{addr ? 'Copy address to pay' : 'Not configured'}</span>
                 </div>
               </div>
               <div className="px-4 py-3 bg-[#1E1E32]/50 border-t border-[#262636] flex items-start gap-2">
