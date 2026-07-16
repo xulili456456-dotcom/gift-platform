@@ -85,11 +85,15 @@ router.post('/unlock', authMiddleware, async (req, res) => {
   const s = await get('SELECT * FROM stakes WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!s) return res.status(400).json({ error: 'No active stake' });
 
+  const plan = PLANS[s.plan_id] || { days: 30, bonus: 1.5 };
   const t = await tx();
   try {
     const daysLeft = Math.max(0, Math.ceil((new Date(s.unlock_at) - Date.now()) / 86400000));
+    const daysElapsed = Math.max(0, plan.days - daysLeft);
     const penalty = daysLeft > 0 ? Math.round(s.amount * 0.2 * 100) / 100 : 0;
-    const refund = Math.round((s.amount - penalty) * 100) / 100;
+    // Bonus: proportional to time locked (annualized)
+    const bonusPayout = Math.round(s.amount * (Number(s.bonus) - 1.0) * (daysElapsed / 365) * 100) / 100;
+    const refund = Math.round((s.amount + bonusPayout - penalty) * 100) / 100;
 
     // Return refund to balance
     if (refund > 0) {

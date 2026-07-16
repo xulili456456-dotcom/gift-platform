@@ -1,5 +1,8 @@
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
 const config = require('../config');
+
+// Fix: NUMERIC columns return JS numbers instead of strings
+types.setTypeParser(1700, parseFloat);
 
 let pool = null;
 

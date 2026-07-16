@@ -14,6 +14,7 @@ export default function TeamPage() {
   const [filterLevel, setFilterLevel] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [showExplain, setShowExplain] = useState(true);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     referralApi.getStats()
@@ -35,7 +36,6 @@ export default function TeamPage() {
   const totalInvites = stats?.total_invites || 0;
   const directCount = stats?.direct_count || 0;
 
-  const [page, setPage] = useState(1);
   const PER_PAGE = 20;
   const filtered = allInvitees.filter(inv => {
     if (filterLevel > 0 && inv.level !== filterLevel) return false;

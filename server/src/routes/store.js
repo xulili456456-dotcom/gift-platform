@@ -259,17 +259,19 @@ router.get('/earnings-stats', async (req, res) => {
 router.post('/deposit', async (req, res) => {
   const amount = parseFloat(req.body.amount);
   if (!amount || amount < 1) return res.status(400).json({ error: 'Minimum deposit amount is $1' });
+  if (amount > 10000) return res.status(400).json({ error: 'Maximum deposit amount is $10,000' });
 
-  // Take from user's overall task_earnings or simulate deposit
-  // For now: add as a "deposit" bonus entry
-  const { insert } = require('../db/database');
-  const result = await insert(
-    'INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
-    [req.user.id, amount, 'bonus', 'delivered']
-  );
-  require('./notifications').notify(req.user.id, '💰 Capital Added',
-    `$${amount} added to your trading account`, 'success');
-  res.json({ id: result.id, amount, message: `Deposited $${amount}` });
+  try {
+    const { insert } = require('../db/database');
+    const result = await insert(
+      'INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+      [req.user.id, amount, 'bonus', 'delivered']
+    );
+    try { require('./notifications').notify(req.user.id, '💰 Capital Added', `$${amount} added to your trading account`, 'success'); } catch {}
+    res.json({ id: result.id, amount, message: `Deposited $${amount}` });
+  } catch (err) {
+    res.status(500).json({ error: 'Deposit failed' });
+  }
 });
 
 // GET /api/store/analytics — dashboard data

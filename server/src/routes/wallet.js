@@ -40,4 +40,12 @@ router.put('/', async (req, res) => {
   res.json({ ok: true, address: addr, network });
 });
 
+// DELETE /api/wallet — unbind wallet
+router.delete('/', async (req, res) => {
+  const existing = await get('SELECT id FROM user_wallets WHERE user_id = ?', [req.user.id]);
+  if (!existing) return res.status(404).json({ error: 'No wallet bound' });
+  await run('DELETE FROM user_wallets WHERE user_id = ?', [req.user.id]);
+  res.json({ ok: true, message: 'Wallet unbound' });
+});
+
 module.exports = router;

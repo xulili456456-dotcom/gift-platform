@@ -32,13 +32,13 @@ export default function WithdrawPage() {
   };
   useEffect(() => { loadData(); window.addEventListener('taskEarning', loadData); return () => window.removeEventListener('taskEarning', loadData); }, []);
 
-  const claimBalance = claims.filter(c => c.status === 'delivered').reduce((s, c) => s + (c.value || 0), 0);
-  const availableBalance = claimBalance + (taskBalance.available || 0);
-  const pendingBalance = claims.filter(c => c.status === 'pending').reduce((s, c) => s + (c.value || 0), 0);
+  const claimBalance = claims.filter(c => c.status === 'delivered').reduce((s, c) => s + (Number(c.value) || 0), 0);
+  const availableBalance = taskBalance.available || 0; // Only task_earnings is withdrawable
+  const pendingBalance = claims.filter(c => c.status === 'pending').reduce((s, c) => s + (Number(c.value) || 0), 0);
 
   const handleWithdraw = async () => {
     const amt = parseFloat(amount);
-    if (!amt || amt < 20) { toast.error(t('withdraw.minAmount')); return; }
+    if (!amt || amt < 1) { toast.error(t('withdraw.minAmount')); return; }
     if (amt > availableBalance) { toast.error(t('withdraw.insufficient')); return; }
     if (!wallet) { toast.error(t('withdraw.noWallet')); return; }
     setSubmitting(true);
@@ -117,8 +117,8 @@ export default function WithdrawPage() {
                       {w.status === 'completed' ? t('withdraw.done') : w.status === 'pending' ? t('withdraw.pending') : t('withdraw.failed')}
                     </span>
                     {w.status === 'pending' && (
-                      <button onClick={async () => { if (confirm('Cancel this withdrawal?')) { await client.delete('/withdrawals/' + w.id); loadData(); toast.success('Cancelled'); } }}
-                        className="text-[10px] text-red-400 underline font-medium">Cancel</button>
+                      <button onClick={async () => { if (confirm(t('withdraw.cancelConfirm'))) { try { await client.delete('/withdrawals/' + w.id); loadData(); toast.success(t('withdraw.cancelled')); } catch { toast.error(t('common.operationFailed')); } } }}
+                        className="text-[10px] text-red-400 underline font-medium">{t('common.cancel')}</button>
                     )}
                   </div>
                 </div>

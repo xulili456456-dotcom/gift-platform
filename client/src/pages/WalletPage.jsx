@@ -37,18 +37,18 @@ export default function WalletPage() {
   };
 
   const bindWallet = async () => {
-    if (!form.address.trim()) { toast.error('Please enter wallet address'); return; }
+    if (!form.address.trim()) { toast.error(t('wallet.enterAddress')); return; }
     try {
       const { data } = await client.put('/wallet', { address: form.address.trim(), network: form.network });
       setWallet({ address: data.address, network: data.network });
       setShowBind(false);
       toast.success(t('wallet.boundSuccess'));
-    } catch { toast.error('Failed'); }
+    } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
   };
 
   const unbind = () => {
     if (!confirm(t('wallet.unbindConfirm'))) return;
-    client.put('/wallet', { address: '', network: 'trc20' }).then(() => {
+    client.delete('/wallet').then(() => {
       setWallet(null);
       toast.success(t('wallet.unbound'));
     }).catch(() => toast.error(t('common.operationFailed')));

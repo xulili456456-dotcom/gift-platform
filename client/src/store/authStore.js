@@ -18,6 +18,10 @@ const useAuthStore = create((set, get) => ({
 
   register: async (formData) => {
     const { data } = await authApi.register(formData);
+    if (!data.access_token) {
+      // Email already registered — server returned success without tokens
+      return null;
+    }
     localStorage.setItem('access_token', data.access_token);
     localStorage.setItem('refresh_token', data.refresh_token);
     set({ user: data.user, isAuthenticated: true, isLoading: false });

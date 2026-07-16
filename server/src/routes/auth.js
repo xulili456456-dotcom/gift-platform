@@ -166,7 +166,7 @@ router.post('/reset-password', resetLimiter, async (req, res) => {
   try {
     const { email, phone, newPassword } = req.body;
     if (!email || !phone || !newPassword) return res.status(400).json({ error: 'Please fill in all fields' });
-    if (newPassword.length < 6) return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    if (newPassword.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
     const user = await userModel.findByEmail(email);
     if (!user || user.phone !== phone) return res.status(400).json({ error: 'Email or phone number does not match' });
     const newHash = await hashPassword(newPassword);

@@ -10,11 +10,11 @@ export default function KycPage() {
   const navigate = useNavigate();
   const [kyc, setKyc] = useState(null);
   const [kycLoading, setKycLoading] = useState(true);
-  if (kycLoading) return <div className="min-h-screen bg-bg p-4 space-y-4"><div className="skeleton h-8 w-32 rounded-lg" /><div className="skeleton h-20 rounded-2xl" /><div className="skeleton h-64 rounded-2xl" /></div>;
+  const [form, setForm] = useState({ docType: 'driver_license', name: '', idNumber: '', frontImg: null, backImg: null });
   useEffect(() => {
     client.get('/kyc').then(({ data }) => { setKyc(data); setKycLoading(false); }).catch(() => setKycLoading(false));
   }, []);
-  const [form, setForm] = useState({ docType: 'driver_license', name: '', idNumber: '', frontImg: null, backImg: null });
+  if (kycLoading) return <div className="min-h-screen bg-bg p-4 space-y-4"><div className="skeleton h-8 w-32 rounded-lg" /><div className="skeleton h-20 rounded-2xl" /><div className="skeleton h-64 rounded-2xl" /></div>;
   const [submitting, setSubmitting] = useState(false);
 
   const DOC_TYPES = [
@@ -48,7 +48,7 @@ export default function KycPage() {
 
   const current = statusCfg[kyc?.status || 'unverified'];
   const isPassport = form.docType === 'passport';
-  const idLabel = isPassport ? t('kyc.passportNumber') : form.docType === 'driver_license' ? t('kyc.licenseNumber') : t('kyc.idNumber');
+  const idLabel = isPassport ? t('kyc.passportNumber') : form.docType === 'driver_license' ? t('kyc.licenseNumber') : t('kyc.id_number');
   const idPlaceholder = isPassport ? t('kyc.passportPlaceholder') : form.docType === 'driver_license' ? t('kyc.licensePlaceholder') : t('kyc.idPlaceholder');
   const frontLabel = isPassport ? t('kyc.passportFront') : t('kyc.frontGeneric');
   const backLabel = isPassport ? t('kyc.passportBack') : t('kyc.backGeneric');
@@ -76,16 +76,16 @@ export default function KycPage() {
           <div className="bg-white rounded-2xl p-5 border border-separator shadow-sm space-y-3">
             <h3 className="text-[14px] font-bold text-text">{t('kyc.submittedInfo')}</h3>
             <div className="grid grid-cols-2 gap-3 text-[12px]">
-              <div><span className="text-text-muted">{t('kyc.name')}</span><p className="font-semibold mt-0.5">{kyc.name}</p></div>
-              <div><span className="text-text-muted">{idLabel}</span><p className="font-semibold mt-0.5">{kyc.idNumber.replace(/(\d{4})\d{10}(\d{4})/, '$1**********$2')}</p></div>
+              <div><span className="text-text-muted">{t('kyc.real_name')}</span><p className="font-semibold mt-0.5">{kyc.real_name}</p></div>
+              <div><span className="text-text-muted">{idLabel}</span><p className="font-semibold mt-0.5">{kyc.id_number.replace(/(\d{4})\d{10}(\d{4})/, '$1**********$2')}</p></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-bg rounded-xl p-2 text-center">
-                <img src={kyc.frontImg} alt="front" className="h-28 mx-auto rounded-lg object-cover" />
+                <img src={kyc.front_image} alt="front" className="h-28 mx-auto rounded-lg object-cover" />
                 <p className="text-[10px] text-text-muted mt-1">{frontLabel}</p>
               </div>
               <div className="bg-bg rounded-xl p-2 text-center">
-                <img src={kyc.backImg} alt="back" className="h-28 mx-auto rounded-lg object-cover" />
+                <img src={kyc.back_image} alt="back" className="h-28 mx-auto rounded-lg object-cover" />
                 <p className="text-[10px] text-text-muted mt-1">{backLabel}</p>
               </div>
             </div>

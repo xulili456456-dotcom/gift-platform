@@ -18,7 +18,7 @@ export default function SecurityPage() {
   const changePassword = async (e) => {
     e.preventDefault();
     if (!pwForm.oldPassword || !pwForm.newPassword) { toast.error(t('sec.fillAll')); return; }
-    if (pwForm.newPassword.length < 6) { toast.error(t('sec.passLength')); return; }
+    if (pwForm.newPassword.length < 8) { toast.error(t('sec.passLength')); return; }
     if (pwForm.newPassword !== pwForm.confirmPassword) { toast.error(t('sec.passMismatch')); return; }
     setLoading(true);
     try {

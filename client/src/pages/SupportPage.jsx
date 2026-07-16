@@ -8,12 +8,12 @@ const FAQ_DB = [
   { q: ['有效邀请','怎么算','计算方式','权重','有效人数','effective','calculate','formula','weight','calcular','efectivo','有効','計算'], aKey: 'messages.faq2a' },
   { q: ['领取','怎么领','提现','怎么提','到账','奖励发放','拿钱','怎么拿','claim','withdraw','receive','reward','recibir','reclamar','受取','受け取り','出金'], aKey: 'messages.faq3a' },
   { q: ['钱包','绑定钱包','加密钱包','USDT','地址','网络','TRC20','ERC20','BEP20','wallet','crypto','address','network','bind','billetera','vincular','ウォレット','アドレス'], aKey: 'messages.faq4a' },
-  { q: ['审核','审核多久','审核时间','什么时候','多久到账','review','approve','how long','time','pendiente','revisión','審査','時間'], aKey: 'messages.faq5a' },
-  { q: ['密码','改密码','修改密码','忘记密码','安全','账户安全','password','security','change','reset','contraseña','seguridad','パスワード','セキュリティ'], aKey: 'messages.faq5a' },
-  { q: ['实名','认证','KYC','身份证','证件','验证身份','identity','verification','document','verificación','identidad','本人確認','認証'], aKey: 'messages.faq5a' },
-  { q: ['会员','等级','VIP','升级','黄金','钻石','白银','铂金','member','tier','level','gold','diamond','silver','platinum','miembro','nivel','メンバー','ランク'], aKey: 'messages.faq5a' },
-  { q: ['保证金','锁仓','staking','质押','锁仓计划','stake','deposit','lock','plan','bloquear','ステーキング','ロック'], aKey: 'messages.faq5a' },
-  { q: ['违规','封号','作弊','刷','脚本','虚假','ban','cheat','script','violation','fraud','trampa','不正','禁止','違反'], aKey: 'messages.faq5a' },
+  { q: ['审核','审核多久','review','approve','how long','pendiente','revisión','審査','時間'], aKey: 'messages.faq1a' },
+  { q: ['密码','改密码','修改密码','忘记密码','安全','password','security','change','reset','contraseña','seguridad','パスワード','セキュリティ'], aKey: 'messages.faq2a' },
+  { q: ['实名','认证','KYC','identity','verification','document','verificación','identidad','本人確認','認証'], aKey: 'messages.faq3a' },
+  { q: ['会员','等级','VIP','member','tier','level','gold','diamond','silver','platinum','miembro','nivel','メンバー','ランク'], aKey: 'messages.faq1a' },
+  { q: ['保证金','锁仓','staking','质押','stake','deposit','lock','plan','bloquear','ステーキング','ロック'], aKey: 'messages.faq2a' },
+  { q: ['违规','封号','作弊','ban','cheat','script','violation','fraud','trampa','不正','禁止','違反'], aKey: 'messages.faq3a' },
 ];
 
 const QUICK_QUESTIONS = [

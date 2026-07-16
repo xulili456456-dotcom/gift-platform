@@ -38,17 +38,17 @@ export default function StakingPage() {
   useEffect(() => { loadData(); }, []);
 
   const handleStake = async (plan) => {
-    if (plan.amount > balance) { toast.error('Insufficient balance'); setShowConfirm(null); return; }
+    if (plan.amount > balance) { toast.error(t('stake.insufficientBalance')); setShowConfirm(null); return; }
     setSubmitting(true);
     try {
       const { data } = await client.post('/staking', { plan_id: plan.id, amount: plan.amount });
       setStake(data); setShowConfirm(null); toast.success(t('stake.success'));
-    } catch (err) { toast.error(err.response?.data?.error||'Failed'); }
+    } catch (err) { toast.error(err.response?.data?.error||t('common.operationFailed')); }
     finally { setSubmitting(false); }
   };
 
   const handleUnstake = async () => {
-    const d = stake ? Math.max(0, Math.ceil((new Date(stake.unlock_at) - Date.now()) / 86400000)) : 0;
+    const d = stake ? Math.max(0, Math.ceil((new Date(stake.unlockAt) - Date.now()) / 86400000)) : 0;
     const penalty = d > 0 ? Number((stake.amount * 0.2).toFixed(0)) : 0;
     if (!confirm(d > 0 ? t('stake.forceUnstakeConfirm',{amount:stake.amount,penalty}) : t('stake.unstakeConfirm'))) return;
     try {
@@ -60,7 +60,7 @@ export default function StakingPage() {
 
   if (loading) return <div className="min-h-screen bg-bg p-4"><div className="skeleton h-48 rounded-2xl" /><div className="skeleton h-64 rounded-2xl" /></div>;
 
-  const daysLeft = stake ? Math.max(0, Math.ceil((new Date(stake.unlock_at) - Date.now()) / 86400000)) : 0;
+  const daysLeft = stake ? Math.max(0, Math.ceil((new Date(stake.unlockAt) - Date.now()) / 86400000)) : 0;
   const currentPlan = stake ? (PLANS.find(p => p.id === stake.plan_id) || { id: 'custom', amount: stake.amount, bonus: stake.bonus, color: 'from-gray-500 to-gray-600', icon: Zap, gifts: [] }) : null;
   const CurIcon = currentPlan?.icon || Zap;
 
