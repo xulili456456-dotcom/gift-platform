@@ -765,10 +765,10 @@ export default function StorePage() {
                     <button
                       onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
                       disabled={s.balance < p.costPrice || s.remaining <= 0}
-                      className={`text-[10px] px-2.5 py-1 rounded font-medium ${
+                      className={`text-[12px] px-4 py-2 rounded font-bold active:scale-95 transition-all ${
                         s.balance < p.costPrice || s.remaining <= 0
-                          ? 'bg-[#f0f2f2] text-[#999999]'
-                          : 'bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] border border-[#FCD200]'
+                          ? 'bg-gray-200 text-gray-400'
+                          : 'bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] border border-[#FCD200] shadow-sm'
                       }`}
                     >{t('store.buy')}</button>
                   )}
