@@ -60,7 +60,7 @@ export default function TasksPage() {
 
   return (
     <PullToRefresh onRefresh={loadAll}>
-    <div className="tab-enter bg-gradient-to-b from-[#0d0d1a] to-[#141420] min-h-screen pb-4">
+    <div className="tab-enter bg-gradient-to-b from-[#eaeded] to-[#ffffff] min-h-screen pb-4">
       <div className="bg-gradient-to-r from-[#c8a06e] to-[#a07840] px-5 py-3 text-white text-center">
         <p className="text-[11px] text-white/60">{t('mine.totalEarned')}</p>
         <p className="text-2xl font-black">${balance.total.toFixed(2)}</p>
@@ -139,7 +139,7 @@ export default function TasksPage() {
             {gifts.map(gift => {
               const done = effective >= gift.required_invites;
               return (
-                <div key={gift.id} className={`px-4 py-3 flex items-center gap-3 ${done ? 'bg-gradient-to-r from-[#1E1E32]/50' : ''}`}>
+                <div key={gift.id} className={`px-4 py-3 flex items-center gap-3 ${done ? 'bg-gradient-to-r from-[#f0f2f2]/50' : ''}`}>
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg ${done ? 'bg-gold/10' : 'bg-bg'}`}>{done ? '✅' : '🧧'}</div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-baseline mb-1"><span className="text-[13px] font-semibold text-text">{tg(gift).name}</span><span className={`text-[14px] font-black ${done ? 'text-gold' : 'text-primary'}`}>${gift.value}</span></div>

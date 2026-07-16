@@ -60,7 +60,7 @@ export default function HomePage() {
     <PullToRefresh onRefresh={loadAll}>
     <div className="tab-enter bg-[#eaeded] min-h-screen">
       {/* ── Compact Hero: dark with gold accents ── */}
-      <div className="bg-gradient-to-b from-[#141420] to-[#0d0d1a] px-5 pt-10 pb-5 relative overflow-hidden border-b border-[#e7e7e7]">
+      <div className="bg-gradient-to-b from-[#232f3e] to-[#131921] px-5 pt-10 pb-5 relative overflow-hidden border-b border-[#e7e7e7]">
         {/* Subtle gold glow */}
         <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[#FF9900]/10 blur-3xl pointer-events-none" />
         <div className="h-4" />
@@ -128,7 +128,7 @@ export default function HomePage() {
               <div key={gift.id} onClick={() => navigate(`/gift/${gift.id}`)}
                 className={`rounded-2xl p-3.5 transition-all press-active cursor-pointer ${
                   done
-                    ? 'bg-gradient-to-b from-[#1E1E32] to-[#141420] border border-[#FF9900] shadow-lg shadow-[#FF9900]/10'
+                    ? 'bg-gradient-to-b from-[#f0f2f2] to-[#ffffff] border border-[#FF9900] shadow-lg shadow-[#FF9900]/10'
                     : 'bg-white border border-[#e7e7e7]'
                 }`}>
                 <div className="flex items-center justify-between mb-1.5">
@@ -162,7 +162,7 @@ export default function HomePage() {
       {claims.length > 0 && (
         <div className="px-4 mt-4 mb-6">
           <h3 className="text-[12px] font-bold text-[#565959] uppercase tracking-wider mb-2">{t('home.recentActivity')}</h3>
-          <div className="bg-white rounded-2xl border border-[#e7e7e7] divide-y divide-[#262636]">
+          <div className="bg-white rounded-2xl border border-[#e7e7e7] divide-y divide-[#e7e7e7]">
             {claims.slice(0, 6).map((c) => (
               <div key={c.id} className="px-4 py-2.5 flex items-center gap-3">
                 <span className="text-lg shrink-0">🧧</span>

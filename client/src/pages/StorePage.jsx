@@ -402,7 +402,7 @@ export default function StorePage() {
     const p = detail;
     const savingsPct = Math.round(((p.price - p.costPrice) / p.price) * 100);
     return (
-      <div className="min-h-screen bg-[#ffffff] safe-top safe-bottom flex flex-col">
+      <div className="min-h-screen bg-white safe-top safe-bottom flex flex-col">
         <div className="shrink-0 flex items-center gap-3 px-4 py-3 bg-[#131921] text-white">
           <button onClick={() => setDetail(null)} className="p-1 -ml-1"><ChevronLeft size={22} /></button>
           <span className="text-sm font-medium truncate flex-1">{p.name}</span>
@@ -463,7 +463,7 @@ export default function StorePage() {
           </div>
         </div>
 
-        <div className="shrink-0 px-4 py-3 border-t border-[#e7e7e7] bg-[#ffffff] flex items-center gap-3 safe-bottom">
+        <div className="shrink-0 px-4 py-3 border-t border-[#e7e7e7] bg-white flex items-center gap-3 safe-bottom">
           <div className="flex-1">
             <p className="text-lg font-bold text-[#0F1111]">${p.costPrice.toFixed(2)} <span className="text-xs font-normal text-[#565959]">{t('store.costPrice')}</span></p>
             <p className="text-xs text-[#067D62] font-bold">{t('store.earn')} +${p.profit.toFixed(2)}</p>
@@ -474,7 +474,7 @@ export default function StorePage() {
             </button>
           ) : (
             <button onClick={() => handleBuy(p)} disabled={s.balance < p.costPrice || s.remaining <= 0}
-              className={`px-10 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-[#e7e7e7] text-[#999999]' : 'bg-[#FFD814] hover:bg-[#FFB84D] text-[#eaeded] shadow-md active:scale-95 border border-[#e47911]'} transition-all`}>
+              className={`px-10 py-3 rounded-full font-bold text-sm ${s.balance < p.costPrice || s.remaining <= 0 ? 'bg-[#f0f2f2] text-[#999999]' : 'bg-[#FFD814] hover:bg-[#FFB84D] text-[#eaeded] shadow-md active:scale-95 border border-[#e47911]'} transition-all`}>
               {s.remaining <= 0 ? t('store.dailyFull') : s.balance < p.costPrice ? t('store.insufficient') : t('store.buyNow')}
             </button>
           )}
@@ -482,7 +482,7 @@ export default function StorePage() {
 
         {showInsufficient && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowInsufficient(null)}>
-            <div className="bg-[#ffffff] rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
+            <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
               <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {t('store.insufficient') || 'Insufficient Balance'}</p>
               <div className="space-y-1.5 mb-4 text-sm">
                 <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#FFB84D]">${showInsufficient.need?.toFixed(2)}</b></p>
@@ -508,7 +508,7 @@ export default function StorePage() {
       {/* Top Nav Bar */}
       <div className="shrink-0 bg-[#131921] text-white">
         <div className="px-3 py-2 flex items-center gap-3">
-          <div className="flex items-center gap-1.5 bg-[#ffffff]/10 rounded-full px-3 py-1">
+          <div className="flex items-center gap-1.5 bg-white/10 rounded-full px-3 py-1">
             <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{background: ti.color}}><Store size={12} className="text-white" /></div>
             <span className="text-[11px] font-medium">{t(ti.nameKey)}</span>
           </div>
@@ -519,7 +519,7 @@ export default function StorePage() {
           </button>
         </div>
         <div className="px-3 pb-2.5">
-          <div className="flex items-center bg-[#ffffff] rounded-lg overflow-hidden">
+          <div className="flex items-center bg-white rounded-lg overflow-hidden">
             <Search size={14} className="ml-3 text-[#565959]" />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('store.searchPlaceholder')} className="flex-1 px-2 py-2.5 text-[13px] text-[#0F1111] bg-transparent outline-none placeholder:text-[#999999]" />
             {search && <button onClick={() => setSearch('')} className="px-3 text-[#565959]"><X size={14} /></button>}
@@ -528,17 +528,17 @@ export default function StorePage() {
       </div>
 
       {/* Category Chips */}
-      <div className="shrink-0 bg-[#ffffff] border-b border-[#e7e7e7] px-2 flex gap-1.5 overflow-x-auto scrollbar-none py-2.5">
+      <div className="shrink-0 bg-white border-b border-[#e7e7e7] px-2 flex gap-1.5 overflow-x-auto scrollbar-none py-2.5">
         {CAT_KEYS.map((c, i) => (
           <button key={c} onClick={() => setCatIdx(i)}
             className={`shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-medium transition-colors ${
-              catIdx === i ? 'bg-[#131921] text-white' : 'text-[#0F1111] bg-[#e7e7e7] hover:bg-[#2e2e40]'
+              catIdx === i ? 'bg-[#131921] text-white' : 'text-[#0F1111] bg-[#f0f2f2] hover:bg-[#e7e7e7]'
             }`}>{t(c)}</button>
         ))}
       </div>
 
       {/* Tab Bar */}
-      <div className="shrink-0 bg-[#ffffff] border-b border-[#e7e7e7] flex">
+      <div className="shrink-0 bg-white border-b border-[#e7e7e7] flex">
         {[
           ['dashboard', '📊', t('store.dashboard') || 'Dashboard'],
           ['products', '🛒', t('store.products') || 'Products'],
@@ -557,26 +557,26 @@ export default function StorePage() {
           <div className="p-3 space-y-3">
             {/* Key Metrics */}
             <div className="grid grid-cols-2 gap-2">
-              <div className="bg-[#ffffff] rounded-lg p-3 border border-[#e7e7e7]">
+              <div className="bg-white rounded-lg p-3 border border-[#e7e7e7]">
                 <p className="text-[10px] text-[#565959]">{t('store.balance')}</p>
                 <p className="text-xl font-bold text-[#0F1111]">${analytics.balance.toFixed(2)}</p>
               </div>
-              <div className="bg-[#ffffff] rounded-lg p-3 border border-[#e7e7e7]">
+              <div className="bg-white rounded-lg p-3 border border-[#e7e7e7]">
                 <p className="text-[10px] text-[#565959]">{t('store.todayProfit')}</p>
                 <p className="text-xl font-bold text-[#067D62]">+${analytics.todayProfit.toFixed(2)}</p>
               </div>
-              <div className="bg-[#ffffff] rounded-lg p-3 border border-[#e7e7e7]">
+              <div className="bg-white rounded-lg p-3 border border-[#e7e7e7]">
                 <p className="text-[10px] text-[#565959]">{t('store.totalEarned') || 'Total'}</p>
                 <p className="text-xl font-bold text-[#0F1111]">${analytics.totalProfit.toFixed(2)}</p>
               </div>
-              <div className="bg-[#ffffff] rounded-lg p-3 border border-[#e7e7e7]">
+              <div className="bg-white rounded-lg p-3 border border-[#e7e7e7]">
                 <p className="text-[10px] text-[#565959]">{t('store.dailyGoal') || 'Goal'}</p>
                 <p className="text-xl font-bold text-[#FFB84D]">{Math.round((analytics.todayProfit / analytics.dailyGoal) * 100)}%</p>
               </div>
             </div>
 
             {/* Profit Trend Mini Chart */}
-            <div className="bg-[#ffffff] rounded-lg p-3 border border-[#e7e7e7]">
+            <div className="bg-white rounded-lg p-3 border border-[#e7e7e7]">
               <p className="text-[11px] font-bold text-[#0F1111] mb-2">📈 {t('store.profitTrend') || 'Profit Trend (7d)'}</p>
               <div className="flex items-end gap-1 h-20">
                 {analytics.trend.map((d, i) => {
@@ -595,7 +595,7 @@ export default function StorePage() {
             </div>
 
             {/* Top Products */}
-            <div className="bg-[#ffffff] rounded-lg p-3 border border-[#e7e7e7]">
+            <div className="bg-white rounded-lg p-3 border border-[#e7e7e7]">
               <p className="text-[11px] font-bold text-[#0F1111] mb-2">🏆 {t('store.topProducts') || 'Top Products'}</p>
               {analytics.topProducts.length === 0 && <p className="text-[11px] text-[#999999] text-center py-4">{t('store.noOrders') || 'No orders yet'}</p>}
               {analytics.topProducts.map((o, i) => (
@@ -608,7 +608,7 @@ export default function StorePage() {
             </div>
 
             {/* Holdings */}
-            <div className="bg-[#ffffff] rounded-lg p-3 border border-[#e7e7e7]">
+            <div className="bg-white rounded-lg p-3 border border-[#e7e7e7]">
               <p className="text-[11px] font-bold text-[#0F1111] mb-2">📦 {t('store.holdings') || 'My Holdings'} ({holdings.length})</p>
               {holdings.length === 0 && <p className="text-[11px] text-[#999999] text-center py-4">{t('store.noHoldings') || 'No active holdings'}</p>}
               {holdings.map(h => (
@@ -616,7 +616,7 @@ export default function StorePage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-medium text-[#0F1111] truncate">{t('store.orderLabel')} #{h.id}</p>
                     <p className="text-[10px] text-[#565959]">Cost ${h.cost.toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</p>
-                    <div className="w-full h-1 bg-[#e7e7e7] rounded-full mt-1 overflow-hidden">
+                    <div className="w-full h-1 bg-[#f0f2f2] rounded-full mt-1 overflow-hidden">
                       <div className="h-full bg-[#FFD814] rounded-full transition-all" style={{width: `${h.progress}%`}} />
                     </div>
                   </div>
@@ -626,7 +626,7 @@ export default function StorePage() {
             </div>
 
             {/* Operating Metrics */}
-            <div className="bg-[#ffffff] rounded-lg p-3 border border-[#e7e7e7]">
+            <div className="bg-white rounded-lg p-3 border border-[#e7e7e7]">
               <p className="text-[11px] font-bold text-[#0F1111] mb-2">📊 {t('store.metrics') || 'Metrics'}</p>
               <div className="space-y-1.5 text-[11px]">
                 <div className="flex justify-between"><span className="text-[#565959]">{t('store.profitRate') || 'Profit Rate'}</span><span className="font-bold text-[#0F1111]">{analytics.profitRate}%</span></div>
@@ -647,14 +647,14 @@ export default function StorePage() {
             <div className="flex gap-2 mb-3">
               {['today','week','month'].map(p => (
                 <button key={p} onClick={() => setOrderPeriod(p)}
-                  className={`text-[10px] px-3 py-1 rounded-full font-medium ${orderPeriod===p?'bg-[#131921] text-white':'bg-[#ffffff] text-[#565959] border border-[#e7e7e7]'}`}>
+                  className={`text-[10px] px-3 py-1 rounded-full font-medium ${orderPeriod===p?'bg-[#131921] text-white':'bg-white text-[#565959] border border-[#e7e7e7]'}`}>
                   {p === 'today' ? (t('store.today')||'Today') : p === 'week' ? (t('store.week')||'Week') : (t('store.month')||'Month')}
                 </button>
               ))}
             </div>
 
             {orderHistory?.summary && (
-              <div className="bg-[#ffffff] rounded-lg p-3 border border-[#e7e7e7] mb-3 text-[11px] flex justify-between">
+              <div className="bg-white rounded-lg p-3 border border-[#e7e7e7] mb-3 text-[11px] flex justify-between">
                 <span>{t('store.total') || 'Total'}: <b>{orderHistory.summary.count}</b> {t('store.orders')}</span>
                 <span className="text-[#067D62] font-bold">+${orderHistory.summary.totalProfit.toFixed(2)}</span>
               </div>
@@ -665,7 +665,7 @@ export default function StorePage() {
             )}
 
             {orderHistory?.orders?.map(o => (
-              <div key={o.id} className="bg-[#ffffff] rounded-lg p-3 border border-[#e7e7e7] mb-2">
+              <div key={o.id} className="bg-white rounded-lg p-3 border border-[#e7e7e7] mb-2">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-[11px] text-[#0F1111] font-medium">{t('store.orderLabel') || 'Order'} #{o.id}</p>
@@ -683,7 +683,7 @@ export default function StorePage() {
       {/* Products Tab */}
       {tab === 'products' && (<>
       {/* Asset Dashboard Card */}
-      <div className="shrink-0 bg-[#ffffff] border-b border-[#e7e7e7] px-4 py-3">
+      <div className="shrink-0 bg-white border-b border-[#e7e7e7] px-4 py-3">
         <div className="flex items-start justify-between mb-2">
           <div>
             <span className="text-[11px] text-[#565959]">{t('store.balance')}</span>
@@ -703,7 +703,7 @@ export default function StorePage() {
             <span>{t('store.dailyGoal') || 'Daily Goal'}: ${earnings.dailyGoal.toFixed(0)}</span>
             <span>{Math.round((earnings.todayProfit / earnings.dailyGoal) * 100)}%</span>
           </div>
-          <div className="w-full h-1.5 bg-[#e7e7e7] rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-[#f0f2f2] rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-[#067D62] to-[#00A97F] rounded-full transition-all" style={{width: `${Math.min(100, (earnings.todayProfit / earnings.dailyGoal) * 100)}%`}} />
           </div>
           {earnings.tomorrowEstimate > s.balance && <p className="text-[9px] text-[#565959] mt-1">🚀 {t('store.tomorrowEstimate') || 'Tomorrow'}: ~${earnings.tomorrowEstimate.toFixed(2)}</p>}
@@ -711,24 +711,24 @@ export default function StorePage() {
       </div>
 
       {/* Trade Mode Toggle */}
-      <div className="shrink-0 bg-[#ffffff] border-b border-[#e7e7e7] px-3 py-2 flex items-center gap-2">
+      <div className="shrink-0 bg-white border-b border-[#e7e7e7] px-3 py-2 flex items-center gap-2">
         <button onClick={() => setTradeMode('holding')}
-          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='holding'?'bg-[#FFD814] text-[#eaeded]':'bg-[#e7e7e7] text-[#565959]'}`}>
+          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='holding'?'bg-[#FFD814] text-[#eaeded]':'bg-[#f0f2f2] text-[#565959]'}`}>
           📦 {t('store.holdingMode') || 'Holding'} <span className="text-[9px] ml-0.5 opacity-60">15%</span>
         </button>
         <button onClick={() => setTradeMode('share')}
-          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='share'?'bg-[#067D62] text-white':'bg-[#e7e7e7] text-[#565959]'}`}>
+          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='share'?'bg-[#067D62] text-white':'bg-[#f0f2f2] text-[#565959]'}`}>
           🔗 {t('store.shareMode') || 'Share'} <span className="text-[9px] ml-0.5 opacity-60">3%</span>
         </button>
       </div>
 
       {/* Sort & Filter Row */}
-      <div className="shrink-0 bg-[#ffffff] border-b border-[#e7e7e7] px-3 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
-        <button onClick={() => setSortMode('profit')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='profit'?'bg-[#0F1111] text-white':'bg-[#e7e7e7] text-[#0F1111]'}`}>💰 {t('store.sortProfit') || 'Profit'}</button>
-        <button onClick={() => setSortMode('price')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='price'?'bg-[#0F1111] text-white':'bg-[#e7e7e7] text-[#0F1111]'}`}>📊 {t('store.sortPrice') || 'Price'}</button>
-        <button onClick={() => setSortMode('sales')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='sales'?'bg-[#0F1111] text-white':'bg-[#e7e7e7] text-[#0F1111]'}`}>🔥 {t('store.sortSales') || 'Top'}</button>
+      <div className="shrink-0 bg-white border-b border-[#e7e7e7] px-3 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
+        <button onClick={() => setSortMode('profit')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='profit'?'bg-[#0F1111] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>💰 {t('store.sortProfit') || 'Profit'}</button>
+        <button onClick={() => setSortMode('price')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='price'?'bg-[#0F1111] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>📊 {t('store.sortPrice') || 'Price'}</button>
+        <button onClick={() => setSortMode('sales')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='sales'?'bg-[#0F1111] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>🔥 {t('store.sortSales') || 'Top'}</button>
         <span className="text-[#ddd]">|</span>
-        <button onClick={() => setAffordableOnly(!affordableOnly)} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${affordableOnly?'bg-[#067D62] text-white':'bg-[#e7e7e7] text-[#0F1111]'}`}>
+        <button onClick={() => setAffordableOnly(!affordableOnly)} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${affordableOnly?'bg-[#067D62] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>
           {affordableOnly ? '✅' : '💰'} {t('store.affordable') || 'Affordable'}
         </button>
       </div>
@@ -737,7 +737,7 @@ export default function StorePage() {
       <div className="flex-1 overflow-y-auto px-2 pt-2">
         <div className="grid grid-cols-2 gap-2">
           {products.map(p => (
-            <div key={p.id} onClick={() => setDetail(p)} className="bg-[#ffffff] rounded-lg shadow-sm border border-[#e7e7e7] active:shadow-md cursor-pointer overflow-hidden hover:border-[#ddd] transition-colors">
+            <div key={p.id} onClick={() => setDetail(p)} className="bg-white rounded-lg shadow-sm border border-[#e7e7e7] active:shadow-md cursor-pointer overflow-hidden hover:border-[#ddd] transition-colors">
               <div className="relative bg-[#f0f2f2] aspect-square">
                 <img src={p.img} alt={p.name} className="w-full h-full object-contain p-3" loading="lazy" />
                 {p.sold > 5000 && <span className="absolute top-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#CC0C39] text-white font-bold uppercase tracking-wide">Best</span>}
@@ -767,7 +767,7 @@ export default function StorePage() {
                       disabled={s.balance < p.costPrice || s.remaining <= 0}
                       className={`text-[10px] px-2.5 py-1 rounded font-medium ${
                         s.balance < p.costPrice || s.remaining <= 0
-                          ? 'bg-[#e7e7e7] text-[#999999]'
+                          ? 'bg-[#f0f2f2] text-[#999999]'
                           : 'bg-[#FFD814] hover:bg-[#FFB84D] text-[#eaeded] border border-[#e47911]'
                       }`}
                     >{t('store.buy')}</button>
@@ -787,13 +787,13 @@ export default function StorePage() {
       </div>
 
       {/* Bottom status bar */}
-      <div className="shrink-0 bg-[#ffffff] border-t border-[#e7e7e7] safe-bottom px-4 py-2.5 flex items-center justify-between text-xs">
+      <div className="shrink-0 bg-white border-t border-[#e7e7e7] safe-bottom px-4 py-2.5 flex items-center justify-between text-xs">
         <div>
           <span className="text-[#565959]">{t('store.todayProfit')} </span>
           <span className="text-[#0F1111] font-bold">${s.todayEarnings.toFixed(2)}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] bg-[#e7e7e7] px-2 py-0.5 rounded-full text-[#565959]">
+          <span className="text-[10px] bg-[#f0f2f2] px-2 py-0.5 rounded-full text-[#565959]">
             {t('store.today')} {s.doneToday}/{s.dailyOrders}
           </span>
           <button onClick={handleClose} className="text-[10px] text-[#565959] hover:text-[#CC0C39] transition-colors">{t('store.closeStore')}</button>
@@ -802,7 +802,7 @@ export default function StorePage() {
 
       {showInsufficient && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowInsufficient(null)}>
-          <div className="bg-[#ffffff] rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
             <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {t('store.insufficient') || 'Insufficient Balance'}</p>
             <div className="space-y-1.5 mb-4 text-sm">
               <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#FFB84D]">${showInsufficient.need?.toFixed(2)}</b></p>
@@ -822,7 +822,7 @@ export default function StorePage() {
       {/* Share Modal */}
       {shareProduct && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShareProduct(null)}>
-          <div className="bg-[#ffffff] rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in border border-[#e7e7e7]" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in border border-[#e7e7e7]" onClick={e => e.stopPropagation()}>
             <div className="text-center mb-4">
               <span className="text-4xl">🔗</span>
               <h3 className="text-lg font-bold text-[#0F1111] mt-2">Share & Earn 3%</h3>
@@ -837,7 +837,7 @@ export default function StorePage() {
               <button onClick={() => copyShareLink(shareProduct.shareUrl)} className="shrink-0 px-3 py-1.5 bg-[#FFD814] text-[#eaeded] text-[10px] font-bold rounded-lg">Copy</button>
             </div>
             <p className="text-[9px] text-[#999999] text-center mb-3">Share this link. When someone buys, you earn the commission.</p>
-            <button onClick={() => setShareProduct(null)} className="w-full py-2.5 bg-[#e7e7e7] text-[#0F1111] font-medium rounded-xl text-sm">Close</button>
+            <button onClick={() => setShareProduct(null)} className="w-full py-2.5 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">Close</button>
           </div>
         </div>
       )}
@@ -846,13 +846,13 @@ export default function StorePage() {
       {/* Deposit Modal */}
       {showDeposit && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowDeposit(false)}>
-          <div className="bg-[#ffffff] rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in border border-[#e7e7e7]" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in border border-[#e7e7e7]" onClick={e => e.stopPropagation()}>
             <h3 className="text-base font-bold text-[#0F1111] mb-1">{t('store.deposit') || 'Add Funds'}</h3>
             <p className="text-xs text-[#565959] mb-4">{t('store.depositDesc') || 'Add capital to trade bigger items'}</p>
             <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="100" className="w-full px-3 py-2.5 bg-[#f0f2f2] border border-[#e7e7e7] rounded-lg text-sm text-[#0F1111] mb-4 outline-none focus:border-[#FF9900]" autoFocus />
             <div className="text-[10px] text-[#999999] mb-3">Min $1 · Max $10,000</div>
             <div className="flex gap-2">
-              <button onClick={() => setShowDeposit(false)} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#e7e7e7] text-[#0F1111]">{t('common.cancel') || 'Cancel'}</button>
+              <button onClick={() => setShowDeposit(false)} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#f0f2f2] text-[#0F1111]">{t('common.cancel') || 'Cancel'}</button>
               <button onClick={handleDeposit} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#eaeded]">{t('store.confirmDeposit') || 'Confirm'}</button>
             </div>
           </div>
