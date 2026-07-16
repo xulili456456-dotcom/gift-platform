@@ -1,43 +1,70 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/auth');
-const { get, all, insert, tx } = require('../db/database');
+const { get, all, insert, run, tx } = require('../db/database');
+const config = require('../config');
 
 const router = Router();
-const COMMISSION_RATE = 0.03; // 3% — lower than holding mode's 15%
+const COMMISSION_RATE = 0.03;
 
-// POST /api/commissions/claim — share a product and claim commission
+// POST /api/commissions/claim — share a product, get a unique tracking link
 router.post('/claim', authMiddleware, async (req, res) => {
-  const { productPrice, productName } = req.body;
+  const { productId, productPrice, productName } = req.body;
   const price = parseFloat(productPrice);
   if (!price || price <= 0) return res.status(400).json({ error: 'Invalid product price' });
 
   const commission = Math.round(price * COMMISSION_RATE * 100) / 100;
 
+  // Create a pending commission record
   const result = await insert(
     'INSERT INTO share_commissions (sharer_id, product_name, product_price, commission) VALUES (?, ?, ?, ?)',
-    [req.user.id, productName || 'Unknown Product', price, commission]
+    [req.user.id, productName || 'Unknown', price, commission]
   );
 
-  // Simulate: randomly someone buys within 1-12 hours
-  // In production, this would be triggered by an actual purchase event
-  // For now, we credit immediately with a small random delay feel
-  const delayMs = 3000 + Math.random() * 5000; // 3-8 seconds for demo
-
-  setTimeout(async () => {
-    try {
-      const t = await tx();
-      await t.run("UPDATE share_commissions SET status = 'credited' WHERE id = ?", [result.id]);
-      await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
-        [req.user.id, commission, 'bonus', 'delivered']);
-      await t.commit();
-    } catch (e) { /* silent */ }
-  }, delayMs);
+  // Generate share link with tracking
+  const user = await get('SELECT referral_code FROM users WHERE id = ?', [req.user.id]);
+  const shareUrl = `${config.CORS_ORIGIN || 'https://gift-platform-h6um.onrender.com'}/buy?ref=${user.referral_code}&pid=${result.id}&p=${productId || 0}`;
 
   res.json({
-    id: result.id, productName: productName || 'Unknown', productPrice: price,
+    id: result.id, productName, productPrice: price,
     commission, rate: '3%', status: 'pending',
-    message: `Commission of $${commission} will be credited shortly!`
+    shareUrl,
+    message: `Share this link! When someone buys, you earn $${commission}`
   });
+});
+
+// GET /api/commissions/public-product/:pid — public product info for buyers
+router.get('/public-product/:pid', async (req, res) => {
+  const record = await get(
+    'SELECT sc.*, u.name as sharer_name FROM share_commissions sc JOIN users u ON u.id = sc.sharer_id WHERE sc.id = ? AND sc.status = ?',
+    [req.params.pid, 'pending']
+  );
+  if (!record) return res.status(404).json({ error: 'Product not found or already sold' });
+
+  res.json({
+    productName: record.product_name,
+    productPrice: Number(record.product_price),
+    commission: Number(record.commission),
+    sharerName: record.sharer_name,
+    status: 'available'
+  });
+});
+
+// POST /api/commissions/buy/:pid — someone buys through the share link
+router.post('/buy/:pid', async (req, res) => {
+  const record = await get('SELECT * FROM share_commissions WHERE id = ? AND status = ?', [req.params.pid, 'pending']);
+  if (!record) return res.status(404).json({ error: 'Product not available or already sold' });
+
+  const t = await tx();
+  try {
+    await t.run("UPDATE share_commissions SET status = 'credited' WHERE id = ?", [record.id]);
+    await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+      [record.sharer_id, Number(record.commission), 'bonus', 'delivered']);
+    await t.commit();
+
+    try { require('./notifications').notify(record.sharer_id, '💰 Commission Earned!', `$${Number(record.commission)} from ${record.product_name}`, 'success'); } catch {}
+
+    res.json({ ok: true, commission: Number(record.commission), message: 'Purchase successful! Commission credited to sharer.' });
+  } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 
 // GET /api/commissions — user's commission history

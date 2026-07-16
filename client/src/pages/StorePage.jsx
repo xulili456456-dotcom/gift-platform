@@ -353,12 +353,15 @@ export default function StorePage() {
   const handleOpen = async () => { setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
   const handleShare = async (product) => {
     try {
-      const { data } = await client.post('/commissions/claim', { productPrice: product.price, productName: product.name });
-      setShareProduct(product);
-      setShareMsg(`Shared! $${data.commission} commission will be credited shortly.`);
-      toast.success(data.message);
-      setTimeout(() => { setShareProduct(null); setShareMsg(''); }, 8000);
+      const { data } = await client.post('/commissions/claim', { productId: product.id, productPrice: product.price, productName: product.name });
+      setShareProduct({ ...product, shareUrl: data.shareUrl, commission: data.commission });
+      setShareMsg('');
+      toast.success('Share link generated!');
     } catch (err) { toast.error(err.response?.data?.error || 'Share failed'); }
+  };
+  const copyShareLink = (url) => {
+    navigator.clipboard.writeText(url);
+    toast.success('Link copied! Share it with friends.');
   };
   const handleBuy = async (product) => {
     try {
@@ -812,6 +815,29 @@ export default function StorePage() {
               <p>• {t('store.tipHolding') || 'Holdings auto-sell and return funds'}</p>
             </div>
             <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#c8a06e] text-[#0d0d1a]">{t('common.ok') || 'OK'}</button>
+          </div>
+        </div>
+      )}
+
+      {/* Share Modal */}
+      {shareProduct && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShareProduct(null)}>
+          <div className="bg-[#141420] rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in border border-[#262636]" onClick={e => e.stopPropagation()}>
+            <div className="text-center mb-4">
+              <span className="text-4xl">🔗</span>
+              <h3 className="text-lg font-bold text-[#f8f7f4] mt-2">Share & Earn 3%</h3>
+              <p className="text-[11px] text-[#9e9eaa] mt-1">{shareProduct.name}</p>
+            </div>
+            <div className="bg-[#0d0d1a] rounded-lg p-3 mb-3 text-center">
+              <p className="text-[10px] text-[#6e6e7a] mb-1">Commission</p>
+              <p className="text-2xl font-black text-[#00c758]">+${shareProduct.commission?.toFixed(2)}</p>
+            </div>
+            <div className="bg-[#1E1E32] rounded-lg p-3 mb-3 flex items-center justify-between">
+              <p className="text-[10px] text-[#9e9eaa] break-all flex-1 mr-2 font-mono">{shareProduct.shareUrl || ""}</p>
+              <button onClick={() => copyShareLink(shareProduct.shareUrl)} className="shrink-0 px-3 py-1.5 bg-[#c8a06e] text-[#0d0d1a] text-[10px] font-bold rounded-lg">Copy</button>
+            </div>
+            <p className="text-[9px] text-[#6e6e7a] text-center mb-3">Share this link. When someone buys, you earn the commission.</p>
+            <button onClick={() => setShareProduct(null)} className="w-full py-2.5 bg-[#262636] text-[#f8f7f4] font-medium rounded-xl text-sm">Close</button>
           </div>
         </div>
       )}
