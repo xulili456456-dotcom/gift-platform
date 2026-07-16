@@ -63,7 +63,7 @@ router.get('/status', async (req, res) => {
   const next = nextTier(store.tier);
 
   const doneToday = await get(
-    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND created_at::date = ?::date",
     [store.id, today]
   );
   const earningsToday = await get(
