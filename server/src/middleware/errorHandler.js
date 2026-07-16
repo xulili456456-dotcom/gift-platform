@@ -13,7 +13,7 @@ function errorHandler(err, req, res, next) {
     return res.status(400).json({ error: 'Related data does not exist' });
   }
   if (err.code && err.code.startsWith('23')) { // integrity_constraint_violation family
-    return res.status(409).json({ error: 'Data already exists or violates a constraint' });
+    return res.status(409).json({ error: `Constraint violation [${err.code}]: ${err.detail || err.message}` });
   }
 
   res.status(err.status || 500).json({
