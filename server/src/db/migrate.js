@@ -257,8 +257,8 @@ async function migrate() {
   console.log('Running database migrations...');
   await getDb();
   await exec(schema);
-  await exec(depositsSchema);
-  await exec(commissionsSchema);
+  try { await exec(depositsSchema); } catch (e) { console.log('Deposits migration skipped:', e.message); }
+  try { await exec(commissionsSchema); } catch (e) { console.log('Commissions migration skipped:', e.message); }
   await exec(defaultSettings);
   // One-time cleanup: remove legacy Chinese notifications
   try {
