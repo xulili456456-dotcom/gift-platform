@@ -1,0 +1,74 @@
+const { Router } = require('express');
+const authMiddleware = require('../middleware/auth');
+const adminMiddleware = require('../middleware/admin');
+const { get, all, run, insert, tx } = require('../db/database');
+
+const router = Router();
+
+// POST /api/deposits — submit deposit request
+router.post('/', authMiddleware, async (req, res) => {
+  const { network, amount, tx_hash } = req.body;
+  const amt = parseFloat(amount);
+  if (!amt || amt < 1) return res.status(400).json({ error: 'Minimum deposit is $1' });
+  if (!network || !tx_hash) return res.status(400).json({ error: 'Network and transaction hash are required' });
+  if (!['trc20','erc20','bep20'].includes(network)) return res.status(400).json({ error: 'Invalid network' });
+
+  const result = await insert(
+    'INSERT INTO deposits (user_id, network, amount, tx_hash) VALUES (?, ?, ?, ?)',
+    [req.user.id, network, amt, tx_hash.trim()]
+  );
+  try { require('./notifications').notify(req.user.id, '💵 Deposit Submitted', `$${amt} deposit pending review`, 'info'); } catch {}
+  res.status(201).json({ id: result.id, network, amount: amt, tx_hash: tx_hash.trim(), status: 'pending' });
+});
+
+// GET /api/deposits — user's deposit history
+router.get('/', authMiddleware, async (req, res) => {
+  const rows = await all('SELECT * FROM deposits WHERE user_id = ? ORDER BY created_at DESC LIMIT 20', [req.user.id]);
+  res.json(rows);
+});
+
+// GET /api/deposits/addresses — get platform deposit addresses
+router.get('/addresses', authMiddleware, async (req, res) => {
+  const settings = require('../models/settings');
+  res.json({
+    trc20: await settings.get('deposit_address_trc20', ''),
+    erc20: await settings.get('deposit_address_erc20', ''),
+    bep20: await settings.get('deposit_address_bep20', ''),
+  });
+});
+
+// Admin: list all deposits
+router.get('/admin', authMiddleware, adminMiddleware, async (req, res) => {
+  const rows = await all('SELECT d.*, u.name, u.email FROM deposits d JOIN users u ON u.id = d.user_id ORDER BY d.created_at DESC LIMIT 100');
+  res.json(rows);
+});
+
+// Admin: confirm deposit
+router.put('/:id/confirm', authMiddleware, adminMiddleware, async (req, res) => {
+  const d = await get('SELECT * FROM deposits WHERE id = ? AND status = ?', [req.params.id, 'pending']);
+  if (!d) return res.status(404).json({ error: 'Deposit not found or already processed' });
+
+  const t = await tx();
+  try {
+    await t.run("UPDATE deposits SET status = 'confirmed', confirmed_at = NOW(), admin_note = ? WHERE id = ?",
+      [req.body.note || '', d.id]);
+    await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+      [d.user_id, Number(d.amount), 'bonus', 'delivered']);
+    await t.commit();
+    try { require('./notifications').notify(d.user_id, '💵 Deposit Confirmed', `$${Number(d.amount)} has been credited to your account`, 'success'); } catch {}
+    res.json({ ok: true, message: 'Deposit confirmed' });
+  } catch (err) { await t.rollback().catch(() => {}); throw err; }
+});
+
+// Admin: reject deposit
+router.put('/:id/reject', authMiddleware, adminMiddleware, async (req, res) => {
+  const d = await get('SELECT * FROM deposits WHERE id = ? AND status = ?', [req.params.id, 'pending']);
+  if (!d) return res.status(404).json({ error: 'Deposit not found or already processed' });
+
+  await run("UPDATE deposits SET status = 'rejected', admin_note = ? WHERE id = ?",
+    [req.body.note || '', d.id]);
+  try { require('./notifications').notify(d.user_id, '💵 Deposit Rejected', `$${Number(d.amount)} deposit was rejected`, 'warning'); } catch {}
+  res.json({ ok: true, message: 'Deposit rejected' });
+});
+
+module.exports = router;

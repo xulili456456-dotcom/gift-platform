@@ -692,7 +692,7 @@
     "small": "Small Store",
     "medium": "Medium Store",
     "large": "Large Store",
-    "deposit": "Add Funds",
+    "deposit": "Deposit",
     "perOrder": "Per Order",
     "dailyMax": "Daily Max",
     "dailyOrders": "{{n}} orders/day",

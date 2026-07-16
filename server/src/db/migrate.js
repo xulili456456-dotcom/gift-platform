@@ -211,14 +211,39 @@ INSERT INTO admin_settings (key, value) VALUES ('platform_name', 'Shopee Shoppin
 ON CONFLICT (key) DO NOTHING;
 INSERT INTO admin_settings (key, value) VALUES ('platform_share_title', 'Invite friends, win great gifts!')
 ON CONFLICT (key) DO NOTHING;
-INSERT INTO admin_settings (key, value) VALUES ('platform_share_desc', 'Complete tasks to earn free cash and prizes. Join now!')
+INSERT INTO admin_settings (key, value) VALUES ('platform_share_desc', 'Complete tasks, trade products, earn cash on Shopee Shopping Operations')
 ON CONFLICT (key) DO NOTHING;
+INSERT INTO admin_settings (key, value) VALUES ('deposit_address_trc20', '')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO admin_settings (key, value) VALUES ('deposit_address_erc20', '')
+ON CONFLICT (key) DO NOTHING;
+INSERT INTO admin_settings (key, value) VALUES ('deposit_address_bep20', '')
+ON CONFLICT (key) DO NOTHING;
+`;
+
+// Add deposits table
+const depositsSchema = `
+CREATE TABLE IF NOT EXISTS deposits (
+    id              SERIAL PRIMARY KEY,
+    user_id         INTEGER NOT NULL,
+    network         TEXT NOT NULL DEFAULT 'trc20' CHECK(network IN ('trc20','erc20','bep20')),
+    amount          NUMERIC(10,2) NOT NULL,
+    tx_hash         TEXT NOT NULL DEFAULT '',
+    status          TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','confirmed','rejected')),
+    admin_note      TEXT DEFAULT '',
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    confirmed_at    TIMESTAMP DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_deposits_user ON deposits(user_id);
+CREATE INDEX IF NOT EXISTS idx_deposits_status ON deposits(status);
 `;
 
 async function migrate() {
   console.log('Running database migrations...');
   await getDb();
   await exec(schema);
+  await exec(depositsSchema);
   await exec(defaultSettings);
   // One-time cleanup: remove legacy Chinese notifications
   try {

@@ -668,7 +668,7 @@ export default function StorePage() {
             <span className="text-[11px] text-[#9e9eaa]">{t('store.balance')}</span>
             <p className="text-[28px] font-bold text-[#f8f7f4] leading-tight">${s.balance.toFixed(2)}</p>
           </div>
-          <button onClick={() => setShowDeposit(true)} className="text-[11px] px-3 py-1.5 rounded-full bg-[#c8a06e] text-[#0d0d1a] font-medium">{t('store.deposit') || 'Deposit'}</button>
+          <button onClick={() => window.location.href="/mine/deposit"} className="text-[11px] px-3 py-1.5 rounded-full bg-[#c8a06e] text-[#0d0d1a] font-medium">{t('store.deposit') || 'Deposit'}</button>
         </div>
         <div className="flex items-center gap-4 text-[11px]">
           <span className="text-[#00c758] font-bold">+${earnings.todayProfit.toFixed(2)} {t('store.today')}</span>

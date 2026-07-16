@@ -692,7 +692,7 @@
     "toys": "おもちゃ",
     "medium": "中規模店舗",
     "large": "大規模店舗",
-    "deposit": "資金追加",
+    "deposit": "入金",
     "perOrder": "注文単価",
     "dailyMax": "1日上限",
     "dailyOrders": "1日{{n}}件",

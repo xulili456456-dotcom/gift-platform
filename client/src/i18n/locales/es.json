@@ -670,7 +670,7 @@
     "small": "Tienda Pequeña",
     "medium": "Tienda Mediana",
     "large": "Tienda Grande",
-    "deposit": "Añadir Fondos",
+    "deposit": "Depositar",
     "perOrder": "Por Pedido",
     "dailyMax": "Máx Diario",
     "dailyOrders": "{{n}} pedidos/día",
