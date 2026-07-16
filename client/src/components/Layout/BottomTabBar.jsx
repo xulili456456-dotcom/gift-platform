@@ -54,7 +54,7 @@ export default function BottomTabBar() {
 
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 safe-bottom" style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
-      <div className="mx-4 mb-2 bg-[#141420]/95 backdrop-blur-xl rounded-2xl shadow-lg shadow-black/40 border border-[#262636]">
+      <div className="mx-4 mb-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg shadow-black/5 border border-[#e7e7e7]">
         <div className="relative" ref={barRef}>
           {/* Sliding Indicator */}
           <div

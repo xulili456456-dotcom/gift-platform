@@ -48,11 +48,11 @@ export default function DepositPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0d0d1a] safe-top safe-bottom flex flex-col">
+    <div className="min-h-screen bg-[#eaeded] safe-top safe-bottom flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-[#0d0d1a] border-b border-[#262636]">
-        <button onClick={() => navigate(-1)}><ChevronLeft size={22} className="text-[#f8f7f4]" /></button>
-        <h1 className="text-base font-bold text-[#f8f7f4]">Deposit USDT</h1>
+      <div className="flex items-center gap-3 px-4 py-3 bg-[#eaeded] border-b border-[#e7e7e7]">
+        <button onClick={() => navigate(-1)}><ChevronLeft size={22} className="text-[#0F1111]" /></button>
+        <h1 className="text-base font-bold text-[#0F1111]">Deposit USDT</h1>
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -60,26 +60,26 @@ export default function DepositPage() {
           {/* Step 1: Network */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <span className="w-6 h-6 rounded-full bg-[#c8a06e] text-[#0d0d1a] text-[11px] font-bold flex items-center justify-center">1</span>
-              <span className="text-sm font-bold text-[#f8f7f4]">Select Network</span>
+              <span className="w-6 h-6 rounded-full bg-[#FF9900] text-[#0d0d1a] text-[11px] font-bold flex items-center justify-center">1</span>
+              <span className="text-sm font-bold text-[#0F1111]">Select Network</span>
             </div>
             <div className="space-y-2">
               {NETWORKS.map(n => (
                 <button key={n.id} onClick={() => setNetwork(n.id)}
                   className={`w-full text-left p-4 rounded-xl border transition-all ${
                     network === n.id
-                      ? 'bg-[#c8a06e]/10 border-[#c8a06e]'
-                      : 'bg-[#141420] border-[#262636] hover:border-[#3a3a4a]'
+                      ? 'bg-[#FF9900]/10 border-[#FF9900]'
+                      : 'bg-white border-[#e7e7e7] hover:border-[#3a3a4a]'
                   }`}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{n.icon}</span>
                       <div>
-                        <p className={`text-[13px] font-bold ${network === n.id ? 'text-[#c8a06e]' : 'text-[#f8f7f4]'}`}>{n.label}</p>
-                        <p className="text-[10px] text-[#6e6e7a]">{n.desc}</p>
+                        <p className={`text-[13px] font-bold ${network === n.id ? 'text-[#FF9900]' : 'text-[#0F1111]'}`}>{n.label}</p>
+                        <p className="text-[10px] text-[#999]">{n.desc}</p>
                       </div>
                     </div>
-                    {network === n.id && <div className="w-5 h-5 rounded-full bg-[#c8a06e] flex items-center justify-center"><CheckCircle size={12} className="text-[#0d0d1a]" /></div>}
+                    {network === n.id && <div className="w-5 h-5 rounded-full bg-[#FF9900] flex items-center justify-center"><CheckCircle size={12} className="text-[#0d0d1a]" /></div>}
                   </div>
                 </button>
               ))}
@@ -89,23 +89,23 @@ export default function DepositPage() {
           {/* Step 2: Address */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <span className="w-6 h-6 rounded-full bg-[#c8a06e] text-[#0d0d1a] text-[11px] font-bold flex items-center justify-center">2</span>
-              <span className="text-sm font-bold text-[#f8f7f4]">Send USDT to This Address</span>
+              <span className="w-6 h-6 rounded-full bg-[#FF9900] text-[#0d0d1a] text-[11px] font-bold flex items-center justify-center">2</span>
+              <span className="text-sm font-bold text-[#0F1111]">Send USDT to This Address</span>
             </div>
-            <div className="bg-[#141420] rounded-xl border border-[#262636] overflow-hidden">
+            <div className="bg-white rounded-xl border border-[#e7e7e7] overflow-hidden">
               <div className="p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[11px] font-bold text-[#9e9eaa] uppercase tracking-wider">{network.toUpperCase()} Address</span>
-                  <button onClick={copyAddr} className="flex items-center gap-1 text-[11px] text-[#c8a06e] font-medium"><Copy size={12} /> Copy</button>
+                  <span className="text-[11px] font-bold text-[#565959] uppercase tracking-wider">{network.toUpperCase()} Address</span>
+                  <button onClick={copyAddr} className="flex items-center gap-1 text-[11px] text-[#FF9900] font-medium"><Copy size={12} /> Copy</button>
                 </div>
-                <div className="bg-[#0d0d1a] rounded-lg p-3">
-                  <p className="text-[11px] text-[#f8f7f4] font-mono break-all leading-relaxed">{addr || 'Not configured yet'}</p>
+                <div className="bg-[#eaeded] rounded-lg p-3">
+                  <p className="text-[11px] text-[#0F1111] font-mono break-all leading-relaxed">{addr || 'Not configured yet'}</p>
                 </div>
               </div>
-              <div className="px-4 py-3 bg-[#1E1E32]/50 border-t border-[#262636] flex items-start gap-2">
-                <AlertTriangle size={14} className="text-[#c8a06e] shrink-0 mt-0.5" />
-                <p className="text-[10px] text-[#6e6e7a] leading-relaxed">
-                  Only send <b className="text-[#f8f7f4]">USDT</b> on the <b className="text-[#f8f7f4]">{network.toUpperCase()}</b> network.
+              <div className="px-4 py-3 bg-[#f0f2f2]/50 border-t border-[#e7e7e7] flex items-start gap-2">
+                <AlertTriangle size={14} className="text-[#FF9900] shrink-0 mt-0.5" />
+                <p className="text-[10px] text-[#999] leading-relaxed">
+                  Only send <b className="text-[#0F1111]">USDT</b> on the <b className="text-[#0F1111]">{network.toUpperCase()}</b> network.
                   Sending other tokens or using the wrong network will result in permanent loss of funds.
                 </p>
               </div>
@@ -115,30 +115,30 @@ export default function DepositPage() {
           {/* Step 3: Submit */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <span className="w-6 h-6 rounded-full bg-[#c8a06e] text-[#0d0d1a] text-[11px] font-bold flex items-center justify-center">3</span>
-              <span className="text-sm font-bold text-[#f8f7f4]">Confirm Your Deposit</span>
+              <span className="w-6 h-6 rounded-full bg-[#FF9900] text-[#0d0d1a] text-[11px] font-bold flex items-center justify-center">3</span>
+              <span className="text-sm font-bold text-[#0F1111]">Confirm Your Deposit</span>
             </div>
-            <div className="bg-[#141420] rounded-xl border border-[#262636] p-4 space-y-3">
+            <div className="bg-white rounded-xl border border-[#e7e7e7] p-4 space-y-3">
               <div>
-                <label className="text-[10px] font-bold text-[#9e9eaa] uppercase tracking-wider block mb-1">Amount (USDT)</label>
+                <label className="text-[10px] font-bold text-[#565959] uppercase tracking-wider block mb-1">Amount (USDT)</label>
                 <div className="relative">
                   <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00"
-                    className="w-full px-4 py-3 bg-[#0d0d1a] border border-[#262636] rounded-lg text-lg font-bold text-[#f8f7f4] outline-none focus:border-[#c8a06e] placeholder:text-[#3a3a4a]" />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-[#9e9eaa]">USDT</span>
+                    className="w-full px-4 py-3 bg-[#eaeded] border border-[#e7e7e7] rounded-lg text-lg font-bold text-[#0F1111] outline-none focus:border-[#FF9900] placeholder:text-[#3a3a4a]" />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-[#565959]">USDT</span>
                 </div>
               </div>
               <div>
-                <label className="text-[10px] font-bold text-[#9e9eaa] uppercase tracking-wider block mb-1">Transaction Hash (TXID)</label>
+                <label className="text-[10px] font-bold text-[#565959] uppercase tracking-wider block mb-1">Transaction Hash (TXID)</label>
                 <input type="text" value={txHash} onChange={e => setTxHash(e.target.value)} placeholder="Paste your transaction hash here"
-                  className="w-full px-4 py-3 bg-[#0d0d1a] border border-[#262636] rounded-lg text-[12px] text-[#f8f7f4] font-mono outline-none focus:border-[#c8a06e] placeholder:text-[#3a3a4a]" />
+                  className="w-full px-4 py-3 bg-[#eaeded] border border-[#e7e7e7] rounded-lg text-[12px] text-[#0F1111] font-mono outline-none focus:border-[#FF9900] placeholder:text-[#3a3a4a]" />
               </div>
               <button onClick={submit} disabled={submitting || !addr}
-                className="w-full py-3.5 bg-[#c8a06e] text-[#0d0d1a] font-bold rounded-xl text-sm active:scale-[0.98] disabled:opacity-40 transition-all">
+                className="w-full py-3.5 bg-[#FF9900] text-[#0d0d1a] font-bold rounded-xl text-sm active:scale-[0.98] disabled:opacity-40 transition-all">
                 {!addr ? 'Deposit address not configured' : submitting ? 'Submitting...' : 'Submit Deposit'}
               </button>
               <div className="flex items-center gap-1.5 justify-center">
-                <Shield size={12} className="text-[#6e6e7a]" />
-                <p className="text-[9px] text-[#6e6e7a]">Admin review required · Funds credited within 24h</p>
+                <Shield size={12} className="text-[#999]" />
+                <p className="text-[9px] text-[#999]">Admin review required · Funds credited within 24h</p>
               </div>
             </div>
           </div>
@@ -146,18 +146,18 @@ export default function DepositPage() {
           {/* History */}
           {history.length > 0 && (
             <div>
-              <p className="text-[11px] font-bold text-[#9e9eaa] uppercase tracking-wider mb-3">Deposit History</p>
-              <div className="bg-[#141420] rounded-xl border border-[#262636] divide-y divide-[#262636]">
+              <p className="text-[11px] font-bold text-[#565959] uppercase tracking-wider mb-3">Deposit History</p>
+              <div className="bg-white rounded-xl border border-[#e7e7e7] divide-y divide-[#262636]">
                 {history.map(d => (
                   <div key={d.id} className="px-4 py-3 flex items-center justify-between">
                     <div>
-                      <p className="text-[13px] font-bold text-[#f8f7f4]">${Number(d.amount).toFixed(2)}</p>
-                      <p className="text-[10px] text-[#6e6e7a]">{d.network.toUpperCase()} · {new Date(d.created_at).toLocaleDateString()}</p>
+                      <p className="text-[13px] font-bold text-[#0F1111]">${Number(d.amount).toFixed(2)}</p>
+                      <p className="text-[10px] text-[#999]">{d.network.toUpperCase()} · {new Date(d.created_at).toLocaleDateString()}</p>
                     </div>
                     <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1 ${
-                      d.status === 'confirmed' ? 'bg-[#00c758]/15 text-[#00c758]' :
-                      d.status === 'rejected' ? 'bg-[#fb2c36]/15 text-[#fb2c36]' :
-                      'bg-[#c8a06e]/15 text-[#c8a06e]'
+                      d.status === 'confirmed' ? 'bg-[#067D62]/15 text-[#067D62]' :
+                      d.status === 'rejected' ? 'bg-[#CC0C39]/15 text-[#fb2c36]' :
+                      'bg-[#FF9900]/15 text-[#FF9900]'
                     }`}>
                       {d.status === 'confirmed' ? <CheckCircle size={10} /> :
                        d.status === 'rejected' ? <XCircle size={10} /> : <Clock size={10} />}

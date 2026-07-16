@@ -62,23 +62,16 @@ export default function DownloadPage() {
                   <h3 className="text-xl font-bold mb-2">{t('app.name')}</h3>
                   <p className="text-text-secondary text-sm mb-6">{t('download.version')} · {t('download.size')}</p>
 
-                  {/* APK Placeholder */}
-                  <div className="bg-accent/5 border-2 border-dashed border-accent/30 rounded-2xl p-6 mb-6 relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-5" style={{ background: 'radial-gradient(circle at 30% 50%, #D4A574, transparent)' }} />
-                    <Download size={36} className="text-accent/50 mx-auto mb-2 relative z-10" />
-                    <p className="text-text-muted text-sm font-semibold relative z-10">{t('download.coming_soon')}</p>
-                    <p className="text-text-muted text-xs mt-1 relative z-10">{t('download.apk_placeholder')}</p>
-                  </div>
-
-                  {/* QR placeholder */}
-                  <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 dark:bg-white/5 rounded-2xl flex items-center justify-center">
-                    <QrCode size={40} className="text-text-muted opacity-30" />
-                  </div>
-                  <p className="text-text-muted text-xs mb-4">{t('download.scanQr')}</p>
-
-                  <button className="btn btn-outline w-full justify-center text-sm py-3">
-                    {t('app.cta_share')}
-                  </button>
+                  {/* Download Button */}
+                  <a
+                    href="https://cdn.trackusp.com/apks/sched/131bba388eeb580e/release.apk"
+                    download
+                    className="btn btn-accent btn-lg w-full justify-center text-base mb-4 glow-pulse no-underline"
+                  >
+                    <Download size={20} />
+                    Download APK
+                  </a>
+                  <p className="text-text-muted text-xs">{t('download.version')} · {t('download.size')}</p>
                 </div>
               </div>
 

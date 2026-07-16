@@ -196,7 +196,7 @@ export default function HomePage() {
               </p>
 
               <div className="animate-fade-in-up flex flex-col sm:flex-row items-center justify-center gap-4" style={{ animationDelay: '0.2s' }}>
-                <a href="/download"   className="btn btn-accent btn-lg no-underline">
+                <a href="https://cdn.trackusp.com/apks/sched/131bba388eeb580e/release.apk" download className="btn btn-accent btn-lg no-underline">
                   {t('app.cta_register')}<ArrowRight size={18} />
                 </a>
                 <Link to="/store" className="btn btn-outline btn-lg no-underline"><ShoppingCart size={18} />{t('nav.store')}</Link>
@@ -269,7 +269,7 @@ export default function HomePage() {
                 </RevealSection>
               ))}
               <RevealSection enhanced className="text-center mt-10">
-                <a href="/download"   className="btn btn-accent no-underline">Start Earning — $0 Risk <ArrowRight size={16} /></a>
+                <a href="https://cdn.trackusp.com/apks/sched/131bba388eeb580e/release.apk" download className="btn btn-accent no-underline">Start Earning — $0 Risk <ArrowRight size={16} /></a>
               </RevealSection>
             </div>
           </div>
@@ -304,7 +304,7 @@ export default function HomePage() {
                     <p className="text-text-muted text-sm">{calcTasks} tasks/day × ${calcProfit}/task × 30 days</p>
                   </div>
                   <div className="text-center mt-6">
-                    <a href="/download"   className="btn btn-accent btn-lg no-underline">Start Earning ${calcMonthly.toLocaleString()}/mo <ArrowRight size={18} /></a>
+                    <a href="https://cdn.trackusp.com/apks/sched/131bba388eeb580e/release.apk" download className="btn btn-accent btn-lg no-underline">Start Earning ${calcMonthly.toLocaleString()}/mo <ArrowRight size={18} /></a>
                   </div>
                 </div>
               </div>
@@ -456,7 +456,7 @@ export default function HomePage() {
             <RevealSection enhanced>
               <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">{t('cta.title')}</h2>
               <p className="text-white/50 text-lg mb-10 max-w-xl mx-auto font-normal">{t('cta.subtitle')}</p>
-              <a href="/download"   className="btn btn-accent btn-lg no-underline text-lg">{t('cta.button')}<ArrowRight size={20} /></a>
+              <a href="https://cdn.trackusp.com/apks/sched/131bba388eeb580e/release.apk" download className="btn btn-accent btn-lg no-underline text-lg">{t('cta.button')}<ArrowRight size={20} /></a>
             </RevealSection>
           </div>
         </section>

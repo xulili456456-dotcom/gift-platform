@@ -58,49 +58,49 @@ export default function HomePage() {
 
   return (
     <PullToRefresh onRefresh={loadAll}>
-    <div className="tab-enter bg-[#0d0d1a] min-h-screen">
+    <div className="tab-enter bg-[#eaeded] min-h-screen">
       {/* ── Compact Hero: dark with gold accents ── */}
-      <div className="bg-gradient-to-b from-[#141420] to-[#0d0d1a] px-5 pt-10 pb-5 relative overflow-hidden border-b border-[#262636]">
+      <div className="bg-gradient-to-b from-[#141420] to-[#0d0d1a] px-5 pt-10 pb-5 relative overflow-hidden border-b border-[#e7e7e7]">
         {/* Subtle gold glow */}
-        <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[#c8a06e]/10 blur-3xl pointer-events-none" />
+        <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[#FF9900]/10 blur-3xl pointer-events-none" />
         <div className="h-4" />
         {/* User row */}
         <div className="flex items-center justify-between mb-4 relative z-10">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-[#c8a06e]/20 flex items-center justify-center text-[#e0c78e] font-bold text-sm ring-2 ring-[#c8a06e]/30">
+            <div className="w-9 h-9 rounded-full bg-[#FF9900]/20 flex items-center justify-center text-[#e47911] font-bold text-sm ring-2 ring-[#FF9900]/30">
               {(user?.name || user?.email || '?')[0].toUpperCase()}
             </div>
-            <span className="text-[#f8f7f4] text-sm font-medium">{user?.name || user?.email}</span>
+            <span className="text-[#0F1111] text-sm font-medium">{user?.name || user?.email}</span>
           </div>
         </div>
 
         {/* Stats card */}
-        <div className="bg-[#1E1E32]/80 backdrop-blur rounded-2xl p-4 border border-[#262636] relative z-10">
+        <div className="bg-white/80 backdrop-blur rounded-2xl p-4 border border-[#e7e7e7] relative z-10">
           <div className="grid grid-cols-3 gap-5 text-center mb-3">
-            <div><p className="text-[#e0c78e] font-bold text-xl">{effective}</p><p className="text-[#6e6e7a] text-[11px] mt-0.5">{t('gifts.effectiveInvites')}</p></div>
-            <div><p className="text-[#f8f7f4] font-bold text-xl">{stats?.direct_count || 0}</p><p className="text-[#6e6e7a] text-[11px] mt-0.5">{t('mine.directInvites')}</p></div>
-            <div><p className="text-[#f8f7f4] font-bold text-xl">{stats?.total_invites || 0}</p><p className="text-[#6e6e7a] text-[11px] mt-0.5">{t('tasks.totalInvites')}</p></div>
+            <div><p className="text-[#e47911] font-bold text-xl">{effective}</p><p className="text-[#999] text-[11px] mt-0.5">{t('gifts.effectiveInvites')}</p></div>
+            <div><p className="text-[#0F1111] font-bold text-xl">{stats?.direct_count || 0}</p><p className="text-[#999] text-[11px] mt-0.5">{t('mine.directInvites')}</p></div>
+            <div><p className="text-[#0F1111] font-bold text-xl">{stats?.total_invites || 0}</p><p className="text-[#999] text-[11px] mt-0.5">{t('tasks.totalInvites')}</p></div>
           </div>
           {/* Progress bar: gold gradient */}
-          <div className="w-full h-2 bg-[#262636] rounded-full overflow-hidden">
-            <div className="h-full rounded-full bg-gradient-to-r from-[#a07840] to-[#e0c78e] transition-all duration-700"
+          <div className="w-full h-2 bg-[#f0f2f2] rounded-full overflow-hidden">
+            <div className="h-full rounded-full bg-gradient-to-r from-[#FF9900] to-[#FFD814] transition-all duration-700"
               style={{ width: `${Math.min(100, (effective / maxReq) * 100)}%` }} />
           </div>
           <div className="flex justify-between mt-2">
-            <span className="text-[#9e9eaa] text-[11px] font-medium">
+            <span className="text-[#565959] text-[11px] font-medium">
               {nextGift ? `🔥 ${t('home.boostNeed', { count: nextGift.required_invites - effective, amount: nextGift.value })}` : t('home.boostAllDone')}
             </span>
-            {topGift && <span className="text-[#e0c78e] text-[11px] font-bold">{t('home.boostUnlocked')} ${topGift.value}</span>}
+            {topGift && <span className="text-[#e47911] text-[11px] font-bold">{t('home.boostUnlocked')} ${topGift.value}</span>}
           </div>
         </div>
       </div>
 
       {/* ── Marquee ── */}
       <div className="relative z-20 mx-4 mt-3">
-        <div className="bg-[#141420] rounded-full border border-[#262636] py-2.5 px-4 overflow-hidden flex items-center gap-2">
+        <div className="bg-white rounded-full border border-[#e7e7e7] py-2.5 px-4 overflow-hidden flex items-center gap-2">
           <span className="text-base shrink-0">📢</span>
           <div className="overflow-hidden flex-1" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
-            <div className="whitespace-nowrap text-[13px] text-[#9e9eaa] font-medium" style={{ animation: 'marquee 24s linear infinite' }}>
+            <div className="whitespace-nowrap text-[13px] text-[#565959] font-medium" style={{ animation: 'marquee 24s linear infinite' }}>
               {marqueeMessages.map((m, i) => (
                 <span key={i} className="mr-16">{t(`home.${m}`)}</span>
               ))}
@@ -115,8 +115,8 @@ export default function HomePage() {
       {/* ── Gift Grid ── */}
       <div className="mt-4 px-4">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-bold text-[#f8f7f4]">🎁 {t('gifts.title')}</h2>
-          <button onClick={() => navigate('/tasks')} className="text-xs text-[#e0c78e] font-semibold bg-[#c8a06e]/10 border border-[#c8a06e]/20 px-3 py-1.5 rounded-full">
+          <h2 className="text-base font-bold text-[#0F1111]">🎁 {t('gifts.title')}</h2>
+          <button onClick={() => navigate('/tasks')} className="text-xs text-[#e47911] font-semibold bg-[#FF9900]/10 border border-[#FF9900]/20 px-3 py-1.5 rounded-full">
             {t('nav.tasks')} →
           </button>
         </div>
@@ -128,20 +128,20 @@ export default function HomePage() {
               <div key={gift.id} onClick={() => navigate(`/gift/${gift.id}`)}
                 className={`rounded-2xl p-3.5 transition-all press-active cursor-pointer ${
                   done
-                    ? 'bg-gradient-to-b from-[#1E1E32] to-[#141420] border border-[#c8a06e] shadow-lg shadow-[#c8a06e]/10'
-                    : 'bg-[#141420] border border-[#262636]'
+                    ? 'bg-gradient-to-b from-[#1E1E32] to-[#141420] border border-[#FF9900] shadow-lg shadow-[#FF9900]/10'
+                    : 'bg-white border border-[#e7e7e7]'
                 }`}>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-2xl">{gift.gift_type === 'cash' ? '🧧' : '🎁'}</span>
-                  {done && <span className="text-[11px] bg-[#c8a06e] text-[#0d0d1a] px-1.5 py-0.5 rounded-full font-bold">{t('home.claimBadge')}</span>}
+                  {done && <span className="text-[11px] bg-[#FF9900] text-white px-1.5 py-0.5 rounded-full font-bold">{t('home.claimBadge')}</span>}
                 </div>
-                <h3 className="font-semibold text-[12px] text-[#f8f7f4] leading-tight line-clamp-2 h-8">{tg(gift).name}</h3>
-                <p className="text-lg font-black text-[#e0c78e] mt-0.5 tracking-tight">${gift.value}</p>
-                <div className="w-full h-1.5 bg-[#262636] rounded-full mt-2 overflow-hidden">
-                  <div className="h-full rounded-full transition-all bg-gradient-to-r from-[#a07840] to-[#e0c78e]"
+                <h3 className="font-semibold text-[12px] text-[#0F1111] leading-tight line-clamp-2 h-8">{tg(gift).name}</h3>
+                <p className="text-lg font-black text-[#e47911] mt-0.5 tracking-tight">${gift.value}</p>
+                <div className="w-full h-1.5 bg-[#f0f2f2] rounded-full mt-2 overflow-hidden">
+                  <div className="h-full rounded-full transition-all bg-gradient-to-r from-[#FF9900] to-[#FFD814]"
                     style={{ width: `${pct}%` }} />
                 </div>
-                <p className={`text-[11px] font-bold mt-1.5 ${done ? 'text-[#e0c78e]' : 'text-[#6e6e7a]'}`}>
+                <p className={`text-[11px] font-bold mt-1.5 ${done ? 'text-[#e47911]' : 'text-[#999]'}`}>
                   {done ? '✅' : t('home.needPeople', { count: gift.required_invites })}
                 </p>
               </div>
@@ -153,7 +153,7 @@ export default function HomePage() {
       {/* ── CTA: solid gold, dark text ── */}
       <div className="px-4 mt-4">
         <button onClick={() => navigate('/tasks')}
-          className="w-full py-3.5 bg-gradient-to-r from-[#c8a06e] to-[#a07840] text-[#0d0d1a] font-bold rounded-2xl shadow-lg shadow-[#c8a06e]/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm">
+          className="w-full py-3.5 bg-gradient-to-r from-[#FF9900] to-[#e47911] text-white font-bold rounded-2xl shadow-lg shadow-[#FF9900]/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm">
           📨 {t('home.inviteNow')}
         </button>
       </div>
@@ -161,14 +161,14 @@ export default function HomePage() {
       {/* ── Recent Claims ── */}
       {claims.length > 0 && (
         <div className="px-4 mt-4 mb-6">
-          <h3 className="text-[12px] font-bold text-[#9e9eaa] uppercase tracking-wider mb-2">{t('home.recentActivity')}</h3>
-          <div className="bg-[#141420] rounded-2xl border border-[#262636] divide-y divide-[#262636]">
+          <h3 className="text-[12px] font-bold text-[#565959] uppercase tracking-wider mb-2">{t('home.recentActivity')}</h3>
+          <div className="bg-white rounded-2xl border border-[#e7e7e7] divide-y divide-[#262636]">
             {claims.slice(0, 6).map((c) => (
               <div key={c.id} className="px-4 py-2.5 flex items-center gap-3">
                 <span className="text-lg shrink-0">🧧</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-medium text-[#f8f7f4]">{tg({ name: c.gift_name }).name}</p>
-                  <p className="text-[11px] text-[#6e6e7a]">{(c.claimed_at || '').slice(0, 10)}</p>
+                  <p className="text-[12px] font-medium text-[#0F1111]">{tg({ name: c.gift_name }).name}</p>
+                  <p className="text-[11px] text-[#999]">{(c.claimed_at || '').slice(0, 10)}</p>
                 </div>
                 <span className="text-sm font-black text-[#00c758]">+${c.value}</span>
               </div>
