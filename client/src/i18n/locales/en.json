@@ -769,7 +769,8 @@
     "month": "Month",
     "total": "Total",
     "sports": "Sports",
-    "auto": "Auto"
+    "auto": "Auto",
+    "depositSuccess": "Deposited!"
   },
   "specs": {
     "产地": "Origin",

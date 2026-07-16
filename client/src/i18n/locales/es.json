@@ -757,7 +757,8 @@
     "home": "Hogar",
     "accessories": "Accesorios",
     "food": "Comida",
-    "toys": "Juguetes"
+    "toys": "Juguetes",
+    "depositSuccess": "¡Depositado!"
   },
   "specs": {
     "产地": "Origen",

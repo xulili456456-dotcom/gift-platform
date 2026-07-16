@@ -359,6 +359,14 @@ export default function StorePage() {
       else toast.error(d?.error || t('common.operationFailed'));
     }
   };
+  const [showDeposit, setShowDeposit] = useState(false);
+  const [depositAmount, setDepositAmount] = useState('');
+  const handleDeposit = async () => {
+    const amt = parseFloat(depositAmount);
+    if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
+    try { await client.post('/store/deposit', { amount: amt }); toast.success(t('store.depositSuccess') || 'Deposited!'); setShowDeposit(false); setDepositAmount(''); loadStatus(); loadEarnings(); }
+    catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
+  };
   const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
 
   if (loading) return <div className="min-h-screen bg-[#0d0d1a] flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#c8a06e] border-t-transparent rounded-full animate-spin" /></div>;
@@ -660,6 +668,7 @@ export default function StorePage() {
             <span className="text-[11px] text-[#9e9eaa]">{t('store.balance')}</span>
             <p className="text-[28px] font-bold text-[#f8f7f4] leading-tight">${s.balance.toFixed(2)}</p>
           </div>
+          <button onClick={() => setShowDeposit(true)} className="text-[11px] px-3 py-1.5 rounded-full bg-[#c8a06e] text-[#0d0d1a] font-medium">{t('store.deposit') || 'Deposit'}</button>
         </div>
         <div className="flex items-center gap-4 text-[11px]">
           <span className="text-[#00c758] font-bold">+${earnings.todayProfit.toFixed(2)} {t('store.today')}</span>
@@ -770,6 +779,22 @@ export default function StorePage() {
         </div>
       )}
       </>)}
+
+      {/* Deposit Modal */}
+      {showDeposit && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowDeposit(false)}>
+          <div className="bg-[#141420] rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in border border-[#262636]" onClick={e => e.stopPropagation()}>
+            <h3 className="text-base font-bold text-[#f8f7f4] mb-1">{t('store.deposit') || 'Add Funds'}</h3>
+            <p className="text-xs text-[#9e9eaa] mb-4">{t('store.depositDesc') || 'Add capital to trade bigger items'}</p>
+            <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="100" className="w-full px-3 py-2.5 bg-[#1E1E32] border border-[#262636] rounded-lg text-sm text-[#f8f7f4] mb-4 outline-none focus:border-[#c8a06e]" autoFocus />
+            <div className="text-[10px] text-[#6e6e7a] mb-3">Min $1 · Max $10,000</div>
+            <div className="flex gap-2">
+              <button onClick={() => setShowDeposit(false)} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#262636] text-[#f8f7f4]">{t('common.cancel') || 'Cancel'}</button>
+              <button onClick={handleDeposit} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#c8a06e] text-[#0d0d1a]">{t('store.confirmDeposit') || 'Confirm'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
