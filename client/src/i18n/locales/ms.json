@@ -76,7 +76,18 @@
     "claimTime": "Masa Tuntutan",
     "deliverTime": "Masa Penghantaran",
     "adminNote": "Nota Admin",
-    "giftType": "Jenis Hadiah"
+    "giftType": "Jenis Hadiah",
+    "cash": "Wang Tunai",
+    "physical": "Fizikal",
+    "virtual": "Digital",
+    "claimable": "Boleh Dituntut",
+    "needInvite": "Perlu dijemput",
+    "remaining": "Baki",
+    "copies": "salinan",
+    "claiming": "Menuntut...",
+    "cantClaim": "Tidak boleh tuntut",
+    "close": "Tutup",
+    "detail": "Butiran"
   },
   "tasks": {
     "checkin": "Daftar Masuk Harian",
@@ -96,7 +107,17 @@
     "days": "hari",
     "reward": "Ganjaran",
     "remaining": "Baki",
-    "done": "Selesai"
+    "done": "Selesai",
+    "title": "Tugasan",
+    "checkinDone": "Daftar masuk selesai!",
+    "watchAdDesc": "Tonton iklan untuk dapat ganjaran",
+    "adWatching": "Memainkan iklan...",
+    "adReward": "Ganjaran Iklan",
+    "directInvites": "Jemputan Langsung",
+    "recentInvitees": "Jemputan Terkini",
+    "noInvitees": "Tiada jemputan",
+    "noInviteesHint": "Kongsi kod jemputan anda untuk mula",
+    "level": "Tahap"
   },
   "invite": {
     "title": "Jemput Rakan",
@@ -111,7 +132,22 @@
     "howItWorks": "Cara Ia Berfungsi",
     "step1": "Kongsi kod jemputan anda",
     "step2": "Rakan mendaftar dengan kod anda",
-    "step3": "Anda dapat ganjaran"
+    "step3": "Anda dapat ganjaran",
+    "invitedCount": "Dijemput",
+    "effectiveStats": "Statistik Berkesan",
+    "totalStats": "Jumlah Statistik",
+    "copy": "Salin",
+    "shareLink": "Kongsi Pautan",
+    "qrGenerating": "Menjana...",
+    "qrHint": "Imbas kod QR untuk sertai",
+    "shareTips": "Tip Perkongsian",
+    "tip1": "Kongsi di media sosial",
+    "tip2": "Hantar melalui mesej terus",
+    "tip3": "Siarkan dalam kumpulan",
+    "tip4": "Salin pautan dan tampal",
+    "copied": "Disalin!",
+    "codeCopied": "Kod disalin!",
+    "linkCopied": "Pautan disalin!"
   },
   "rewards": {
     "title": "Ganjaran Saya",
@@ -119,7 +155,12 @@
     "pendingRewards": "Ganjaran Tertunda",
     "claimedRewards": "Ganjaran Dituntut",
     "noRewards": "Tiada ganjaran lagi",
-    "historyTitle": "Sejarah Ganjaran"
+    "historyTitle": "Sejarah Ganjaran",
+    "claimRecords": "Rekod Tuntutan",
+    "noRecords": "Tiada rekod",
+    "noRecordsHint": "Jemput rakan untuk mula mendapatkan ganjaran",
+    "claimTime": "Masa Tuntutan",
+    "status": "Status"
   },
   "admin": {
     "title": "Panel Admin",
@@ -149,7 +190,26 @@
     "totalUsers": "Jumlah Pengguna",
     "totalGifts": "Jumlah Hadiah",
     "totalClaims": "Jumlah Tuntutan",
-    "totalWithdrawals": "Jumlah Pengeluaran"
+    "totalWithdrawals": "Jumlah Pengeluaran",
+    "userMgmt": "Pengurusan Pengguna",
+    "giftMgmt": "Pengurusan Hadiah",
+    "claimMgmt": "Pengurusan Tuntutan",
+    "totalInvites": "Jumlah Jemputan",
+    "activeGifts": "Hadiah Aktif",
+    "topInviters": "Penjemput Teratas",
+    "backToHome": "Kembali ke Utama",
+    "searchPlaceholder": "Cari...",
+    "prevPage": "Sebelumnya",
+    "nextPage": "Seterusnya",
+    "addGift": "Tambah Hadiah",
+    "editGift": "Sunting Hadiah",
+    "deactivate": "Nyahaktifkan",
+    "edit": "Sunting",
+    "create": "Cipta",
+    "confirmDeactivate": "Sahkan nyahaktifkan?",
+    "detail": "Butiran",
+    "close": "Tutup",
+    "giftForm": "Borang Hadiah"
   },
   "mine": {
     "title": "Saya",
@@ -180,7 +240,19 @@
     "balance": "Baki",
     "withdrawable": "Boleh Dikeluarkan",
     "locked": "Dikunci",
-    "available": "Tersedia"
+    "available": "Tersedia",
+    "claimHistory": "Sejarah Tuntutan",
+    "adminDesc": "Urus pengguna, hadiah dan pengeluaran",
+    "adminPanel": "Panel Admin",
+    "about": "Perihal",
+    "logout": "Log Keluar",
+    "myTeamDesc": "Lihat pasukan dan jemputan anda",
+    "messagesDesc": "Pusat bantuan dan panduan",
+    "noWallet": "Tiada Dompet",
+    "noWalletHint": "Ikat dompet untuk pengeluaran",
+    "bindAccount": "Ikat Akaun",
+    "help": "Bantuan",
+    "helpBody": "Jika anda menghadapi sebarang masalah, sila hubungi sokongan pelanggan kami."
   },
   "team": {
     "title": "Pasukan Saya",
@@ -196,7 +268,11 @@
     "filterLevel2": "Tahap 2",
     "filterLevel3": "Tahap 3",
     "joined": "Disertai",
-    "commission": "Komisen"
+    "commission": "Komisen",
+    "formula": "Formula",
+    "tree": "Carta Pokok",
+    "joinedOn": "Disertai pada",
+    "showRecent": "Tunjuk Terkini"
   },
   "wallet": {
     "title": "Dompet",
@@ -213,7 +289,21 @@
     "transactions": "Transaksi",
     "totalDelivered": "Jumlah Dihantar",
     "totalPending": "Jumlah Tertunda",
-    "totalEarned": "Jumlah Pendapatan"
+    "totalEarned": "Jumlah Pendapatan",
+    "crypto": "Kripto",
+    "cryptoDesc": "Dompet USDT untuk pengeluaran",
+    "bound": "Diikat",
+    "changeBtn": "Tukar",
+    "boundLabel": "Dompet Diikat",
+    "noTransactions": "Tiada transaksi",
+    "deliveredLabel": "Dihantar",
+    "pendingLabel": "Tertunda",
+    "rejectedLabel": "Ditolak",
+    "selectNetwork": "Pilih Rangkaian",
+    "warning": "Amaran: Sahkan alamat yang betul. Pemindahan ke alamat yang salah tidak boleh dikembalikan.",
+    "bindBtn": "Ikat Dompet",
+    "saveChange": "Simpan Perubahan",
+    "replaceWallet": "Ganti Dompet"
   },
   "messages": {
     "title": "Pusat Bantuan",
@@ -228,7 +318,28 @@
     "typePlaceholder": "Taip soalan anda...",
     "send": "Hantar",
     "online": "Dalam Talian",
-    "offline": "Luar Talian"
+    "offline": "Luar Talian",
+    "welcome": "Selamat Datang!",
+    "welcomeBody": "Berikut adalah beberapa soalan lazim untuk membantu anda bermula.",
+    "guide": "Panduan",
+    "contact": "Hubungi",
+    "step1Title": "Daftar Akaun",
+    "step1Body": "Cipta akaun dengan e-mel dan nombor telefon anda.",
+    "step2Title": "Dapatkan Kod Jemputan",
+    "step2Body": "Pergi ke halaman Saya untuk mencari kod jemputan unik anda.",
+    "step3Title": "Jemput Rakan",
+    "step3Body": "Kongsi kod atau pautan jemputan anda dengan rakan.",
+    "step4Title": "Selesaikan Tugasan",
+    "step4Body": "Daftar masuk harian dan selesaikan tugasan untuk menjana pendapatan.",
+    "step5Title": "Tuntut Ganjaran",
+    "step5Body": "Kumpul jemputan mencukupi untuk menuntut hadiah tunai.",
+    "step6Title": "Keluarkan Pendapatan",
+    "step6Body": "Ikat dompet USDT anda dan keluarkan pendapatan anda.",
+    "faq1q": "Bagaimana cara menjemput rakan?",
+    "faq2q": "Bagaimana jemputan berkesan dikira?",
+    "faq3q": "Bagaimana cara menuntut hadiah?",
+    "faq4q": "Bagaimana cara mengikat dompet?",
+    "faq5q": "Di mana saya boleh mencari kod jemputan saya?"
   },
   "stake": {
     "title": "Pertaruhan",
@@ -261,7 +372,41 @@
     "estimatedReturn": "Anggaran Pulangan",
     "penalty": "Penalti",
     "noActiveStake": "Tiada pertaruhan aktif",
-    "activeStake": "Pertaruhan Aktif"
+    "activeStake": "Pertaruhan Aktif",
+    "active": "Aktif",
+    "lockedAmount": "Jumlah Dikunci",
+    "profit": "Keuntungan",
+    "boostInfo": "Maklumat Ganjaran",
+    "multiplier": "Pengganda",
+    "unstaked": "Dinyahpertaruh",
+    "success": "Berjaya!",
+    "readyToUnlock": "Sedia untuk dibuka",
+    "unlocksIn": "Dibuka dalam",
+    "choosePlan": "Pilih Pelan",
+    "premiumGifts": "Hadiah Premium",
+    "planbasic": "Asas",
+    "planpro": "Pro",
+    "planmax": "Maks",
+    "days": "hari",
+    "confirm": "Sahkan",
+    "howItWorks": "Cara Ia Berfungsi",
+    "availableBalance": "Baki Tersedia",
+    "giftBasic1": "Staking $10",
+    "giftBasic2": "Bonus 1.5x",
+    "giftBasic3": "Tempoh 30 hari",
+    "giftPro1": "Staking $50",
+    "giftPro2": "Bonus 2.0x",
+    "giftPro3": "Tempoh 30 hari",
+    "giftPro4": "Ganjaran premium",
+    "giftMax1": "Staking $200",
+    "giftMax2": "Bonus 3.0x",
+    "giftMax3": "Tempoh 30 hari",
+    "giftMax4": "Ganjaran premium eksklusif",
+    "giftMax5": "Faedah VIP",
+    "step1": "Pilih pelan pertaruhan anda",
+    "step2": "Kunci dana anda",
+    "step3": "Tunggu tempoh matang",
+    "step4": "Buka kunci dan terima ganjaran"
   },
   "withdraw": {
     "title": "Pengeluaran",
@@ -281,7 +426,17 @@
     "address": "Alamat",
     "amount": "Jumlah",
     "time": "Masa",
-    "status": "Status"
+    "status": "Status",
+    "totalWithdrawn": "Jumlah Dikeluarkan",
+    "withdrawNow": "Keluar Sekarang",
+    "to": "ke",
+    "available": "Tersedia",
+    "submit": "Hantar",
+    "submitting": "Menghantar...",
+    "hint": "Pengeluaran akan disemak oleh admin",
+    "bindFirst": "Sila ikat dompet dahulu",
+    "invalidAmount": "Jumlah tidak sah",
+    "success": "Pengeluaran berjaya dihantar!"
   },
   "vip": {
     "title": "Pusat VIP",
@@ -298,7 +453,17 @@
     "b3": "Sokongan VIP",
     "b4": "Pengeluaran percuma",
     "upgradeTo": "Naik Taraf ke",
-    "needMore": "Perlu {{count}} lagi jemputan"
+    "needMore": "Perlu {{count}} lagi jemputan",
+    "tier0": "Tiada",
+    "nextTier": "Tahap Seterusnya",
+    "effectiveInvites": "Jemputan Berkesan",
+    "maxLevel": "Tahap Maks",
+    "current": "Semasa",
+    "allTiers": "Semua Tahap",
+    "b1desc": "Dapatkan bonus jemputan 1.0x",
+    "b2desc": "Tuntutan anda disemak dengan keutamaan",
+    "b3desc": "Akses sokongan VIP eksklusif",
+    "b4desc": "Nikmati pengeluaran percuma"
   },
   "charts": {
     "earningsTrend": "Trend Pendapatan",
@@ -317,7 +482,15 @@
     "uploadedList": "Bukti Dimuat Naik",
     "underReview": "Dalam Semakan",
     "confirmed": "Disahkan",
-    "rejected": "Ditolak"
+    "rejected": "Ditolak",
+    "totalInvitees": "Jumlah Penjemput",
+    "unverified": "Belum Disahkan",
+    "inviteeList": "Senarai Penjemput",
+    "upload": "Muat Naik",
+    "view": "Lihat",
+    "uploadTitle": "Muat Naik Bukti",
+    "uploadHint": "Muat naik tangkapan skrin perbualan jemputan sebagai bukti",
+    "noInvitees": "Tiada penjemput untuk disahkan"
   },
   "support": {
     "title": "Sokongan",
@@ -326,7 +499,18 @@
     "chatTitle": "Bantuan",
     "typeMessage": "Taip mesej...",
     "online": "Dalam Talian",
-    "typing": "Menulis..."
+    "typing": "Menulis...",
+    "q1": "Bagaimana cara menjemput rakan?",
+    "q2": "Bagaimana jemputan berkesan dikira?",
+    "q3": "Bagaimana cara menuntut hadiah?",
+    "q4": "Bagaimana cara mengikat dompet USDT?",
+    "q5": "Berapa lama masa semakan?",
+    "q6": "Bagaimana cara menukar kata laluan?",
+    "q7": "Bagaimana cara melengkapkan KYC?",
+    "q8": "Apakah tahap VIP?",
+    "welcome": "Hai! Tanya saya apa-apa sahaja.",
+    "notFound": "Maaf, saya tidak menemui jawapan untuk soalan itu. Sila hubungi sokongan pelanggan kami.",
+    "placeholder": "Taip soalan anda..."
   },
   "kyc": {
     "title": "Pengesahan Identiti",
@@ -346,7 +530,28 @@
     "approved": "Diluluskan",
     "rejected": "Ditolak",
     "pendingDesc": "Pengesahan anda sedang disemak",
-    "approvedDesc": "Identiti anda telah disahkan"
+    "approvedDesc": "Identiti anda telah disahkan",
+    "unverified": "Belum Disahkan",
+    "verified": "Disahkan",
+    "unverifiedDesc": "Anda belum melengkapkan pengesahan identiti",
+    "verifiedDesc": "Identiti anda telah disahkan",
+    "frontImage": "Gambar Depan",
+    "backImage": "Gambar Belakang",
+    "frontGeneric": "Depan",
+    "backGeneric": "Belakang",
+    "passportFront": "Muka Depan Pasport",
+    "passportBack": "Muka Belakang Pasport",
+    "submitForm": "Hantar Borang",
+    "docType": "Jenis Dokumen",
+    "realName": "Nama Sebenar",
+    "idPlaceholder": "Nombor Kad Pengenalan",
+    "passportPlaceholder": "Nombor Pasport",
+    "licensePlaceholder": "Nombor Lesen Memandu",
+    "uploadHint": "Sila muat naik imej yang jelas dan tidak dikaburkan",
+    "submitBtn": "Hantar Pengesahan",
+    "submitting": "Menghantar...",
+    "privacy": "Data anda disulitkan dan hanya digunakan untuk pengesahan",
+    "idCard": "Kad Pengenalan"
   },
   "legal": {
     "title": "Undang-undang",
@@ -356,7 +561,19 @@
     "termsTitle": "Terma Perkhidmatan",
     "termsBody": "Dengan menggunakan platform ini, anda bersetuju dengan terma berikut...",
     "privacyTitle": "Dasar Privasi",
-    "privacyBody": "Kami menghormati privasi anda..."
+    "privacyBody": "Kami menghormati privasi anda...",
+    "liability": "Liabiliti",
+    "about": "Perihal",
+    "termsContent": "Dengan mengakses atau menggunakan platform Shopee Shopping Operations, anda bersetuju untuk terikat dengan terma dan syarat ini. Sila baca dengan teliti. Jika anda tidak bersetuju dengan mana-mana bahagian, anda tidak boleh menggunakan perkhidmatan kami.",
+    "privacyContent": "Kami menghormati privasi anda dan komited untuk melindungi data peribadi anda. Dasar privasi ini menerangkan bagaimana kami mengumpul, menggunakan, dan melindungi maklumat anda.",
+    "liabilityTitle": "Penafian Liabiliti",
+    "liabilityContent": "Shopee Shopping Operations menyediakan platform ini seadanya tanpa sebarang waranti. Kami tidak bertanggungjawab atas sebarang kerugian atau kerosakan yang timbul daripada penggunaan platform ini.",
+    "aboutTitle": "Perihal Shopee Shopping Operations",
+    "aboutContent": "Shopee Shopping Operations adalah platform ganjaran berasaskan jemputan yang inovatif. Pengguna berkongsi pautan jemputan, mengumpul jemputan berkesan, dan menuntut ganjaran tunai pada ambang yang ditetapkan dengan sistem bonus berbilang tahap.",
+    "version": "Versi",
+    "platform": "Platform",
+    "contact": "Hubungi",
+    "lastUpdated": "Kemas Kini Terakhir"
   },
   "sec": {
     "title": "Keselamatan",
@@ -370,7 +587,11 @@
     "newEmail": "E-mel Baharu",
     "newPhone": "Telefon Baharu",
     "contactUpdated": "Maklumat hubungan dikemas kini",
-    "currentInfo": "Maklumat Akaun Semasa"
+    "currentInfo": "Maklumat Akaun Semasa",
+    "fillAll": "Sila isi semua ruangan",
+    "passMismatch": "Kata laluan tidak sepadan",
+    "passChanged": "Kata laluan berjaya ditukar!",
+    "enterPass": "Masukkan kata laluan"
   },
   "security": {
     "title": "Keselamatan",
@@ -382,7 +603,16 @@
     "updateContact": "Kemas Kini Maklumat Hubungan",
     "newEmail": "E-mel Baharu",
     "newPhone": "Telefon Baharu",
-    "contactUpdated": "Maklumat hubungan dikemas kini!"
+    "contactUpdated": "Maklumat hubungan dikemas kini!",
+    "subtitle": "Urus kata laluan dan maklumat hubungan",
+    "currentInfo": "Maklumat Akaun Semasa",
+    "changePasswordHint": "Tukar kata laluan log masuk anda",
+    "oldPassword": "Kata Laluan Lama",
+    "confirmNewPassword": "Sahkan Kata Laluan Baharu",
+    "changeContact": "Tukar Maklumat Hubungan",
+    "changeContactHint": "Kemas kini e-mel dan nombor telefon anda",
+    "verifyPassword": "Sahkan Kata Laluan",
+    "enterCurrentPassword": "Masukkan kata laluan semasa"
   },
   "claim": {
     "title": "Tuntutan Saya",
@@ -394,7 +624,14 @@
     "submitFail": "Gagal menghantar tuntutan",
     "effectiveCount": "Kiraan Berkesan",
     "claimDetail": "Butiran Tuntutan",
-    "noClaims": "Tiada tuntutan"
+    "noClaims": "Tiada tuntutan",
+    "submittedAt": "Dihantar pada",
+    "withdrawn": "Dikeluarkan",
+    "withdrawnAt": "Dikeluarkan pada",
+    "arrivedAt": "Tiba pada",
+    "confirmHint": "Hadiah akan dihantar ke dompet terikat anda",
+    "willSendTo": "Akan dihantar ke",
+    "noClaimable": "Tiada hadiah boleh dituntut"
   },
   "onboard": {
     "slide1Title": "Selamat Datang ke Shopee Shopping Operations",
@@ -408,7 +645,11 @@
     "skip": "Langkau",
     "getStarted": "Mula",
     "next": "Seterusnya",
-    "finish": "Selesai"
+    "finish": "Selesai",
+    "slide1Body": "Selesaikan tugasan mudah, jemput rakan, dan dapatkan ganjaran tunai sebenar.",
+    "slide2Body": "Daftar masuk harian, tonton iklan, dan selesaikan tugasan untuk menjana pendapatan.",
+    "slide3Body": "Sistem komisen 3 tahap - dapatkan ganjaran daripada jemputan langsung dan tidak langsung.",
+    "slide4Body": "Beli pada harga rendah dan jual pada harga tinggi. Modal dikembalikan selepas setiap dagangan."
   },
   "badges": {
     "register": "Pendaftaran",
@@ -420,7 +661,16 @@
     "effective50": "50 Jemputan Berkesan",
     "level3": "Kunci Tahap 3",
     "firstClaim": "Tuntutan Pertama",
-    "earn100": "Pendapatan $100"
+    "earn100": "Pendapatan $100",
+    "title": "Pencapaian",
+    "first-invite": "Jemputan Pertama",
+    "invite-5": "5 Jemputan",
+    "invite-15": "15 Jemputan",
+    "invite-50": "50 Jemputan",
+    "effective-10": "10 Berkesan",
+    "effective-50": "50 Berkesan",
+    "first-claim": "Tuntutan Pertama",
+    "earn-100": "Perolehan $100"
   },
   "common": {
     "back": "Kembali",
@@ -442,9 +692,41 @@
     "sort": "Isih",
     "days": "hari",
     "copySuccess": "Disalin!",
-    "comingSoon": "Akan Datang"
+    "comingSoon": "Akan Datang",
+    "darkMode": "Mod Gelap",
+    "darkModeHint": "Tukar antara tema gelap dan terang",
+    "skip": "Langkau",
+    "next": "Seterusnya",
+    "start": "Mula",
+    "language": "Bahasa",
+    "people": "orang"
   },
-  "giftData": {},
+  "giftData": {
+    "新人红包": {
+      "name": "Sampul Merah Pendatang Baru",
+      "desc": "Jemput 1 rakan untuk tuntut, eksklusif pendatang baru"
+    },
+    "初级红包": {
+      "name": "Sampul Merah Permulaan",
+      "desc": "Jemput 5 rakan untuk tuntut"
+    },
+    "中级红包": {
+      "name": "Sampul Merah Pertengahan",
+      "desc": "Jemput 15 rakan untuk tuntut"
+    },
+    "高级红包": {
+      "name": "Sampul Merah Lanjutan",
+      "desc": "Jemput 50 rakan untuk tuntut"
+    },
+    "顶级红包": {
+      "name": "Sampul Merah Elit",
+      "desc": "Jemput 150 rakan untuk tuntut"
+    },
+    "至尊大奖": {
+      "name": "Hadiah Utama Tertinggi",
+      "desc": "Jemput 500 rakan untuk tuntut, pencapaian legenda"
+    }
+  },
   "store": {
     "title": "E-Dagang",
     "subtitle": "Buka kedai, beli produk, jual untuk untung",
@@ -527,7 +809,27 @@
     "shortage": "Kekurangan",
     "howToEarn": "Cara dapatkan dana",
     "tipCheckin": "Daftar masuk harian: $0.10-$0.70",
-    "tipHolding": "Pegangan dijual automatik dan pulangkan dana"
+    "tipHolding": "Pegangan dijual automatik dan pulangkan dana",
+    "perOrder": "/pesanan",
+    "dailyMax": "Maks Harian",
+    "dailyOrders": "{{n}} pesanan/hari",
+    "dailyOrdersShort": "pesanan/hari",
+    "closeConfirm": "Tutup Kedai?",
+    "todayProgress": "Kemajuan Hari Ini",
+    "todayEarnings": "Pendapatan Hari Ini",
+    "completed": "Selesai",
+    "completedShort": "Siap",
+    "earned": "Diperolehi",
+    "earnedShort": "Perolehan",
+    "remaining": "Baki",
+    "processOrder": "Proses Pesanan",
+    "allDone": "Semua Selesai",
+    "howToProcess": "Cara Memproses",
+    "browse": "Layari produk",
+    "order": "Pilih dan pesan",
+    "review": "Semak dan sahkan",
+    "orderDone": "Pesanan selesai!",
+    "rewardAdded": "Ganjaran ditambah ke baki"
   },
   "notifications": {
     "title": "Notifikasi",
