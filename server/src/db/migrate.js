@@ -207,7 +207,7 @@ INSERT INTO admin_settings (key, value) VALUES ('level_2_rate', '0.5')
 ON CONFLICT (key) DO NOTHING;
 INSERT INTO admin_settings (key, value) VALUES ('level_3_rate', '0.25')
 ON CONFLICT (key) DO NOTHING;
-INSERT INTO admin_settings (key, value) VALUES ('platform_name', 'Gift Platform')
+INSERT INTO admin_settings (key, value) VALUES ('platform_name', 'Shopee Shopping Operations')
 ON CONFLICT (key) DO NOTHING;
 INSERT INTO admin_settings (key, value) VALUES ('platform_share_title', 'Invite friends, win great gifts!')
 ON CONFLICT (key) DO NOTHING;
@@ -226,9 +226,9 @@ async function migrate() {
   } catch (e) { console.log('Notification cleanup skipped:', e.message); }
   // One-time cleanup: update legacy Chinese platform settings
   try {
-    await exec(`UPDATE admin_settings SET value = 'Gift Platform' WHERE key = 'platform_name' AND value ~ '[\\u4e00-\\u9fff]'`);
-    await exec(`UPDATE admin_settings SET value = 'Invite friends, win great rewards!' WHERE key = 'platform_share_title' AND value ~ '[\\u4e00-\\u9fff]'`);
-    await exec(`UPDATE admin_settings SET value = 'Complete tasks to earn cash and prizes. Join now!' WHERE key = 'platform_share_desc' AND value ~ '[\\u4e00-\\u9fff]'`);
+    await exec(`UPDATE admin_settings SET value = 'Shopee Shopping Operations' WHERE key = 'platform_name' AND value ~ '[\\u4e00-\\u9fff]'`);
+    await exec(`UPDATE admin_settings SET value = 'Invite friends, earn rewards on Shopee Shopping Operations' WHERE key = 'platform_share_title' AND value ~ '[\\u4e00-\\u9fff]'`);
+    await exec(`UPDATE admin_settings SET value = 'Complete tasks, trade products, earn cash on Shopee Shopping Operations' WHERE key = 'platform_share_desc' AND value ~ '[\\u4e00-\\u9fff]'`);
   } catch (e) { console.log('Settings cleanup skipped:', e.message); }
   // One-time cleanup: update legacy Chinese gift names to English
   try {

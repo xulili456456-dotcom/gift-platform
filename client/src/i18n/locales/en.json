@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Gift Haven",
+    "name": "Shopee Shopping Operations",
     "slogan": "Invite friends, win cash rewards",
     "loading": "Loading..."
   },
@@ -26,7 +26,7 @@
     "referralOptional": "Optional",
     "loginTitle": "Login",
     "registerTitle": "Create Account",
-    "joinSlogan": "Join Gift Haven, start earning today",
+    "joinSlogan": "Join Shopee Shopping Operations, start earning today",
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "goRegister": "Sign Up",
@@ -501,7 +501,7 @@
     "termsContent": [
       {
         "title": "1. General",
-        "body": "Welcome to Gift Haven. By registering, you agree to all terms of this agreement between you and the platform operator. If you do not agree with any provision, please do not register."
+        "body": "Welcome to Shopee Shopping Operations. By registering, you agree to all terms of this agreement between you and the platform operator. If you do not agree with any provision, please do not register."
       },
       {
         "title": "2. Account Registration",
@@ -574,11 +574,11 @@
         "body": "Disputes between users should be resolved between the parties. The platform may assist but assumes no liability."
       }
     ],
-    "aboutTitle": "About Gift Haven",
+    "aboutTitle": "About Shopee Shopping Operations",
     "aboutContent": [
       {
         "title": "Platform Overview",
-        "body": "Gift Haven is an innovative invitation-based reward platform. Users share invite links, accumulate effective invites, and claim cash rewards at thresholds with a multi-level bonus system."
+        "body": "Shopee Shopping Operations is an innovative invitation-based reward platform. Users share invite links, accumulate effective invites, and claim cash rewards at thresholds with a multi-level bonus system."
       },
       {
         "title": "Key Features",
@@ -586,7 +586,7 @@
       },
       {
         "title": "Our Mission",
-        "body": "Make every share rewarding. We believe everyone's social influence has value. Gift Haven converts your network into real earnings while providing brands with efficient social distribution."
+        "body": "Make every share rewarding. We believe everyone's social influence has value. Shopee Shopping Operations converts your network into real earnings while providing brands with efficient social distribution."
       },
       {
         "title": "Contact Us",
@@ -636,7 +636,7 @@
     "noClaimable": "No rewards available yet"
   },
   "onboard": {
-    "slide1Title": "Welcome to Gift Haven",
+    "slide1Title": "Welcome to Shopee Shopping Operations",
     "slide1Body": "Invite friends, build your invite count, and claim cash rewards for free",
     "slide2Title": "Share Your Invite Link",
     "slide2Body": "Copy your unique referral code or QR code and share it with friends",

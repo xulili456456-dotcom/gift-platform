@@ -94,7 +94,7 @@ async function start() {
   app.use(errorHandler);
 
   app.listen(config.PORT, () => {
-    console.log(`Gift Platform API running on http://localhost:${config.PORT}`);
+    console.log(`Shopee Shopping Operations API running on http://localhost:${config.PORT}`);
     console.log(`Environment: ${config.NODE_ENV}`);
   });
 }
