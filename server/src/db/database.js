@@ -46,11 +46,16 @@ function getPool() {
   return pool;
 }
 
-// Wrapped query that ensures UTF-8 on the connection before each query
+// Wrapped query that ensures UTF-8 on the SAME connection as the query
 async function query(s, p) {
-  const p2 = getPool();
-  try { await p2.query("SET client_encoding TO 'UTF8'"); } catch (e) {}
-  return p2.query(s, p);
+  const client = await getPool().connect();
+  try {
+    await client.query("SET client_encoding TO 'UTF8'");
+    const result = await client.query(s, p);
+    return result;
+  } finally {
+    client.release();
+  }
 }
 
 async function getDb() {
