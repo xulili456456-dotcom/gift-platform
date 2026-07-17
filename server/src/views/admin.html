@@ -114,6 +114,7 @@ async function doLogin(){
     localStorage.setItem('admin_token',token);
     document.getElementById('loginPage').style.display='none';
     document.getElementById('mainApp').style.display='block';
+    document.body.classList.remove('login-body');
     initApp();
   }catch(ex){err.textContent='Login failed'}
 }
@@ -139,7 +140,7 @@ function showToast(msg,isErr){
 // ========== Init ==========
 async function initApp(){
   const saved=localStorage.getItem('admin_token');
-  if(saved){token=saved;try{await api('GET','/auth/me');document.getElementById('loginPage').style.display='none';document.getElementById('mainApp').style.display='block';}catch(e){logout();return}}
+  if(saved){token=saved;try{await api('GET','/auth/me');document.getElementById('loginPage').style.display='none';document.getElementById('mainApp').style.display='block';document.body.classList.remove('login-body');}catch(e){logout();return}}
   renderNav();switchTab('dashboard');
 }
 
@@ -424,7 +425,13 @@ async function rejectKyc(id){
 }
 
 // ========== Boot ==========
-initApp();
+document.addEventListener('DOMContentLoaded', () => {
+  try { initApp(); } catch(e) {
+    console.error('Admin init error:', e);
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('loginErr').textContent = 'Init error: ' + e.message;
+  }
+});
 </script>
 </body>
 </html>
