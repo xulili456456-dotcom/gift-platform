@@ -659,6 +659,16 @@ export default function StorePage() {
         </div>
       )}
 
+      {tab === 'dashboard' && !analytics && (
+        <div className="flex-1 overflow-y-auto bg-[#eaeded] flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-[#999999] text-sm mb-3">Failed to load analytics</p>
+            <button onClick={() => client.get('/store/analytics').then(({data}) => setAnalytics(data)).catch(()=>{})}
+              className="text-[#FF9900] text-sm font-bold">Retry</button>
+          </div>
+        </div>
+      )}
+
       {/* Orders Tab */}
       {tab === 'orders' && (
         <div className="flex-1 overflow-y-auto bg-[#eaeded]">

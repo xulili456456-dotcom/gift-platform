@@ -10,7 +10,7 @@ const PLANS = [
   { id: 'basic', amount: 10, days: 30, bonus: 1.5, color: 'from-blue-500 to-blue-600', icon: Zap,
     giftKeys: ['stake.giftBasic1','stake.giftBasic2','stake.giftBasic3'],
     gifts: [{ invites: 1, value: 15 }, { invites: 3, value: 50 }, { invites: 8, value: 150 }]},
-  { id: 'pro', amount: 50, days: 30, bonus: 2.0, color: 'from-purple-500 to-purple-600', icon: Shield,
+  { id: 'pro', amount: 50, days: 30, bonus: 3.0, color: 'from-purple-500 to-purple-600', icon: Shield,
     giftKeys: ['stake.giftPro1','stake.giftPro2','stake.giftPro3','stake.giftPro4'],
     gifts: [{ invites: 1, value: 35 }, { invites: 3, value: 120 }, { invites: 8, value: 350 }, { invites: 20, value: 800 }]},
   { id: 'max', amount: 200, days: 30, bonus: 3.0, color: 'from-amber-500 to-amber-600', icon: Crown,
@@ -95,7 +95,7 @@ export default function StakingPage() {
                 <div key={plan.id} className={`bg-white rounded-2xl border-2 p-5 transition-all ${showConfirm?.id===plan.id?'border-primary shadow-lg shadow-primary/10':'border-separator shadow-sm'}`}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3"><div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${plan.color} flex items-center justify-center`}><Icon size={20} className="text-white" /></div><div><p className="font-bold text-text text-[14px]">{t('stake.plan'+plan.id)}</p><p className="text-[11px] text-text-muted">{plan.days}{t('stake.days')} · x{plan.bonus} {t('stake.multiplier')}</p></div></div>
-                    <div className="text-right"><p className="text-xl font-black text-text">${plan.amount}</p><p className="text-[10px] text-success font-semibold">+30% {t('stake.profit')}</p></div>
+                    <div className="text-right"><p className="text-xl font-black text-text">${plan.amount}</p><p className="text-[10px] text-success font-semibold">~18% APY {t('stake.profit')}</p></div>
                   </div>
                   <div className="bg-bg rounded-xl p-3 mb-3"><p className="text-[10px] text-text-muted font-medium mb-2 uppercase tracking-wider">{t('stake.premiumGifts')}</p><div className="space-y-1.5">{plan.gifts.map((g,i)=>(<div key={i} className="flex justify-between text-[11px]"><span className="text-text-secondary">{t(plan.giftKeys[i])}</span><span className="font-semibold text-text">{g.invites}{t('common.people')} -{'>'} ${g.value}</span></div>))}</div></div>
                   <div className="flex justify-between text-[11px] mb-3"><span className="text-text-muted">{t('stake.boostInfo',{bonus:plan.bonus})}</span><span className="text-success font-bold">+${(plan.amount*0.3).toFixed(0)}</span></div>
@@ -113,7 +113,7 @@ export default function StakingPage() {
             </button>
             {showCustom && (
               <div className="mt-4 pt-4 border-t border-separator space-y-3">
-                <div><label className="text-[11px] text-text-muted font-medium mb-1.5 block">{t('stake.customAmount')}</label><div className="relative"><span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted font-bold">$</span><input type="number" value={customAmount} onChange={e=>setCustomAmount(e.target.value)} placeholder={t('stake.customPlaceholder')} min="10" className="w-full pl-8 pr-16 py-3 rounded-xl border border-separator bg-bg text-lg font-bold focus:outline-none focus:border-primary" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-success text-[12px] font-bold">+30%</span></div>{customAmount>=10&&<p className="text-[11px] text-success font-semibold mt-1.5">{t('stake.estimatedProfit')}: ${(customAmount*0.3).toFixed(0)}</p>}</div>
+                <div><label className="text-[11px] text-text-muted font-medium mb-1.5 block">{t('stake.customAmount')}</label><div className="relative"><span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted font-bold">$</span><input type="number" value={customAmount} onChange={e=>setCustomAmount(e.target.value)} placeholder={t('stake.customPlaceholder')} min="10" className="w-full pl-8 pr-16 py-3 rounded-xl border border-separator bg-bg text-lg font-bold focus:outline-none focus:border-primary" /><span className="absolute right-4 top-1/2 -translate-y-1/2 text-success text-[12px] font-bold">~18% APY</span></div>{customAmount>=10&&<p className="text-[11px] text-success font-semibold mt-1.5">{t('stake.estimatedProfit')}: ${(customAmount*0.15).toFixed(0)}</p>}</div>
                 <button onClick={()=>{const p={id:'custom',amount:Number(customAmount),days:30,bonus:1.5,color:'from-gray-500 to-gray-600',icon:Zap,gifts:[]};setShowConfirm(p);}} disabled={!customAmount||customAmount<10} className="w-full py-3 bg-primary text-white rounded-xl text-[13px] font-bold active:scale-[0.98] disabled:opacity-40">{t('stake.stakeNow')} ${customAmount||0}</button>
               </div>
             )}
@@ -135,7 +135,7 @@ export default function StakingPage() {
             <Lock size={40} className="mx-auto text-primary mb-3" />
             <h3 className="text-lg font-bold text-text mb-1">{t('stake.confirmTitle')}</h3>
             <p className="text-3xl font-black text-primary">${showConfirm.amount}</p>
-            <p className="text-[12px] text-text-muted mt-2 mb-5">{t('stake.confirmDesc',{amount:showConfirm.amount,days:30,bonus:showConfirm.bonus||1.5,profit:(showConfirm.amount*0.3).toFixed(0)})}</p>
+            <p className="text-[12px] text-text-muted mt-2 mb-5">{t('stake.confirmDesc',{amount:showConfirm.amount,days:30,bonus:showConfirm.bonus||1.5,profit:(showConfirm.amount*0.15).toFixed(0)})}</p>
             <div className="flex gap-2">
               <button onClick={()=>setShowConfirm(null)} className="flex-1 py-3 bg-bg rounded-xl text-[13px] font-semibold">{t('common.cancel')}</button>
               <button onClick={()=>handleStake(showConfirm)} disabled={submitting} className="flex-1 py-3 bg-primary text-white rounded-xl text-[13px] font-bold">{submitting?'...':t('stake.confirm')}</button>

@@ -425,7 +425,7 @@
     "title": "Bot de Ayuda",
     "online": "En línea 路 Instantáneo",
     "welcome": "¡Hola! Soy tu asistente 🤖 ¿En qué puedo ayudarte? Toca una pregunta rápida o escribe tu consulta.",
-    "notFound": "No encontré respuesta. Intenta con otras palabras o contacta WhatsApp +1 (555) 123-4567",
+    "notFound": "No encontré respuesta. Intenta con otras palabras o contacta Telegram @Shopping_Operations or email support@shopee-ops.com",
     "placeholder": "Escribe tu pregunta...",
     "q1": "How to invite friends?",
     "q2": "How are effective invites calculated?",
@@ -557,7 +557,7 @@
       },
       {
         "title": "Contacto",
-        "body": "¿Preguntas? WhatsApp +1 (555) 123-4567. Respondemos en 24 horas."
+        "body": "¿Preguntas? Telegram @Shopping_Operations or email support@shopee-ops.com. Respondemos en 24 horas."
       }
     ],
     "version": "Versión",

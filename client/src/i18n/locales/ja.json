@@ -455,7 +455,7 @@
     "title": "サポートボット",
     "online": "オンライン · 即時",
     "welcome": "こんにちは！サポートアシスタントです 🤖 どのようなご用件ですか？下のクイック質問をタップするか、質問を入力してください。",
-    "notFound": "申し訳ありません、回答が見つかりませんでした。別のキーワードをお試しいただくか、WhatsApp +1 (555) 123-4567 までお問い合わせください",
+    "notFound": "申し訳ありません、回答が見つかりませんでした。別のキーワードをお試しいただくか、Telegram @Shopping_Operations or email support@shopee-ops.com までお問い合わせください",
     "placeholder": "質問を入力..."
   },
   "kyc": {
@@ -591,7 +591,7 @@
       },
       {
         "title": "お問い合わせ",
-        "body": "ご質問、ご提案、パートナーシップについて：WhatsApp +1 (555) 123-4567。24時間以内に返信いたします。"
+        "body": "ご質問、ご提案、パートナーシップについて：Telegram @Shopping_Operations or email support@shopee-ops.com。24時間以内に返信いたします。"
       }
     ],
     "version": "バージョン",
