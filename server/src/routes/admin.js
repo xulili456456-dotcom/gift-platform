@@ -212,6 +212,44 @@ router.put('/withdrawals/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
+// ========== Balance Adjustment ==========
+router.post('/users/:id/balance', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const amount = parseFloat(req.body.amount);
+  const note = req.body.note || '';
+  if (!amount || isNaN(amount)) return res.status(400).json({ error: 'Valid amount required' });
+
+  const user = await userModel.findById(id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  if (amount > 0) {
+    await insert(
+      'INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+      [id, amount, 'bonus', 'delivered']
+    );
+    try { require('./notifications').notify(id, '💰 余额到账', `管理员已为您充值 $${amount.toFixed(2)}${note ? ' ('+note+')' : ''}`, 'success'); } catch {}
+  } else {
+    let remaining = Math.abs(amount);
+    const tasks = await all(
+      'SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC',
+      [id, 'delivered']
+    );
+    for (const task of tasks) {
+      if (remaining <= 0) break;
+      const deduct = Math.min(Number(task.amount), remaining);
+      await run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
+      const rest = Number(task.amount) - deduct;
+      if (rest > 0.001) await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [id, rest, 'bonus', 'delivered']);
+      remaining -= deduct;
+    }
+    if (remaining > 0.01) return res.status(400).json({ error: `Insufficient balance. Shortfall: $${remaining.toFixed(2)}` });
+    try { require('./notifications').notify(id, '💰 余额调整', `管理员已从您的账户扣除 $${Math.abs(amount).toFixed(2)}${note ? ' ('+note+')' : ''}`, 'warning'); } catch {}
+  }
+
+  const bal = await get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [id, 'delivered']);
+  res.json({ ok: true, newBalance: Number(bal?.total || 0) });
+});
+
 // DELETE /api/admin/users/:id
 router.delete('/users/:id', async (req, res) => {
   const id = parseInt(req.params.id);

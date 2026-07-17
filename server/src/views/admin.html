@@ -247,6 +247,12 @@ async function showUserDetail(id){
             <button class="btn btn-sm ${u.frozen?'btn-green':'btn-red'}" onclick="toggleFreeze(${u.id},${u.frozen})">${u.frozen?'✅ 解冻':'❄️ 冻结'}</button>
             <button class="btn btn-sm btn-red" onclick="deleteUser(${u.id})">🗑️ 删除</button>
             <button class="btn btn-sm btn-gray" onclick="switchTab('users')">← 返回</button>
+            <hr style="margin:12px 0;border-color:#eee">
+            <div style="display:flex;gap:8px;align-items:center">
+              <input id="balAmount" type="number" placeholder="金额(正=上分,负=下分)" style="flex:1">
+              <input id="balNote" type="text" placeholder="备注" style="width:100px">
+              <button class="btn btn-sm btn-blue" onclick="adjustBalance(${u.id})">确认</button>
+            </div>
           </div>
         </div>
       </div>
@@ -274,6 +280,17 @@ function toggleFreeze(id,current){
 function deleteUser(id){
   if(!confirm('确定删除此用户？此操作不可恢复！'))return;
   api('DELETE','/admin/users/'+id).then(()=>{showToast('用户已删除');switchTab('users')}).catch(e=>showToast(e.message,1));
+}
+function adjustBalance(id){
+  var amt=parseFloat(document.getElementById('balAmount').value);
+  if(!amt||isNaN(amt)){showToast('请输入有效金额（正数上分，负数下分）',1);return;}
+  var note=document.getElementById('balNote').value||'';
+  var action=amt>0?'上分 $'+amt:'下分 $'+Math.abs(amt);
+  if(!confirm('确认'+action+'？'+(note?' 备注: '+note:'')))return;
+  api('POST','/admin/users/'+id+'/balance',{amount:amt,note:note}).then(d=>{
+    showToast(action+' 成功，新余额: $'+d.newBalance.toFixed(2));
+    showUserDetail(id);
+  }).catch(e=>showToast(e.message,1));
 }
 
 let ordersPage=1,ordersStatus='',ordersUser='';
