@@ -342,14 +342,14 @@ export default function StorePage() {
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
     let list = genProducts(status.store.tier, CAT_VALUES[catIdx], search);
-    if (sortMode === 'free') list = list.filter(p => p.costPrice <= 50);
+    if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => !fp.claimed && fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0)));
     else if (affordableOnly) list = list.filter(p => p.costPrice <= (status.store.balance || 0));
     if (sortMode === 'profit') list.sort((a, b) => b.profit - a.profit);
     else if (sortMode === 'price') list.sort((a, b) => b.price - a.price);
     else if (sortMode === 'free') list.sort((a, b) => a.price - b.price);
     else list.sort((a, b) => b.sold - a.sold);
     return list;
-  }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, catIdx, search, sortMode, affordableOnly, status?.store?.balance]);
+  }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, catIdx, search, sortMode, affordableOnly, status?.store?.balance, freeProducts]);
 
   const [tradeMode, setTradeMode] = useState('holding'); // 'holding' | 'share'
   const [shareProduct, setShareProduct] = useState(null);
