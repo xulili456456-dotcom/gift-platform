@@ -383,7 +383,10 @@ export default function StorePage() {
   };
   const handleWithdrawDeposit = async () => {
     try { const { data } = await client.post('/store/withdraw-deposit', {}); toast.success(`$${data.returned} returned to balance`); loadStatus(); loadEarnings(); }
-    catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
+    catch (err) {
+      const d = err.response?.data;
+      toast.error(d?.detail ? `${d.error}\n\n${d.detail}` : (d?.error || 'Withdraw failed'), { duration: 8000 });
+    }
   };
   const handleBuy = async (product) => {
     try {

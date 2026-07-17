@@ -525,7 +525,14 @@ router.post('/withdraw-deposit', authMiddleware, async (req, res) => {
   const maxHolding = await get("SELECT COALESCE(MAX(amount), 0) as max_cost FROM store_orders WHERE store_id = ? AND status = 'holding'", [store.id]);
   const newDeposit = currentDeposit - withdrawAmt;
   if (Number(maxHolding?.max_cost || 0) > newDeposit) {
-    return res.status(400).json({ error: `Cannot withdraw: you have active holdings up to $${Number(maxHolding.max_cost).toFixed(2)}. Clear them first.` });
+    return res.status(400).json({
+      error: `Cannot withdraw: your largest active order costs $${Number(maxHolding.max_cost).toFixed(2)}`,
+      detail: `Withdrawing would leave $${newDeposit.toFixed(2)} deposit, but you need at least $${Number(maxHolding.max_cost).toFixed(2)} to cover your active order. Wait for it to sell (6-30 hours), then try again.`,
+      maxHoldingCost: Number(maxHolding.max_cost),
+      currentDeposit,
+      newDeposit,
+      withdrawAmt,
+    });
   }
 
   const result = await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, withdrawAmt, 'bonus', 'delivered']);
