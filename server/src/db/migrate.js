@@ -329,16 +329,21 @@ async function migrate() {
   } catch (e) { console.log('Gifts cleanup skipped:', e.message); }
   // Convert existing referral codes to numeric (100001, 100002...)
   try {
-    const nonNumeric = await all("SELECT id FROM users WHERE referral_code !~ '^[0-9]+$' ORDER BY id");
+    const nonNumeric = await all("SELECT id FROM users WHERE NOT (referral_code ~ '^[0-9]+$') ORDER BY id");
     if (nonNumeric.length > 0) {
       console.log('Converting '+nonNumeric.length+' referral codes to numeric...');
+      let maxCode = 100000;
       for (let i = 0; i < nonNumeric.length; i++) {
-        await run('UPDATE users SET referral_code = ? WHERE id = ?', [String(100001 + i), nonNumeric[i].id]);
+        const newCode = String(100001 + i);
+        await run('UPDATE users SET referral_code = ? WHERE id = ?', [newCode, nonNumeric[i].id]);
+        maxCode = 100001 + i;
       }
-      const maxCode = 100000 + nonNumeric.length;
       await run("INSERT INTO admin_settings (key, value) VALUES ('referral_counter', ?) ON CONFLICT (key) DO UPDATE SET value = ?", [String(maxCode), String(maxCode)]);
+      console.log('Converted '+nonNumeric.length+' referral codes. Counter set to '+maxCode);
+    } else {
+      console.log('All referral codes already numeric.');
     }
-  } catch (e) { console.log('Referral code conversion skipped:', e.message); }
+  } catch (e) { console.log('Referral code conversion error:', e.message); }
   console.log('Migrations complete.');
 }
 
