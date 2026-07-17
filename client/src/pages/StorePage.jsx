@@ -920,22 +920,6 @@ export default function StorePage() {
         </div>
       )}
       </>)}
-
-      {/* Deposit Modal */}
-      {showDeposit && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowDeposit(false)}>
-          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in border border-[#e7e7e7]" onClick={e => e.stopPropagation()}>
-            <h3 className="text-base font-bold text-[#0F1111] mb-1">{t('store.deposit') || 'Add Funds'}</h3>
-            <p className="text-xs text-[#565959] mb-4">{t('store.depositDesc') || 'Add capital to trade bigger items'}</p>
-            <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="100" className="w-full px-3 py-2.5 bg-[#f0f2f2] border border-[#e7e7e7] rounded-lg text-sm text-[#0F1111] mb-4 outline-none focus:border-[#FF9900]" autoFocus />
-            <div className="text-[10px] text-[#999999] mb-3">{t('store.depositMinMax')}</div>
-            <div className="flex gap-2">
-              <button onClick={() => setShowDeposit(false)} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#f0f2f2] text-[#0F1111]">{t('common.cancel') || 'Cancel'}</button>
-              <button onClick={handleDeposit} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111]">{t('store.confirmDeposit') || 'Confirm'}</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
