@@ -410,9 +410,9 @@ export default function StorePage() {
   };
   const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
 
-  if (loading) return <div className="min-h-screen bg-[#eaeded] flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#FF9900] border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="min-h-screen bg-[#ffffff] flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#FF9900] border-t-transparent rounded-full animate-spin" /></div>;
   if (!status?.hasStore) return (
-    <div className="min-h-screen bg-[#eaeded] safe-top safe-bottom flex flex-col items-center justify-center px-6 text-center">
+    <div className="min-h-screen bg-[#ffffff] safe-top safe-bottom flex flex-col items-center justify-center px-6 text-center">
       <div className="w-24 h-24 rounded-full bg-[#FFD814] flex items-center justify-center mb-6 shadow-2xl"><Store size={44} className="text-white" /></div>
       <h1 className="text-2xl font-black text-[#0F1111] mb-1">{t('store.title')}</h1>
       <p className="text-sm text-[#565959] mb-8">{t('store.subtitle')}</p>
@@ -531,7 +531,7 @@ export default function StorePage() {
 
   // ==== Product List Page (Amazon-style) ====
   return (
-    <div className="bg-[#eaeded] safe-top flex flex-col min-h-screen">
+    <div className="bg-[#ffffff] safe-top flex flex-col min-h-screen">
       {/* Top Nav Bar */}
       <div className="shrink-0 bg-[#131921] text-white">
         <div className="px-3 py-2 flex items-center gap-3">
@@ -714,7 +714,7 @@ export default function StorePage() {
               <h3 className="text-lg font-bold text-[#0F1111] mt-2">{t('store.shareEarn')} 3%</h3>
               <p className="text-[11px] text-[#565959] mt-1">{shareProduct.name}</p>
             </div>
-            <div className="bg-[#eaeded] rounded-lg p-3 mb-3 text-center">
+            <div className="bg-[#ffffff] rounded-lg p-3 mb-3 text-center">
               <p className="text-[10px] text-[#999999] mb-1">{t('store.shareCommission')} · 3% {t('store.shareRate')}</p>
               <p className="text-2xl font-black text-[#067D62]">+${shareProduct.commission?.toFixed(2)}</p>
             </div>
@@ -730,7 +730,7 @@ export default function StorePage() {
       </>)}
       {/* Funds Tab */}
       {tab === 'funds' && (<>
-      <div className="flex-1 overflow-y-auto bg-[#eaeded]">
+      <div className="flex-1 overflow-y-auto bg-[#ffffff]">
         <div className="p-3 space-y-3">
           {/* Balance & Deposit Cards */}
           <div className="grid grid-cols-2 gap-2">
