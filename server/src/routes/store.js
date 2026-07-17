@@ -93,7 +93,7 @@ router.get('/status', async (req, res) => {
       balance: Number(taskBal?.total || 0),
       deposit: Number(store.deposit || 0),
       maxTrade: Number(store.deposit || 0),
-      freeRemaining: Math.max(0, 5 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_orders_count_v3_' + today]))?.value || 0)),
+      freeRemaining: Math.max(0, 5 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_orders_count_' + today]))?.value || 0)),
     },
   });
 });
@@ -159,7 +159,7 @@ router.post('/orders/process', async (req, res) => {
   const FREE_SLOTS = 5;
   const FREE_MAX_COST = 50;
   const FREE_PROFIT_RATE = 0.05;
-  const freeKey = 'free_orders_count_v3_' + today;
+  const freeKey = 'free_orders_count_' + today;
   const freeUsed = await get("SELECT value FROM admin_settings WHERE key = ?", [freeKey]);
   const freeRemaining = FREE_SLOTS - Number(freeUsed?.value || 0);
   const isFreeOrder = cost <= FREE_MAX_COST && freeRemaining > 0;
@@ -405,15 +405,20 @@ router.get('/orders-history', async (req, res) => {
 // GET /api/store/free-products — daily random free products (≤$100, no deposit)
 router.get('/free-products', authMiddleware, async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
-  const key = 'free_products_v3_v2_' + today;
-  const countKey = 'free_orders_count_v3_v2_' + today;
+  const key = 'free_products_' + today;
+  const countKey = 'free_orders_count_' + today;
 
   let data = await get("SELECT value FROM admin_settings WHERE key = ?", [key]);
   let products = [];
 
+  // Clean old versioned keys
+  try { await run("DELETE FROM admin_settings WHERE key LIKE 'free_products_v%' OR key LIKE 'free_orders_count_v%'"); } catch {}
+  // Regenerate if not cached or if ?reset=1
+  if (req.query.reset === '1') { data = null; }
   if (data?.value) {
     try { products = JSON.parse(data.value); } catch { products = []; }
-  } else {
+  }
+  if (!products.length) {
     // Generate 5 random products with price ≤ $100
     try {
       const catalog = require('../data/products.json');
@@ -442,8 +447,8 @@ router.get('/free-products', authMiddleware, async (req, res) => {
 // POST /api/store/claim-free/:productId — claim AND buy a free product
 router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
-  const key = 'free_products_v3_' + today;
-  const countKey = 'free_orders_count_v3_' + today;
+  const key = 'free_products_' + today;
+  const countKey = 'free_orders_count_' + today;
   const productId = parseInt(req.params.productId);
 
   const data = await get("SELECT value FROM admin_settings WHERE key = ?", [key]);
