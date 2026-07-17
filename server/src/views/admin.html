@@ -66,7 +66,7 @@ input:focus,select:focus{border-color:var(--red)}
 <div class="login-box">
 <h1>管理后台</h1><p class="sub">请使用管理员账号登录</p>
 <input id="loginEmail" placeholder="管理员邮箱" value="admin@gift.com">
-<input id="loginPass" type="password" placeholder="密码" value="admin888">
+<input id="loginPass" type="password" placeholder="密� �" value="admin888">
 <div class="err" id="loginErr"></div>
 <button onclick="doLogin()">登 录</button>
 </div></div>
@@ -105,10 +105,12 @@ async function initApp(){
   renderNav();switchTab('dashboard');
 }
 function renderNav(){
-  const tabs=[['dashboard','📊 仪表盘'],['users','👥 用户管理'],['orders','📦 订单'],['deposits','💵 充值审批'],['withdrawals','💸 提现审批'],['kyc','🛂 实名认证'],['audit','📋 操作日志']];
+  const tabs=[['dashboard','📊 仪表盘'],['users','👥 用户管理'],['orders','📦 订单'],['deposits','💵 �
+
+值审批'],['withdrawals','💸 提现审批'],['kyc','🛂 实名认证'],['audit','📋 操作日志']];
   document.getElementById('nav').innerHTML=tabs.map(([k,v])=>`<button class="${k===currentTab?'active':''}" onclick="switchTab('${k}')">${v}</button>`).join('');
 }
-async function switchTab(tab){currentTab=tab;renderNav();const c=document.getElementById('content');c.innerHTML='<div class="empty">加载中...</div>';
+async function switchTab(tab){currentTab=tab;renderNav();const c=document.getElementById('content');c.innerHTML='<div class="empty">� 载中...</div>';
   if(tab==='dashboard')await loadDashboard(c);else if(tab==='users')await loadUsers(c);else if(tab==='orders')await loadOrders(c);
   else if(tab==='deposits')await loadDeposits(c);else if(tab==='withdrawals')await loadWithdrawals(c);
   else if(tab==='kyc')await loadKyc(c);else if(tab==='audit')await loadAuditLog(c);
@@ -122,9 +124,14 @@ async function loadDashboard(c){
     <div class="stat-card"><div class="label">总余额</div><div class="value green">$${(stats.totalBalance||0).toFixed(0)}</div></div>
     <div class="stat-card"><div class="label">总保证金</div><div class="value">$${(stats.totalDeposit||0).toFixed(0)}</div></div>
     <div class="stat-card"><div class="label">今日订单</div><div class="value">${stats.ordersToday||0}</div></div>
-    <div class="stat-card"><div class="label">待审批充值</div><div class="value red">${stats.pendingDeposits||0}</div></div>
-    <div class="stat-card"><div class="label">待审批提现</div><div class="value red">${stats.pendingWithdrawals||0}</div></div>
-    <div class="stat-card"><div class="label">待审核认证</div><div class="value red">${stats.pendingKyc||0}</div></div>
+    <div class="stat-card"><div class="label">�
+审批�
+
+值</div><div class="value red">${stats.pendingDeposits||0}</div></div>
+    <div class="stat-card"><div class="label">�
+审批提现</div><div class="value red">${stats.pendingWithdrawals||0}</div></div>
+    <div class="stat-card"><div class="label">�
+审� �认证</div><div class="value red">${stats.pendingKyc||0}</div></div>
   </div>`;
 }
 
@@ -134,9 +141,13 @@ async function loadUsers(c){
   c.innerHTML=`<div class="card"><div class="card-body">
     <div class="search-row">
       <input id="userSearch" placeholder="搜索邮箱/姓名/手机..." value="${usersSearch}" onkeydown="if(event.key==='Enter'){usersSearch=this.value;usersPage=1;loadUsers(document.getElementById('content'))}">
-      <select id="filterKyc" onchange="uFilterKyc=this.value;usersPage=1;selectedUsers=[];loadUsers(document.getElementById('content'))"><option value="">KYC:全部</option><option value="approved" ${uFilterKyc==='approved'?'selected':''}>已通过</option><option value="pending" ${uFilterKyc==='pending'?'selected':''}>待审核</option><option value="none" ${uFilterKyc==='none'?'selected':''}>未提交</option></select>
-      <select id="filterFrozen" onchange="uFilterFrozen=this.value;usersPage=1;selectedUsers=[];loadUsers(document.getElementById('content'))"><option value="">状态:全部</option><option value="no" ${uFilterFrozen==='no'?'selected':''}>正常</option><option value="yes" ${uFilterFrozen==='yes'?'selected':''}>已冻结</option></select>
-      <select id="filterTier" onchange="uFilterTier=this.value;usersPage=1;selectedUsers=[];loadUsers(document.getElementById('content'))"><option value="">店铺:全部</option><option value="small" ${uFilterTier==='small'?'selected':''}>小型</option><option value="medium" ${uFilterTier==='medium'?'selected':''}>中型</option><option value="large" ${uFilterTier==='large'?'selected':''}>大型</option><option value="none" ${uFilterTier==='none'?'selected':''}>无</option></select>
+      <select id="filterKyc" onchange="uFilterKyc=this.value;usersPage=1;selectedUsers=[];loadUsers(document.getElementById('content'))"><option value="">KYC:�
+�部</option><option value="approved" ${uFilterKyc==='approved'?'selected':''}>已通过</option><option value="pending" ${uFilterKyc==='pending'?'selected':''}>�
+审� �</option><option value="none" ${uFilterKyc==='none'?'selected':''}>未提交</option></select>
+      <select id="filterFrozen" onchange="uFilterFrozen=this.value;usersPage=1;selectedUsers=[];loadUsers(document.getElementById('content'))"><option value="">状态:�
+�部</option><option value="no" ${uFilterFrozen==='no'?'selected':''}>正常</option><option value="yes" ${uFilterFrozen==='yes'?'selected':''}>已冻结</option></select>
+      <select id="filterTier" onchange="uFilterTier=this.value;usersPage=1;selectedUsers=[];loadUsers(document.getElementById('content'))"><option value="">店铺:�
+�部</option><option value="small" ${uFilterTier==='small'?'selected':''}>小型</option><option value="medium" ${uFilterTier==='medium'?'selected':''}>中型</option><option value="large" ${uFilterTier==='large'?'selected':''}>大型</option><option value="none" ${uFilterTier==='none'?'selected':''}>� </option></select>
       <button class="btn btn-blue" onclick="usersSearch=document.getElementById('userSearch').value;uFilterKyc=document.getElementById('filterKyc').value;uFilterFrozen=document.getElementById('filterFrozen').value;uFilterTier=document.getElementById('filterTier').value;usersPage=1;selectedUsers=[];loadUsers(document.getElementById('content'))">搜索</button>
     </div>
     <div id="batchBar"></div>
@@ -146,22 +157,23 @@ async function loadUsers(c){
     const q=new URLSearchParams({page:usersPage,limit:15,search:usersSearch,kyc:uFilterKyc,frozen:uFilterFrozen,tier:uFilterTier});
     const d=await api('GET','/admin/users-filtered?'+q.toString());
     renderUserTable(d);
-  }catch(e){document.getElementById('userTable').innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
+  }catch(e){document.getElementById('userTable').innerHTML='<div class="empty">� 载失败: '+e.message+'</div>'}
 }
 function renderUserTable(d){
   const users=d.users||[];
-  document.getElementById('batchBar').innerHTML=selectedUsers.length>0?`<div class="batch-bar">已选 ${selectedUsers.length} 个用户 <button class="btn btn-xs" style="background:#fff;color:var(--blue)" onclick="batchAction('freeze')">批量冻结</button><button class="btn btn-xs" style="background:#fff;color:var(--success)" onclick="batchAction('unfreeze')">批量解冻</button><button class="btn btn-xs" style="background:#fff;color:var(--danger)" onclick="batchAction('delete')">批量删除</button><button class="btn btn-xs btn-gray" onclick="selectedUsers=[];loadUsers(document.getElementById('content'))">取消</button></div>`:'';
+  document.getElementById('batchBar').innerHTML=selectedUsers.length>0?`<div class="batch-bar">已选 ${selectedUsers.length} 个用户 <button class="btn btn-xs" style="background:#fff;color:var(--blue)" onclick="batchAction('freeze')">批量冻结</button><button class="btn btn-xs" style="background:#fff;color:var(--success)" onclick="batchAction('unfreeze')">批量解冻</button><button class="btn btn-xs" style="background:#fff;color:var(--danger)" onclick="batchAction('delete')">批量� 除</button><button class="btn btn-xs btn-gray" onclick="selectedUsers=[];loadUsers(document.getElementById('content'))">取消</button></div>`:'';
   document.getElementById('userTable').innerHTML=`<table><thead><tr>
     <th><input type="checkbox" onchange="toggleAllUsers(this,${JSON.stringify(users.map(u=>u.id))})"></th>
-    <th>ID</th><th>邮箱</th><th>姓名</th><th>手机</th><th>邀请码</th><th>余额</th><th>保证金</th><th>店铺</th><th>实名</th><th>冻结</th><th>备注</th><th>操作</th>
-  </tr></thead><tbody>${users.length===0?'<tr><td colspan="13" class="empty">暂无用户</td></tr>':
+    <th>ID</th><th>邮箱</th><th>姓名</th><th>手机</th><th>邀请� �</th><th>余额</th><th>保证金</th><th>店铺</th><th>实名</th><th>冻结</th><th>备注</th><th>操作</th>
+  </tr></thead><tbody>${users.length===0?'<tr><td colspan="13" class="empty">暂� 用户</td></tr>':
     users.map(u=>`<tr>
       <td><input type="checkbox" ${selectedUsers.includes(u.id)?'checked':''} onchange="toggleUser(${u.id},this.checked)"></td>
       <td>${u.id}</td><td>${u.email}</td><td>${u.name||'-'}</td><td>${u.phone||'-'}</td>
       <td style="font-size:10px;color:var(--blue)">${u.referral_code||'-'}</td>
       <td style="color:var(--success);font-weight:600">$${u.balance.toFixed(2)}</td><td>$${u.store_deposit.toFixed(2)}</td>
-      <td><span class="badge ${u.store_status==='active'?'badge-green':'badge-gray'}">${u.tier==='small'?'小型':u.tier==='medium'?'中型':u.tier==='large'?'大型':'无'}</span></td>
-      <td><span class="badge ${u.kyc_status==='approved'?'badge-green':u.kyc_status==='pending'?'badge-yellow':'badge-gray'}">${u.kyc_status==='approved'?'已通过':u.kyc_status==='pending'?'待审核':'未提交'}</span></td>
+      <td><span class="badge ${u.store_status==='active'?'badge-green':'badge-gray'}">${u.tier==='small'?'小型':u.tier==='medium'?'中型':u.tier==='large'?'大型':'� '}</span></td>
+      <td><span class="badge ${u.kyc_status==='approved'?'badge-green':u.kyc_status==='pending'?'badge-yellow':'badge-gray'}">${u.kyc_status==='approved'?'已通过':u.kyc_status==='pending'?'�
+审� �':'未提交'}</span></td>
       <td>${u.frozen?'<span class="badge badge-red">已冻结</span>':'<span class="badge badge-green">正常</span>'}</td>
       <td style="font-size:10px">${u.admin_notes?'📝':''}</td>
       <td><button class="btn btn-sm btn-blue" onclick="showUserDetail(${u.id})">管理</button></td>
@@ -172,13 +184,13 @@ function renderUserTable(d){
 function toggleUser(id,checked){if(checked)selectedUsers.push(id);else selectedUsers=selectedUsers.filter(x=>x!==id);loadUsers(document.getElementById('content'))}
 function toggleAllUsers(cb,ids){selectedUsers=cb.checked?[...ids]:[];loadUsers(document.getElementById('content'))}
 async function batchAction(action){
-  if(!confirm(`确定批量${action==='freeze'?'冻结':action==='unfreeze'?'解冻':'删除'} ${selectedUsers.length} 个用户？`))return;
-  try{const r=await api('POST','/admin/users/batch',{ids:selectedUsers,action});showToast(`${r.affected} 个用户已${action==='freeze'?'冻结':action==='unfreeze'?'解冻':'删除'}`);selectedUsers=[];loadUsers(document.getElementById('content'))}catch(e){showToast(e.message,1)}
+  if(!confirm(`确定批量${action==='freeze'?'冻结':action==='unfreeze'?'解冻':'� 除'} ${selectedUsers.length} 个用户？`))return;
+  try{const r=await api('POST','/admin/users/batch',{ids:selectedUsers,action});showToast(`${r.affected} 个用户已${action==='freeze'?'冻结':action==='unfreeze'?'解冻':'� 除'}`);selectedUsers=[];loadUsers(document.getElementById('content'))}catch(e){showToast(e.message,1)}
 }
 
 // ========== USER DETAIL (multi-tab) ==========
 async function showUserDetail(id){
-  const c=document.getElementById('content');c.innerHTML='<div class="empty">加载中...</div>';
+  const c=document.getElementById('content');c.innerHTML='<div class="empty">� 载中...</div>';
   try{
     const u=await api('GET','/admin/users/'+id);
     c.innerHTML=`<div class="modal-overlay" onclick="switchTab('users')"><div class="modal" onclick="event.stopPropagation()">
@@ -192,7 +204,7 @@ async function showUserDetail(id){
       </div>
       <div id="detailContent"></div></div></div></div>`;
     await renderDetailTab('info',u);
-  }catch(e){c.innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
+  }catch(e){c.innerHTML='<div class="empty">� 载失败: '+e.message+'</div>'}
 }
 async function switchDetailTab(btn,tab,id){
   btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
@@ -204,7 +216,7 @@ async function renderDetailTab(tab,u,id){
   if(tab==='info'){
     dc.innerHTML=`<div class="kv">
       <div class="k">邮箱</div><div class="v">${u.email}</div><div class="k">手机</div><div class="v">${u.phone||'-'}</div>
-      <div class="k">邀请码</div><div class="v">${u.referral_code}</div><div class="k">注册时间</div><div class="v">${new Date(u.created_at).toLocaleString()}</div>
+      <div class="k">邀请� �</div><div class="v">${u.referral_code}</div><div class="k">注册时间</div><div class="v">${new Date(u.created_at).toLocaleString()}</div>
       <div class="k">IP地址</div><div class="v">${u.ip_address||'-'}</div>
       <div class="k">冻结</div><div class="v">${u.frozen?'<span class="badge badge-red">已冻结</span>':'<span class="badge badge-green">正常</span>'}</div>
     </div>
@@ -213,7 +225,7 @@ async function renderDetailTab(tab,u,id){
       <button class="btn btn-sm btn-blue" style="margin-top:4px" onclick="saveNotes(${id})">保存备注</button>
     </div>`;
   }else if(tab==='finance'){
-    dc.innerHTML='<div class="empty">加载中...</div>';
+    dc.innerHTML='<div class="empty">� 载中...</div>';
     try{
       const f=await api('GET','/admin/users/'+id+'/finance');
       let html='<div style="font-size:11px">';
@@ -221,70 +233,91 @@ async function renderDetailTab(tab,u,id){
       f.earnings.slice(0,10).forEach(e=>html+=`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f0f0f0"><span>${e.type}</span><span style="color:var(--success)">+$${Number(e.amount).toFixed(2)}</span><span style="color:var(--muted);font-size:10px">${new Date(e.created_at).toLocaleString()}</span></div>`);
       html+=`<p style="font-weight:700;margin:8px 0 4px">📦 订单 (${f.orders.length})</p>`;
       f.orders.slice(0,10).forEach(o=>html+=`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f0f0f0"><span>#${o.id} ${o.product_name||''}</span><span class="badge ${o.status==='done'?'badge-green':'badge-yellow'}">${o.status==='done'?'已完成':'持仓中'}</span><span style="color:var(--muted);font-size:10px">${new Date(o.created_at).toLocaleString()}</span></div>`);
-      html+=`<p style="font-weight:700;margin:8px 0 4px">💵 充值 (${f.deposits.length})</p>`;
+      html+=`<p style="font-weight:700;margin:8px 0 4px">💵 �
+
+值 (${f.deposits.length})</p>`;
       f.deposits.slice(0,5).forEach(d=>html+=`<div style="display:flex;justify-content:space-between;padding:3px 0"><span>${d.network}</span><span>$${Number(d.amount).toFixed(2)}</span><span class="badge ${d.status==='confirmed'?'badge-green':'badge-yellow'}">${d.status}</span></div>`);
       html+=`<p style="font-weight:700;margin:8px 0 4px">💸 提现 (${f.withdrawals.length})</p>`;
       f.withdrawals.slice(0,5).forEach(w=>html+=`<div style="display:flex;justify-content:space-between;padding:3px 0"><span>${w.network||''}</span><span>$${Number(w.amount).toFixed(2)}</span><span class="badge ${w.status==='completed'?'badge-green':w.status==='pending'?'badge-yellow':'badge-red'}">${w.status}</span></div>`);
       html+='</div>';dc.innerHTML=html;
-    }catch(e){dc.innerHTML='<div class="empty">加载失败</div>'}
+    }catch(e){dc.innerHTML='<div class="empty">� 载失败</div>'}
   }else if(tab==='invite'){
-    dc.innerHTML='<div class="empty">加载中...</div>';
+    dc.innerHTML='<div class="empty">� 载中...</div>';
     try{
       let inv='';
       if(u.parent_id){try{const p=await api('GET','/admin/users/'+u.parent_id);inv+=`<p style="font-size:12px;margin-bottom:8px">⬆️ 上级: <b>${p.name||p.email}</b></p>`}catch(e){}}
-      else inv+='<p style="font-size:12px;margin-bottom:8px;color:var(--muted)">⬆️ 无上级</p>';
-      try{const t=await api('GET','/admin/users/'+id+'/tree');inv+=`<p style="font-size:12px;font-weight:700">⬇️ 下级邀请 (${t.length||0}人)</p>`;if(t.length)inv+='<table style="margin-top:4px"><tr><th>等级</th><th>用户</th></tr>'+t.map(i=>`<tr><td>Lv${i.level}</td><td>${i.name||i.email}</td></tr>`).join('')+'</table>'}catch(e){inv+='<p style="color:var(--muted)">无下级</p>'}
+      else inv+='<p style="font-size:12px;margin-bottom:8px;color:var(--muted)">⬆️ � 上级</p>';
+      try{const t=await api('GET','/admin/users/'+id+'/tree');inv+=`<p style="font-size:12px;font-weight:700">⬇️ 下级邀请 (${t.length||0}人)</p>`;if(t.length)inv+='<table style="margin-top:4px"><tr><th>等级</th><th>用户</th></tr>'+t.map(i=>`<tr><td>Lv${i.level}</td><td>${i.name||i.email}</td></tr>`).join('')+'</table>'}catch(e){inv+='<p style="color:var(--muted)">� 下级</p>'}
       dc.innerHTML=inv;
-    }catch(e){dc.innerHTML='<div class="empty">加载失败</div>'}
+    }catch(e){dc.innerHTML='<div class="empty">� 载失败</div>'}
   }else if(tab==='actions'){
     dc.innerHTML=`
       <div style="display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;gap:8px;align-items:center"><input id="balAmt" type="number" placeholder="金额" style="flex:1" min="1"><input id="balNote" type="text" placeholder="备注" style="width:80px"><button class="btn btn-sm btn-green" onclick="adjustBalance(${id},1)">上分</button><button class="btn btn-sm btn-red" onclick="adjustBalance(${id},-1)">下分</button></div>
-        <div style="display:flex;gap:8px"><button class="btn btn-sm btn-blue" onclick="editUserName(${id},'${(u.name||'').replace(/'/g,\"\\\\'\")}','${(u.phone||'').replace(/'/g,\"\\\\'\")}')">✏️ 编辑</button><button class="btn btn-sm btn-red" onclick="resetUserPw(${id})">🔑 重置密码</button><button class="btn btn-sm ${u.frozen?'btn-green':'btn-red'}" onclick="toggleFreeze(${id},${u.frozen})">${u.frozen?'✅ 解冻':'❄️ 冻结'}</button><button class="btn btn-sm btn-red" onclick="deleteUser(${id})">🗑️ 删除</button><button class="btn btn-sm" style="background:#8B5CF6;color:#fff" onclick="loginAs(${id})">🔮 模拟登录</button></div>
+        <div style="display:flex;gap:8px"><button class="btn btn-sm btn-blue" onclick="editUserName(${id},'${(u.name||'').replace(/'/g,\"\\\\'\")}','${(u.phone||'').replace(/'/g,\"\\\\'\")}')">✏️ 编辑</button><button class="btn btn-sm btn-red" onclick="resetUserPw(${id})">🔑 重置密� �</button><button class="btn btn-sm ${u.frozen?'btn-green':'btn-red'}" onclick="toggleFreeze(${id},${u.frozen})">${u.frozen?'�
+ 解冻':'❄️ 冻结'}</button><button class="btn btn-sm btn-red" onclick="deleteUser(${id})">🗑️ � 除</button><button class="btn btn-sm" style="background:#8B5CF6;color:#fff" onclick="loginAs(${id})">🔮 模拟登录</button></div>
       </div>`;
   }
 }
 function saveNotes(id){var n=document.getElementById('adminNotes').value;api('PUT','/admin/users/'+id+'/notes',{notes:n}).then(()=>showToast('备注已保存')).catch(e=>showToast(e.message,1))}
 function adjustBalance(id,sign){
-  var amt=parseFloat(document.getElementById('balAmt').value);if(!amt||amt<0){showToast('请输入有效金额',1);return}
+  var amt=parseFloat(document.getElementById('balAmt').value);if(!amt||amt<0){showToast('请输�
+�有效金额',1);return}
   var note=document.getElementById('balNote').value||'',total=sign>0?amt:-amt,label=sign>0?'上分 $'+amt:'下分 $'+amt;
   if(!confirm('确认'+label+'？'))return;
   api('POST','/admin/users/'+id+'/balance',{amount:total,note:note}).then(d=>{showToast(label+' 成功，余额:$'+d.newBalance.toFixed(2));switchTab('users')}).catch(e=>showToast(e.message,1));
 }
 function editUserName(id,name,phone){const n=prompt('新姓名:',name);if(n===null)return;const p=prompt('新手机号:',phone);if(p===null)return;api('PUT','/admin/users/'+id,{name:n,phone:p}).then(()=>{showToast('已更新');switchTab('users')}).catch(e=>showToast(e.message,1))}
-function resetUserPw(id){const pw=prompt('新密码(8位以上):');if(!pw||pw.length<8){showToast('至少8位',1);return}api('POST','/admin/users/'+id+'/reset-password',{newPassword:pw}).then(()=>showToast('密码已重置')).catch(e=>showToast(e.message,1))}
+function resetUserPw(id){const pw=prompt('新密� �(8位以上):');if(!pw||pw.length<8){showToast('至少8位',1);return}api('POST','/admin/users/'+id+'/reset-password',{newPassword:pw}).then(()=>showToast('密� �已重置')).catch(e=>showToast(e.message,1))}
 function toggleFreeze(id,c){api('PUT','/admin/users/'+id+'/freeze',{frozen:!c}).then(()=>{showToast(c?'已解冻':'已冻结');switchTab('users')}).catch(e=>showToast(e.message,1))}
-function deleteUser(id){if(!confirm('确定删除？不可恢复！'))return;api('DELETE','/admin/users/'+id).then(()=>{showToast('已删除');switchTab('users')}).catch(e=>showToast(e.message,1))}
+function deleteUser(id){if(!confirm('确定� 除？不可恢复！'))return;api('DELETE','/admin/users/'+id).then(()=>{showToast('已� 除');switchTab('users')}).catch(e=>showToast(e.message,1))}
 function loginAs(id){api('POST','/admin/users/'+id+'/login-as').then(d=>{window.open(d.redirect,'_blank')}).catch(e=>showToast(e.message,1))}
 
 // ========== ORDERS / DEPOSITS / WITHDRAWALS / KYC ==========
 let ordersPage=1,ordersStatus='',ordersUser='';
 async function loadOrders(c){
   c.innerHTML=`<div class="card"><div class="card-body"><div class="search-row">
-    <input id="orderUser" placeholder="用户ID" value="${ordersUser}"><select id="orderStatus"><option value="">全部</option><option value="holding" ${ordersStatus==='holding'?'selected':''}>持仓中</option><option value="done" ${ordersStatus==='done'?'selected':''}>已完成</option></select>
+    <input id="orderUser" placeholder="用户ID" value="${ordersUser}"><select id="orderStatus"><option value="">�
+�部</option><option value="holding" ${ordersStatus==='holding'?'selected':''}>持仓中</option><option value="done" ${ordersStatus==='done'?'selected':''}>已完成</option></select>
     <button class="btn btn-blue" onclick="ordersUser=document.getElementById('orderUser').value;ordersStatus=document.getElementById('orderStatus').value;ordersPage=1;loadOrders(document.getElementById('content'))">筛选</button></div>
     <div id="orderTable"></div><div id="orderPager" class="pagination"></div></div></div>`;
   try{
     const d=await api('GET',`/admin/orders?page=${ordersPage}&limit=20&user_id=${ordersUser}&status=${ordersStatus}`);const orders=d.orders||[];
-    document.getElementById('orderTable').innerHTML=`<table><thead><tr><th>ID</th><th>用户</th><th>产品</th><th>成本</th><th>利润</th><th>状态</th><th>时间</th></tr></thead><tbody>${orders.length===0?'<tr><td colspan="7" class="empty">暂无订单</td></tr>':orders.map(o=>`<tr><td>#${o.id}</td><td>${o.user_name||o.user_email} (#${o.user_id})</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.product_name||'-'}</td><td>$${Number(o.amount||0).toFixed(2)}</td><td style="color:var(--success);font-weight:600">+$${(Number(o.amount||0)*0.15/0.85).toFixed(2)}</td><td><span class="badge ${o.status==='done'?'badge-green':'badge-yellow'}">${o.status==='done'?'已完成':'持仓中'}</span></td><td style="font-size:10px">${new Date(o.created_at).toLocaleString()}</td></tr>`).join('')}</tbody></table>`;
+    document.getElementById('orderTable').innerHTML=`<table><thead><tr><th>ID</th><th>用户</th><th>产品</th><th>成本</th><th>利润</th><th>状态</th><th>时间</th></tr></thead><tbody>${orders.length===0?'<tr><td colspan="7" class="empty">暂� 订单</td></tr>':orders.map(o=>`<tr><td>#${o.id}</td><td>${o.user_name||o.user_email} (#${o.user_id})</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.product_name||'-'}</td><td>$${Number(o.amount||0).toFixed(2)}</td><td style="color:var(--success);font-weight:600">+$${(Number(o.amount||0)*0.15/0.85).toFixed(2)}</td><td><span class="badge ${o.status==='done'?'badge-green':'badge-yellow'}">${o.status==='done'?'已完成':'持仓中'}</span></td><td style="font-size:10px">${new Date(o.created_at).toLocaleString()}</td></tr>`).join('')}</tbody></table>`;
     const total=Number(d.total)||0,pages=Math.ceil(total/20);
     document.getElementById('orderPager').innerHTML=`<button class="btn btn-gray btn-sm" ${ordersPage<=1?'disabled':''} onclick="ordersPage--;loadOrders(document.getElementById('content'))">上一页</button><span>第 ${ordersPage}/${pages||1} 页 (${total})</span><button class="btn btn-gray btn-sm" ${ordersPage>=pages?'disabled':''} onclick="ordersPage++;loadOrders(document.getElementById('content'))">下一页</button>`;
   }catch(e){document.getElementById('orderTable').innerHTML='<div class="empty">'+e.message+'</div>'}
 }
-async function loadDeposits(c){c.innerHTML='<div class="empty">加载中...</div>';try{const rows=await api('GET','/deposits/admin');c.innerHTML=`<div class="card"><div class="card-header">💵 充值审批</div><div class="card-body"><table><thead><tr><th>ID</th><th>用户</th><th>网络</th><th>金额</th><th>哈希</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="8" class="empty">暂无</td></tr>':rows.map(d=>`<tr><td>#${d.id}</td><td>${d.name||d.email} (#${d.user_id})</td><td><span class="badge badge-blue">${d.network.toUpperCase()}</span></td><td style="font-weight:700">$${Number(d.amount).toFixed(2)}</td><td style="font-size:10px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.tx_hash}</td><td><span class="badge ${d.status==='confirmed'?'badge-green':d.status==='pending'?'badge-yellow':'badge-red'}">${d.status==='confirmed'?'已确认':d.status==='pending'?'待审核':'已拒绝'}</span></td><td style="font-size:10px">${new Date(d.created_at).toLocaleString()}</td><td>${d.status==='pending'?`<button class="btn btn-xs btn-green" onclick="confirmDeposit(${d.id})">✅</button><button class="btn btn-xs btn-red" onclick="rejectDeposit(${d.id})">❌</button>`:'-'}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
-async function confirmDeposit(id){if(!confirm('确认充值？'))return;try{await api('PUT','/deposits/'+id+'/confirm',{});showToast('已确认');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
-async function rejectDeposit(id){if(!confirm('拒绝充值？'))return;try{await api('PUT','/deposits/'+id+'/reject',{});showToast('已拒绝');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
+async function loadDeposits(c){c.innerHTML='<div class="empty">� 载中...</div>';try{const rows=await api('GET','/deposits/admin');c.innerHTML=`<div class="card"><div class="card-header">💵 �
+
+值审批</div><div class="card-body"><table><thead><tr><th>ID</th><th>用户</th><th>网络</th><th>金额</th><th>哈希</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="8" class="empty">暂� </td></tr>':rows.map(d=>`<tr><td>#${d.id}</td><td>${d.name||d.email} (#${d.user_id})</td><td><span class="badge badge-blue">${d.network.toUpperCase()}</span></td><td style="font-weight:700">$${Number(d.amount).toFixed(2)}</td><td style="font-size:10px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.tx_hash}</td><td><span class="badge ${d.status==='confirmed'?'badge-green':d.status==='pending'?'badge-yellow':'badge-red'}">${d.status==='confirmed'?'已确认':d.status==='pending'?'�
+审� �':'已拒绝'}</span></td><td style="font-size:10px">${new Date(d.created_at).toLocaleString()}</td><td>${d.status==='pending'?`<button class="btn btn-xs btn-green" onclick="confirmDeposit(${d.id})">�
+</button><button class="btn btn-xs btn-red" onclick="rejectDeposit(${d.id})">❌</button>`:'-'}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
+async function confirmDeposit(id){if(!confirm('确认�
+
+值？'))return;try{await api('PUT','/deposits/'+id+'/confirm',{});showToast('已确认');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
+async function rejectDeposit(id){if(!confirm('拒绝�
+
+值？'))return;try{await api('PUT','/deposits/'+id+'/reject',{});showToast('已拒绝');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
 let wPage=1,wFilter='';
-async function loadWithdrawals(c){c.innerHTML='<div class="empty">加载中...</div>';try{const d=await api('GET',`/admin/withdrawals?page=${wPage}&limit=20&status=${wFilter}`);const rows=d.withdrawals||[];c.innerHTML=`<div class="card"><div class="card-header">💸 提现审批<div style="display:flex;gap:4px">${['','pending','completed','rejected'].map(s=>`<button class="btn btn-xs ${wFilter===s?'btn-blue':'btn-gray'}" onclick="wFilter='${s}';wPage=1;loadWithdrawals(document.getElementById('content'))">${!s?'全部':s==='pending'?'待审批':s==='completed'?'已完成':'已拒绝'}</button>`).join('')}</div></div><div class="card-body"><table><thead><tr><th>ID</th><th>用户</th><th>金额</th><th>网络</th><th>地址</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="8" class="empty">暂无</td></tr>':rows.map(w=>`<tr><td>#${w.id}</td><td>${w.user_name||w.user_email} (#${w.user_id})</td><td style="font-weight:700">$${Number(w.amount).toFixed(2)}</td><td>${w.network||'-'}</td><td style="font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.wallet_address||'-'}</td><td><span class="badge ${w.status==='completed'?'badge-green':w.status==='pending'?'badge-yellow':'badge-red'}">${w.status==='completed'?'已完成':w.status==='pending'?'待审批':'已拒绝'}</span></td><td style="font-size:10px">${new Date(w.created_at).toLocaleString()}</td><td>${w.status==='pending'?`<button class="btn btn-xs btn-green" onclick="approveWithdrawal(${w.id})">✅</button><button class="btn btn-xs btn-red" onclick="rejectWithdrawal(${w.id})">❌</button>`:'-'}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
+async function loadWithdrawals(c){c.innerHTML='<div class="empty">� 载中...</div>';try{const d=await api('GET',`/admin/withdrawals?page=${wPage}&limit=20&status=${wFilter}`);const rows=d.withdrawals||[];c.innerHTML=`<div class="card"><div class="card-header">💸 提现审批<div style="display:flex;gap:4px">${['','pending','completed','rejected'].map(s=>`<button class="btn btn-xs ${wFilter===s?'btn-blue':'btn-gray'}" onclick="wFilter='${s}';wPage=1;loadWithdrawals(document.getElementById('content'))">${!s?'�
+�部':s==='pending'?'�
+审批':s==='completed'?'已完成':'已拒绝'}</button>`).join('')}</div></div><div class="card-body"><table><thead><tr><th>ID</th><th>用户</th><th>金额</th><th>网络</th><th>地址</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="8" class="empty">暂� </td></tr>':rows.map(w=>`<tr><td>#${w.id}</td><td>${w.user_name||w.user_email} (#${w.user_id})</td><td style="font-weight:700">$${Number(w.amount).toFixed(2)}</td><td>${w.network||'-'}</td><td style="font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.wallet_address||'-'}</td><td><span class="badge ${w.status==='completed'?'badge-green':w.status==='pending'?'badge-yellow':'badge-red'}">${w.status==='completed'?'已完成':w.status==='pending'?'�
+审批':'已拒绝'}</span></td><td style="font-size:10px">${new Date(w.created_at).toLocaleString()}</td><td>${w.status==='pending'?`<button class="btn btn-xs btn-green" onclick="approveWithdrawal(${w.id})">�
+</button><button class="btn btn-xs btn-red" onclick="rejectWithdrawal(${w.id})">❌</button>`:'-'}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
 async function approveWithdrawal(id){if(!confirm('确认通过？'))return;try{await api('PUT','/admin/withdrawals/'+id,{status:'completed'});showToast('已通过');loadWithdrawals(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
 async function rejectWithdrawal(id){if(!confirm('确认拒绝？'))return;try{await api('PUT','/admin/withdrawals/'+id,{status:'rejected'});showToast('已拒绝');loadWithdrawals(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
-async function loadKyc(c){c.innerHTML='<div class="empty">加载中...</div>';try{const rows=await api('GET','/kyc/admin/list');c.innerHTML=`<div class="card"><div class="card-header">🛂 实名认证</div><div class="card-body"><table><thead><tr><th>ID</th><th>用户</th><th>姓名</th><th>证件号</th><th>照片</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="8" class="empty">暂无</td></tr>':rows.map(k=>`<tr><td>#${k.id}</td><td>${k.user_name||k.user_email} (#${k.user_id})</td><td>${k.real_name||'-'}</td><td style="font-size:11px">${k.id_number||'-'}</td><td style="display:flex;gap:8px">${k.front_image?`<img src="${k.front_image}" onclick="viewKycImage(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer">`:'无'}${k.back_image?`<img src="${k.back_image}" onclick="viewKycImage(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer">`:''}</td><td><span class="badge ${k.status==='approved'?'badge-green':k.status==='pending'?'badge-yellow':'badge-red'}">${k.status==='approved'?'已通过':k.status==='pending'?'待审核':'已拒绝'}</span></td><td style="font-size:10px">${new Date(k.submitted_at).toLocaleString()}</td><td>${k.status==='pending'?`<button class="btn btn-xs btn-green" onclick="approveKyc(${k.id})">✅</button><button class="btn btn-xs btn-red" onclick="rejectKyc(${k.id})">❌</button>`:'-'}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
+async function loadKyc(c){c.innerHTML='<div class="empty">� 载中...</div>';try{const rows=await api('GET','/kyc/admin/list');c.innerHTML=`<div class="card"><div class="card-header">🛂 实名认证</div><div class="card-body"><table><thead><tr><th>ID</th><th>用户</th><th>姓名</th><th>证件号</th><th>�
+�片</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="8" class="empty">暂� </td></tr>':rows.map(k=>`<tr><td>#${k.id}</td><td>${k.user_name||k.user_email} (#${k.user_id})</td><td>${k.real_name||'-'}</td><td style="font-size:11px">${k.id_number||'-'}</td><td style="display:flex;gap:8px">${k.front_image?`<img src="${k.front_image}" onclick="viewKycImage(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer">`:'� '}${k.back_image?`<img src="${k.back_image}" onclick="viewKycImage(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer">`:''}</td><td><span class="badge ${k.status==='approved'?'badge-green':k.status==='pending'?'badge-yellow':'badge-red'}">${k.status==='approved'?'已通过':k.status==='pending'?'�
+审� �':'已拒绝'}</span></td><td style="font-size:10px">${new Date(k.submitted_at).toLocaleString()}</td><td>${k.status==='pending'?`<button class="btn btn-xs btn-green" onclick="approveKyc(${k.id})">�
+</button><button class="btn btn-xs btn-red" onclick="rejectKyc(${k.id})">❌</button>`:'-'}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
 async function approveKyc(id){try{await api('PUT','/kyc/admin/'+id,{status:'approved'});showToast('已通过');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
 async function rejectKyc(id){try{await api('PUT','/kyc/admin/'+id,{status:'rejected'});showToast('已拒绝');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
 function viewKycImage(el){var s=el.getAttribute('src');var d=document.createElement('div');d.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;cursor:pointer';d.onclick=function(){d.remove()};var i=document.createElement('img');i.src=s;i.style.cssText='max-width:95vw;max-height:95vh;object-fit:contain;pointer-events:none';d.appendChild(i);document.body.appendChild(d)}
 
 // ========== AUDIT LOG ==========
-async function loadAuditLog(c){c.innerHTML='<div class="empty">加载中...</div>';try{const rows=await api('GET','/admin/audit-log');c.innerHTML=`<div class="card"><div class="card-header">📋 操作日志</div><div class="card-body"><table><thead><tr><th>时间</th><th>管理员</th><th>操作</th><th>目标</th><th>详情</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="5" class="empty">暂无记录</td></tr>':rows.map(a=>`<tr><td style="font-size:10px">${new Date(a.created_at).toLocaleString()}</td><td>${a.admin_name||a.admin_email}</td><td><span class="badge badge-blue">${a.action}</span></td><td>${a.target_user_id||'-'}</td><td style="font-size:10px">${a.detail||''}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
+async function loadAuditLog(c){c.innerHTML='<div class="empty">� 载中...</div>';try{const rows=await api('GET','/admin/audit-log');c.innerHTML=`<div class="card"><div class="card-header">📋 操作日志</div><div class="card-body"><table><thead><tr><th>时间</th><th>管理员</th><th>操作</th><th>目� �</th><th>详�
+</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="5" class="empty">暂� 记录</td></tr>':rows.map(a=>`<tr><td style="font-size:10px">${new Date(a.created_at).toLocaleString()}</td><td>${a.admin_name||a.admin_email}</td><td><span class="badge badge-blue">${a.action}</span></td><td>${a.target_user_id||'-'}</td><td style="font-size:10px">${a.detail||''}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
 
 document.addEventListener('DOMContentLoaded',()=>{try{initApp()}catch(e){document.getElementById('loginPage').style.display='flex';document.getElementById('loginErr').textContent='错误: '+e.message}});
 </script></body></html>
