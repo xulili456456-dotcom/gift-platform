@@ -203,12 +203,13 @@ router.post('/orders/process', async (req, res) => {
     await t.commit();
 
     // Increment free order counter if applicable
+    let freeUsedCount = Number(freeUsed?.value || 0);
     if (isFreeOrder) {
-      const newCount = Number(freeUsed?.value || 0) + 1;
-      await run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [freeKey, String(newCount), String(newCount)]);
+      freeUsedCount += 1;
+      await run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [freeKey, String(freeUsedCount), String(freeUsedCount)]);
     }
 
-    res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: isFreeOrder ? FREE_SLOTS - newCount : undefined });
+    res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: FREE_SLOTS - freeUsedCount });
   } catch (err) {
     console.error('Buy order failed:', err.code, err.message, err.detail);
     await t.rollback().catch(() => {});
