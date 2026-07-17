@@ -415,16 +415,10 @@ router.get('/free-products', authMiddleware, async (req, res) => {
     try { products = JSON.parse(data.value); } catch { products = []; }
   } else {
     // Generate 5 random products with price ≤ $100
-    const catalog = require('../../client/src/pages/StorePage.jsx')?.PRODUCTS || [];
-    // Actually we need the PRODUCTS array from frontend. Use a simpler approach:
-    // Store product data on server side or just return IDs
-    const { all } = require('../db/database');
-    // Generate random IDs 1-246, filter by price later on frontend
-    products = Array.from({ length: 5 }, (_, i) => ({
-      id: Math.floor(Math.random() * 246) + 1,
-      claimed: false,
-      claimedBy: null
-    }));
+    const catalog = require('../data/products.json');
+    const eligible = catalog.filter(p => p.price <= 100);
+    const shuffled = eligible.sort(() => Math.random() - 0.5);
+    products = shuffled.slice(0, 5).map(p => ({ ...p, claimed: false, claimedBy: null }));
     await run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO NOTHING", [key, JSON.stringify(products)]);
   }
 
