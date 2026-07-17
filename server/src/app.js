@@ -78,14 +78,40 @@ app.use('/api/commissions', require('./routes/commissions'));
   // Serve static uploads
   app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
-  // Serve the built frontend (SPA for all non-API routes)
-  const clientDist = path.join(__dirname, '..', '..', 'client', 'dist');
-  if (require('fs').existsSync(clientDist)) {
-    app.use(express.static(clientDist));
-    app.get(/^\/(?!api\/).*/, (req, res) => {
-      res.sendFile(path.join(clientDist, 'index.html'));
-    });
+  // Serve landing page dist
+  const landingDist = path.join(__dirname, '..', 'landing-dist');
+  const hasLanding = require('fs').existsSync(landingDist);
+  if (hasLanding) {
+    app.use(express.static(landingDist));
   }
+
+  // Serve the app frontend
+  const clientDist = path.join(__dirname, '..', '..', 'client', 'dist');
+  const hasApp = require('fs').existsSync(clientDist);
+  if (hasApp) {
+    app.use(express.static(clientDist));
+  }
+
+  // Landing page routes (served from landing-dist)
+  const landingRoutes = ['/', '/store', '/download', '/about', '/faq', '/legal'];
+  landingRoutes.forEach(route => {
+    app.get(route, (req, res) => {
+      if (hasLanding) {
+        res.sendFile(path.join(landingDist, 'index.html'));
+      }
+    });
+  });
+
+  // App SPA fallback for all other non-API routes
+  app.get(/^\/(?!api\/).*/, (req, res) => {
+    if (hasApp) {
+      res.sendFile(path.join(clientDist, 'index.html'));
+    } else if (hasLanding) {
+      res.sendFile(path.join(landingDist, 'index.html'));
+    } else {
+      res.status(404).send('No frontend available');
+    }
+  });
 
   // Health check
   app.get('/api/health', (req, res) => {
