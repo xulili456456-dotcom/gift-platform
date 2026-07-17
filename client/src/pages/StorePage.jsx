@@ -373,7 +373,7 @@ export default function StorePage() {
   const [depositMsg, setDepositMsg] = useState('');
   const [freeProducts, setFreeProducts] = useState([]);
   const [freeRemaining, setFreeRemaining] = useState(0);
-  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); }).catch(()=>{}); }, [s?.doneToday]);
+  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); }).catch(()=>{}); }, [status?.store?.doneToday]);
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
     if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
