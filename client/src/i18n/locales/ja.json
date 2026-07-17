@@ -490,7 +490,7 @@
     "idCard": "IDカード",
     "driverLicense": "運転免許証",
     "passport": "パスポート",
-    "uploadBoth": "両面をアップロードしてください"
+    "uploadBoth": "両面をアップロード"
   },
   "legal": {
     "title": "法務・情報",
