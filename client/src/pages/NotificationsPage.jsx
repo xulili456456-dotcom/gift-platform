@@ -26,6 +26,8 @@ export default function NotificationsPage() {
 
   if (loading) return <div className="min-h-screen bg-bg p-4"><div className="skeleton h-8 w-32" /><div className="skeleton h-64 rounded-2xl" /></div>;
 
+  const [selected, setSelected] = useState(null);
+
   return (
     <div className="min-h-screen bg-bg animate-fade-in">
       <div className="bg-white px-4 py-3 flex items-center justify-between border-b border-separator">
@@ -45,7 +47,7 @@ export default function NotificationsPage() {
         {data.notifications.length > 0 ? (
           <div className="space-y-2">
             {data.notifications.map((n, idx) => (
-              <div key={n.id} onClick={() => { if (!n.is_read) { setData(prev => ({ ...prev, notifications: prev.notifications.map(x => x.id === n.id ? {...x, is_read: true} : x), unread: Math.max(0, prev.unread - 1) })); client.put('/notifications/' + n.id + '/read').catch(() => {}); window.dispatchEvent(new Event('notifUpdate')); } }} className={`bg-white rounded-2xl p-4 border shadow-sm stagger-item cursor-pointer active:scale-[0.98] transition-all hover:bg-gray-50 ${n.is_read ? 'border-separator opacity-60' : 'border-primary/20 bg-primary/[0.02]'}`} style={{ animationDelay: idx * 0.05 + 's' }}>
+              <div key={n.id} onClick={() => { setSelected(n); if (!n.is_read) { setData(prev => ({ ...prev, notifications: prev.notifications.map(x => x.id === n.id ? {...x, is_read: true} : x), unread: Math.max(0, prev.unread - 1) })); client.put('/notifications/' + n.id + '/read').catch(() => {}); window.dispatchEvent(new Event('notifUpdate')); } }} className={`bg-white rounded-2xl p-4 border shadow-sm stagger-item cursor-pointer active:scale-[0.98] transition-all hover:bg-gray-50 ${n.is_read ? 'border-separator opacity-60' : 'border-primary/20 bg-primary/[0.02]'}`} style={{ animationDelay: idx * 0.05 + 's' }}>
                 <div className="flex items-start gap-3">
                   <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
                     n.type === 'success' ? 'bg-success/10' : n.type === 'warning' ? 'bg-yellow-100' : 'bg-bg'
@@ -57,7 +59,7 @@ export default function NotificationsPage() {
                       <p className={`text-[13px] font-semibold ${n.is_read ? 'text-text-secondary' : 'text-text'}`}>{n.title}</p>
                       {!n.is_read && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
                     </div>
-                    {n.body && <p className="text-[12px] text-text-muted mt-0.5">{n.body}</p>}
+                    {n.body && <p className="text-[12px] text-text-muted mt-0.5 line-clamp-2">{n.body}</p>}
                     <p className="text-[10px] text-text-muted mt-1">{n.created_at ? new Date(n.created_at).toLocaleString() : ''}</p>
                   </div>
                 </div>
@@ -71,6 +73,23 @@ export default function NotificationsPage() {
           </div>
         )}
       </div>
+
+      {/* Notification Detail Modal */}
+      {selected && (
+        <div className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelected(null)}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-scale-in" onClick={e => e.stopPropagation()}>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
+              selected.type === 'success' ? 'bg-success/10' : selected.type === 'warning' ? 'bg-yellow-100' : 'bg-bg'
+            }`}>
+              <Bell size={24} className={selected.type === 'success' ? 'text-success' : selected.type === 'warning' ? 'text-yellow-600' : 'text-text-muted'} />
+            </div>
+            <h3 className="text-base font-bold text-text mb-2">{selected.title}</h3>
+            <p className="text-sm text-text-secondary mb-4 leading-relaxed">{selected.body}</p>
+            <p className="text-xs text-text-muted mb-4">{selected.created_at ? new Date(selected.created_at).toLocaleString() : ''}</p>
+            <button onClick={() => setSelected(null)} className="w-full py-2.5 bg-bg text-text font-medium rounded-xl text-sm">关闭</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
