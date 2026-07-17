@@ -412,7 +412,7 @@ router.get('/free-products', authMiddleware, async (req, res) => {
   let products = [];
 
   // Force regenerate — always fresh today
-  try { await run("DELETE FROM admin_settings WHERE key LIKE 'free_%' AND key != ?", ['free_products_' + today]); } catch {}
+  try { await run("DELETE FROM admin_settings WHERE key LIKE 'free_%'"); } catch {}
   data = null;
   if (!products.length) {
     // Generate 5 random products with price ≤ $100
