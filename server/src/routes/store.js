@@ -488,8 +488,8 @@ router.post('/deposit', authMiddleware, async (req, res) => {
   if (!store) return res.status(400).json({ error: 'Please open a store first' });
 
   const bal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
-  const available = Number(bal?.total || 0) - Number(store.deposit || 0); // exclude already-locked deposit
-  if (amount > available) return res.status(400).json({ error: `Insufficient available balance. Available: $${available.toFixed(2)}` });
+  const available = Number(bal?.total || 0);
+  if (amount > available) return res.status(400).json({ error: `Insufficient balance. Available: $${available.toFixed(2)}` });
 
   const t = await tx();
   try {
