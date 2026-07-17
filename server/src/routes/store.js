@@ -394,6 +394,8 @@ router.get('/free-products', authMiddleware, async (req, res) => {
   // Only generate if not cached
   if (data?.value) {
     try { products = JSON.parse(data.value); } catch { products = []; }
+    // Strip old claimed/claimedBy from cached data (now per-user)
+    products = products.map(p => ({ id: p.id, name: p.name, price: p.price, img: p.img }));
   }
   if (!products.length) {
     // Generate 5 random products with price ≤ $100
