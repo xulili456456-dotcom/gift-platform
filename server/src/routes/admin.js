@@ -341,8 +341,12 @@ router.get('/users-filtered', async (req, res) => {
     `SELECT u.id, u.email, u.phone, u.name, u.referral_code, u.is_admin, u.is_active, u.frozen, u.created_at, u.ip_address, u.admin_notes,
             COALESCE(s.id, 0) as store_id, s.tier, s.deposit as store_deposit, s.status as store_status,
             COALESCE((SELECT SUM(amount) FROM task_earnings WHERE user_id = u.id AND status = 'delivered'), 0) as balance,
-            COALESCE(k.status, '') as kyc_status
-     FROM users u LEFT JOIN stores s ON s.user_id = u.id LEFT JOIN kyc_submissions k ON k.user_id = u.id
+            COALESCE(k.status, '') as kyc_status,
+            p.name as parent_name, p.email as parent_email, p.id as parent_id
+     FROM users u
+     LEFT JOIN stores s ON s.user_id = u.id
+     LEFT JOIN kyc_submissions k ON k.user_id = u.id
+     LEFT JOIN users p ON p.id = u.parent_id
      ${where} ORDER BY u.id DESC LIMIT ? OFFSET ?`,
     [...params, limit, offset]
   );
