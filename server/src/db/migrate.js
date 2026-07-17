@@ -327,6 +327,18 @@ async function migrate() {
     await exec(`UPDATE gifts SET name = 'Elite Red Packet', description = 'Invite 150 friends to claim' WHERE name ~ '顶级'`);
     await exec(`UPDATE gifts SET name = 'Supreme Grand Prize', description = 'Invite 500 friends to claim, legendary achievement' WHERE name ~ '至尊'`);
   } catch (e) { console.log('Gifts cleanup skipped:', e.message); }
+  // Convert existing referral codes to numeric (100001, 100002...)
+  try {
+    const nonNumeric = await all("SELECT id FROM users WHERE referral_code !~ '^[0-9]+$' ORDER BY id");
+    if (nonNumeric.length > 0) {
+      console.log('Converting '+nonNumeric.length+' referral codes to numeric...');
+      for (let i = 0; i < nonNumeric.length; i++) {
+        await run('UPDATE users SET referral_code = ? WHERE id = ?', [String(100001 + i), nonNumeric[i].id]);
+      }
+      const maxCode = 100000 + nonNumeric.length;
+      await run("INSERT INTO admin_settings (key, value) VALUES ('referral_counter', ?) ON CONFLICT (key) DO UPDATE SET value = ?", [String(maxCode), String(maxCode)]);
+    }
+  } catch (e) { console.log('Referral code conversion skipped:', e.message); }
   console.log('Migrations complete.');
 }
 
