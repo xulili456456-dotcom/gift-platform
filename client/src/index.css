@@ -19,7 +19,7 @@
   --color-success: #067D62;
   --color-success-light: #e6f7f1;
   --color-separator: #e7e7e7;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Helvetica Neue', sans-serif;
+  --font-sans: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
