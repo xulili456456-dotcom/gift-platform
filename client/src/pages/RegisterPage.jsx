@@ -3,10 +3,12 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
+import { ChevronLeft, ChevronRight, Mail, Lock, User, Phone, Gift, Shield } from 'lucide-react';
 
 export default function RegisterPage() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
+  const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     email: '', phone: '', password: '', confirmPassword: '', name: '',
     referral_code: searchParams.get('ref') || '',
@@ -16,11 +18,11 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const updateField = (f) => (e) => setForm({ ...form, [f]: e.target.value });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const canNext = step === 1 ? (form.email && form.password && form.confirmPassword && form.password === form.confirmPassword && form.password.length >= 8) : true;
+
+  const handleSubmit = async () => {
     if (!form.email || !form.phone || !form.password) { toast.error(t('auth.fillRequired')); return; }
-    if (form.password !== form.confirmPassword) { toast.error(t('auth.passNotMatch')); return; }
-    if (form.password.length < 8) { toast.error(t('auth.passMinLength')); return; }
+    if (!form.name.trim()) { toast.error('Please enter your name'); return; }
     setLoading(true);
     try {
       await register({ email: form.email, phone: form.phone, password: form.password, name: form.name, referral_code: form.referral_code || undefined });
@@ -28,33 +30,108 @@ export default function RegisterPage() {
       navigate('/home', { replace: true });
     } catch (err) {
       toast.error(err.response?.data?.error || t('common.operationFailed'));
-    } finally { setLoading(false); }
+      setLoading(false);
+    }
   };
 
+  const inputClass = "w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-[15px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#FF9900] focus:bg-white transition-colors";
+
   return (
-    <div className="min-h-dvh bg-warm-bg">
-      <div className="bg-gradient-to-br from-primary to-primary-dark pt-10 pb-12 px-6 text-center text-white rounded-b-[40px] shadow-lg">
-        <div className="text-4xl mb-2">🎁</div>
-        <h1 className="text-xl font-bold tracking-wide mb-1">{t('auth.registerTitle')}</h1>
-        <p className="text-white/80 text-sm">{t('auth.joinSlogan')}</p>
-        {form.referral_code && (
-          <div className="mt-3 inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 text-xs">
-            <span>🔗</span> {t('auth.referralCode')}: <strong>{form.referral_code}</strong>
+    <div className="min-h-dvh bg-white flex flex-col">
+      {/* Header */}
+      <div className="px-4 py-3 flex items-center justify-between border-b border-gray-100">
+        {step === 2 ? (
+          <button onClick={() => setStep(1)} className="p-1 -ml-1"><ChevronLeft size={22} className="text-gray-700" /></button>
+        ) : <div className="w-8" />}
+        <span className="text-sm font-medium text-gray-400">{step}/2</span>
+      </div>
+
+      {/* Progress */}
+      <div className="px-6 pt-6 pb-2">
+        <h1 className="text-[22px] font-bold text-gray-900 mb-1">
+          {step === 1 ? 'Create Account' : 'Your Profile'}
+        </h1>
+        <p className="text-sm text-gray-500">
+          {step === 1 ? 'Enter your email and set a password' : 'Tell us about yourself'}
+        </p>
+        <div className="flex gap-2 mt-4 mb-2">
+          <div className="h-1 flex-1 rounded-full bg-[#FF9900]" />
+          <div className={`h-1 flex-1 rounded-full ${step >= 2 ? 'bg-[#FF9900]' : 'bg-gray-200'}`} />
+        </div>
+      </div>
+
+      {/* Form */}
+      <div className="flex-1 px-6 pt-4">
+        {step === 1 ? (
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1.5 block">Email</label>
+              <div className="relative">
+                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type="email" value={form.email} onChange={updateField('email')} placeholder="your@email.com" className={inputClass + " pl-11"} autoFocus />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1.5 block">Password</label>
+              <div className="relative">
+                <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type="password" value={form.password} onChange={updateField('password')} placeholder="At least 8 characters" className={inputClass + " pl-11"} />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1.5 block">Confirm Password</label>
+              <div className="relative">
+                <Shield size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type="password" value={form.confirmPassword} onChange={updateField('confirmPassword')} placeholder="Re-enter password" className={inputClass + " pl-11"} />
+              </div>
+              {form.confirmPassword && form.password !== form.confirmPassword && (
+                <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1.5 block">Name</label>
+              <div className="relative">
+                <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type="text" value={form.name} onChange={updateField('name')} placeholder="Your full name" className={inputClass + " pl-11"} autoFocus />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1.5 block">Phone Number</label>
+              <div className="relative">
+                <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type="tel" value={form.phone} onChange={updateField('phone')} placeholder="10-15 digits" className={inputClass + " pl-11"} />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1.5 block">Referral Code <span className="text-gray-300">(optional)</span></label>
+              <div className="relative">
+                <Gift size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type="text" value={form.referral_code} onChange={updateField('referral_code')} placeholder="Enter referral code" className={inputClass + " pl-11"} />
+              </div>
+            </div>
           </div>
         )}
       </div>
-      <div className="px-6 -mt-6 pb-8">
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-md p-6 space-y-3.5 animate-fade-in">
-          <h2 className="text-lg font-semibold text-text-primary text-center mb-1">{t('auth.registerTitle')}</h2>
-          <div><label className="block text-sm font-medium text-text-secondary mb-1">{t('auth.email')} <span className="text-primary">*</span></label><input type="email" value={form.email} onChange={updateField('email')} placeholder={t('auth.placeholderEmail')} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-warm-white text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" autoComplete="email" /></div>
-          <div><label className="block text-sm font-medium text-text-secondary mb-1">{t('auth.phone')} <span className="text-primary">*</span></label><input type="tel" value={form.phone} onChange={updateField('phone')} placeholder={t('auth.placeholderPhone')} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-warm-white text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" autoComplete="tel" /></div>
-          <div><label className="block text-sm font-medium text-text-secondary mb-1">{t('auth.name')}</label><input type="text" value={form.name} onChange={updateField('name')} placeholder={t('auth.placeholderName')} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-warm-white text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" /></div>
-          <div><label className="block text-sm font-medium text-text-secondary mb-1">{t('auth.password')} <span className="text-primary">*</span></label><input type="password" value={form.password} onChange={updateField('password')} placeholder={t('auth.placeholderPass')} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-warm-white text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" autoComplete="new-password" /></div>
-          <div><label className="block text-sm font-medium text-text-secondary mb-1">{t('auth.confirmPassword')} <span className="text-primary">*</span></label><input type="password" value={form.confirmPassword} onChange={updateField('confirmPassword')} placeholder={t('auth.placeholderConfirm')} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-warm-white text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all" autoComplete="new-password" /></div>
-          <div><label className="block text-sm font-medium text-text-secondary mb-1">{t('auth.referralCode')} <span className="text-text-muted font-normal">({t('auth.referralOptional')})</span></label><input type="text" value={form.referral_code} onChange={updateField('referral_code')} placeholder={t('auth.placeholderReferral')} className="w-full px-4 py-2.5 rounded-xl border border-gold/50 bg-gold-light/30 text-sm focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20 transition-all uppercase placeholder:text-text-muted" /></div>
-          <button type="submit" disabled={loading} className="w-full py-3 bg-gradient-to-r from-primary to-primary-dark text-white font-semibold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all active:scale-[0.98] disabled:opacity-60 text-sm mt-2">{loading ? t('auth.registering') : t('auth.registerBtn')}</button>
-          <p className="text-center text-sm text-text-muted">{t('auth.hasAccount')} <Link to="/login" className="text-primary font-medium hover:underline">{t('auth.goLogin')}</Link></p>
-        </form>
+
+      {/* Bottom Button */}
+      <div className="px-6 py-4 border-t border-gray-100 safe-bottom">
+        {step === 1 ? (
+          <button onClick={() => setStep(2)} disabled={!canNext}
+            className="w-full py-3.5 bg-[#FF9900] text-white rounded-xl text-[16px] font-semibold flex items-center justify-center gap-2 disabled:opacity-40 active:scale-[0.98] transition-all">
+            Continue <ChevronRight size={18} />
+          </button>
+        ) : (
+          <button onClick={handleSubmit} disabled={loading}
+            className="w-full py-3.5 bg-[#FF9900] text-white rounded-xl text-[16px] font-semibold disabled:opacity-60 active:scale-[0.98] transition-all">
+            {loading ? 'Creating...' : 'Create Account'}
+          </button>
+        )}
+        <p className="text-center text-sm text-gray-500 mt-3">
+          Already have an account? <Link to="/login" className="text-[#FF9900] font-medium">Sign In</Link>
+        </p>
       </div>
     </div>
   );

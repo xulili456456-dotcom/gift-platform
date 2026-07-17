@@ -148,10 +148,7 @@ body.dark .from-orange-50 { --tw-gradient-from: #2a1e10; }
 .animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 
-/* Flat design - no rounded corners on cards */
-.rounded-2xl, .rounded-3xl, .rounded-\[32px\], .rounded-\[36px\], .rounded-\[40px\], .rounded-xl:not(.keep-round) {
-  border-radius: 4px !important;
-}
+/* Restore natural rounded corners for app-like feel */
 
 /* Skeleton */
 .skeleton {
