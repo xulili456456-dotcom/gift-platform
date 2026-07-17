@@ -6,7 +6,7 @@ const giftModel = require('../models/gift');
 const userGiftModel = require('../models/userGift');
 const invitationModel = require('../models/invitation');
 const settingsModel = require('../models/settings');
-const { get, all, run } = require('../db/database');
+const { get, all, run, insert } = require('../db/database');
 
 const router = Router();
 router.use(authMiddleware);
