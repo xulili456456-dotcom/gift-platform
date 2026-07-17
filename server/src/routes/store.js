@@ -415,10 +415,21 @@ router.get('/free-products', authMiddleware, async (req, res) => {
     try { products = JSON.parse(data.value); } catch { products = []; }
   } else {
     // Generate 5 random products with price ≤ $100
-    const catalog = require('../data/products.json');
-    const eligible = catalog.filter(p => p.price <= 100);
-    const shuffled = eligible.sort(() => Math.random() - 0.5);
-    products = shuffled.slice(0, 5).map(p => ({ ...p, claimed: false, claimedBy: null }));
+    try {
+      const catalog = require('../data/products.json');
+      const eligible = catalog.filter(p => p.price <= 100);
+      const shuffled = eligible.sort(() => Math.random() - 0.5);
+      products = shuffled.slice(0, 5).map(p => ({ ...p, claimed: false, claimedBy: null }));
+    } catch (e) {
+      // Fallback: hardcoded sample products
+      products = [
+        {id:39, name:'KitchenAid Kitchen Shears', price:7.59, img:'/products/39.jpg', claimed:false, claimedBy:null},
+        {id:44, name:'Astercook Kitchen Utensils Set', price:19.98, img:'/products/44.jpg', claimed:false, claimedBy:null},
+        {id:77, name:'Snack Box Containers Set', price:8.96, img:'/products/77.jpg', claimed:false, claimedBy:null},
+        {id:41, name:'Hefty Trash Bags 80ct', price:11.97, img:'/products/41.jpg', claimed:false, claimedBy:null},
+        {id:55, name:'Bluetooth Headphones', price:15.00, img:'/products/55.jpg', claimed:false, claimedBy:null},
+      ];
+    }
     await run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO NOTHING", [key, JSON.stringify(products)]);
   }
 
