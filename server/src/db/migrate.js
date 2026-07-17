@@ -264,6 +264,24 @@ async function migrate() {
   try { await exec(`ALTER TABLE store_orders ADD CONSTRAINT store_orders_status_check CHECK(status IN ('pending', 'done', 'holding'))`); } catch (e) { console.log('Store orders constraint update skipped:', e.message); }
   // Add product_name column
   try { await exec(`ALTER TABLE store_orders ADD COLUMN IF NOT EXISTS product_name TEXT DEFAULT ''`); } catch (e) { console.log('product_name column skipped:', e.message); }
+  // Add IP tracking to users
+  try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS ip_address VARCHAR(45) DEFAULT ''`); } catch (e) { console.log('ip_address column skipped:', e.message); }
+  // Add frozen flag to users
+  try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS frozen BOOLEAN DEFAULT FALSE`); } catch (e) { console.log('frozen column skipped:', e.message); }
+  // Transaction requests (deposit/withdrawal approval)
+  try {
+    await exec(`CREATE TABLE IF NOT EXISTS transaction_requests (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      type TEXT NOT NULL CHECK(type IN ('deposit', 'withdrawal')),
+      amount NUMERIC(10,2) NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
+      admin_note TEXT DEFAULT '',
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      reviewed_at TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`);
+  } catch (e) { console.log('Transaction requests migration skipped:', e.message); }
   await exec(defaultSettings);
   // One-time cleanup: remove legacy Chinese notifications
   try {

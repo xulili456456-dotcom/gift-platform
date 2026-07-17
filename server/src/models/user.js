@@ -22,10 +22,10 @@ const userModel = {
     );
   },
 
-  async create({ email, phone, passwordHash, name, referralCode, parentId }) {
+  async create({ email, phone, passwordHash, name, referralCode, parentId, ipAddress }) {
     const result = await insert(
-      'INSERT INTO users (email, phone, password_hash, name, referral_code, parent_id) VALUES (?, ?, ?, ?, ?, ?)',
-      [email, phone, passwordHash, name, referralCode, parentId || null]
+      'INSERT INTO users (email, phone, password_hash, name, referral_code, parent_id, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [email, phone, passwordHash, name, referralCode, parentId || null, ipAddress || '']
     );
     return this.findById(result.id);
   },

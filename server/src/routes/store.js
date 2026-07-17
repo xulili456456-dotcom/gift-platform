@@ -482,7 +482,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 
-// POST /api/store/deposit — move funds from balance to deposit
+// POST /api/store/deposit — move funds from balance to deposit (instant, no approval needed)
 router.post('/deposit', authMiddleware, async (req, res) => {
   const amount = parseFloat(req.body.amount);
   if (!amount || amount < 1) return res.status(400).json({ error: 'Minimum deposit is $1' });

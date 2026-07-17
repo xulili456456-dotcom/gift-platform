@@ -70,6 +70,7 @@ router.post('/register', registerLimiter, async (req, res) => {
       name: name || '',
       referralCode: code,
       parentId,
+      ipAddress: req.ip || req.connection?.remoteAddress || '',
     });
 
     if (parentId && inviter) {

@@ -248,8 +248,134 @@ router.get('/stores', async (req, res) => {
   );
   res.json(rows.map(r => ({
     ...r,
-    todayEarnings: 0, // lazy: could compute from store_orders
+    todayEarnings: 0,
   })));
+});
+
+// ========== Enhanced User List (with store + KYC) ==========
+router.get('/users-enhanced', async (req, res) => {
+  const { page = 1, limit = 20, search = '' } = req.query;
+  const offset = (page - 1) * limit;
+  const searchClause = search ? `WHERE u.email ILIKE $1 OR u.name ILIKE $1 OR u.phone ILIKE $1` : '';
+  const countParams = search ? [`%${search}%`] : [];
+
+  const total = await get(
+    `SELECT COUNT(*) as c FROM users u ${searchClause.replace('$1','?')}`,
+    countParams
+  );
+
+  const params = search ? [`%${search}%`, limit, offset] : [limit, offset];
+  const rows = await all(
+    `SELECT u.id, u.email, u.phone, u.name, u.referral_code, u.is_admin, u.is_active, u.frozen,
+            u.created_at, u.ip_address,
+            COALESCE(s.id, 0) as store_id, s.tier, s.deposit as store_deposit, s.status as store_status,
+            COALESCE((SELECT SUM(amount) FROM task_earnings WHERE user_id = u.id AND status = 'delivered'), 0) as balance,
+            COALESCE(k.status, '') as kyc_status
+     FROM users u
+     LEFT JOIN stores s ON s.user_id = u.id
+     LEFT JOIN kyc_submissions k ON k.user_id = u.id
+     ${searchClause}
+     ORDER BY u.id DESC
+     LIMIT $${search ? 2 : 1} OFFSET $${search ? 3 : 2}`,
+    params
+  );
+
+  res.json({
+    users: rows.map(r => ({ ...r, balance: Number(r.balance), store_deposit: Number(r.store_deposit || 0) })),
+    total: Number(total?.c || 0),
+    page, limit,
+  });
+});
+
+// ========== Edit User ==========
+router.put('/users/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const user = await userModel.findById(id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const { name, phone } = req.body;
+  if (name !== undefined || phone !== undefined) {
+    await userModel.update(id, { name, phone });
+  }
+  res.json({ ok: true });
+});
+
+// ========== Freeze / Unfreeze User ==========
+router.put('/users/:id/freeze', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const { frozen } = req.body;
+  await run('UPDATE users SET frozen = ? WHERE id = ?', [!!frozen, id]);
+  res.json({ ok: true, frozen: !!frozen });
+});
+
+// ========== Reset User Password ==========
+router.post('/users/:id/reset-password', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const { newPassword } = req.body;
+  if (!newPassword || newPassword.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+
+  const { hashPassword } = require('../utils/password');
+  const hash = await hashPassword(newPassword);
+  await run('UPDATE users SET password_hash = ? WHERE id = ?', [hash, id]);
+  res.json({ ok: true });
+});
+
+// ========== All Orders ==========
+router.get('/orders', async (req, res) => {
+  const { page = 1, limit = 30, user_id = '', status = '' } = req.query;
+  const offset = (page - 1) * limit;
+  let where = 'WHERE 1=1';
+  const params = [];
+  if (user_id) { where += ' AND o.user_id = ?'; params.push(user_id); }
+  if (status) { where += ' AND o.status = ?'; params.push(status); }
+
+  const total = await get(`SELECT COUNT(*) as c FROM store_orders o ${where}`, params);
+  const rows = await all(
+    `SELECT o.*, u.name as user_name, u.email as user_email
+     FROM store_orders o JOIN users u ON u.id = o.user_id
+     ${where} ORDER BY o.created_at DESC LIMIT ? OFFSET ?`,
+    [...params, limit, offset]
+  );
+  res.json({ orders: rows, total: Number(total?.c || 0), page, limit });
+});
+
+// ========== All Holdings ==========
+router.get('/holdings', async (req, res) => {
+  const { user_id = '' } = req.query;
+  let where = "WHERE o.status = 'holding'";
+  const params = [];
+  if (user_id) { where += ' AND o.user_id = ?'; params.push(user_id); }
+
+  const rows = await all(
+    `SELECT o.*, u.name as user_name, u.email as user_email
+     FROM store_orders o JOIN users u ON u.id = o.user_id
+     ${where} ORDER BY o.created_at DESC LIMIT 200`,
+    params
+  );
+  res.json(rows);
+});
+
+// ========== Enhanced Stats ==========
+router.get('/enhanced-stats', async (req, res) => {
+  const totalUsers = await get('SELECT COUNT(*) as c FROM users');
+  const totalStores = await get("SELECT COUNT(*) as c FROM stores WHERE status = 'active'");
+  const totalBalance = await get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE status = 'delivered'");
+  const totalDeposit = await get("SELECT COALESCE(SUM(deposit),0) as total FROM stores");
+  const ordersToday = await get("SELECT COUNT(*) as c FROM store_orders WHERE created_at::date = CURRENT_DATE");
+  const pendingDeposits = await get("SELECT COUNT(*) as c FROM deposits WHERE status = 'pending'");
+  const pendingWithdrawals = await get("SELECT COUNT(*) as c FROM withdrawals WHERE status = 'pending'");
+  const pendingKyc = await get("SELECT COUNT(*) as c FROM kyc_submissions WHERE status = 'pending'");
+
+  res.json({
+    totalUsers: Number(totalUsers?.c || 0),
+    totalStores: Number(totalStores?.c || 0),
+    totalBalance: Number(totalBalance?.total || 0),
+    totalDeposit: Number(totalDeposit?.total || 0),
+    ordersToday: Number(ordersToday?.c || 0),
+    pendingDeposits: Number(pendingDeposits?.c || 0),
+    pendingWithdrawals: Number(pendingWithdrawals?.c || 0),
+    pendingKyc: Number(pendingKyc?.c || 0),
+  });
 });
 
 module.exports = router;
