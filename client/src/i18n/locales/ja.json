@@ -807,7 +807,8 @@
     "depositShortage": "より多くのデポジットが必要",
     "maxTrade": "最大取引",
     "addDeposit": "+デポジット",
-    "withdrawDeposit": "デポジット解除"
+    "withdrawDeposit": "デポジット解除",
+    "freeOrders": "無料"
   },
   "specs": {
     "产地": "原産地",

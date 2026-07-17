@@ -807,7 +807,8 @@
     "depositShortage": "Need more deposit to trade this item",
     "maxTrade": "Max Trade",
     "addDeposit": "+Deposit",
-    "withdrawDeposit": "Withdraw Deposit"
+    "withdrawDeposit": "Withdraw Deposit",
+    "freeOrders": "Free"
   },
   "specs": {
     "产地": "Origin",

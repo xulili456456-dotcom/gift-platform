@@ -855,7 +855,8 @@
     "depositShortage": "Perlu lebih banyak deposit",
     "maxTrade": "Maks Dagangan",
     "addDeposit": "+Deposit",
-    "withdrawDeposit": "Keluarkan Deposit"
+    "withdrawDeposit": "Keluarkan Deposit",
+    "freeOrders": "Percuma"
   },
   "notifications": {
     "title": "Notifikasi",

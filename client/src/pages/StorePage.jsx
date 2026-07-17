@@ -342,9 +342,11 @@ export default function StorePage() {
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
     let list = genProducts(status.store.tier, CAT_VALUES[catIdx], search);
-    if (affordableOnly) list = list.filter(p => p.costPrice <= (status.store.balance || 0));
+    if (sortMode === 'free') list = list.filter(p => p.costPrice <= 50);
+    else if (affordableOnly) list = list.filter(p => p.costPrice <= (status.store.balance || 0));
     if (sortMode === 'profit') list.sort((a, b) => b.profit - a.profit);
     else if (sortMode === 'price') list.sort((a, b) => b.price - a.price);
+    else if (sortMode === 'free') list.sort((a, b) => a.price - b.price);
     else list.sort((a, b) => b.sold - a.sold);
     return list;
   }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, catIdx, search, sortMode, affordableOnly, status?.store?.balance]);
@@ -790,6 +792,11 @@ export default function StorePage() {
         <button onClick={() => setAffordableOnly(!affordableOnly)} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${affordableOnly?'bg-[#067D62] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>
           {affordableOnly ? '✅' : '💰'} {t('store.affordable') || 'Affordable'}
         </button>
+        {(s.freeRemaining > 0) && (
+          <button onClick={() => { setSortMode('free'); setAffordableOnly(false); }} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${sortMode==='free'?'bg-[#CC0C39] text-white':'bg-[#FFF8E1] text-[#CC0C39] border border-[#FFB800]'}`}>
+            🔥 {t('store.freeOrders') || 'Free'} ({s.freeRemaining})
+          </button>
+        )}
       </div>
 
       {/* Daily Free Orders */}

@@ -795,7 +795,8 @@
     "depositShortage": "Necesita más depósito",
     "maxTrade": "Comercio Máx",
     "addDeposit": "+Depósito",
-    "withdrawDeposit": "Retirar Depósito"
+    "withdrawDeposit": "Retirar Depósito",
+    "freeOrders": "Gratis"
   },
   "specs": {
     "产地": "Origen",
