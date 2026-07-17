@@ -256,6 +256,13 @@ CREATE INDEX IF NOT EXISTS idx_share_commissions_user ON share_commissions(share
 async function migrate() {
   console.log('Running database migrations...');
   await getDb();
+  // Force UTF-8 encoding on the database
+  try { await exec(`SET client_encoding TO 'UTF8'`); } catch (e) {}
+  try {
+    const { getPool } = require('./database');
+    const dbName = (await getPool().query('SELECT current_database() as name')).rows[0].name;
+    await exec(`ALTER DATABASE "${dbName}" SET client_encoding TO 'UTF8'`);
+  } catch (e) { console.log('ALTER DATABASE skipped:', e.message); }
   await exec(schema);
   try { await exec(depositsSchema); } catch (e) { console.log('Deposits migration skipped:', e.message); }
   try { await exec(commissionsSchema); } catch (e) { console.log('Commissions migration skipped:', e.message); }
