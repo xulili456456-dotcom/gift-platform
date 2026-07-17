@@ -741,7 +741,6 @@ export default function StorePage() {
             <span className="text-[11px] text-[#565959]">{t('store.balance')}</span>
             <p className="text-[28px] font-bold text-[#0F1111] leading-tight">${s.balance.toFixed(2)}</p>
           </div>
-          <button onClick={() => setTab('funds')} className="text-[10px] px-3 py-1.5 rounded-full bg-[#FFD814] text-[#0F1111] font-medium">💰 Manage Funds</button>
         </div>
         {(s.freeRemaining || 0) > 0 && (
           <div className="mt-1.5 bg-[#FFF8E1] border border-[#FFB800] rounded-lg px-3 py-1.5 flex items-center gap-2">
