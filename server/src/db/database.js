@@ -1,3 +1,6 @@
+// MUST be set before requiring pg — otherwise UTF-8 encoding breaks
+process.env.PGCLIENTENCODING = 'UTF8';
+
 const { Pool, types } = require('pg');
 const config = require('../config');
 
@@ -28,8 +31,6 @@ function toPgInsert(sql) {
 
 function getPool() {
   if (!pool) {
-    // Force UTF-8 at the process level and connection level
-    process.env.PGCLIENTENCODING = 'UTF8';
     pool = new Pool({
       connectionString: config.DATABASE_URL,
       ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
