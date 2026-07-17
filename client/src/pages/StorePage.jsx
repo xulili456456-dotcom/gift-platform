@@ -827,13 +827,29 @@ export default function StorePage() {
           <div className="bg-white rounded-xl p-4 border border-[#e7e7e7]">
             <h3 className="text-sm font-bold text-[#0F1111] mb-2">📋 Today's Orders</h3>
             {(!orderHistory?.orders || orderHistory.orders.length === 0) && <p className="text-[11px] text-[#999] text-center py-4">No orders today</p>}
-            {orderHistory?.orders?.slice(0, 10).map(o => (
-              <div key={o.id} className="flex items-center justify-between py-1.5 border-b border-[#e7e7e7] last:border-0 text-[11px]">
-                <span className="text-[#0F1111]">#{o.id}</span>
-                <span className="text-[#067D62] font-bold">+${Number(o.profit||0).toFixed(2)}</span>
-                <span className="text-[#999] text-[9px]">{new Date(o.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+            {orderHistory?.orders?.slice(0, 20).map(o => {
+              const profit = Number(o.profit) || 0;
+              const cost = profit > 0 ? Math.round((profit / PROFIT_RATE * COST_RATE) * 100) / 100 : 0;
+              const isOpen = expandedOrder === o.id;
+              return (
+              <div key={o.id} className="border-b border-[#e7e7e7] last:border-0">
+                <div className="flex items-center justify-between py-2 cursor-pointer active:bg-gray-50" onClick={() => setExpandedOrder(isOpen ? null : o.id)}>
+                  <div>
+                    <span className="text-[11px] text-[#0F1111] font-medium">Order #{o.id}</span>
+                    <span className="text-[9px] text-[#999] ml-2">{new Date(o.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                  </div>
+                  <span className="text-[11px] font-bold text-[#067D62]">+${profit.toFixed(2)}</span>
+                </div>
+                {isOpen && (
+                <div className="pb-2 text-[10px] space-y-1 text-[#565959] px-1">
+                  <div className="flex justify-between"><span>Cost</span><span className="text-[#0F1111] font-medium">${cost.toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Profit (15%)</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${(cost + profit).toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Time</span><span className="text-[#0F1111]">{new Date(o.created_at).toLocaleString()}</span></div>
+                </div>
+                )}
               </div>
-            ))}
+            )})}
           </div>
 
           <div className="h-4" />
