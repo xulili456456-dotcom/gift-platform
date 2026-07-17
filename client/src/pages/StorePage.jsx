@@ -801,15 +801,22 @@ export default function StorePage() {
             <span className="text-[10px] bg-[#CC0C39] text-white px-1.5 py-0.5 rounded-full font-bold">{freeRemaining} left</span>
             <span className="text-[9px] text-[#999]">· No deposit · 5% profit</span>
           </div>
-          <div className="flex gap-2 overflow-x-auto scrollbar-none">
+          <div className="grid grid-cols-2 gap-2">
             {freeProducts.filter(p => !p.claimed).map(fp => (
-              <div key={fp.id} className="shrink-0 w-[140px] bg-gradient-to-b from-[#FFF8E1] to-white rounded-xl border border-[#FFB800] p-2.5 text-center cursor-pointer active:scale-95 transition-all"
+              <div key={fp.id} className="bg-gradient-to-b from-[#FFF8E1] to-white rounded-xl border border-[#FFB800] p-2.5 text-center cursor-pointer active:scale-95 transition-all"
                 onClick={() => { client.post('/store/claim-free/'+fp.id).then(({data}) => { toast.success(`🔥 Grabbed! Cost $${data.cost}, profit $${data.profit}`); setFreeRemaining(data.remaining); setFreeProducts(prev=>prev.map(p=>p.id===fp.id?{...p,claimed:true}:p)); loadStatus(); loadHoldings(); }).catch(err => toast.error(err.response?.data?.error)); }}>
                 <img src={fp.img} alt={fp.name} className="w-full aspect-square object-contain rounded-lg mb-1.5 bg-white" />
                 <p className="text-[9px] text-[#0F1111] font-medium line-clamp-2 leading-tight mb-1">{fp.name}</p>
                 <p className="text-[10px] font-bold text-[#B12704]">${fp.price.toFixed(2)}</p>
                 <p className="text-[9px] text-[#999]">Cost ${(fp.price*COST_RATE).toFixed(0)} · +${(fp.price*0.05).toFixed(2)}</p>
                 <span className="inline-block mt-1 text-[9px] bg-[#CC0C39] text-white px-2 py-0.5 rounded-full font-bold">Grab It!</span>
+              </div>
+            ))}
+            {freeProducts.filter(p => p.claimed).map(fp => (
+              <div key={fp.id} className="bg-gray-100 rounded-xl border border-[#e7e7e7] p-2.5 text-center opacity-50">
+                <img src={fp.img} alt={fp.name} className="w-full aspect-square object-contain rounded-lg mb-1.5 grayscale" />
+                <p className="text-[9px] text-[#0F1111] font-medium line-clamp-2 leading-tight mb-1">{fp.name}</p>
+                <span className="inline-block mt-1 text-[9px] bg-gray-400 text-white px-2 py-0.5 rounded-full font-bold">Claimed</span>
               </div>
             ))}
           </div>
