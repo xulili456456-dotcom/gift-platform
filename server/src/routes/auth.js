@@ -60,7 +60,7 @@ router.post('/register', registerLimiter, async (req, res) => {
     let code;
     let attempts = 0;
     do {
-      code = generateReferralCode();
+      code = await generateReferralCode();
       attempts++;
     } while (await userModel.findByReferralCode(code) && attempts < 10);
 
