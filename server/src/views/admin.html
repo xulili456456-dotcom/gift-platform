@@ -75,7 +75,8 @@ input:focus,select:focus{border-color:var(--red)}
 .kv .k{color:var(--muted)}.kv .v{font-weight:500}
 </style>
 </head>
-<body class="login-body" id="loginPage">
+<body class="login-body">
+<div id="loginPage">
 <div class="login-box">
 <h1>Shopee Admin</h1>
 <p class="sub">后台管理系统</p>
@@ -83,6 +84,7 @@ input:focus,select:focus{border-color:var(--red)}
 <input id="loginPass" type="password" placeholder="Password" value="admin888">
 <div class="err" id="loginErr"></div>
 <button onclick="doLogin()">Login</button>
+</div>
 </div>
 
 <div id="mainApp" style="display:none;width:100%">
