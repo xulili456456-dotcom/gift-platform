@@ -805,19 +805,32 @@ export default function StorePage() {
             {holdings.length === 0 && <p className="text-[11px] text-[#999] text-center py-4">No active holdings</p>}
             {holdings.map(h => {
               const profit = Math.round((Number(h.cost) / COST_RATE * PROFIT_RATE) * 100) / 100;
+              const isOpen = expandedHolding === h.id;
               return (
-                <div key={h.id} className="border-b border-[#e7e7e7] last:border-0 py-2">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-[#0F1111] font-medium truncate max-w-[70%]">{h.product_name || `Order #${h.id}`}</span>
-                    <span className="text-[#067D62] font-bold shrink-0">+${profit.toFixed(2)}</span>
+                <div key={h.id} className="border-b border-[#e7e7e7] last:border-0">
+                  <div className="py-2 cursor-pointer active:bg-gray-50" onClick={() => setExpandedHolding(isOpen ? null : h.id)}>
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="text-[#0F1111] font-medium truncate max-w-[70%]">{h.product_name || `Order #${h.id}`}</span>
+                      <span className="text-[#067D62] font-bold shrink-0">+${profit.toFixed(2)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[9px] text-[#565959] mt-0.5">
+                      <span>Cost ${Number(h.cost).toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</span>
+                      <span>{h.progress}%</span>
+                    </div>
+                    <div className="w-full h-1 bg-[#f0f2f2] rounded-full mt-1 overflow-hidden">
+                      <div className="h-full bg-[#FFD814] rounded-full transition-all" style={{width: `${h.progress}%`}} />
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between text-[9px] text-[#565959] mt-0.5">
-                    <span>Cost ${Number(h.cost).toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</span>
-                    <span>{h.progress}%</span>
+                  {isOpen && (
+                  <div className="pb-2 text-[10px] space-y-1 text-[#565959] px-1 border-t border-[#f0f2f2] pt-1">
+                    <div className="flex justify-between"><span>Product</span><span className="text-[#0F1111] font-medium truncate max-w-[70%]">{h.product_name || '-'}</span></div>
+                    <div className="flex justify-between"><span>Cost</span><span className="text-[#0F1111] font-medium">${Number(h.cost).toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>Profit (15%)</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${(Number(h.cost) + profit).toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>Created</span><span className="text-[#0F1111]">{new Date(h.created_at).toLocaleString()}</span></div>
+                    <div className="flex justify-between"><span>Sell By</span><span className="text-[#0F1111]">{new Date(h.sell_by).toLocaleString()}</span></div>
                   </div>
-                  <div className="w-full h-1 bg-[#f0f2f2] rounded-full mt-1 overflow-hidden">
-                    <div className="h-full bg-[#FFD814] rounded-full transition-all" style={{width: `${h.progress}%`}} />
-                  </div>
+                  )}
                 </div>
               );
             })}
