@@ -411,13 +411,9 @@ router.get('/free-products', authMiddleware, async (req, res) => {
   let data = await get("SELECT value FROM admin_settings WHERE key = ?", [key]);
   let products = [];
 
-  // Clean old versioned keys
-  try { await run("DELETE FROM admin_settings WHERE key LIKE 'free_products_v%' OR key LIKE 'free_orders_count_v%'"); } catch {}
-  // Regenerate if not cached or if ?reset=1
-  if (req.query.reset === '1') { data = null; }
-  if (data?.value) {
-    try { products = JSON.parse(data.value); } catch { products = []; }
-  }
+  // Force regenerate — always fresh today
+  try { await run("DELETE FROM admin_settings WHERE key LIKE 'free_%' AND key != ?", ['free_products_' + today]); } catch {}
+  data = null;
   if (!products.length) {
     // Generate 5 random products with price ≤ $100
     try {
