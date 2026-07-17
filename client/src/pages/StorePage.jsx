@@ -561,6 +561,7 @@ export default function StorePage() {
           ['dashboard', '📊', t('store.dashboard') || 'Dashboard'],
           ['products', '🛒', t('store.products') || 'Products'],
           ['orders', '📋', t('store.orders') || 'Orders'],
+          ['funds', '💰', 'Funds'],
         ].map(([key, icon, label]) => (
           <button key={key} onClick={() => setTab(key)}
             className={`flex-1 py-2.5 text-[11px] font-bold text-center border-b-2 transition-colors ${
@@ -733,17 +734,14 @@ export default function StorePage() {
 
       {/* Products Tab */}
       {tab === 'products' && (<>
-      {/* Asset Dashboard Card */}
+      {/* Asset Summary Bar */}
       <div className="shrink-0 bg-white border-b border-[#e7e7e7] px-4 py-3">
-        <div className="flex items-start justify-between mb-2">
+        <div className="flex items-center justify-between">
           <div>
             <span className="text-[11px] text-[#565959]">{t('store.balance')}</span>
             <p className="text-[28px] font-bold text-[#0F1111] leading-tight">${s.balance.toFixed(2)}</p>
-            <span className="text-[10px] text-[#565959]">{t('store.deposit') || 'Deposit'}: <b className="text-[#0F1111]">${(s.deposit||0).toFixed(2)}</b> · {t('store.maxTrade') || 'Max Trade'}: <b className="text-[#0F1111]">${(s.maxTrade||0).toFixed(2)}</b></span>
           </div>
-          <div className="flex gap-1.5">
-            <button onClick={() => setShowDeposit(true)} className="text-[10px] px-2.5 py-1.5 rounded-full bg-[#FFD814] text-[#0F1111] font-medium">{t('store.addDeposit') || '+Deposit'}</button>
-          </div>
+          <button onClick={() => setTab('funds')} className="text-[10px] px-3 py-1.5 rounded-full bg-[#FFD814] text-[#0F1111] font-medium">💰 Manage Funds</button>
         </div>
         {(s.freeRemaining || 0) > 0 && (
           <div className="mt-1.5 bg-[#FFF8E1] border border-[#FFB800] rounded-lg px-3 py-1.5 flex items-center gap-2">
@@ -751,23 +749,6 @@ export default function StorePage() {
             <span className="text-[10px] text-[#0F1111] font-bold">{s.freeRemaining} free orders left today! No deposit needed for items ≤ $50</span>
           </div>
         )}
-        <div className="flex items-center gap-4 text-[11px]">
-          <span className="text-[#067D62] font-bold">+${earnings.todayProfit.toFixed(2)} {t('store.today')}</span>
-          <span className="text-[#565959]">{t('store.totalEarned') || 'Total'}: <b className="text-[#0F1111]">${earnings.totalProfit.toFixed(2)}</b></span>
-          <span className="text-[#565959]">{t('store.today')} <b className="text-[#0F1111]">{s.doneToday} orders</b></span>
-          {s.nextTier && <span className="ml-auto text-[#FFB84D] text-[10px]"><Crown size={10} className="inline mr-0.5" />{s.totalOrders}/{s.nextTier.threshold}</span>}
-        </div>
-        {/* Daily Goal Progress */}
-        <div className="mt-2">
-          <div className="flex justify-between text-[10px] text-[#565959] mb-0.5">
-            <span>{t('store.dailyGoal') || 'Daily Goal'}: ${earnings.dailyGoal.toFixed(0)}</span>
-            <span>{Math.round((earnings.todayProfit / earnings.dailyGoal) * 100)}%</span>
-          </div>
-          <div className="w-full h-1.5 bg-[#f0f2f2] rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-[#067D62] to-[#00A97F] rounded-full transition-all" style={{width: `${Math.min(100, (earnings.todayProfit / earnings.dailyGoal) * 100)}%`}} />
-          </div>
-          {earnings.tomorrowEstimate > s.balance && <p className="text-[9px] text-[#565959] mt-1">🚀 {t('store.tomorrowEstimate') || 'Tomorrow'}: ~${earnings.tomorrowEstimate.toFixed(2)}</p>}
-        </div>
       </div>
 
       {/* Trade Mode Toggle */}
@@ -922,6 +903,96 @@ export default function StorePage() {
           </div>
         </div>
       )}
+      </>)}
+      {/* Funds Tab */}
+      {tab === 'funds' && (<>
+      <div className="flex-1 overflow-y-auto bg-[#eaeded]">
+        <div className="p-3 space-y-3">
+          {/* Balance & Deposit Cards */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="bg-white rounded-xl p-4 border border-[#e7e7e7]">
+              <p className="text-[10px] text-[#565959] mb-1">💰 {t('store.balance')}</p>
+              <p className="text-2xl font-bold text-[#0F1111]">${s.balance.toFixed(2)}</p>
+            </div>
+            <div className="bg-white rounded-xl p-4 border border-[#e7e7e7]">
+              <p className="text-[10px] text-[#565959] mb-1">🔒 Deposit</p>
+              <p className="text-2xl font-bold text-[#0F1111]">${(s.deposit||0).toFixed(2)}</p>
+            </div>
+          </div>
+
+          {/* Stats Row */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="bg-white rounded-lg p-3 border border-[#e7e7e7] text-center">
+              <p className="text-[9px] text-[#565959]">📊 Max Trade</p>
+              <p className="text-sm font-bold text-[#0F1111]">${(s.maxTrade||0).toFixed(0)}</p>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-[#e7e7e7] text-center">
+              <p className="text-[9px] text-[#565959]">🔥 Free Orders</p>
+              <p className="text-sm font-bold text-[#0F1111]">{s.freeRemaining||0}/5</p>
+            </div>
+            <div className="bg-white rounded-lg p-3 border border-[#e7e7e7] text-center">
+              <p className="text-[9px] text-[#565959]">📈 Today Earned</p>
+              <p className="text-sm font-bold text-[#067D62]">+${earnings.todayProfit.toFixed(2)}</p>
+            </div>
+          </div>
+
+          {/* Deposit / Withdraw Form */}
+          <div className="bg-white rounded-xl p-4 border border-[#e7e7e7]">
+            <h3 className="text-sm font-bold text-[#0F1111] mb-3">💳 Manage Deposit</h3>
+            <p className="text-[10px] text-[#565959] mb-2">Deposit acts as collateral. 1:1 ratio — $1 deposit lets you trade $1 cost. Deposit is locked but can be withdrawn when no active holdings exceed the remaining amount.</p>
+            <div className="flex items-center gap-2 mb-3">
+              <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="Amount" className="flex-1 px-3 py-2.5 border border-[#e7e7e7] rounded-lg text-sm outline-none focus:border-[#FF9900]" />
+              <button onClick={handleDeposit} className="px-4 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111] shrink-0">+ Deposit</button>
+            </div>
+            <p className="text-[9px] text-[#999] mb-2">Available balance: <b className="text-[#0F1111]">${s.balance.toFixed(2)}</b> · After deposit max trade: <b className="text-[#0F1111]">${((s.deposit||0) + parseFloat(depositAmount||0)).toFixed(2)}</b></p>
+            {depositMsg && <p className="text-xs text-[#067D62] font-bold mb-2">{depositMsg}</p>}
+            {(s.deposit||0) > 0 && (
+              <button onClick={handleWithdrawDeposit} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#FFF0F0] text-[#CC0C39] border border-[#FFCDD2] hover:bg-[#FFE0E0]">
+                ↩ Withdraw All Deposit (${(s.deposit||0).toFixed(2)})
+              </button>
+            )}
+          </div>
+
+          {/* Active Holdings */}
+          <div className="bg-white rounded-xl p-4 border border-[#e7e7e7]">
+            <h3 className="text-sm font-bold text-[#0F1111] mb-2">📦 Active Holdings ({holdings.length})</h3>
+            {holdings.length === 0 && <p className="text-[11px] text-[#999] text-center py-4">No active holdings</p>}
+            {holdings.map(h => {
+              const profit = Math.round((Number(h.cost) / COST_RATE * PROFIT_RATE) * 100) / 100;
+              return (
+                <div key={h.id} className="border-b border-[#e7e7e7] last:border-0 py-2">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-[#0F1111] font-medium">Order #{h.id}</span>
+                    <span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[9px] text-[#565959] mt-0.5">
+                    <span>Cost ${Number(h.cost).toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</span>
+                    <span>{h.progress}%</span>
+                  </div>
+                  <div className="w-full h-1 bg-[#f0f2f2] rounded-full mt-1 overflow-hidden">
+                    <div className="h-full bg-[#FFD814] rounded-full transition-all" style={{width: `${h.progress}%`}} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Today's Orders */}
+          <div className="bg-white rounded-xl p-4 border border-[#e7e7e7]">
+            <h3 className="text-sm font-bold text-[#0F1111] mb-2">📋 Today's Orders</h3>
+            {(!orderHistory?.orders || orderHistory.orders.length === 0) && <p className="text-[11px] text-[#999] text-center py-4">No orders today</p>}
+            {orderHistory?.orders?.slice(0, 10).map(o => (
+              <div key={o.id} className="flex items-center justify-between py-1.5 border-b border-[#e7e7e7] last:border-0 text-[11px]">
+                <span className="text-[#0F1111]">#{o.id}</span>
+                <span className="text-[#067D62] font-bold">+${Number(o.profit||0).toFixed(2)}</span>
+                <span className="text-[#999] text-[9px]">{new Date(o.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="h-4" />
+        </div>
+      </div>
       </>)}
     </div>
   );
