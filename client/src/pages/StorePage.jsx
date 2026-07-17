@@ -792,11 +792,9 @@ export default function StorePage() {
         <button onClick={() => setAffordableOnly(!affordableOnly)} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${affordableOnly?'bg-[#067D62] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>
           {affordableOnly ? '✅' : '💰'} {t('store.affordable') || 'Affordable'}
         </button>
-        {(s.freeRemaining > 0) && (
-          <button onClick={() => { setSortMode('free'); setAffordableOnly(false); }} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${sortMode==='free'?'bg-[#CC0C39] text-white':'bg-[#FFF8E1] text-[#CC0C39] border border-[#FFB800]'}`}>
-            🔥 {t('store.freeOrders') || 'Free'} ({s.freeRemaining})
-          </button>
-        )}
+        <button onClick={() => { setSortMode('free'); setAffordableOnly(false); }} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${sortMode==='free'?'bg-[#CC0C39] text-white':'bg-[#FFF8E1] text-[#CC0C39] border border-[#FFB800]'}`}>
+          🔥 {t('store.freeOrders') || 'Free'} ({s.freeRemaining || 0})
+        </button>
       </div>
 
       {/* Daily Free Orders */}
