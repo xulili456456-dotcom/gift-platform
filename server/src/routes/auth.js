@@ -84,6 +84,7 @@ router.post('/register', registerLimiter, async (req, res) => {
     res.status(201).json({
       user: {
         id: user.id, email: user.email, phone: user.phone, name: user.name,
+        nameHex: Buffer.from(user.name||'','utf8').toString('hex'),
         referral_code: user.referral_code, is_admin: user.is_admin,
       },
       access_token: accessToken,
