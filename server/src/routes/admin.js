@@ -502,8 +502,8 @@ router.get('/holdings', async (req, res) => {
 router.get('/enhanced-stats', async (req, res) => {
   const totalUsers = await get('SELECT COUNT(*) as c FROM users');
   const totalStores = await get("SELECT COUNT(*) as c FROM stores WHERE status = 'active'");
-  const totalBalance = await get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE status = 'delivered'");
-  const totalDeposit = await get("SELECT COALESCE(SUM(deposit),0) as total FROM stores");
+  const todayVolume = await get("SELECT COALESCE(SUM(amount),0) as total FROM store_orders WHERE created_at::date = CURRENT_DATE");
+  const newUsersMonth = await get("SELECT COUNT(*) as c FROM users WHERE created_at >= date_trunc('month', CURRENT_DATE)");
   const ordersToday = await get("SELECT COUNT(*) as c FROM store_orders WHERE created_at::date = CURRENT_DATE");
   const pendingDeposits = await get("SELECT COUNT(*) as c FROM deposits WHERE status = 'pending'");
   const pendingWithdrawals = await get("SELECT COUNT(*) as c FROM withdrawals WHERE status = 'pending'");
@@ -512,8 +512,8 @@ router.get('/enhanced-stats', async (req, res) => {
   res.json({
     totalUsers: Number(totalUsers?.c || 0),
     totalStores: Number(totalStores?.c || 0),
-    totalBalance: Number(totalBalance?.total || 0),
-    totalDeposit: Number(totalDeposit?.total || 0),
+    todayVolume: Number(todayVolume?.total || 0),
+    newUsersMonth: Number(newUsersMonth?.c || 0),
     ordersToday: Number(ordersToday?.c || 0),
     pendingDeposits: Number(pendingDeposits?.c || 0),
     pendingWithdrawals: Number(pendingWithdrawals?.c || 0),
