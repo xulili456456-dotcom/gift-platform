@@ -262,6 +262,8 @@ async function migrate() {
   // Fix: add 'holding' to store_orders status CHECK constraint
   try { await exec(`ALTER TABLE store_orders DROP CONSTRAINT IF EXISTS store_orders_status_check`); } catch (e) {}
   try { await exec(`ALTER TABLE store_orders ADD CONSTRAINT store_orders_status_check CHECK(status IN ('pending', 'done', 'holding'))`); } catch (e) { console.log('Store orders constraint update skipped:', e.message); }
+  // Add product_name column
+  try { await exec(`ALTER TABLE store_orders ADD COLUMN IF NOT EXISTS product_name TEXT DEFAULT ''`); } catch (e) { console.log('product_name column skipped:', e.message); }
   await exec(defaultSettings);
   // One-time cleanup: remove legacy Chinese notifications
   try {

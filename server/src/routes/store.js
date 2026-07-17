@@ -199,7 +199,7 @@ router.post('/orders/process', async (req, res) => {
     const sellHours = 6 + Math.random() * 24;
     const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
 
-    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'holding', ?)", [store.id, req.user.id, cost, sellBy]);
+    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name) VALUES (?, ?, ?, 'holding', ?, ?)", [store.id, req.user.id, cost, sellBy, productName || '']);
     await t.commit();
 
     // Increment free order counter if applicable
@@ -221,7 +221,7 @@ router.post('/orders/process', async (req, res) => {
 router.get('/holdings', async (req, res) => {
   const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
   if (!store) return res.json([]);
-  const holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
+  const holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at, product_name FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
   const now = Date.now();
   res.json(holdings.map(h => {
     const sellBy = new Date(h.sell_by).getTime();
@@ -367,7 +367,7 @@ router.get('/orders-history', async (req, res) => {
   else if (period === 'month') dateFilter = "AND created_at >= CURRENT_DATE - INTERVAL '30 days'";
 
   const orders = await all(
-    `SELECT id, amount as profit, created_at, status FROM store_orders WHERE store_id = ? AND status = 'done' ${dateFilter} ORDER BY created_at DESC LIMIT 50`,
+    `SELECT id, amount as profit, created_at, status, product_name FROM store_orders WHERE store_id = ? AND status = 'done' ${dateFilter} ORDER BY created_at DESC LIMIT 50`,
     [store.id]);
 
   const summary = await get(
@@ -469,7 +469,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
 
     const sellHours = 6 + Math.random() * 24;
     const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
-    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'holding', ?)", [store.id, req.user.id, cost, sellBy]);
+    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name) VALUES (?, ?, ?, 'holding', ?, ?)", [store.id, req.user.id, cost, sellBy, product.name]);
 
     // Increment per-user free counter
     await t.run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [countKey, String(used + 1), String(used + 1)]);

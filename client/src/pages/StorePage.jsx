@@ -808,8 +808,8 @@ export default function StorePage() {
               return (
                 <div key={h.id} className="border-b border-[#e7e7e7] last:border-0 py-2">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="text-[#0F1111] font-medium">Order #{h.id}</span>
-                    <span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span>
+                    <span className="text-[#0F1111] font-medium truncate max-w-[70%]">{h.product_name || `Order #${h.id}`}</span>
+                    <span className="text-[#067D62] font-bold shrink-0">+${profit.toFixed(2)}</span>
                   </div>
                   <div className="flex items-center justify-between text-[9px] text-[#565959] mt-0.5">
                     <span>Cost ${Number(h.cost).toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</span>
@@ -834,14 +834,15 @@ export default function StorePage() {
               return (
               <div key={o.id} className="border-b border-[#e7e7e7] last:border-0">
                 <div className="flex items-center justify-between py-2 cursor-pointer active:bg-gray-50" onClick={() => setExpandedOrder(isOpen ? null : o.id)}>
-                  <div>
-                    <span className="text-[11px] text-[#0F1111] font-medium">Order #{o.id}</span>
-                    <span className="text-[9px] text-[#999] ml-2">{new Date(o.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                  <div className="flex-1 min-w-0 mr-2">
+                    <p className="text-[11px] text-[#0F1111] font-medium truncate">{o.product_name || `Order #${o.id}`}</p>
+                    <p className="text-[9px] text-[#999]">{new Date(o.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>
                   </div>
-                  <span className="text-[11px] font-bold text-[#067D62]">+${profit.toFixed(2)}</span>
+                  <span className="text-[11px] font-bold text-[#067D62] shrink-0">+${profit.toFixed(2)}</span>
                 </div>
                 {isOpen && (
                 <div className="pb-2 text-[10px] space-y-1 text-[#565959] px-1">
+                  <div className="flex justify-between"><span>Product</span><span className="text-[#0F1111] font-medium truncate max-w-[70%]">{o.product_name || `#${o.id}`}</span></div>
                   <div className="flex justify-between"><span>Cost</span><span className="text-[#0F1111] font-medium">${cost.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>Profit (15%)</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${(cost + profit).toFixed(2)}</span></div>
