@@ -67,7 +67,7 @@ export default function TasksPage() {
       </div>
       <div className="p-4 space-y-5">
         {/* Check-in */}
-        <div className="bg-white rounded-2xl border border-separator shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-separator overflow-hidden">
           <div className="px-4 py-3 border-b border-separator flex items-center justify-between">
             <div className="flex items-center gap-2"><Flame size={20} className="text-amber-500" /><span className="text-[14px] font-bold text-text">{t('tasks.checkin')}</span></div>
           </div>
