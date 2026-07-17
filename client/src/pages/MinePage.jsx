@@ -79,9 +79,9 @@ export default function MinePage() {
   const current = langs.find(l => l.code === i18n.language) || langs[0];
 
   return (
-    <div className="tab-enter bg-gradient-to-b from-[#0d0d1a] to-[#141420] min-h-screen">
+    <div className="tab-enter bg-gradient-to-b from-[#ffffff] to-[#f5f5f5] min-h-screen">
       {/* Hero */}
-      <div className="relative bg-gradient-to-br from-[#c8a06e] via-[#b8905e] to-[#a07840] px-5 pt-10 pb-5 shadow-xl shadow-purple-500/20 overflow-hidden"
+      <div className="relative bg-gradient-to-br from-[#FF5000] via-[#FF5000] to-[#E04500] px-5 pt-10 pb-5 shadow-xl shadow-purple-500/20 overflow-hidden"
         style={{ backgroundSize: '200% 200%', animation: 'gradientShift 4s ease-in-out infinite' }}>
         {/* Floating particles */}
         {[...Array(12)].map((_, i) => (
@@ -141,7 +141,7 @@ export default function MinePage() {
                 </div>
                 <button
                   onClick={() => setShowClaimConfirm(gift)}
-                  className="bg-gradient-to-r from-[#c8a06e] to-[#a07840] text-white px-4 py-2 rounded-xl text-[12px] font-bold active:scale-95 transition-transform shadow-md shadow-purple-500/20">
+                  className="bg-gradient-to-r from-[#FF5000] to-[#E04500] text-white px-4 py-2 rounded-xl text-[12px] font-bold active:scale-95 transition-transform shadow-md shadow-purple-500/20">
                   ${gift.value} {t('gifts.claimNow')}
                 </button>
               </div>
@@ -188,7 +188,7 @@ export default function MinePage() {
         {/* Deposit */}
         <button onClick={() => document.dispatchEvent(new CustomEvent('showContactSupport'))}
           className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm border border-separator active:bg-bg transition-colors">
-          <CreditCard size={22} className="text-[#c8a06e] shrink-0" />
+          <CreditCard size={22} className="text-[#FF5000] shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">Deposit</p>
             <p className="text-[12px] text-text-muted">Contact support to deposit</p>
@@ -354,7 +354,7 @@ export default function MinePage() {
               <button onClick={() => setShowClaimConfirm(null)}
                 className="flex-1 py-3 bg-bg rounded-xl text-[13px] font-semibold text-text-secondary">{t('common.cancel')}</button>
               <button onClick={() => handleClaim(showClaimConfirm)} disabled={claimingGift === showClaimConfirm.id}
-                className="flex-1 py-3 bg-gradient-to-r from-[#c8a06e] to-[#a07840] text-white rounded-xl text-[13px] font-bold active:scale-95 transition-transform">
+                className="flex-1 py-3 bg-gradient-to-r from-[#FF5000] to-[#E04500] text-white rounded-xl text-[13px] font-bold active:scale-95 transition-transform">
                 {claimingGift === showClaimConfirm.id ? '...' : t('gifts.claimNow')}
               </button>
             </div>

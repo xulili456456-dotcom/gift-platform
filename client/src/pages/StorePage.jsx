@@ -410,13 +410,13 @@ export default function StorePage() {
   };
   const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
 
-  if (loading) return <div className="min-h-screen bg-[#ffffff] flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#FF9900] border-t-transparent rounded-full animate-spin" /></div>;
+  if (loading) return <div className="min-h-screen bg-[#ffffff] flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#FF5000] border-t-transparent rounded-full animate-spin" /></div>;
   if (!status?.hasStore) return (
     <div className="min-h-screen bg-[#ffffff] safe-top safe-bottom flex flex-col items-center justify-center px-6 text-center">
-      <div className="w-24 h-24 rounded-full bg-[#FFD814] flex items-center justify-center mb-6 shadow-2xl"><Store size={44} className="text-white" /></div>
+      <div className="w-24 h-24 rounded-full bg-[#FF5000] flex items-center justify-center mb-6 shadow-2xl"><Store size={44} className="text-white" /></div>
       <h1 className="text-2xl font-black text-[#0F1111] mb-1">{t('store.title')}</h1>
       <p className="text-sm text-[#565959] mb-8">{t('store.subtitle')}</p>
-      <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-bold rounded-full shadow-lg active:scale-[0.98] transition-all text-base border border-[#FCD200]">{opening ? '...' : t('store.openFree')}</button>
+      <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-[#FF5000] hover:bg-[#E04500] text-[#0F1111] font-bold rounded-full shadow-lg active:scale-[0.98] transition-all text-base border border-[#FF5000]">{opening ? '...' : t('store.openFree')}</button>
     </div>
   );
 
@@ -429,14 +429,14 @@ export default function StorePage() {
     const savingsPct = Math.round(((p.price - p.costPrice) / p.price) * 100);
     return (
       <div className="min-h-screen bg-white safe-top flex flex-col" style={{paddingBottom:'70px'}}>
-        <div className="shrink-0 flex items-center gap-3 px-4 py-3 bg-[#131921] text-white">
+        <div className="shrink-0 flex items-center gap-3 px-4 py-3 bg-[#FF5000] text-white">
           <button onClick={() => setDetail(null)} className="p-1 -ml-1"><ChevronLeft size={22} /></button>
           <span className="text-sm font-medium truncate flex-1">{p.name}</span>
           <button className="p-1"><ShoppingCart size={20} /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="relative bg-[#f0f2f2]">
+          <div className="relative bg-gray-50">
             <img src={p.img} alt={p.name} className="w-full aspect-square object-contain" />
             {savingsPct >= 30 && <span className="absolute top-3 left-3 bg-[#CC0C39] text-white text-xs font-bold px-2 py-1 rounded">-{savingsPct}%</span>}
           </div>
@@ -451,7 +451,7 @@ export default function StorePage() {
 
             <div className="my-3 border-t border-[#e7e7e7]" />
 
-            <div className="bg-[#f0f2f2] border border-[#FCD200] rounded-lg p-3">
+            <div className="bg-gray-50 border border-[#FF5000] rounded-lg p-3">
               <div className="flex items-baseline gap-2">
                 {savingsPct > 0 && <span className="text-xs bg-[#CC0C39] text-white px-1.5 py-0.5 rounded font-bold">-{savingsPct}%</span>}
                 <span className="text-[28px] font-normal text-[#FFB84D]">${p.price.toFixed(2)}</span>
@@ -459,7 +459,7 @@ export default function StorePage() {
               <div className="text-xs text-[#565959] mt-0.5">
                 {t('store.marketPrice')}: <span className="line-through">${p.price.toFixed(2)}</span>
               </div>
-              <div className="flex gap-4 mt-2 pt-2 border-t border-[#FCD200]">
+              <div className="flex gap-4 mt-2 pt-2 border-t border-[#FF5000]">
                 <div><span className="text-[11px] text-[#565959]">{t('store.costPrice')}</span><span className="text-sm font-bold text-[#0F1111] ml-1">${p.costPrice.toFixed(2)}</span></div>
                 <div><span className="text-[11px] text-[#565959]">{t('store.earn')}</span><span className="text-sm font-bold text-[#067D62] ml-1">+${p.profit.toFixed(2)}</span></div>
               </div>
@@ -500,7 +500,7 @@ export default function StorePage() {
             </button>
           ) : (
             <button onClick={() => handleBuy(p)}
-              className="px-10 py-3 rounded-full font-bold text-sm bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] shadow-md active:scale-95 border border-[#FCD200] transition-all">
+              className="px-10 py-3 rounded-full font-bold text-sm bg-[#FF5000] hover:bg-[#E04500] text-[#0F1111] shadow-md active:scale-95 border border-[#FF5000] transition-all">
               {t('store.buyNow')}
             </button>
           )}
@@ -516,12 +516,12 @@ export default function StorePage() {
                 <p className="text-[#565959]">{t('store.shortage') || 'Shortage'}: <b className="text-[#FFB84D]">${showInsufficient.shortage?.toFixed(2)}</b></p>
                 {showInsufficient.balance != null && <p className="text-[10px] text-[#999]">💰 Balance: ${showInsufficient.balance?.toFixed(2)} · 🔒 Deposit: ${(showInsufficient.deposit||0).toFixed(2)}</p>}
               </div>
-              <div className="bg-[#f0f2f2] rounded-lg p-3 mb-4 text-xs text-[#565959] space-y-1">
+              <div className="bg-gray-50 rounded-lg p-3 mb-4 text-xs text-[#565959] space-y-1">
                 <p className="font-bold text-[#0F1111]">💡 {t('store.howToEarn') || 'How to get funds'}:</p>
                 <p>• {t('store.tipCheckin') || 'Daily check-in: $0.10-$0.70'}</p>
                 <p>• {t('store.tipHolding') || 'Holdings auto-sell and return funds'}</p>
               </div>
-              <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111]">{t('common.ok') || 'OK'}</button>
+              <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#FF5000] text-[#0F1111]">{t('common.ok') || 'OK'}</button>
             </div>
           </div>
         )}
@@ -533,7 +533,7 @@ export default function StorePage() {
   return (
     <div className="bg-[#ffffff] safe-top flex flex-col min-h-screen">
       {/* Top Nav Bar */}
-      <div className="shrink-0 bg-[#131921] text-white">
+      <div className="shrink-0 bg-[#FF5000] text-white">
         <div className="px-3 py-2 flex items-center gap-3">
           <div className="flex items-center gap-1.5 bg-white/10 rounded-full px-3 py-1">
             <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{background: ti.color}}><Store size={12} className="text-white" /></div>
@@ -559,7 +559,7 @@ export default function StorePage() {
         {CAT_KEYS.map((c, i) => (
           <button key={c} onClick={() => setCatIdx(i)}
             className={`shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-medium transition-colors ${
-              catIdx === i ? 'bg-[#131921] text-white' : 'text-[#0F1111] bg-[#f0f2f2] hover:bg-[#e7e7e7]'
+              catIdx === i ? 'bg-[#FF5000] text-white' : 'text-[#0F1111] bg-gray-50 hover:bg-[#e7e7e7]'
             }`}>{t(c)}</button>
         ))}
       </div>
@@ -572,7 +572,7 @@ export default function StorePage() {
         ].map(([key, icon, label]) => (
           <button key={key} onClick={() => setTab(key)}
             className={`flex-1 py-2.5 text-[11px] font-bold text-center border-b-2 transition-colors ${
-              tab === key ? 'border-[#131921] text-[#131921]' : 'border-transparent text-[#565959]'
+              tab === key ? 'border-[#FF5000] text-[#FF5000]' : 'border-transparent text-[#565959]'
             }`}>{icon} {label}</button>
         ))}
       </div>
@@ -598,22 +598,22 @@ export default function StorePage() {
       {/* Trade Mode Toggle */}
       <div className="shrink-0 bg-white border-b border-[#e7e7e7] px-3 py-2 flex items-center gap-2">
         <button onClick={() => setTradeMode('holding')}
-          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='holding'?'bg-[#FFD814] text-[#0F1111]':'bg-[#f0f2f2] text-[#565959]'}`}>
+          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='holding'?'bg-[#FF5000] text-[#0F1111]':'bg-gray-50 text-[#565959]'}`}>
           📦 {t('store.holdingMode') || 'Holding'} <span className="text-[9px] ml-0.5 opacity-60">15%</span>
         </button>
         <button onClick={() => setTradeMode('share')}
-          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='share'?'bg-[#067D62] text-white':'bg-[#f0f2f2] text-[#565959]'}`}>
+          className={`flex-1 py-2 rounded-lg text-[11px] font-bold transition-colors ${tradeMode==='share'?'bg-[#067D62] text-white':'bg-gray-50 text-[#565959]'}`}>
           🔗 {t('store.shareMode') || 'Share'} <span className="text-[9px] ml-0.5 opacity-60">3%</span>
         </button>
       </div>
 
       {/* Sort & Filter Row */}
       <div className="shrink-0 bg-white border-b border-[#e7e7e7] px-3 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
-        <button onClick={() => setSortMode('profit')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='profit'?'bg-[#0F1111] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>💰 {t('store.sortProfit') || 'Profit'}</button>
-        <button onClick={() => setSortMode('price')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='price'?'bg-[#0F1111] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>📊 {t('store.sortPrice') || 'Price'}</button>
-        <button onClick={() => setSortMode('sales')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='sales'?'bg-[#0F1111] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>🔥 {t('store.sortSales') || 'Top'}</button>
+        <button onClick={() => setSortMode('profit')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='profit'?'bg-[#0F1111] text-white':'bg-gray-50 text-[#0F1111]'}`}>💰 {t('store.sortProfit') || 'Profit'}</button>
+        <button onClick={() => setSortMode('price')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='price'?'bg-[#0F1111] text-white':'bg-gray-50 text-[#0F1111]'}`}>📊 {t('store.sortPrice') || 'Price'}</button>
+        <button onClick={() => setSortMode('sales')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='sales'?'bg-[#0F1111] text-white':'bg-gray-50 text-[#0F1111]'}`}>🔥 {t('store.sortSales') || 'Top'}</button>
         <span className="text-[#ddd]">|</span>
-        <button onClick={() => setAffordableOnly(!affordableOnly)} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${affordableOnly?'bg-[#067D62] text-white':'bg-[#f0f2f2] text-[#0F1111]'}`}>
+        <button onClick={() => setAffordableOnly(!affordableOnly)} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${affordableOnly?'bg-[#067D62] text-white':'bg-gray-50 text-[#0F1111]'}`}>
           {affordableOnly ? '✅' : '💰'} {t('store.affordable') || 'Affordable'}
         </button>
         <button onClick={() => { setSortMode('free'); setAffordableOnly(false); }} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${sortMode==='free'?'bg-[#CC0C39] text-white':'bg-[#FFF8E1] text-[#CC0C39] border border-[#FFB800]'}`}>
@@ -628,10 +628,10 @@ export default function StorePage() {
             const isFreeSoldOut = sortMode === 'free' && freeRemaining <= 0 && isFreeProduct;
             return (
             <div key={p.id} onClick={() => !isFreeSoldOut && setDetail(p)} className={`bg-white rounded-lg shadow-sm border border-[#e7e7e7] overflow-hidden hover:border-[#ddd] transition-colors ${isFreeSoldOut ? 'opacity-50' : 'active:shadow-md cursor-pointer'}`}>
-              <div className="relative bg-[#f0f2f2] aspect-square">
+              <div className="relative bg-gray-50 aspect-square">
                 <img src={p.img} alt={p.name} className="w-full h-full object-contain p-3" loading="lazy" />
                 {p.sold > 5000 && <span className="absolute top-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#CC0C39] text-white font-bold uppercase tracking-wide">Best</span>}
-                {p.sold > 1000 && p.sold <= 5000 && <span className="absolute top-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#FFD814] text-white font-bold">Top</span>}
+                {p.sold > 1000 && p.sold <= 5000 && <span className="absolute top-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#FF5000] text-white font-bold">Top</span>}
                 {isFreeSoldOut && <span className="absolute top-1.5 right-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#999] text-white font-bold">已抢完</span>}
               </div>
               <div className="p-2.5">
@@ -657,7 +657,7 @@ export default function StorePage() {
                   ) : (
                     <button
                       onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
-                      className="text-[12px] px-4 py-2 rounded font-bold active:scale-95 transition-all bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] border border-[#FCD200] shadow-sm"
+                      className="text-[12px] px-4 py-2 rounded font-bold active:scale-95 transition-all bg-[#FF5000] hover:bg-[#E04500] text-[#0F1111] border border-[#FF5000] shadow-sm"
                     >{t('store.buy')}</button>
                   )}
                 </div>
@@ -695,12 +695,12 @@ export default function StorePage() {
               <p className="text-[#565959]">{t('store.shortage') || 'Shortage'}: <b className="text-[#FFB84D]">${showInsufficient.shortage?.toFixed(2)}</b></p>
               {showInsufficient.balance != null && <p className="text-[10px] text-[#999]">💰 Balance: ${showInsufficient.balance?.toFixed(2)} · 🔒 Deposit: ${(showInsufficient.deposit||0).toFixed(2)}</p>}
             </div>
-            <div className="bg-[#f0f2f2] rounded-lg p-3 mb-4 text-xs text-[#565959] space-y-1">
+            <div className="bg-gray-50 rounded-lg p-3 mb-4 text-xs text-[#565959] space-y-1">
               <p className="font-bold text-[#0F1111]">💡 {t('store.howToEarn') || 'How to get funds'}:</p>
               <p>• {t('store.tipCheckin') || 'Daily check-in: $0.10-$0.70'}</p>
               <p>• {t('store.tipHolding') || 'Holdings auto-sell and return funds'}</p>
             </div>
-            <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111]">{t('common.ok') || 'OK'}</button>
+            <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-lg text-sm font-bold bg-[#FF5000] text-[#0F1111]">{t('common.ok') || 'OK'}</button>
           </div>
         </div>
       )}
@@ -718,12 +718,12 @@ export default function StorePage() {
               <p className="text-[10px] text-[#999999] mb-1">{t('store.shareCommission')} · 3% {t('store.shareRate')}</p>
               <p className="text-2xl font-black text-[#067D62]">+${shareProduct.commission?.toFixed(2)}</p>
             </div>
-            <div className="bg-[#f0f2f2] rounded-lg p-3 mb-3 flex items-center justify-between">
+            <div className="bg-gray-50 rounded-lg p-3 mb-3 flex items-center justify-between">
               <p className="text-[10px] text-[#565959] break-all flex-1 mr-2 font-mono">{shareProduct.shareUrl || ""}</p>
-              <button onClick={() => copyShareLink(shareProduct.shareUrl)} className="shrink-0 px-3 py-1.5 bg-[#FFD814] text-[#0F1111] text-[10px] font-bold rounded-lg">{t('invite.copy')}</button>
+              <button onClick={() => copyShareLink(shareProduct.shareUrl)} className="shrink-0 px-3 py-1.5 bg-[#FF5000] text-[#0F1111] text-[10px] font-bold rounded-lg">{t('invite.copy')}</button>
             </div>
             <p className="text-[9px] text-[#999999] text-center mb-3">{t('store.shareHint')}</p>
-            <button onClick={() => setShareProduct(null)} className="w-full py-2.5 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">{t('common.close')}</button>
+            <button onClick={() => setShareProduct(null)} className="w-full py-2.5 bg-gray-50 text-[#0F1111] font-medium rounded-xl text-sm">{t('common.close')}</button>
           </div>
         </div>
       )}
@@ -765,8 +765,8 @@ export default function StorePage() {
             <h3 className="text-sm font-bold text-[#0F1111] mb-3">💳 Manage Deposit</h3>
             <p className="text-[10px] text-[#565959] mb-2">Deposit acts as collateral. 1:1 ratio — $1 deposit lets you trade $1 cost. Deposit is locked but can be withdrawn when no active holdings exceed the remaining amount.</p>
             <div className="flex items-center gap-2 mb-3">
-              <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="Amount" className="flex-1 px-3 py-2.5 border border-[#e7e7e7] rounded-lg text-sm outline-none focus:border-[#FF9900]" />
-              <button onClick={handleDeposit} className="px-4 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111] shrink-0">+ Deposit</button>
+              <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="Amount" className="flex-1 px-3 py-2.5 border border-[#e7e7e7] rounded-lg text-sm outline-none focus:border-[#FF5000]" />
+              <button onClick={handleDeposit} className="px-4 py-2.5 rounded-lg text-sm font-bold bg-[#FF5000] text-[#0F1111] shrink-0">+ Deposit</button>
             </div>
             <p className="text-[9px] text-[#999] mb-2">Available balance: <b className="text-[#0F1111]">${s.balance.toFixed(2)}</b> · After deposit max trade: <b className="text-[#0F1111]">${((s.deposit||0) + parseFloat(depositAmount||0)).toFixed(2)}</b></p>
             {depositMsg && <p className="text-xs text-[#067D62] font-bold mb-2">{depositMsg}</p>}
@@ -795,8 +795,8 @@ export default function StorePage() {
                       <span>Cost ${Number(h.cost).toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</span>
                       <span>{h.progress}%</span>
                     </div>
-                    <div className="w-full h-1 bg-[#f0f2f2] rounded-full mt-1 overflow-hidden">
-                      <div className="h-full bg-[#FFD814] rounded-full transition-all" style={{width: `${h.progress}%`}} />
+                    <div className="w-full h-1 bg-gray-50 rounded-full mt-1 overflow-hidden">
+                      <div className="h-full bg-[#FF5000] rounded-full transition-all" style={{width: `${h.progress}%`}} />
                     </div>
                   </div>
                   {isOpen && (
@@ -856,7 +856,7 @@ export default function StorePage() {
             <span className="text-3xl block text-center mb-3">🛒</span>
             <h3 className="text-base font-bold text-[#0F1111] mb-1">Confirm Purchase</h3>
             <p className="text-[11px] text-[#565959] mb-3 line-clamp-2">{buyConfirm.name}</p>
-            <div className="bg-[#f0f2f2] rounded-lg p-3 mb-4 space-y-1.5 text-sm">
+            <div className="bg-gray-50 rounded-lg p-3 mb-4 space-y-1.5 text-sm">
               <div className="flex justify-between"><span className="text-[#565959]">Market Price</span><span className="font-bold text-[#0F1111]">${buyConfirm.price.toFixed(2)}</span></div>
               <div className="flex justify-between"><span className="text-[#565959]">Cost (85%)</span><span className="font-bold text-[#0F1111]">${buyConfirm.costPrice.toFixed(2)}</span></div>
               <div className="flex justify-between"><span className="text-[#565959]">Profit</span><span className="font-bold text-[#067D62]">+${buyConfirm.profit.toFixed(2)}</span></div>
@@ -867,8 +867,8 @@ export default function StorePage() {
               <p>Hold time: 6-30 hours · Profit: {PROFIT_RATE * 100}%</p>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setBuyConfirm(null)} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#f0f2f2] text-[#0F1111]">Cancel</button>
-              <button onClick={handleConfirmBuy} disabled={buying} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111] border border-[#FCD200]">
+              <button onClick={() => setBuyConfirm(null)} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-gray-50 text-[#0F1111]">Cancel</button>
+              <button onClick={handleConfirmBuy} disabled={buying} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FF5000] text-[#0F1111] border border-[#FF5000]">
                 {buying ? '...' : `Buy $${buyConfirm.costPrice.toFixed(2)}`}
               </button>
             </div>
