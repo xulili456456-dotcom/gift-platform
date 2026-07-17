@@ -215,9 +215,9 @@ router.put('/withdrawals/:id', async (req, res) => {
 // DELETE /api/admin/users/:id
 router.delete('/users/:id', async (req, res) => {
   const id = parseInt(req.params.id);
-  if (id === 1) return res.status(400).json({ error: 'Cannot delete the primary admin' });
   const user = await userModel.findById(id);
   if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.is_admin) return res.status(400).json({ error: 'Cannot delete admin accounts' });
   await run('DELETE FROM users WHERE id = ?', [id]);
   res.json({ ok: true, message: 'User deleted' });
 });
