@@ -89,7 +89,6 @@ router.get('/status', async (req, res) => {
       todayEarnings: Number(earningsToday?.total) || 0,
       totalOrders,
       totalEarnings: Number(totalEarnings?.total) || 0,
-      remaining: Math.max(0, tier.dailyOrders - (Number(doneToday?.c) || 0)),
       balance: Number(taskBal?.total || 0),
       deposit: Number(store.deposit || 0),
       maxTrade: Number(store.deposit || 0),
@@ -182,10 +181,6 @@ router.post('/orders/process', async (req, res) => {
     });
   }
 
-  // Daily limit
-  const doneToday = await get("SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND created_at::date = ?::date", [store.id, today]);
-  if (Number(doneToday?.c || 0) >= tier.dailyOrders) return res.status(400).json({ error: 'Daily order limit reached' });
-
   // Transaction: deduct + create holding
   const t = await tx();
   try {
@@ -213,7 +208,7 @@ router.post('/orders/process', async (req, res) => {
       await run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [freeKey, String(newCount), String(newCount)]);
     }
 
-    res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: isFreeOrder ? FREE_SLOTS - newCount : undefined, remaining: Math.max(0, tier.dailyOrders - Number(doneToday?.c || 0) - 1) });
+    res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: isFreeOrder ? FREE_SLOTS - newCount : undefined });
   } catch (err) {
     console.error('Buy order failed:', err.code, err.message, err.detail);
     await t.rollback().catch(() => {});

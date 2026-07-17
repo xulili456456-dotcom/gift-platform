@@ -370,7 +370,6 @@ export default function StorePage() {
     navigator.clipboard.writeText(url);
     toast.success(t('store.linkCopiedMsg'));
   };
-  const [showDailyFull, setShowDailyFull] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [expandedHolding, setExpandedHolding] = useState(null);
   const [showDeposit, setShowDeposit] = useState(false);
@@ -387,8 +386,6 @@ export default function StorePage() {
     catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
   };
   const handleBuy = async (product) => {
-    // Pre-check locally first, then let backend verify
-    if (s.remaining <= 0) { setShowDailyFull(true); return; }
     try {
       const { data } = await client.post('/store/orders/process', { productPrice: product.price, productName: product.name });
       toast.success(`${t('store.boughtMsg')} ${new Date(data.sellBy).toLocaleDateString()}`);
@@ -397,7 +394,6 @@ export default function StorePage() {
       const d = err.response?.data;
       if (d?.depositRequired) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, isDeposit: true });
       else if (d?.shortage) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage });
-      else if (d?.error?.includes('daily') || d?.error?.includes('limit')) setShowDailyFull(true);
       else toast.error(d?.error || t('common.operationFailed'));
     }
   };
@@ -755,7 +751,7 @@ export default function StorePage() {
         <div className="flex items-center gap-4 text-[11px]">
           <span className="text-[#067D62] font-bold">+${earnings.todayProfit.toFixed(2)} {t('store.today')}</span>
           <span className="text-[#565959]">{t('store.totalEarned') || 'Total'}: <b className="text-[#0F1111]">${earnings.totalProfit.toFixed(2)}</b></span>
-          <span className="text-[#565959]">{t('store.today')} <b className="text-[#0F1111]">{s.doneToday}/{s.dailyOrders}</b></span>
+          <span className="text-[#565959]">{t('store.today')} <b className="text-[#0F1111]">{s.doneToday} orders</b></span>
           {s.nextTier && <span className="ml-auto text-[#FFB84D] text-[10px]"><Crown size={10} className="inline mr-0.5" />{s.totalOrders}/{s.nextTier.threshold}</span>}
         </div>
         {/* Daily Goal Progress */}
@@ -857,9 +853,6 @@ export default function StorePage() {
           <span className="text-[#0F1111] font-bold">${s.todayEarnings.toFixed(2)}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] bg-[#f0f2f2] px-2 py-0.5 rounded-full text-[#565959]">
-            {t('store.today')} {s.doneToday}/{s.dailyOrders}
-          </span>
           <button onClick={handleClose} className="text-[10px] text-[#565959] hover:text-[#CC0C39] transition-colors">{t('store.closeStore')}</button>
         </div>
       </div>
@@ -923,19 +916,6 @@ export default function StorePage() {
               {(s.deposit||0) > 0 && <button onClick={handleWithdrawDeposit} className="w-full mt-2 py-2 rounded-lg text-xs text-[#CC0C39] font-medium">{t('store.withdrawDeposit') || 'Withdraw All Deposit'}</button>}
             </>}
             {depositMsg && <button onClick={() => { setShowDeposit(false); setDepositMsg(''); }} className="w-full py-2.5 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">Close</button>}
-          </div>
-        </div>
-      )}
-
-      {/* Daily Limit Reached Modal */}
-      {showDailyFull && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowDailyFull(false)}>
-          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in text-center" onClick={e => e.stopPropagation()}>
-            <span className="text-5xl mb-3 block">📅</span>
-            <h3 className="text-lg font-bold text-[#0F1111] mb-1">{t('store.dailyLimitReached')}</h3>
-            <p className="text-sm text-[#565959] mb-1">{t('store.dailyLimitMsg')}</p>
-            <p className="text-xs text-[#999] mb-4">Today: <b className="text-[#0F1111]">{s.doneToday}/{s.dailyOrders}</b> · Balance: <b className="text-[#0F1111]">${s.balance.toFixed(2)}</b> · Deposit: <b className="text-[#0F1111]">${(s.deposit||0).toFixed(2)}</b></p>
-            <button onClick={() => setShowDailyFull(false)} className="w-full py-2.5 bg-[#FFD814] text-[#0F1111] font-bold rounded-xl text-sm">{t('store.gotIt')}</button>
           </div>
         </div>
       )}
