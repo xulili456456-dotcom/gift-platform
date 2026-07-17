@@ -245,6 +245,7 @@ async function showUserDetail(id){
             <button class="btn btn-sm btn-blue" onclick="editUserName(${u.id},'${(u.name||'').replace(/'/g,"\\'")}','${(u.phone||'').replace(/'/g,"\\'")}')">✏️ 编辑</button>
             <button class="btn btn-sm btn-red" onclick="resetUserPw(${u.id})">🔑 重置密码</button>
             <button class="btn btn-sm ${u.frozen?'btn-green':'btn-red'}" onclick="toggleFreeze(${u.id},${u.frozen})">${u.frozen?'✅ 解冻':'❄️ 冻结'}</button>
+            <button class="btn btn-sm btn-red" onclick="deleteUser(${u.id})">🗑️ 删除</button>
             <button class="btn btn-sm btn-gray" onclick="switchTab('users')">← 返回</button>
           </div>
         </div>
@@ -269,6 +270,10 @@ function resetUserPw(id){
 
 function toggleFreeze(id,current){
   api('PUT','/admin/users/'+id+'/freeze',{frozen:!current}).then(()=>{showToast(current?'用户已解冻':'用户已冻结');showUserDetail(id)}).catch(e=>showToast(e.message,1));
+}
+function deleteUser(id){
+  if(!confirm('确定删除此用户？此操作不可恢复！'))return;
+  api('DELETE','/admin/users/'+id).then(()=>{showToast('用户已删除');switchTab('users')}).catch(e=>showToast(e.message,1));
 }
 
 let ordersPage=1,ordersStatus='',ordersUser='';
