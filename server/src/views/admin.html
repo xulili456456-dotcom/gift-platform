@@ -422,9 +422,15 @@ async function rejectKyc(id){
 
 function viewKycImage(el) {
   var src = el.getAttribute('src');
-  var w = window.open('');
-  w.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="' + src + '" style="max-width:100vw;max-height:100vh;cursor:pointer" onclick="window.close()"></body></html>');
-  w.document.close();
+  var div = document.createElement('div');
+  div.id = 'kycPreview';
+  div.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;cursor:pointer';
+  div.onclick = function(){ div.remove(); };
+  var img = document.createElement('img');
+  img.src = src;
+  img.style.cssText = 'max-width:95vw;max-height:95vh;object-fit:contain;pointer-events:none';
+  div.appendChild(img);
+  document.body.appendChild(div);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
