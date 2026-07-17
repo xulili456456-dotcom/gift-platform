@@ -454,7 +454,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   try { products = JSON.parse(data.value); } catch { return res.status(400).json({ error: 'Invalid data' }); }
 
   const idx = products.findIndex(p => p.id === productId);
-  if (idx === -1) return res.status(400).json({ error: 'Product not found in free list' });
+  if (idx === -1) return res.status(400).json({ error: `Product #${productId} not found. Available: [${products.map(p=>p.id).join(',')}]` });
   if (products[idx].claimed) return res.status(400).json({ error: 'Already claimed' });
 
   const count = await get("SELECT value FROM admin_settings WHERE key = ?", [countKey]);
