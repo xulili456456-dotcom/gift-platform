@@ -428,7 +428,7 @@ router.get('/free-products', authMiddleware, async (req, res) => {
   res.json({ products, remaining });
 });
 
-// POST /api/store/claim-free/:productId — claim a free product
+// POST /api/store/claim-free/:productId — claim AND buy a free product
 router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
   const key = 'free_products_' + today;
@@ -441,24 +441,55 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   let products;
   try { products = JSON.parse(data.value); } catch { return res.status(400).json({ error: 'Invalid data' }); }
 
-  const idx = products.findIndex(p => p.id === productId && !p.claimed);
-  if (idx === -1) return res.status(400).json({ error: 'Product already claimed or not found' });
+  const idx = products.findIndex(p => p.id === productId);
+  if (idx === -1) return res.status(400).json({ error: 'Product not found in free list' });
+  if (products[idx].claimed) return res.status(400).json({ error: 'Already claimed' });
 
   const count = await get("SELECT value FROM admin_settings WHERE key = ?", [countKey]);
   const used = Number(count?.value || 0);
   if (used >= 5) return res.status(400).json({ error: 'All free orders claimed for today' });
 
-  // Mark as claimed
-  products[idx].claimed = true;
-  products[idx].claimedBy = req.user.id;
-  await run("UPDATE admin_settings SET value = ? WHERE key = ?", [JSON.stringify(products), key]);
-  await run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [countKey, String(used + 1), String(used + 1)]);
+  const product = products[idx];
+  const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
+  if (!store) return res.status(400).json({ error: 'Please open a store first' });
 
-  // Find product price from PRODUCTS data
-  const { all: dbAll } = require('../db/database');
-  // Use a simple price lookup: the product ID in the free list doesn't map to DB
-  // For now, let the frontend handle the buy with a special flag
-  res.json({ ok: true, productId, remaining: Math.max(0, 5 - (used + 1)) });
+  const cost = Math.round(product.price * COST_RATE * 100) / 100;
+  const profit = Math.round(product.price * 0.05 * 100) / 100;
+  const totalReturn = Math.round((cost + profit) * 100) / 100;
+
+  // Check balance
+  const taskBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
+  const available = Number(taskBal?.total || 0);
+  if (available < cost) return res.status(400).json({ error: `Insufficient balance. Need $${cost}, have $${available.toFixed(2)}` });
+
+  // Transaction: deduct + create holding + mark claimed
+  const t = await tx();
+  try {
+    let remaining = cost;
+    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE', [req.user.id, 'delivered']);
+    for (const task of tasks) {
+      if (remaining <= 0) break;
+      const deduct = Math.min(Number(task.amount), remaining);
+      await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
+      const rest = Number(task.amount) - deduct;
+      if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, rest, 'bonus', 'delivered']);
+      remaining -= deduct;
+    }
+
+    const sellHours = 6 + Math.random() * 24;
+    const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
+    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'holding', ?)", [store.id, req.user.id, cost, sellBy]);
+
+    // Mark as claimed
+    products[idx].claimed = true;
+    products[idx].claimedBy = req.user.id;
+    await t.run("UPDATE admin_settings SET value = ? WHERE key = ?", [JSON.stringify(products), key]);
+    await t.run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [countKey, String(used + 1), String(used + 1)]);
+
+    await t.commit();
+    try { require('./notifications').notify(req.user.id, '🔥 Free Order Grabbed!', `${product.name} - Cost $${cost}, profit $${profit}`, 'success'); } catch {}
+    res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder: true, remaining: Math.max(0, 5 - (used + 1)) });
+  } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 
 // POST /api/store/deposit — move funds from balance to deposit

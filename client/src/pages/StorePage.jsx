@@ -804,7 +804,7 @@ export default function StorePage() {
           <div className="flex gap-2 overflow-x-auto scrollbar-none">
             {freeProducts.filter(p => !p.claimed).map(fp => (
               <div key={fp.id} className="shrink-0 w-[140px] bg-gradient-to-b from-[#FFF8E1] to-white rounded-xl border border-[#FFB800] p-2.5 text-center cursor-pointer active:scale-95 transition-all"
-                onClick={() => { client.post('/store/claim-free/'+fp.id).then(() => { toast.success('Grabbed! Buy now with no deposit.'); setFreeRemaining(r=>r-1); setFreeProducts(prev=>prev.map(p=>p.id===fp.id?{...p,claimed:true}:p)); }).catch(err => toast.error(err.response?.data?.error)); }}>
+                onClick={() => { client.post('/store/claim-free/'+fp.id).then(({data}) => { toast.success(`🔥 Grabbed! Cost $${data.cost}, profit $${data.profit}`); setFreeRemaining(data.remaining); setFreeProducts(prev=>prev.map(p=>p.id===fp.id?{...p,claimed:true}:p)); loadStatus(); loadHoldings(); }).catch(err => toast.error(err.response?.data?.error)); }}>
                 <img src={fp.img} alt={fp.name} className="w-full aspect-square object-contain rounded-lg mb-1.5 bg-white" />
                 <p className="text-[9px] text-[#0F1111] font-medium line-clamp-2 leading-tight mb-1">{fp.name}</p>
                 <p className="text-[10px] font-bold text-[#B12704]">${fp.price.toFixed(2)}</p>
