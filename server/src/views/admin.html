@@ -400,7 +400,7 @@ async function loadKyc(c){
             <td>${k.real_name||'-'}</td>
             <td style="font-size:11px">${k.id_number||'-'}</td>
             <td>${k.doc_type||'-'}</td>
-            <td style="display:flex;gap:8px">${k.front_image?`<img src="${k.front_image}" data-full="${k.front_image}" class="kyc-thumb" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer" title="点击查看大图">`:'无'} ${k.back_image?`<img src="${k.back_image}" data-full="${k.back_image}" class="kyc-thumb" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer" title="点击查看大图">`:''}</td>
+            <td style="display:flex;gap:8px">${k.front_image?`<img src="${k.front_image}" onclick="viewKycImage(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer" title="点击查看大图">`:'无'} ${k.back_image?`<img src="${k.back_image}" onclick="viewKycImage(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer" title="点击查看大图">`:''}</td>
             <td><span class="badge ${k.status==='approved'?'badge-green':k.status==='pending'?'badge-yellow':'badge-red'}">${k.status==='approved'?'已通过':k.status==='pending'?'待审核':'已拒绝'}</span></td>
             <td style="font-size:10px">${new Date(k.submitted_at).toLocaleString()}</td>
             <td>${k.status==='pending'?`
@@ -420,17 +420,16 @@ async function rejectKyc(id){
   try{await api('PUT','/kyc/admin/'+id,{status:'rejected'});showToast('实名认证已拒绝');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}
 }
 
-// KYC image click -> full screen preview
-document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('kyc-thumb')) {
-    const src = e.target.src;
-    const modal = document.createElement('div');
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:flex;align-items:center;justify-content:center;cursor:pointer';
-    modal.innerHTML = `<img src="${src}" style="max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px">`;
-    modal.onclick = () => modal.remove();
-    document.body.appendChild(modal);
-  }
-});
+function viewKycImage(img) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center';
+  overlay.onclick = function() { overlay.remove(); };
+  const bigImg = document.createElement('img');
+  bigImg.src = img.src;
+  bigImg.style.cssText = 'max-width:95%;max-height:95%;object-fit:contain';
+  overlay.appendChild(bigImg);
+  document.body.appendChild(overlay);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   try { initApp(); } catch(e) {
