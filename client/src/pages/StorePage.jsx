@@ -373,7 +373,7 @@ export default function StorePage() {
   const [depositMsg, setDepositMsg] = useState('');
   const [freeProducts, setFreeProducts] = useState([]);
   const [freeRemaining, setFreeRemaining] = useState(0);
-  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); }).catch(()=>{}); }, [status?.store?.doneToday]);
+  useEffect(() => { client.get('/store/free-products').then(({data}) => { console.log('Free products:', data); setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); }).catch(err => console.error('Free products error:', err)); }, [status?.store?.doneToday]);
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
     if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
@@ -793,7 +793,7 @@ export default function StorePage() {
       </div>
 
       {/* Daily Free Orders */}
-      {freeRemaining > 0 && (
+      {freeProducts.length > 0 && (
         <div className="shrink-0 bg-white border-b border-[#e7e7e7] px-3 py-3">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-sm">🔥</span>
