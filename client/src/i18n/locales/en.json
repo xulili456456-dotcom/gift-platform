@@ -757,7 +757,7 @@
     "dailyGoal": "Daily Goal",
     "totalEarned": "Total",
     "tomorrowEstimate": "Tomorrow est",
-    "depositDesc": "Add more capital to trade bigger items and earn more",
+    "depositDesc": "Lock funds as collateral to unlock higher-value trades. 1:1 ratio — deposit $100 to trade products costing up to $100. Fully refundable when you withdraw (no active holdings).",
     "confirmDeposit": "Confirm",
     "dashboard": "Dashboard",
     "products": "Products",

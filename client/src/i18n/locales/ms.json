@@ -796,7 +796,7 @@
     "tomorrowEstimate": "Anggaran Esok",
     "deposit": "Deposit",
     "withdraw": "Pengeluaran",
-    "depositDesc": "Tambah modal untuk berdagang item lebih besar",
+    "depositDesc": "Kunci dana sebagai cagaran untuk membuka perdagangan bernilai lebih tinggi. Nisbah 1:1 — deposit $100 untuk berdagang produk berharga sehingga $100. Dikembalikan sepenuhnya.",
     "confirmDeposit": "Sahkan Deposit",
     "depositSuccess": "Didepositkan!",
     "affordable": "Mampu Milik",

@@ -735,7 +735,7 @@
     "dailyGoal": "Meta Diaria",
     "totalEarned": "Total",
     "tomorrowEstimate": "Est. mañana",
-    "depositDesc": "Añade capital para negociar artículos más grandes",
+    "depositDesc": "Bloquea fondos como garantía para desbloquear operaciones de mayor valor. Relación 1:1 — deposita $100 para operar productos de hasta $100. Totalmente reembolsable.",
     "confirmDeposit": "Confirmar",
     "dashboard": "Panel",
     "products": "Productos",

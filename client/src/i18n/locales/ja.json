@@ -757,7 +757,7 @@
     "dailyGoal": "本日目標",
     "totalEarned": "累計",
     "tomorrowEstimate": "明日予想",
-    "depositDesc": "より大きな商品を取引するために資金を追加",
+    "depositDesc": "高額取引の担保として資金をロック。1:1比率 — $100のデポジットで$100までの商品を取引可能。全額返金可能。",
     "confirmDeposit": "確認",
     "dashboard": "ダッシュボード",
     "products": "商品",
