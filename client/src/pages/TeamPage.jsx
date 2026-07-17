@@ -19,7 +19,7 @@ export default function TeamPage() {
   useEffect(() => {
     referralApi.getStats()
       .then(({ data }) => setStats(data))
-      .catch(() => toast.error('Load failed'))
+      .catch(() => toast.error(t('common.loadingFailed')))
       .finally(() => setLoading(false));
   }, []);
 

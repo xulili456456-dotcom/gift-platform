@@ -27,7 +27,7 @@ export default function VerifyPage() {
         setProofs(prev => [{ id: data.id, image: reader.result, status: 'pending', submitted_at: new Date().toISOString() }, ...prev]);
         setBurst(true); setTimeout(() => setBurst(false), 1200);
         toast.success(t('verify.uploaded'));
-      } catch (err) { toast.error(err.response?.data?.error || 'Upload failed'); }
+      } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
     };
     reader.readAsDataURL(file);
   };

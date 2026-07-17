@@ -210,7 +210,7 @@ export default function MinePage() {
         {[
           { Icon: Users, label: t('mine.myTeam'), desc: t('mine.myTeamDesc'), to: '/mine/team' },
           { Icon: CreditCard, label: t('mine.myWallet'), desc: t('mine.myWalletDesc'), to: '/mine/wallet' },
-          { Icon: Store, label: t('mine.myStore'), desc: t('mine.myStoreDesc'), to: '/mine/store' },
+          { Icon: Store, label: t('mine.myStore'), desc: t('mine.myStoreDesc'), to: '/store' },
           { Icon: Bell, label: t('mine.messages'), desc: t('mine.messagesDesc'), to: '/mine/messages' },
         ].map(({ Icon, label, desc, to }, i) => (
           <button key={i} onClick={() => navigate(to)}
@@ -314,7 +314,7 @@ export default function MinePage() {
         </button>
 
         {/* Admin */}
-        {user?.is_admin === 1 && (
+        {user?.is_admin == true && (
           <button onClick={() => navigate('/admin')}
             className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm border border-separator active:bg-bg transition-colors">
             <Lock size={22} className="text-primary shrink-0" />

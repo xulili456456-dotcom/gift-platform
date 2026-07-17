@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import client from '../api/client';
 import { Crown, ShoppingCart, X, Store, Search, Star, ChevronLeft, Truck, Shield, RotateCcw, Bell } from 'lucide-react';
@@ -271,7 +272,7 @@ const PRODUCTS = [
 
 function genProducts(tier, cat, search) {
   let filtered = cat === 'All' ? [...PRODUCTS] : PRODUCTS.filter(p => p.cat === cat);
-  if (search) filtered = filtered.filter(p => p.name.includes(search) || p.cat.includes(search));
+  if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.cat.toLowerCase().includes(search.toLowerCase()));
   filtered.sort((a,b) => b.sold - a.sold);
   return filtered.map((p, i) => {
     const cost = Math.round(p.price * COST_RATE * 100) / 100;
@@ -303,6 +304,7 @@ function Stars({ rating, reviews, showCount }) {
 
 export default function StorePage() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const tSpec = (k) => {
     const bundle = i18n.getResourceBundle(i18n.language, 'translation');
     return bundle?.specs?.[k] || k;
@@ -330,7 +332,7 @@ export default function StorePage() {
   const loadEarnings = useCallback(async () => {
     try { const { data } = await client.get('/store/earnings-stats'); setEarnings(data); } catch {}
   }, []);
-  const checkSell = useCallback(async () => { try { const { data } = await client.post('/store/check-sell'); if (data.settled?.length > 0) { toast.success(`${data.settled.length} item(s) sold!`); loadStatus(); loadEarnings(); } } catch {} }, []);
+  const checkSell = useCallback(async () => { try { const { data } = await client.post('/store/check-sell'); if (data.settled?.length > 0) { toast.success(t('store.itemsSold', { n: data.settled.length })); loadStatus(); loadEarnings(); } } catch {} }, []);
   const loadHoldings = useCallback(async () => { try { const { data } = await client.get('/store/holdings'); setHoldings(data); } catch {} }, []);
 
   useEffect(() => { loadStatus(); loadEarnings(); checkSell(); loadHoldings(); client.get('/notifications').then(({data}) => setNotifCount(data.unread||0)).catch(()=>{}); }, []);
@@ -350,18 +352,18 @@ export default function StorePage() {
   const [tradeMode, setTradeMode] = useState('holding'); // 'holding' | 'share'
   const [shareProduct, setShareProduct] = useState(null);
   const [shareMsg, setShareMsg] = useState('');
-  const handleOpen = async () => { setOpening(true); try { const { data } = await client.post('/store/open'); setStatus({ hasStore: true, store: data }); toast.success(t('store.openSuccess')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
+  const handleOpen = async () => { setOpening(true); try { await client.post('/store/open'); toast.success(t('store.openSuccess')); loadStatus(); loadEarnings(); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
   const handleShare = async (product) => {
     try {
       const { data } = await client.post('/commissions/claim', { productId: product.id, productPrice: product.price, productName: product.name, productImg: product.img });
       setShareProduct({ ...product, shareUrl: data.shareUrl, commission: data.commission });
       setShareMsg('');
-      toast.success('Share link generated!');
-    } catch (err) { toast.error(err.response?.data?.error || 'Share failed'); }
+      toast.success(t('store.shareGenerated'));
+    } catch (err) { toast.error(err.response?.data?.error || t('store.shareFailed')); }
   };
   const copyShareLink = (url) => {
     navigator.clipboard.writeText(url);
-    toast.success('Link copied! Share it with friends.');
+    toast.success(t('store.linkCopiedMsg'));
   };
   const [showDailyFull, setShowDailyFull] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState(null);
@@ -371,7 +373,7 @@ export default function StorePage() {
     if (s.remaining <= 0) { setShowDailyFull(true); return; }
     try {
       const { data } = await client.post('/store/orders/process', { productPrice: product.price, productName: product.name });
-      toast.success(`Bought! Expected to sell by ${new Date(data.sellBy).toLocaleDateString()}`);
+      toast.success(`${t('store.boughtMsg')} ${new Date(data.sellBy).toLocaleDateString()}`);
       loadStatus(); loadHoldings(); loadEarnings();
     } catch (err) {
       const d = err.response?.data;
@@ -384,7 +386,7 @@ export default function StorePage() {
   const [depositAmount, setDepositAmount] = useState('');
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
-    if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
+    if (!amt || amt < 1) { toast.error(t('store.depositMinMax')); return; }
     try { await client.post('/store/deposit', { amount: amt }); toast.success(t('store.depositSuccess') || 'Deposited!'); setShowDeposit(false); setDepositAmount(''); loadStatus(); loadEarnings(); }
     catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
   };
@@ -519,7 +521,7 @@ export default function StorePage() {
             <span className="text-[11px] font-medium">{t(ti.nameKey)}</span>
           </div>
           <span className="text-[10px] text-white/60 flex-1">{t('store.today')}: <b className="text-white">${s.todayEarnings.toFixed(2)}</b></span>
-          <button className="relative p-1">
+          <button onClick={() => navigate('/mine/notifications')} className="relative p-1" title={t('store.bellHint')} aria-label={t('store.bellHint')}>
             <Bell size={18} />
             {notifCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#CC0C39] text-white text-[9px] font-bold rounded-full flex items-center justify-center">{notifCount}</span>}
           </button>
@@ -625,7 +627,7 @@ export default function StorePage() {
                   <div className="flex items-center gap-3 py-2 cursor-pointer active:bg-gray-50" onClick={() => setExpandedHolding(isOpen ? null : h.id)}>
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] font-medium text-[#0F1111] truncate">{t('store.orderLabel')} #{h.id}</p>
-                      <p className="text-[10px] text-[#565959]">Cost ${Number(h.cost).toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</p>
+                      <p className="text-[10px] text-[#565959]">{t('store.costPriceColon')} ${Number(h.cost).toFixed(2)} · {t('store.sellBy')} {new Date(h.sell_by).toLocaleDateString()}</p>
                       <div className="w-full h-1 bg-[#f0f2f2] rounded-full mt-1 overflow-hidden">
                         <div className="h-full bg-[#FFD814] rounded-full transition-all" style={{width: `${h.progress}%`}} />
                       </div>
@@ -636,7 +638,7 @@ export default function StorePage() {
                   <div className="pb-2 text-[10px] space-y-1 text-[#565959]">
                     <div className="flex justify-between"><span>{t('store.costPrice')}</span><span className="text-[#0F1111] font-medium">${Number(h.cost).toFixed(2)}</span></div>
                     <div className="flex justify-between"><span>{t('store.earn')}</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
-                    <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${(Number(h.cost) + profit).toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>{t('store.totalReturn')}</span><span className="text-[#0F1111] font-bold">${(Number(h.cost) + profit).toFixed(2)}</span></div>
                   </div>
                   )}
                 </div>
@@ -699,7 +701,7 @@ export default function StorePage() {
                 <div className="px-3 pb-3 border-t border-[#e7e7e7] text-[10px] space-y-1.5 text-[#565959]">
                   <div className="flex justify-between pt-2"><span>{t('store.costPrice')}</span><span className="text-[#0F1111] font-medium">${cost.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>{t('store.earn')}</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
-                  <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${(cost + profit).toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>{t('store.totalReturn')}</span><span className="text-[#0F1111] font-bold">${(cost + profit).toFixed(2)}</span></div>
                 </div>
                 )}
               </div>
@@ -718,7 +720,7 @@ export default function StorePage() {
             <span className="text-[11px] text-[#565959]">{t('store.balance')}</span>
             <p className="text-[28px] font-bold text-[#0F1111] leading-tight">${s.balance.toFixed(2)}</p>
           </div>
-          <button onClick={() => window.location.href="/mine/deposit"} className="text-[11px] px-3 py-1.5 rounded-full bg-[#FFD814] text-[#0F1111] font-medium">{t('store.deposit') || 'Deposit'}</button>
+          <button onClick={() => navigate('/mine/deposit')} className="text-[11px] px-3 py-1.5 rounded-full bg-[#FFD814] text-[#0F1111] font-medium">{t('store.deposit') || 'Deposit'}</button>
         </div>
         <div className="flex items-center gap-4 text-[11px]">
           <span className="text-[#067D62] font-bold">+${earnings.todayProfit.toFixed(2)} {t('store.today')}</span>
@@ -849,19 +851,19 @@ export default function StorePage() {
           <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in border border-[#e7e7e7]" onClick={e => e.stopPropagation()}>
             <div className="text-center mb-4">
               <span className="text-4xl">🔗</span>
-              <h3 className="text-lg font-bold text-[#0F1111] mt-2">Share & Earn 3%</h3>
+              <h3 className="text-lg font-bold text-[#0F1111] mt-2">{t('store.shareEarn')} 3%</h3>
               <p className="text-[11px] text-[#565959] mt-1">{shareProduct.name}</p>
             </div>
             <div className="bg-[#eaeded] rounded-lg p-3 mb-3 text-center">
-              <p className="text-[10px] text-[#999999] mb-1">Commission</p>
+              <p className="text-[10px] text-[#999999] mb-1">{t('store.shareCommission')} · 3% {t('store.shareRate')}</p>
               <p className="text-2xl font-black text-[#067D62]">+${shareProduct.commission?.toFixed(2)}</p>
             </div>
             <div className="bg-[#f0f2f2] rounded-lg p-3 mb-3 flex items-center justify-between">
               <p className="text-[10px] text-[#565959] break-all flex-1 mr-2 font-mono">{shareProduct.shareUrl || ""}</p>
-              <button onClick={() => copyShareLink(shareProduct.shareUrl)} className="shrink-0 px-3 py-1.5 bg-[#FFD814] text-[#0F1111] text-[10px] font-bold rounded-lg">Copy</button>
+              <button onClick={() => copyShareLink(shareProduct.shareUrl)} className="shrink-0 px-3 py-1.5 bg-[#FFD814] text-[#0F1111] text-[10px] font-bold rounded-lg">{t('invite.copy')}</button>
             </div>
-            <p className="text-[9px] text-[#999999] text-center mb-3">Share this link. When someone buys, you earn the commission.</p>
-            <button onClick={() => setShareProduct(null)} className="w-full py-2.5 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">Close</button>
+            <p className="text-[9px] text-[#999999] text-center mb-3">{t('store.shareHint')}</p>
+            <button onClick={() => setShareProduct(null)} className="w-full py-2.5 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">{t('common.close')}</button>
           </div>
         </div>
       )}
@@ -871,9 +873,9 @@ export default function StorePage() {
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowDailyFull(false)}>
           <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in text-center" onClick={e => e.stopPropagation()}>
             <span className="text-5xl mb-3 block">📅</span>
-            <h3 className="text-lg font-bold text-[#0F1111] mb-1">Daily Limit Reached</h3>
-            <p className="text-sm text-[#565959] mb-4">You have completed all orders for today. Come back tomorrow for more!</p>
-            <button onClick={() => setShowDailyFull(false)} className="w-full py-2.5 bg-[#FFD814] text-[#0F1111] font-bold rounded-xl text-sm">Got it</button>
+            <h3 className="text-lg font-bold text-[#0F1111] mb-1">{t('store.dailyLimitReached')}</h3>
+            <p className="text-sm text-[#565959] mb-4">{t('store.dailyLimitMsg')}</p>
+            <button onClick={() => setShowDailyFull(false)} className="w-full py-2.5 bg-[#FFD814] text-[#0F1111] font-bold rounded-xl text-sm">{t('store.gotIt')}</button>
           </div>
         </div>
       )}
@@ -886,7 +888,7 @@ export default function StorePage() {
             <h3 className="text-base font-bold text-[#0F1111] mb-1">{t('store.deposit') || 'Add Funds'}</h3>
             <p className="text-xs text-[#565959] mb-4">{t('store.depositDesc') || 'Add capital to trade bigger items'}</p>
             <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="100" className="w-full px-3 py-2.5 bg-[#f0f2f2] border border-[#e7e7e7] rounded-lg text-sm text-[#0F1111] mb-4 outline-none focus:border-[#FF9900]" autoFocus />
-            <div className="text-[10px] text-[#999999] mb-3">Min $1 · Max $10,000</div>
+            <div className="text-[10px] text-[#999999] mb-3">{t('store.depositMinMax')}</div>
             <div className="flex gap-2">
               <button onClick={() => setShowDeposit(false)} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#f0f2f2] text-[#0F1111]">{t('common.cancel') || 'Cancel'}</button>
               <button onClick={handleDeposit} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111]">{t('store.confirmDeposit') || 'Confirm'}</button>

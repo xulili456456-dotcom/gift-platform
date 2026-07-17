@@ -35,7 +35,7 @@ export default function DepositPage() {
 
   const submit = async () => {
     const amt = parseFloat(amount);
-    if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
+    if (!amt || amt < 1) { toast.error(t('store.depositMinMax')); return; }
     if (!txHash.trim()) { toast.error('Please enter transaction hash'); return; }
     setSubmitting(true);
     try {

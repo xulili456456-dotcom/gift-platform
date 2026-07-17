@@ -5,7 +5,7 @@ import { Star, Truck, Shield, RotateCcw } from 'lucide-react';
 export default function BuyPage() {
   const params = new URLSearchParams(window.location.search);
   const pid = params.get('pid');
-  const pId = params.get('p');
+  const imgParam = params.get('img') || '';
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,7 +14,8 @@ export default function BuyPage() {
 
   useEffect(() => {
     if (!pid) { setError('Invalid link'); setLoading(false); return; }
-    client.get(`/commissions/public-product/${pid}?p=${pId || 1}`)
+    const imgQuery = imgParam ? `&img=${encodeURIComponent(imgParam)}` : '';
+    client.get(`/commissions/public-product/${pid}${imgQuery}`)
       .then(({ data }) => setProduct(data))
       .catch(() => setError('This product is no longer available'))
       .finally(() => setLoading(false));

@@ -551,7 +551,8 @@
     "submitBtn": "Hantar Pengesahan",
     "submitting": "Menghantar...",
     "privacy": "Data anda disulitkan dan hanya digunakan untuk pengesahan",
-    "idCard": "Kad Pengenalan"
+    "idCard": "Kad Pengenalan",
+    "uploadBoth": "Sila muat naik kedua-dua belah"
   },
   "legal": {
     "title": "Undang-undang",
@@ -833,7 +834,23 @@
     "holdingMode": "Pegangan",
     "shareMode": "Kongsi",
     "share": "Kongsi",
-    "shareEarn": "Kongsi & Dapat"
+    "shareEarn": "Kongsi & Dapat",
+    "totalReturn": "Jumlah Pulangan",
+    "shareCommission": "Komisen",
+    "shareRate": "daripada harga belian",
+    "shareHint": "Kongsi pautan ini. Apabila seseorang membeli, anda dapat komisen.",
+    "dailyLimitReached": "Had Harian Tercapai",
+    "dailyLimitMsg": "Anda telah menyelesaikan semua pesanan hari ini. Kembali esok!",
+    "gotIt": "Faham",
+    "depositMinMax": "Min $1 · Maks $10,000",
+    "bellHint": "Notifikasi",
+    "costPriceColon": "Kos:",
+    "sellBy": "Jual sebelum",
+    "boughtMsg": "Dibeli! Dijangka dijual sebelum",
+    "shareGenerated": "Pautan kongsi dijana!",
+    "shareFailed": "Gagal berkongsi",
+    "linkCopiedMsg": "Pautan disalin! Kongsi dengan rakan.",
+    "itemsSold": "{{n}} item dijual!"
   },
   "notifications": {
     "title": "Notifikasi",

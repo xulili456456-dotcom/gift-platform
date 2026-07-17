@@ -35,14 +35,14 @@ export default function TasksPage() {
     setSubmitting(true);
     try {
       const { data } = await client.post('/tasks/checkin');
-      toast.success(`✅ +$${data.amount} Check-in successful`);
+      toast.success(`✅ +$${data.amount} ${t('tasks.checkinDone')}`);
       loadAll();
-    } catch (err) { toast.error(err.response?.data?.error || 'Check-in failed'); }
+    } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
     finally { setSubmitting(false); }
   };
 
   const copyText = async (text) => {
-    try { await navigator.clipboard.writeText(text); setCopied(true); toast.success('Copied!'); setTimeout(() => setCopied(false), 2000); }
+    try { await navigator.clipboard.writeText(text); setCopied(true); toast.success(t('common.copySuccess')); setTimeout(() => setCopied(false), 2000); }
     catch { toast.error(t('common.operationFailed')); }
   };
 

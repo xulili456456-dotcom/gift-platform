@@ -48,7 +48,7 @@ export default function WithdrawPage() {
       toast.success(t('withdraw.success'));
       loadData();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Failed');
+      toast.error(err.response?.data?.error || t('common.operationFailed'));
     } finally { setSubmitting(false); }
   };
 

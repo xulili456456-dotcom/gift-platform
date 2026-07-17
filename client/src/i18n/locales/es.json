@@ -467,7 +467,8 @@
     "privacy": "Tu información está encriptada y segura",
     "idCard": "DNI",
     "driverLicense": "Carnet",
-    "passport": "Pasaporte"
+    "passport": "Pasaporte",
+    "uploadBoth": "Por favor sube ambos lados"
   },
   "legal": {
     "title": "Legal e Info",
@@ -640,7 +641,10 @@
     "loadingFailed": "Error al cargar datos",
     "operationFailed": "Operación fallida",
     "networkError": "Error de red",
-    "days": " days"
+    "days": " days",
+    "ok": "OK",
+    "copySuccess": "¡Copiado!",
+    "submit": "Enviado"
   },
   "verify": {
     "title": "Verification",
@@ -762,7 +766,31 @@
     "holdingMode": "Inventario",
     "shareMode": "Compartir",
     "share": "Compartir",
-    "shareEarn": "Compartir y Ganar"
+    "shareEarn": "Compartir y Ganar",
+    "need": "Necesita",
+    "have": "Disponible",
+    "shortage": "Falta",
+    "howToEarn": "Cómo obtener fondos",
+    "tipCheckin": "Registro diario: $0.10-$0.70",
+    "tipHolding": "Las existencias se venden automáticamente",
+    "holdings": "Mis Existencias",
+    "noHoldings": "Sin existencias activas",
+    "totalReturn": "Retorno Total",
+    "shareCommission": "Comisión",
+    "shareRate": "del precio de compra",
+    "shareHint": "Comparte este enlace. Cuando alguien compra, ganas la comisión.",
+    "dailyLimitReached": "Límite Diario Alcanzado",
+    "dailyLimitMsg": "Has completado todos los pedidos de hoy. ¡Vuelve mañana!",
+    "gotIt": "Entendido",
+    "depositMinMax": "Mín $1 · Máx $10,000",
+    "bellHint": "Notificaciones",
+    "costPriceColon": "Costo:",
+    "sellBy": "Vender antes de",
+    "boughtMsg": "¡Comprado! Se espera vender antes de",
+    "shareGenerated": "¡Enlace generado!",
+    "shareFailed": "Error al compartir",
+    "linkCopiedMsg": "¡Enlace copiado! Compártelo.",
+    "itemsSold": "¡{{n}} artículo(s) vendido(s)!"
   },
   "specs": {
     "产地": "Origen",

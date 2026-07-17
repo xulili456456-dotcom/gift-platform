@@ -14,8 +14,8 @@ export default function KycPage() {
   useEffect(() => {
     client.get('/kyc').then(({ data }) => { setKyc(data); setKycLoading(false); }).catch(() => setKycLoading(false));
   }, []);
-  if (kycLoading) return <div className="min-h-screen bg-bg p-4 space-y-4"><div className="skeleton h-8 w-32 rounded-lg" /><div className="skeleton h-20 rounded-2xl" /><div className="skeleton h-64 rounded-2xl" /></div>;
   const [submitting, setSubmitting] = useState(false);
+  if (kycLoading) return <div className="min-h-screen bg-bg p-4 space-y-4"><div className="skeleton h-8 w-32 rounded-lg" /><div className="skeleton h-20 rounded-2xl" /><div className="skeleton h-64 rounded-2xl" /></div>;
 
   const DOC_TYPES = [
     { id: 'driver_license', label: t('kyc.driverLicense'), Icon: Car },
@@ -31,13 +31,13 @@ export default function KycPage() {
   };
 
   const submitKyc = () => {
-    if (!form.name.trim() || !form.idNumber.trim()) { toast.error('Please fill all fields'); return; }
-    if (!form.frontImg || !form.backImg) { toast.error('Please upload both sides'); return; }
+    if (!form.name.trim() || !form.idNumber.trim()) { toast.error(t('auth.fillRequired')); return; }
+    if (!form.frontImg || !form.backImg) { toast.error(t('kyc.uploadBoth')); return; }
     setSubmitting(true);
     const data = { ...form, status: 'pending', submittedAt: new Date().toISOString() };
     client.post('/kyc', { doc_type: form.docType, real_name: form.name, id_number: form.idNumber, front_image: form.frontImg, back_image: form.backImg })
-      .then(({ data }) => { setKyc({ ...form, status: 'pending', id: data.id }); setSubmitting(false); toast.success('Submitted'); })
-      .catch(err => { setSubmitting(false); toast.error(err.response?.data?.error || 'Failed'); });
+      .then(({ data }) => { setKyc({ ...form, status: 'pending', id: data.id }); setSubmitting(false); toast.success(t('common.submit')); })
+      .catch(err => { setSubmitting(false); toast.error(err.response?.data?.error || t('common.operationFailed')); });
   };
 
   const statusCfg = {

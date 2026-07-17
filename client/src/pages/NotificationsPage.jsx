@@ -19,7 +19,7 @@ export default function NotificationsPage() {
   const markAllRead = () => {
     client.put('/notifications/read-all').then(() => {
       setData(prev => ({ ...prev, unread: 0, notifications: prev.notifications.map(n => ({ ...n, is_read: 1 })) }));
-      toast.success('All marked read');
+      toast.success(t('notifications.markAllRead'));
       window.dispatchEvent(new Event('notifUpdate'));
     });
   };

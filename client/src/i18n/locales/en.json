@@ -489,7 +489,8 @@
     "privacy": "Your information is encrypted and secure",
     "idCard": "ID Card",
     "driverLicense": "Driver's License",
-    "passport": "Passport"
+    "passport": "Passport",
+    "uploadBoth": "Please upload both sides"
   },
   "legal": {
     "title": "Legal & Info",
@@ -674,7 +675,10 @@
     "confirm": "Confirm",
     "loadingFailed": "Failed to load data",
     "operationFailed": "Operation failed",
-    "networkError": "Network error"
+    "networkError": "Network error",
+    "ok": "OK",
+    "copySuccess": "Copied!",
+    "submit": "Submitted"
   },
   "store": {
     "title": "E-Commerce",
@@ -774,7 +778,31 @@
     "holdingMode": "Holding",
     "shareMode": "Share",
     "share": "Share",
-    "shareEarn": "Share & Earn"
+    "shareEarn": "Share & Earn",
+    "need": "Need",
+    "have": "Available",
+    "shortage": "Shortage",
+    "howToEarn": "How to get funds",
+    "tipCheckin": "Daily check-in: $0.10-$0.70",
+    "tipHolding": "Holdings auto-sell and return funds",
+    "holdings": "My Holdings",
+    "noHoldings": "No active holdings",
+    "totalReturn": "Total Return",
+    "shareCommission": "Commission",
+    "shareRate": "of purchase price",
+    "shareHint": "Share this link. When someone buys, you earn the commission.",
+    "dailyLimitReached": "Daily Limit Reached",
+    "dailyLimitMsg": "You have completed all orders for today. Come back tomorrow!",
+    "gotIt": "Got it",
+    "depositMinMax": "Min $1 · Max $10,000",
+    "bellHint": "Notifications",
+    "costPriceColon": "Cost:",
+    "sellBy": "Sell by",
+    "boughtMsg": "Bought! Expected to sell by",
+    "shareGenerated": "Share link generated!",
+    "shareFailed": "Share failed",
+    "linkCopiedMsg": "Link copied! Share it with friends.",
+    "itemsSold": "{{n}} item(s) sold!"
   },
   "specs": {
     "产地": "Origin",

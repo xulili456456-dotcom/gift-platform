@@ -48,19 +48,19 @@ export default function StakingPage() {
   };
 
   const handleUnstake = async () => {
-    const d = stake ? Math.max(0, Math.ceil((new Date(stake.unlockAt) - Date.now()) / 86400000)) : 0;
+    const d = stake ? Math.max(0, Math.ceil((new Date(stake.unlock_at) - Date.now()) / 86400000)) : 0;
     const penalty = d > 0 ? Number((stake.amount * 0.2).toFixed(0)) : 0;
     if (!confirm(d > 0 ? t('stake.forceUnstakeConfirm',{amount:stake.amount,penalty}) : t('stake.unstakeConfirm'))) return;
     try {
       const { data } = await client.post('/staking/unlock');
       toast.success(d > 0 ? t('stake.unstakedPenalty',{penalty}) : t('stake.unstaked'));
       setStake(null);
-    } catch { toast.error('Failed'); }
+    } catch { toast.error(t('common.operationFailed')); }
   };
 
   if (loading) return <div className="min-h-screen bg-bg p-4"><div className="skeleton h-48 rounded-2xl" /><div className="skeleton h-64 rounded-2xl" /></div>;
 
-  const daysLeft = stake ? Math.max(0, Math.ceil((new Date(stake.unlockAt) - Date.now()) / 86400000)) : 0;
+  const daysLeft = stake ? Math.max(0, Math.ceil((new Date(stake.unlock_at) - Date.now()) / 86400000)) : 0;
   const currentPlan = stake ? (PLANS.find(p => p.id === stake.plan_id) || { id: 'custom', amount: stake.amount, bonus: stake.bonus, color: 'from-gray-500 to-gray-600', icon: Zap, gifts: [] }) : null;
   const CurIcon = currentPlan?.icon || Zap;
 

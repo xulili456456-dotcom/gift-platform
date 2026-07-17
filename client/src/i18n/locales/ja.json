@@ -489,7 +489,8 @@
     "privacy": "お客様の情報は暗号化され安全に保護されます",
     "idCard": "IDカード",
     "driverLicense": "運転免許証",
-    "passport": "パスポート"
+    "passport": "パスポート",
+    "uploadBoth": "両面をアップロードしてください"
   },
   "legal": {
     "title": "法務・情報",
@@ -674,7 +675,10 @@
     "confirm": "確認",
     "loadingFailed": "データの読み込みに失敗しました",
     "operationFailed": "操作に失敗しました",
-    "networkError": "ネットワークエラー"
+    "networkError": "ネットワークエラー",
+    "ok": "OK",
+    "copySuccess": "コピーしました！",
+    "submit": "送信しました"
   },
   "store": {
     "title": "Eコマース",
@@ -774,7 +778,31 @@
     "holdingMode": "保有",
     "shareMode": "共有",
     "share": "共有",
-    "shareEarn": "共有して稼ぐ"
+    "shareEarn": "共有して稼ぐ",
+    "need": "必要",
+    "have": "利用可能",
+    "shortage": "不足",
+    "howToEarn": "資金の入手方法",
+    "tipCheckin": "毎日チェックイン: $0.10-$0.70",
+    "tipHolding": "保有商品は自動売却されます",
+    "holdings": "保有商品",
+    "noHoldings": "保有商品なし",
+    "totalReturn": "総収益",
+    "shareCommission": "コミッション",
+    "shareRate": "購入価格の",
+    "shareHint": "このリンクを共有。誰かが購入するとコミッションを獲得。",
+    "dailyLimitReached": "本日の上限に達しました",
+    "dailyLimitMsg": "本日の注文が完了しました。明日またお越しください！",
+    "gotIt": "了解",
+    "depositMinMax": "最低$1 · 最高$10,000",
+    "bellHint": "通知",
+    "costPriceColon": "コスト:",
+    "sellBy": "販売期限",
+    "boughtMsg": "購入！販売予定:",
+    "shareGenerated": "共有リンク生成！",
+    "shareFailed": "共有失敗",
+    "linkCopiedMsg": "リンクをコピーしました！",
+    "itemsSold": "{{n}}個の商品が売れました！"
   },
   "specs": {
     "产地": "原産地",

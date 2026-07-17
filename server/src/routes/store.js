@@ -364,7 +364,7 @@ router.get('/orders-history', async (req, res) => {
 
   res.json({
     orders: orders.map(o => ({ ...o, profit: Number(o.profit) })),
-    summary: { count: Number(summary?.count || 0), totalProfit: Number(summary?.totalProfit || 0) },
+    summary: { count: Number(summary?.count || 0), totalProfit: Number(summary?.totalprofit || 0) },
   });
 });
 

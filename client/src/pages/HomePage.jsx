@@ -70,7 +70,7 @@ export default function HomePage() {
             <div className="w-9 h-9 rounded-full bg-[#FF9900]/20 flex items-center justify-center text-[#e47911] font-bold text-sm ring-2 ring-[#FF9900]/30">
               {(user?.name || user?.email || '?')[0].toUpperCase()}
             </div>
-            <span className="text-[#0F1111] text-sm font-medium">{user?.name || user?.email}</span>
+            <span className="text-white text-sm font-medium">{user?.name || user?.email}</span>
           </div>
         </div>
 

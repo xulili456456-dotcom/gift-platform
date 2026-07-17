@@ -29,6 +29,7 @@ const WithdrawPage = lazy(() => import('./pages/WithdrawPage'));
 const StakingPage = lazy(() => import('./pages/StakingPage'));
 const VerifyPage = lazy(() => import('./pages/VerifyPage'));
 const SupportPage = lazy(() => import('./pages/SupportPage'));
+const DepositPage = lazy(() => import('./pages/DepositPage'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
 const GiftDetailPage = lazy(() => import('./pages/GiftDetailPage'));
 
@@ -108,6 +109,7 @@ export default function App() {
           <Route path="/mine/vip" element={<Lazy Comp={VipPage} />} />
           <Route path="/mine/withdraw" element={<Lazy Comp={WithdrawPage} />} />
           <Route path="/mine/staking" element={<Lazy Comp={StakingPage} />} />
+          <Route path="/mine/deposit" element={<Lazy Comp={DepositPage} />} />
           <Route path="/mine/verify" element={<Lazy Comp={VerifyPage} />} />
           <Route path="/mine/support" element={<Lazy Comp={SupportPage} />} />
           <Route path="/mine/notifications" element={<Lazy Comp={NotificationsPage} />} />
