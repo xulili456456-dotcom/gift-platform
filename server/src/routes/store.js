@@ -92,8 +92,8 @@ router.get('/status', async (req, res) => {
       remaining: Math.max(0, tier.dailyOrders - (Number(doneToday?.c) || 0)),
       balance: Number(taskBal?.total || 0),
       deposit: Number(store.deposit || 0),
-      maxTrade: Number(store.deposit || 0), // Max cost user can trade = deposit amount
-      nextTier: next ? { name: next.name, threshold: next.threshold, remaining: next.threshold - totalOrders } : null,
+      maxTrade: Number(store.deposit || 0),
+      freeRemaining: Math.max(0, 5 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_orders_' + today]))?.value || 0)),
     },
   });
 });
@@ -142,20 +142,35 @@ router.post('/orders/process', async (req, res) => {
 
   const tier = TIERS[store.tier];
   const today = new Date().toISOString().slice(0, 10);
-  const { cost, profit, totalReturn } = calcProduct(productPrice);
+  let { cost, profit, totalReturn } = calcProduct(productPrice);
+
+  // Recalculate for free orders (5% instead of 15%)
+  if (isFreeOrder) {
+    profit = Math.round(productPrice * FREE_PROFIT_RATE * 100) / 100;
+    totalReturn = Math.round((cost + profit) * 100) / 100;
+  }
 
   // Check available balance (exclude locked in holdings)
   const availBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
   const lockedBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = ?", [store.id, 'holding']);
   const available = Number(availBal?.total || 0) - Number(lockedBal?.total || 0);
 
-  // Deposit check: cost must not exceed deposit
+  // Free daily orders: 5 slots/day, cost ≤ $50, no deposit needed, 5% profit
+  const FREE_SLOTS = 5;
+  const FREE_MAX_COST = 50;
+  const FREE_PROFIT_RATE = 0.05;
+  const freeKey = 'free_orders_' + today;
+  const freeUsed = await get("SELECT value FROM admin_settings WHERE key = ?", [freeKey]);
+  const freeRemaining = FREE_SLOTS - Number(freeUsed?.value || 0);
+  const isFreeOrder = cost <= FREE_MAX_COST && freeRemaining > 0;
+
+  // Deposit check: cost must not exceed deposit (skip for free orders)
   const deposit = Number(store.deposit || 0);
-  if (cost > deposit) {
+  if (!isFreeOrder && cost > deposit) {
     return res.status(400).json({
       error: 'Insufficient deposit',
       need: cost, have: deposit, shortage: Math.round((cost - deposit) * 100) / 100,
-      depositRequired: true
+      depositRequired: true, freeRemaining
     });
   }
 
@@ -190,7 +205,14 @@ router.post('/orders/process', async (req, res) => {
 
     const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'holding', ?)", [store.id, req.user.id, cost, sellBy]);
     await t.commit();
-    res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', remaining: Math.max(0, tier.dailyOrders - Number(doneToday?.c || 0) - 1) });
+
+    // Increment free order counter if applicable
+    if (isFreeOrder) {
+      const newCount = Number(freeUsed?.value || 0) + 1;
+      await run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [freeKey, String(newCount), String(newCount)]);
+    }
+
+    res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: isFreeOrder ? FREE_SLOTS - newCount : undefined, remaining: Math.max(0, tier.dailyOrders - Number(doneToday?.c || 0) - 1) });
   } catch (err) {
     console.error('Buy order failed:', err.code, err.message, err.detail);
     await t.rollback().catch(() => {});

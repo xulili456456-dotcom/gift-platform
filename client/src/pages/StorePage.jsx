@@ -741,6 +741,12 @@ export default function StorePage() {
             <button onClick={() => setShowDeposit(true)} className="text-[10px] px-2.5 py-1.5 rounded-full bg-[#FFD814] text-[#0F1111] font-medium">{t('store.addDeposit') || '+Deposit'}</button>
           </div>
         </div>
+        {(s.freeRemaining || 0) > 0 && (
+          <div className="mt-1.5 bg-[#FFF8E1] border border-[#FFB800] rounded-lg px-3 py-1.5 flex items-center gap-2">
+            <span className="text-sm">🔥</span>
+            <span className="text-[10px] text-[#0F1111] font-bold">{s.freeRemaining} free orders left today! No deposit needed for items ≤ $50</span>
+          </div>
+        )}
         <div className="flex items-center gap-4 text-[11px]">
           <span className="text-[#067D62] font-bold">+${earnings.todayProfit.toFixed(2)} {t('store.today')}</span>
           <span className="text-[#565959]">{t('store.totalEarned') || 'Total'}: <b className="text-[#0F1111]">${earnings.totalProfit.toFixed(2)}</b></span>
