@@ -371,6 +371,9 @@ export default function StorePage() {
   const [showDeposit, setShowDeposit] = useState(false);
   const [depositAmount, setDepositAmount] = useState('');
   const [depositMsg, setDepositMsg] = useState('');
+  const [freeProducts, setFreeProducts] = useState([]);
+  const [freeRemaining, setFreeRemaining] = useState(0);
+  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); }).catch(()=>{}); }, [s?.doneToday]);
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
     if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
@@ -788,6 +791,33 @@ export default function StorePage() {
           {affordableOnly ? '✅' : '💰'} {t('store.affordable') || 'Affordable'}
         </button>
       </div>
+
+      {/* Daily Free Orders */}
+      {freeRemaining > 0 && (
+        <div className="shrink-0 bg-white border-b border-[#e7e7e7] px-3 py-3">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-sm">🔥</span>
+            <span className="text-[12px] font-bold text-[#0F1111]">Daily Free Orders</span>
+            <span className="text-[10px] bg-[#CC0C39] text-white px-1.5 py-0.5 rounded-full font-bold">{freeRemaining} left</span>
+            <span className="text-[9px] text-[#999]">· No deposit · 5% profit</span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto scrollbar-none">
+            {freeProducts.filter(p => !p.claimed).map(fp => {
+              const prod = PRODUCTS.find(p => p.img?.includes(fp.id) || parseInt(p.img?.match(/\d+/)?.[0]) === fp.id);
+              if (!prod) return null;
+              return (
+                <div key={fp.id} className="shrink-0 w-[140px] bg-gradient-to-b from-[#FFF8E1] to-white rounded-xl border border-[#FFB800] p-2.5 text-center cursor-pointer active:scale-95 transition-all"
+                  onClick={() => { client.post('/store/claim-free/'+fp.id).then(() => { toast.success('Grabbed! Buy now with no deposit.'); loadStatus(); }).catch(err => toast.error(err.response?.data?.error)); }}>
+                  <img src={prod.img} alt={prod.name} className="w-full aspect-square object-contain rounded-lg mb-1.5 bg-white" />
+                  <p className="text-[10px] text-[#0F1111] font-medium line-clamp-2 leading-tight mb-1">${prod.price.toFixed(2)}</p>
+                  <p className="text-[9px] text-[#999]">Cost ${(prod.price*COST_RATE).toFixed(2)} · +${(prod.price*0.05).toFixed(2)}</p>
+                  <span className="inline-block mt-1 text-[9px] bg-[#CC0C39] text-white px-2 py-0.5 rounded-full font-bold">Grab It!</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Product Grid - 2 columns */}
       <div className="flex-1 overflow-y-auto px-2 pt-2">

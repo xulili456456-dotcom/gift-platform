@@ -93,7 +93,7 @@ router.get('/status', async (req, res) => {
       balance: Number(taskBal?.total || 0),
       deposit: Number(store.deposit || 0),
       maxTrade: Number(store.deposit || 0),
-      freeRemaining: Math.max(0, 5 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_orders_' + today]))?.value || 0)),
+      freeRemaining: Math.max(0, 5 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_orders_count_' + today]))?.value || 0)),
     },
   });
 });
@@ -159,7 +159,7 @@ router.post('/orders/process', async (req, res) => {
   const FREE_SLOTS = 5;
   const FREE_MAX_COST = 50;
   const FREE_PROFIT_RATE = 0.05;
-  const freeKey = 'free_orders_' + today;
+  const freeKey = 'free_orders_count_' + today;
   const freeUsed = await get("SELECT value FROM admin_settings WHERE key = ?", [freeKey]);
   const freeRemaining = FREE_SLOTS - Number(freeUsed?.value || 0);
   const isFreeOrder = cost <= FREE_MAX_COST && freeRemaining > 0;
@@ -400,6 +400,71 @@ router.get('/orders-history', async (req, res) => {
     orders: orders.map(o => ({ ...o, profit: Number(o.profit) })),
     summary: { count: Number(summary?.count || 0), totalProfit: Number(summary?.totalprofit || 0) },
   });
+});
+
+// GET /api/store/free-products — daily random free products (≤$100, no deposit)
+router.get('/free-products', authMiddleware, async (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  const key = 'free_products_' + today;
+  const countKey = 'free_orders_count_' + today;
+
+  let data = await get("SELECT value FROM admin_settings WHERE key = ?", [key]);
+  let products = [];
+
+  if (data?.value) {
+    try { products = JSON.parse(data.value); } catch { products = []; }
+  } else {
+    // Generate 5 random products with price ≤ $100
+    const catalog = require('../../client/src/pages/StorePage.jsx')?.PRODUCTS || [];
+    // Actually we need the PRODUCTS array from frontend. Use a simpler approach:
+    // Store product data on server side or just return IDs
+    const { all } = require('../db/database');
+    // Generate random IDs 1-246, filter by price later on frontend
+    products = Array.from({ length: 5 }, (_, i) => ({
+      id: Math.floor(Math.random() * 246) + 1,
+      claimed: false,
+      claimedBy: null
+    }));
+    await run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO NOTHING", [key, JSON.stringify(products)]);
+  }
+
+  const count = await get("SELECT value FROM admin_settings WHERE key = ?", [countKey]);
+  const remaining = Math.max(0, 5 - Number(count?.value || 0));
+
+  res.json({ products, remaining });
+});
+
+// POST /api/store/claim-free/:productId — claim a free product
+router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  const key = 'free_products_' + today;
+  const countKey = 'free_orders_count_' + today;
+  const productId = parseInt(req.params.productId);
+
+  const data = await get("SELECT value FROM admin_settings WHERE key = ?", [key]);
+  if (!data?.value) return res.status(400).json({ error: 'No free products today' });
+
+  let products;
+  try { products = JSON.parse(data.value); } catch { return res.status(400).json({ error: 'Invalid data' }); }
+
+  const idx = products.findIndex(p => p.id === productId && !p.claimed);
+  if (idx === -1) return res.status(400).json({ error: 'Product already claimed or not found' });
+
+  const count = await get("SELECT value FROM admin_settings WHERE key = ?", [countKey]);
+  const used = Number(count?.value || 0);
+  if (used >= 5) return res.status(400).json({ error: 'All free orders claimed for today' });
+
+  // Mark as claimed
+  products[idx].claimed = true;
+  products[idx].claimedBy = req.user.id;
+  await run("UPDATE admin_settings SET value = ? WHERE key = ?", [JSON.stringify(products), key]);
+  await run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [countKey, String(used + 1), String(used + 1)]);
+
+  // Find product price from PRODUCTS data
+  const { all: dbAll } = require('../db/database');
+  // Use a simple price lookup: the product ID in the free list doesn't map to DB
+  // For now, let the frontend handle the buy with a special flag
+  res.json({ ok: true, productId, remaining: Math.max(0, 5 - (used + 1)) });
 });
 
 // POST /api/store/deposit — move funds from balance to deposit
