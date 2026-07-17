@@ -368,9 +368,6 @@ export default function StorePage() {
   const [showDailyFull, setShowDailyFull] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [expandedHolding, setExpandedHolding] = useState(null);
-  const [showDeposit, setShowDeposit] = useState(false);
-  const [depositAmount, setDepositAmount] = useState('');
-  const [depositMsg, setDepositMsg] = useState('');
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
     if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
@@ -398,6 +395,7 @@ export default function StorePage() {
   };
   const [showDeposit, setShowDeposit] = useState(false);
   const [depositAmount, setDepositAmount] = useState('');
+  const [depositMsg, setDepositMsg] = useState('');
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
     if (!amt || amt < 1) { toast.error(t('store.depositMinMax')); return; }
