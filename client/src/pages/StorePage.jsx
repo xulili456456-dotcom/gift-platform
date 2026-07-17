@@ -345,7 +345,7 @@ export default function StorePage() {
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
     let list = genProducts(status.store.tier, CAT_VALUES[catIdx], search);
-    if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => !fp.claimed && fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0)));
+    if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0)));
     else if (affordableOnly) list = list.filter(p => p.costPrice <= (status.store.balance || 0));
     if (sortMode === 'profit') list.sort((a, b) => b.profit - a.profit);
     else if (sortMode === 'price') list.sort((a, b) => b.price - a.price);
@@ -799,12 +799,16 @@ export default function StorePage() {
       {/* Product Grid - 2 columns */}
       <div className="flex-1 overflow-y-auto px-2 pt-2">
         <div className="grid grid-cols-2 gap-2">
-          {products.map(p => (
-            <div key={p.id} onClick={() => setDetail(p)} className="bg-white rounded-lg shadow-sm border border-[#e7e7e7] active:shadow-md cursor-pointer overflow-hidden hover:border-[#ddd] transition-colors">
+          {products.map(p => {
+            const isFreeProduct = freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0));
+            const isFreeSoldOut = sortMode === 'free' && freeRemaining <= 0 && isFreeProduct;
+            return (
+            <div key={p.id} onClick={() => !isFreeSoldOut && setDetail(p)} className={`bg-white rounded-lg shadow-sm border border-[#e7e7e7] overflow-hidden hover:border-[#ddd] transition-colors ${isFreeSoldOut ? 'opacity-50' : 'active:shadow-md cursor-pointer'}`}>
               <div className="relative bg-[#f0f2f2] aspect-square">
                 <img src={p.img} alt={p.name} className="w-full h-full object-contain p-3" loading="lazy" />
                 {p.sold > 5000 && <span className="absolute top-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#CC0C39] text-white font-bold uppercase tracking-wide">Best</span>}
                 {p.sold > 1000 && p.sold <= 5000 && <span className="absolute top-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#FFD814] text-white font-bold">Top</span>}
+                {isFreeSoldOut && <span className="absolute top-1.5 right-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#999] text-white font-bold">已抢完</span>}
               </div>
               <div className="p-2.5">
                 <p className="text-[11px] text-[#0F1111] leading-tight font-medium line-clamp-2 mb-1.5" style={{minHeight:'2.6em'}}>{p.name}</p>
@@ -824,6 +828,8 @@ export default function StorePage() {
                       onClick={(e) => { e.stopPropagation(); handleShare(p); }}
                       className="text-[10px] px-2.5 py-1 rounded font-medium bg-[#067D62] hover:bg-[#00e060] text-white"
                     >🔗 {t('store.share') || 'Share'} 3%</button>
+                  ) : isFreeSoldOut ? (
+                    <button disabled className="text-[10px] px-3 py-1.5 rounded font-medium bg-[#ddd] text-[#999] cursor-not-allowed">已抢完</button>
                   ) : (
                     <button
                       onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
@@ -833,7 +839,7 @@ export default function StorePage() {
                 </div>
               </div>
             </div>
-          ))}
+          )})}
         </div>
         {products.length === 0 && (
           <div className="text-center py-20 text-[#565959]">

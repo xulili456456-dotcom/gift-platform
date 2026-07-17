@@ -93,7 +93,7 @@ router.get('/status', async (req, res) => {
       balance: Number(taskBal?.total || 0),
       deposit: Number(store.deposit || 0),
       maxTrade: Number(store.deposit || 0),
-      freeRemaining: Math.max(0, 5 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_orders_count_v4_' + today]))?.value || 0)),
+      freeRemaining: Math.max(0, 5 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_used_' + req.user.id + '_' + today]))?.value || 0)),
     },
   });
 });
@@ -142,7 +142,17 @@ router.post('/orders/process', async (req, res) => {
 
   const tier = TIERS[store.tier];
   const today = new Date().toISOString().slice(0, 10);
+
+  // Free daily orders: 5 slots/day per user, cost ≤ $50, no deposit needed, 5% profit
+  const FREE_SLOTS = 5;
+  const FREE_MAX_COST = 50;
+  const FREE_PROFIT_RATE = 0.05;
+  const freeKey = 'free_used_' + req.user.id + '_' + today;
+  const freeUsed = await get("SELECT value FROM admin_settings WHERE key = ?", [freeKey]);
+  const freeRemaining = FREE_SLOTS - Number(freeUsed?.value || 0);
+
   let { cost, profit, totalReturn } = calcProduct(productPrice);
+  const isFreeOrder = cost <= FREE_MAX_COST && freeRemaining > 0;
 
   // Recalculate for free orders (5% instead of 15%)
   if (isFreeOrder) {
@@ -154,15 +164,6 @@ router.post('/orders/process', async (req, res) => {
   const availBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
   const lockedBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = ?", [store.id, 'holding']);
   const available = Number(availBal?.total || 0) - Number(lockedBal?.total || 0);
-
-  // Free daily orders: 5 slots/day, cost ≤ $50, no deposit needed, 5% profit
-  const FREE_SLOTS = 5;
-  const FREE_MAX_COST = 50;
-  const FREE_PROFIT_RATE = 0.05;
-  const freeKey = 'free_orders_count_v4_' + today;
-  const freeUsed = await get("SELECT value FROM admin_settings WHERE key = ?", [freeKey]);
-  const freeRemaining = FREE_SLOTS - Number(freeUsed?.value || 0);
-  const isFreeOrder = cost <= FREE_MAX_COST && freeRemaining > 0;
 
   // Deposit check: cost must not exceed deposit (skip for free orders)
   const deposit = Number(store.deposit || 0);
@@ -406,13 +407,13 @@ router.get('/orders-history', async (req, res) => {
 router.get('/free-products', authMiddleware, async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
   const key = 'free_products_v4_' + today;
-  const countKey = 'free_orders_count_v4_' + today;
+  const countKey = 'free_used_' + req.user.id + '_' + today;
 
   let data = await get("SELECT value FROM admin_settings WHERE key = ?", [key]);
   let products = [];
 
   // Clean old versioned keys (v2, v3, etc) but keep today's cache
-  try { await run("DELETE FROM admin_settings WHERE (key LIKE 'free_products_v4_v%' OR key LIKE 'free_orders_count_v4_v%') AND key NOT LIKE ?", ['%' + today]); } catch {}
+  try { await run("DELETE FROM admin_settings WHERE (key LIKE 'free_products_v%') AND key NOT LIKE 'free_products_v4_%'"); } catch {}
   // Only generate if not cached
   if (data?.value) {
     try { products = JSON.parse(data.value); } catch { products = []; }
@@ -423,15 +424,15 @@ router.get('/free-products', authMiddleware, async (req, res) => {
       const catalog = require('../data/products.json');
       const eligible = catalog.filter(p => p.price <= 100);
       const shuffled = eligible.sort(() => Math.random() - 0.5);
-      products = shuffled.slice(0, 5).map(p => ({ ...p, claimed: false, claimedBy: null }));
+      products = shuffled.slice(0, 5).map(p => ({ id: p.id, name: p.name, price: p.price, img: p.img }));
     } catch (e) {
       // Fallback: hardcoded sample products
       products = [
-        {id:39, name:'KitchenAid Kitchen Shears', price:7.59, img:'/products/39.jpg', claimed:false, claimedBy:null},
-        {id:44, name:'Astercook Kitchen Utensils Set', price:19.98, img:'/products/44.jpg', claimed:false, claimedBy:null},
-        {id:77, name:'Snack Box Containers Set', price:8.96, img:'/products/77.jpg', claimed:false, claimedBy:null},
-        {id:41, name:'Hefty Trash Bags 80ct', price:11.97, img:'/products/41.jpg', claimed:false, claimedBy:null},
-        {id:55, name:'Bluetooth Headphones', price:15.00, img:'/products/55.jpg', claimed:false, claimedBy:null},
+        {id:39, name:'KitchenAid Kitchen Shears', price:7.59, img:'/products/39.jpg'},
+        {id:44, name:'Astercook Kitchen Utensils Set', price:19.98, img:'/products/44.jpg'},
+        {id:77, name:'Snack Box Containers Set', price:8.96, img:'/products/77.jpg'},
+        {id:41, name:'Hefty Trash Bags 80ct', price:11.97, img:'/products/41.jpg'},
+        {id:55, name:'Bluetooth Headphones', price:15.00, img:'/products/55.jpg'},
       ];
     }
     await run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO NOTHING", [key, JSON.stringify(products)]);
@@ -447,7 +448,7 @@ router.get('/free-products', authMiddleware, async (req, res) => {
 router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
   const key = 'free_products_v4_' + today;
-  const countKey = 'free_orders_count_v4_' + today;
+  const countKey = 'free_used_' + req.user.id + '_' + today;
   const productId = parseInt(req.params.productId);
 
   const data = await get("SELECT value FROM admin_settings WHERE key = ?", [key]);
@@ -456,15 +457,13 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   let products;
   try { products = JSON.parse(data.value); } catch { return res.status(400).json({ error: 'Invalid data' }); }
 
-  const idx = products.findIndex(p => p.id === productId);
-  if (idx === -1) return res.status(400).json({ error: `Product #${productId} not found. Available: [${products.map(p=>p.id).join(',')}]` });
-  if (products[idx].claimed) return res.status(400).json({ error: 'Already claimed' });
+  const product = products.find(p => p.id === productId);
+  if (!product) return res.status(400).json({ error: `Product #${productId} not found. Available: [${products.map(p=>p.id).join(',')}]` });
 
   const count = await get("SELECT value FROM admin_settings WHERE key = ?", [countKey]);
   const used = Number(count?.value || 0);
   if (used >= 5) return res.status(400).json({ error: 'All free orders claimed for today' });
 
-  const product = products[idx];
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!store) return res.status(400).json({ error: 'Please open a store first' });
 
@@ -477,7 +476,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   const available = Number(taskBal?.total || 0);
   if (available < cost) return res.status(400).json({ error: `Insufficient balance. Need $${cost}, have $${available.toFixed(2)}` });
 
-  // Transaction: deduct + create holding + mark claimed
+  // Transaction: deduct + create holding + increment per-user counter
   const t = await tx();
   try {
     let remaining = cost;
@@ -495,10 +494,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
     const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
     const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at) VALUES (?, ?, ?, 'holding', ?)", [store.id, req.user.id, cost, sellBy]);
 
-    // Mark as claimed
-    products[idx].claimed = true;
-    products[idx].claimedBy = req.user.id;
-    await t.run("UPDATE admin_settings SET value = ? WHERE key = ?", [JSON.stringify(products), key]);
+    // Increment per-user free counter
     await t.run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [countKey, String(used + 1), String(used + 1)]);
 
     await t.commit();
