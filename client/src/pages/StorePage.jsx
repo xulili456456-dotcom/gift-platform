@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import client from '../api/client';
-import { Crown, ShoppingCart, X, Store, Search, Star, ChevronLeft, Truck, Shield, RotateCcw, Bell } from 'lucide-react';
+import { ShoppingCart, X, Store, Search, Star, ChevronLeft, Truck, Shield, RotateCcw, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const COST_RATE = 0.85;    // cost price = market price × 85%
@@ -372,7 +372,6 @@ export default function StorePage() {
   };
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [expandedHolding, setExpandedHolding] = useState(null);
-  const [showDeposit, setShowDeposit] = useState(false);
   const [depositAmount, setDepositAmount] = useState('');
   const [depositMsg, setDepositMsg] = useState('');
   const handleDeposit = async () => {
@@ -725,27 +724,6 @@ export default function StorePage() {
             </div>
             <p className="text-[9px] text-[#999999] text-center mb-3">{t('store.shareHint')}</p>
             <button onClick={() => setShareProduct(null)} className="w-full py-2.5 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">{t('common.close')}</button>
-          </div>
-        </div>
-      )}
-
-      {/* Deposit Modal */}
-      {showDeposit && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => { setShowDeposit(false); setDepositMsg(''); }}>
-          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
-            <h3 className="text-base font-bold text-[#0F1111] mb-1">{t('store.deposit') || 'Deposit'}</h3>
-            <p className="text-xs text-[#565959] mb-3">{t('store.depositDesc') || 'Lock funds as collateral to trade bigger items. 1:1 ratio.'}</p>
-            {depositMsg && <p className="text-xs text-[#067D62] font-bold mb-3">{depositMsg}</p>}
-            {!depositMsg && <>
-              <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="100" className="w-full px-3 py-2.5 border border-[#e7e7e7] rounded-lg text-sm mb-3 outline-none focus:border-[#FF9900]" autoFocus />
-              <p className="text-[9px] text-[#999] mb-3">Available balance: ${s.balance.toFixed(2)} · Max trade will be ${((s.deposit||0) + parseFloat(depositAmount||0)).toFixed(2)}</p>
-              <div className="flex gap-2">
-                <button onClick={() => { setShowDeposit(false); setDepositMsg(''); }} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#f0f2f2] text-[#0F1111]">{t('common.cancel')}</button>
-                <button onClick={handleDeposit} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111]">{t('store.confirmDeposit') || 'Confirm'}</button>
-              </div>
-              {(s.deposit||0) > 0 && <button onClick={handleWithdrawDeposit} className="w-full mt-2 py-2 rounded-lg text-xs text-[#CC0C39] font-medium">{t('store.withdrawDeposit') || 'Withdraw All Deposit'}</button>}
-            </>}
-            {depositMsg && <button onClick={() => { setShowDeposit(false); setDepositMsg(''); }} className="w-full py-2.5 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">Close</button>}
           </div>
         </div>
       )}
