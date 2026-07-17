@@ -24,9 +24,9 @@ export default function NotificationsPage() {
     });
   };
 
-  if (loading) return <div className="min-h-screen bg-bg p-4"><div className="skeleton h-8 w-32" /><div className="skeleton h-64 rounded-2xl" /></div>;
-
   const [selected, setSelected] = useState(null);
+
+  if (loading) return <div className="min-h-screen bg-bg p-4"><div className="skeleton h-8 w-32" /><div className="skeleton h-64 rounded-2xl" /></div>;
 
   return (
     <div className="min-h-screen bg-bg animate-fade-in">
