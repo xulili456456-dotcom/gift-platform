@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shopee Admin Panel</title>
+<title>后台管理系统</title>
 <style>
 :root{--red:#C41E3A;--red-dark:#8B0000;--gold:#D4A574;--bg:#FFF8F0;--white:#FFF;--text:#2D2D2D;--muted:#8B7355;--success:#2E7D32;--danger:#DC2626;--blue:#2563EB;--border:#e5e7eb}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -35,7 +35,7 @@ main{padding:20px;max-width:1400px;margin:0 auto}
 .card-header{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:space-between}
 .card-body{padding:18px}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:10px 12px;background:#fafafa;color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+th{text-align:left;padding:10px 12px;background:#fafafa;color:var(--muted);font-weight:500;font-size:11px;border-bottom:1px solid var(--border)}
 td{padding:10px 12px;border-bottom:1px solid var(--border)}
 tr:hover{background:#fdf5f5}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
@@ -78,19 +78,19 @@ input:focus,select:focus{border-color:var(--red)}
 <body class="login-body">
 <div id="loginPage">
 <div class="login-box">
-<h1>Shopee Admin</h1>
-<p class="sub">后台管理系统</p>
-<input id="loginEmail" placeholder="Admin Email" value="admin@gift.com">
-<input id="loginPass" type="password" placeholder="Password" value="admin888">
+<h1>管理后台</h1>
+<p class="sub">请使用管理员账号登录</p>
+<input id="loginEmail" placeholder="管理员邮箱" value="admin@gift.com">
+<input id="loginPass" type="password" placeholder="密码" value="admin888">
 <div class="err" id="loginErr"></div>
-<button onclick="doLogin()">Login</button>
+<button onclick="doLogin()">登 录</button>
 </div>
 </div>
 
 <div id="mainApp" style="display:none;width:100%">
 <header>
-<h1>🛡️ Shopee Admin Panel</h1>
-<button class="logout" onclick="logout()">Logout</button>
+<h1>🛡️ 管理后台</h1>
+<button class="logout" onclick="logout()">退出登录</button>
 </header>
 <nav id="nav"></nav>
 <main id="content"></main>
@@ -103,7 +103,6 @@ const API='/api';
 let token='';
 let currentTab='dashboard';
 
-// ========== Auth ==========
 async function doLogin(){
   const e=document.getElementById('loginEmail').value.trim();
   const p=document.getElementById('loginPass').value;
@@ -111,14 +110,14 @@ async function doLogin(){
   try{
     const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})});
     const d=await r.json();
-    if(!r.ok||!d.user?.is_admin){err.textContent='Admin account required';return;}
+    if(!r.ok||!d.user?.is_admin){err.textContent='需要管理员账号';return;}
     token=d.access_token;
     localStorage.setItem('admin_token',token);
     document.getElementById('loginPage').style.display='none';
     document.getElementById('mainApp').style.display='block';
     document.body.classList.remove('login-body');
     initApp();
-  }catch(ex){err.textContent='Login failed'}
+  }catch(ex){err.textContent='登录失败，请重试'}
 }
 
 function logout(){localStorage.removeItem('admin_token');location.reload()}
@@ -128,7 +127,7 @@ async function api(method,path,body){
   if(body)opts.body=JSON.stringify(body);
   const r=await fetch(API+path,opts);
   const d=await r.json();
-  if(!r.ok)throw new Error(d.error||'Request failed');
+  if(!r.ok)throw new Error(d.error||'请求失败');
   return d;
 }
 
@@ -139,7 +138,6 @@ function showToast(msg,isErr){
   setTimeout(()=>t.style.display='none',3000);
 }
 
-// ========== Init ==========
 async function initApp(){
   const saved=localStorage.getItem('admin_token');
   if(saved){token=saved;try{await api('GET','/auth/me');document.getElementById('loginPage').style.display='none';document.getElementById('mainApp').style.display='block';document.body.classList.remove('login-body');}catch(e){logout();return}}
@@ -147,14 +145,14 @@ async function initApp(){
 }
 
 function renderNav(){
-  const tabs=[['dashboard','📊 Dashboard'],['users','👥 Users'],['orders','📦 Orders'],['deposits','💵 Deposits'],['withdrawals','💸 Withdrawals'],['kyc','🛂 KYC']];
+  const tabs=[['dashboard','📊 仪表盘'],['users','👥 用户管理'],['orders','📦 订单'],['deposits','💵 充值审批'],['withdrawals','💸 提现审批'],['kyc','🛂 实名认证']];
   document.getElementById('nav').innerHTML=tabs.map(([k,v])=>`<button class="${k===currentTab?'active':''}" onclick="switchTab('${k}')">${v}</button>`).join('');
 }
 
 async function switchTab(tab){
   currentTab=tab;renderNav();
   const c=document.getElementById('content');
-  c.innerHTML='<div class="empty">Loading...</div>';
+  c.innerHTML='<div class="empty">加载中...</div>';
   if(tab==='dashboard')await loadDashboard(c);
   else if(tab==='users')await loadUsers(c);
   else if(tab==='orders')await loadOrders(c);
@@ -163,32 +161,30 @@ async function switchTab(tab){
   else if(tab==='kyc')await loadKyc(c);
 }
 
-// ========== Dashboard ==========
 async function loadDashboard(c){
   let stats={};
   try{stats=await api('GET','/admin/enhanced-stats');}catch(e){}
   c.innerHTML=`
     <div class="stats-grid">
-      <div class="stat-card"><div class="label">Total Users</div><div class="value blue">${stats.totalUsers||0}</div></div>
-      <div class="stat-card"><div class="label">Active Stores</div><div class="value">${stats.totalStores||0}</div></div>
-      <div class="stat-card"><div class="label">Total Balance</div><div class="value green">$${(stats.totalBalance||0).toFixed(0)}</div></div>
-      <div class="stat-card"><div class="label">Total Deposit</div><div class="value">$${(stats.totalDeposit||0).toFixed(0)}</div></div>
-      <div class="stat-card"><div class="label">Orders Today</div><div class="value">${stats.ordersToday||0}</div></div>
-      <div class="stat-card"><div class="label">Pending Deposits</div><div class="value red">${stats.pendingDeposits||0}</div></div>
-      <div class="stat-card"><div class="label">Pending Withdrawals</div><div class="value red">${stats.pendingWithdrawals||0}</div></div>
-      <div class="stat-card"><div class="label">Pending KYC</div><div class="value red">${stats.pendingKyc||0}</div></div>
+      <div class="stat-card"><div class="label">总用户数</div><div class="value blue">${stats.totalUsers||0}</div></div>
+      <div class="stat-card"><div class="label">活跃店铺</div><div class="value">${stats.totalStores||0}</div></div>
+      <div class="stat-card"><div class="label">总余额</div><div class="value green">$${(stats.totalBalance||0).toFixed(0)}</div></div>
+      <div class="stat-card"><div class="label">总保证金</div><div class="value">$${(stats.totalDeposit||0).toFixed(0)}</div></div>
+      <div class="stat-card"><div class="label">今日订单</div><div class="value">${stats.ordersToday||0}</div></div>
+      <div class="stat-card"><div class="label">待审批充值</div><div class="value red">${stats.pendingDeposits||0}</div></div>
+      <div class="stat-card"><div class="label">待审批提现</div><div class="value red">${stats.pendingWithdrawals||0}</div></div>
+      <div class="stat-card"><div class="label">待审核认证</div><div class="value red">${stats.pendingKyc||0}</div></div>
     </div>
   `;
 }
 
-// ========== Users ==========
 let usersPage=1,usersSearch='';
 async function loadUsers(c){
   c.innerHTML=`
     <div class="card"><div class="card-body">
       <div class="search-row">
-        <input id="userSearch" placeholder="Search by email/name/phone..." value="${usersSearch}" onkeydown="if(event.key==='Enter'){usersSearch=this.value;usersPage=1;loadUsers(document.getElementById('content'))}">
-        <button class="btn btn-blue" onclick="usersSearch=document.getElementById('userSearch').value;usersPage=1;loadUsers(document.getElementById('content'))">Search</button>
+        <input id="userSearch" placeholder="搜索邮箱/姓名/手机..." value="${usersSearch}" onkeydown="if(event.key==='Enter'){usersSearch=this.value;usersPage=1;loadUsers(document.getElementById('content'))}">
+        <button class="btn btn-blue" onclick="usersSearch=document.getElementById('userSearch').value;usersPage=1;loadUsers(document.getElementById('content'))">搜索</button>
       </div>
       <div id="userTable"></div>
       <div id="userPager" class="pagination"></div>
@@ -197,96 +193,92 @@ async function loadUsers(c){
   try{
     const d=await api('GET',`/admin/users-enhanced?page=${usersPage}&limit=15&search=${encodeURIComponent(usersSearch)}`);
     renderUserTable(d);
-  }catch(e){document.getElementById('userTable').innerHTML='<div class="empty">Failed to load: '+e.message+'</div>'}
+  }catch(e){document.getElementById('userTable').innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
 }
 
 function renderUserTable(d){
   const users=d.users||[];
   document.getElementById('userTable').innerHTML=`
     <table><thead><tr>
-      <th>ID</th><th>Email</th><th>Name</th><th>Phone</th><th>Referral</th><th>Balance</th><th>Deposit</th><th>Store</th><th>KYC</th><th>Frozen</th><th>IP</th><th>Actions</th>
+      <th>ID</th><th>邮箱</th><th>姓名</th><th>手机</th><th>邀请码</th><th>余额</th><th>保证金</th><th>店铺</th><th>实名</th><th>冻结</th><th>IP</th><th>操作</th>
     </tr></thead><tbody>
-    ${users.length===0?'<tr><td colspan="12" class="empty">No users found</td></tr>':
+    ${users.length===0?'<tr><td colspan="12" class="empty">暂无用户</td></tr>':
       users.map(u=>`<tr>
-        <td>${u.id}</td>
-        <td>${u.email}</td>
-        <td>${u.name||'-'}</td>
-        <td>${u.phone||'-'}</td>
+        <td>${u.id}</td><td>${u.email}</td><td>${u.name||'-'}</td><td>${u.phone||'-'}</td>
         <td style="font-size:10px;color:var(--blue)">${u.referral_code||'-'}</td>
         <td style="color:var(--success);font-weight:600">$${u.balance.toFixed(2)}</td>
         <td>$${u.store_deposit.toFixed(2)}</td>
-        <td><span class="badge ${u.store_status==='active'?'badge-green':'badge-gray'}">${u.tier||'none'}</span></td>
-        <td><span class="badge ${u.kyc_status==='approved'?'badge-green':u.kyc_status==='pending'?'badge-yellow':'badge-gray'}">${u.kyc_status||'none'}</span></td>
-        <td>${u.frozen?'<span class="badge badge-red">Yes</span>':'<span class="badge badge-green">No</span>'}</td>
+        <td><span class="badge ${u.store_status==='active'?'badge-green':'badge-gray'}">${u.tier==='small'?'小型':u.tier==='medium'?'中型':u.tier==='large'?'大型':'无'}</span></td>
+        <td><span class="badge ${u.kyc_status==='approved'?'badge-green':u.kyc_status==='pending'?'badge-yellow':'badge-gray'}">${u.kyc_status==='approved'?'已通过':u.kyc_status==='pending'?'待审核':'未提交'}</span></td>
+        <td>${u.frozen?'<span class="badge badge-red">已冻结</span>':'<span class="badge badge-green">正常</span>'}</td>
         <td style="font-size:10px;color:var(--muted)">${u.ip_address||'-'}</td>
-        <td><button class="btn btn-sm btn-blue" onclick="showUserDetail(${u.id})">Manage</button></td>
+        <td><button class="btn btn-sm btn-blue" onclick="showUserDetail(${u.id})">管理</button></td>
       </tr>`).join('')}
     </tbody></table>`;
   const total=Number(d.total)||0;
   const pages=Math.ceil(total/15);
   document.getElementById('userPager').innerHTML=`
-    <button class="btn btn-gray btn-sm" ${usersPage<=1?'disabled':''} onclick="usersPage--;loadUsers(document.getElementById('content'))">Prev</button>
-    <span>Page ${usersPage} / ${pages||1}</span>
-    <button class="btn btn-gray btn-sm" ${usersPage>=pages?'disabled':''} onclick="usersPage++;loadUsers(document.getElementById('content'))">Next</button>
+    <button class="btn btn-gray btn-sm" ${usersPage<=1?'disabled':''} onclick="usersPage--;loadUsers(document.getElementById('content'))">上一页</button>
+    <span>第 ${usersPage} / ${pages||1} 页</span>
+    <button class="btn btn-gray btn-sm" ${usersPage>=pages?'disabled':''} onclick="usersPage++;loadUsers(document.getElementById('content'))">下一页</button>
   `;
 }
 
 async function showUserDetail(id){
   const c=document.getElementById('content');
-  c.innerHTML='<div class="empty">Loading...</div>';
+  c.innerHTML='<div class="empty">加载中...</div>';
   try{
     const u=await api('GET',`/admin/users/${id}`);
     c.innerHTML=`
       <div class="modal-overlay" onclick="this.style.display='none'">
         <div class="modal" onclick="event.stopPropagation()" style="max-width:560px">
-          <h2>👤 ${u.name||'User'} #${u.id}</h2>
+          <h2>👤 ${u.name||'用户'} #${u.id}</h2>
           <div class="kv">
-            <div class="k">Email</div><div class="v">${u.email}</div>
-            <div class="k">Phone</div><div class="v">${u.phone||'-'}</div>
-            <div class="k">Referral</div><div class="v">${u.referral_code}</div>
-            <div class="k">Registered</div><div class="v">${new Date(u.created_at).toLocaleString()}</div>
-            <div class="k">Frozen</div><div class="v">${u.frozen?'<span class="badge badge-red">Yes</span>':'<span class="badge badge-green">No</span>'}</div>
-            <div class="k">IP</div><div class="v">${u.ip_address||'-'}</div>
+            <div class="k">邮箱</div><div class="v">${u.email}</div>
+            <div class="k">手机</div><div class="v">${u.phone||'-'}</div>
+            <div class="k">邀请码</div><div class="v">${u.referral_code}</div>
+            <div class="k">注册时间</div><div class="v">${new Date(u.created_at).toLocaleString()}</div>
+            <div class="k">状态</div><div class="v">${u.frozen?'<span class="badge badge-red">已冻结</span>':'<span class="badge badge-green">正常</span>'}</div>
+            <div class="k">IP地址</div><div class="v">${u.ip_address||'-'}</div>
           </div>
           <div class="actions">
-            <button class="btn btn-sm btn-blue" onclick="editUserName(${u.id},'${(u.name||'').replace(/'/g,"\\'")}','${(u.phone||'').replace(/'/g,"\\'")}')">✏️ Edit</button>
-            <button class="btn btn-sm btn-red" onclick="resetUserPw(${u.id})">🔑 Reset PW</button>
-            <button class="btn btn-sm ${u.frozen?'btn-green':'btn-red'}" onclick="toggleFreeze(${u.id},${u.frozen})">${u.frozen?'✅ Unfreeze':'❄️ Freeze'}</button>
-            <button class="btn btn-sm btn-gray" onclick="switchTab('users')">← Back</button>
+            <button class="btn btn-sm btn-blue" onclick="editUserName(${u.id},'${(u.name||'').replace(/'/g,"\\'")}','${(u.phone||'').replace(/'/g,"\\'")}')">✏️ 编辑</button>
+            <button class="btn btn-sm btn-red" onclick="resetUserPw(${u.id})">🔑 重置密码</button>
+            <button class="btn btn-sm ${u.frozen?'btn-green':'btn-red'}" onclick="toggleFreeze(${u.id},${u.frozen})">${u.frozen?'✅ 解冻':'❄️ 冻结'}</button>
+            <button class="btn btn-sm btn-gray" onclick="switchTab('users')">← 返回</button>
           </div>
         </div>
       </div>
     `;
-  }catch(e){c.innerHTML='<div class="empty">Failed: '+e.message+'</div>'}
+  }catch(e){c.innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
 }
 
 function editUserName(id,name,phone){
-  const n=prompt('New name:',name);
+  const n=prompt('新姓名:',name);
   if(n===null)return;
-  const p=prompt('New phone:',phone);
+  const p=prompt('新手机号:',phone);
   if(p===null)return;
-  api('PUT','/admin/users/'+id,{name:n,phone:p}).then(()=>{showToast('User updated');showUserDetail(id)}).catch(e=>showToast(e.message,1));
+  api('PUT','/admin/users/'+id,{name:n,phone:p}).then(()=>{showToast('用户信息已更新');showUserDetail(id)}).catch(e=>showToast(e.message,1));
 }
 
 function resetUserPw(id){
-  const pw=prompt('Enter new password (min 8 chars):');
-  if(!pw||pw.length<8){showToast('Min 8 characters',1);return;}
-  api('POST','/admin/users/'+id+'/reset-password',{newPassword:pw}).then(()=>showToast('Password reset!')).catch(e=>showToast(e.message,1));
+  const pw=prompt('请输入新密码（至少8位）:');
+  if(!pw||pw.length<8){showToast('密码至少需要8位',1);return;}
+  api('POST','/admin/users/'+id+'/reset-password',{newPassword:pw}).then(()=>showToast('密码已重置!')).catch(e=>showToast(e.message,1));
 }
 
 function toggleFreeze(id,current){
-  api('PUT','/admin/users/'+id+'/freeze',{frozen:!current}).then(()=>{showToast(current?'User unfrozen':'User frozen');showUserDetail(id)}).catch(e=>showToast(e.message,1));
+  api('PUT','/admin/users/'+id+'/freeze',{frozen:!current}).then(()=>{showToast(current?'用户已解冻':'用户已冻结');showUserDetail(id)}).catch(e=>showToast(e.message,1));
 }
 
-// ========== Orders ==========
 let ordersPage=1,ordersStatus='',ordersUser='';
 async function loadOrders(c){
   c.innerHTML=`
     <div class="card"><div class="card-body">
       <div class="search-row">
-        <input id="orderUser" placeholder="User ID (optional)" value="${ordersUser}">
-        <select id="orderStatus"><option value="">All Status</option><option value="holding" ${ordersStatus==='holding'?'selected':''}>Holding</option><option value="done" ${ordersStatus==='done'?'selected':''}>Done</option></select>
-        <button class="btn btn-blue" onclick="ordersUser=document.getElementById('orderUser').value;ordersStatus=document.getElementById('orderStatus').value;ordersPage=1;loadOrders(document.getElementById('content'))">Filter</button>
+        <input id="orderUser" placeholder="用户ID（可选）" value="${ordersUser}">
+        <select id="orderStatus"><option value="">全部状态</option><option value="holding" ${ordersStatus==='holding'?'selected':''}>持仓中</option><option value="done" ${ordersStatus==='done'?'selected':''}>已完成</option></select>
+        <button class="btn btn-blue" onclick="ordersUser=document.getElementById('orderUser').value;ordersStatus=document.getElementById('orderStatus').value;ordersPage=1;loadOrders(document.getElementById('content'))">筛选</button>
       </div>
       <div id="orderTable"></div>
       <div id="orderPager" class="pagination"></div>
@@ -295,143 +287,139 @@ async function loadOrders(c){
   try{
     const d=await api('GET',`/admin/orders?page=${ordersPage}&limit=20&user_id=${ordersUser}&status=${ordersStatus}`);
     const orders=d.orders||[];
-    document.getElementById('orderTable').innerHTML=`<table><thead><tr><th>ID</th><th>User</th><th>Product</th><th>Cost</th><th>Profit</th><th>Status</th><th>Time</th></tr></thead><tbody>
-    ${orders.length===0?'<tr><td colspan="7" class="empty">No orders</td></tr>':
+    document.getElementById('orderTable').innerHTML=`<table><thead><tr><th>ID</th><th>用户</th><th>产品</th><th>成本</th><th>利润</th><th>状态</th><th>时间</th></tr></thead><tbody>
+    ${orders.length===0?'<tr><td colspan="7" class="empty">暂无订单</td></tr>':
       orders.map(o=>`<tr>
         <td>#${o.id}</td><td>${o.user_name||o.user_email} (#${o.user_id})</td>
         <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.product_name||'-'}</td>
         <td>$${Number(o.amount||0).toFixed(2)}</td>
         <td style="color:var(--success);font-weight:600">+$${(Number(o.amount||0)*0.15/0.85).toFixed(2)}</td>
-        <td><span class="badge ${o.status==='done'?'badge-green':o.status==='holding'?'badge-yellow':'badge-gray'}">${o.status}</span></td>
+        <td><span class="badge ${o.status==='done'?'badge-green':o.status==='holding'?'badge-yellow':'badge-gray'}">${o.status==='done'?'已完成':'持仓中'}</span></td>
         <td style="font-size:10px">${new Date(o.created_at).toLocaleString()}</td>
       </tr>`).join('')}
     </tbody></table>`;
     const total=Number(d.total)||0;
     const pages=Math.ceil(total/20);
-    document.getElementById('orderPager').innerHTML=`<button class="btn btn-gray btn-sm" ${ordersPage<=1?'disabled':''} onclick="ordersPage--;loadOrders(document.getElementById('content'))">Prev</button>
-      <span>Page ${ordersPage} / ${pages||1} (${total} total)</span>
-      <button class="btn btn-gray btn-sm" ${ordersPage>=pages?'disabled':''} onclick="ordersPage++;loadOrders(document.getElementById('content'))">Next</button>`;
+    document.getElementById('orderPager').innerHTML=`<button class="btn btn-gray btn-sm" ${ordersPage<=1?'disabled':''} onclick="ordersPage--;loadOrders(document.getElementById('content'))">上一页</button>
+      <span>第 ${ordersPage} / ${pages||1} 页 (共${total}条)</span>
+      <button class="btn btn-gray btn-sm" ${ordersPage>=pages?'disabled':''} onclick="ordersPage++;loadOrders(document.getElementById('content'))">下一页</button>`;
   }catch(e){document.getElementById('orderTable').innerHTML='<div class="empty">'+e.message+'</div>'}
 }
 
-// ========== Deposits ==========
 async function loadDeposits(c){
-  c.innerHTML='<div class="empty">Loading...</div>';
+  c.innerHTML='<div class="empty">加载中...</div>';
   try{
     const rows=await api('GET','/deposits/admin');
     c.innerHTML=`
-      <div class="card"><div class="card-header">💵 External Deposits <span style="font-weight:400;font-size:12px;color:var(--muted)">Crypto deposit approval</span></div>
+      <div class="card"><div class="card-header">💵 充值审批 <span style="font-weight:400;font-size:12px;color:var(--muted)">加密货币充值审核</span></div>
       <div class="card-body">
-        <table><thead><tr><th>ID</th><th>User</th><th>Network</th><th>Amount</th><th>Tx Hash</th><th>Status</th><th>Time</th><th>Actions</th></tr></thead><tbody>
-        ${rows.length===0?'<tr><td colspan="8" class="empty">No deposits</td></tr>':
+        <table><thead><tr><th>ID</th><th>用户</th><th>网络</th><th>金额</th><th>交易哈希</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>
+        ${rows.length===0?'<tr><td colspan="8" class="empty">暂无充值记录</td></tr>':
           rows.map(d=>`<tr>
             <td>#${d.id}</td><td>${d.name||d.email} (#${d.user_id})</td>
             <td><span class="badge badge-blue">${d.network.toUpperCase()}</span></td>
             <td style="font-weight:700">$${Number(d.amount).toFixed(2)}</td>
             <td style="font-size:10px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${d.tx_hash}">${d.tx_hash}</td>
-            <td><span class="badge ${d.status==='confirmed'?'badge-green':d.status==='pending'?'badge-yellow':'badge-red'}">${d.status}</span></td>
+            <td><span class="badge ${d.status==='confirmed'?'badge-green':d.status==='pending'?'badge-yellow':'badge-red'}">${d.status==='confirmed'?'已确认':d.status==='pending'?'待审核':'已拒绝'}</span></td>
             <td style="font-size:10px">${new Date(d.created_at).toLocaleString()}</td>
             <td>${d.status==='pending'?`
-              <button class="btn btn-xs btn-green" onclick="confirmDeposit(${d.id})">✅ Confirm</button>
-              <button class="btn btn-xs btn-red" onclick="rejectDeposit(${d.id})">❌ Reject</button>`:'-'}
+              <button class="btn btn-xs btn-green" onclick="confirmDeposit(${d.id})">✅ 确认</button>
+              <button class="btn btn-xs btn-red" onclick="rejectDeposit(${d.id})">❌ 拒绝</button>`:'-'}
             </td>
           </tr>`).join('')}
         </tbody></table>
       </div></div>`;
-  }catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}
+  }catch(e){c.innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
 }
 
 async function confirmDeposit(id){
-  if(!confirm('Confirm this deposit?'))return;
-  try{await api('PUT','/deposits/'+id+'/confirm',{});showToast('Deposit confirmed!');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}
+  if(!confirm('确认这笔充值？资金将转入用户余额。'))return;
+  try{await api('PUT','/deposits/'+id+'/confirm',{});showToast('充值已确认，资金已到账');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}
 }
 async function rejectDeposit(id){
-  if(!confirm('Reject this deposit?'))return;
-  try{await api('PUT','/deposits/'+id+'/reject',{});showToast('Deposit rejected');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}
+  if(!confirm('拒绝这笔充值？'))return;
+  try{await api('PUT','/deposits/'+id+'/reject',{});showToast('充值已拒绝');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}
 }
 
-// ========== Withdrawals ==========
 let wPage=1,wFilter='';
 async function loadWithdrawals(c){
-  c.innerHTML='<div class="empty">Loading...</div>';
+  c.innerHTML='<div class="empty">加载中...</div>';
   try{
     const d=await api('GET',`/admin/withdrawals?page=${wPage}&limit=20&status=${wFilter}`);
     const rows=d.withdrawals||[];
     c.innerHTML=`
-      <div class="card"><div class="card-header">💸 Withdrawals
-        <div style="display:flex;gap:4px">${['','pending','completed','rejected'].map(s=>`<button class="btn btn-xs ${wFilter===s?'btn-blue':'btn-gray'}" onclick="wFilter='${s}';wPage=1;loadWithdrawals(document.getElementById('content'))">${s||'All'}</button>`).join('')}</div>
+      <div class="card"><div class="card-header">💸 提现审批
+        <div style="display:flex;gap:4px">${['','pending','completed','rejected'].map(s=>`<button class="btn btn-xs ${wFilter===s?'btn-blue':'btn-gray'}" onclick="wFilter='${s}';wPage=1;loadWithdrawals(document.getElementById('content'))">${!s?'全部':s==='pending'?'待审批':s==='completed'?'已完成':'已拒绝'}</button>`).join('')}</div>
       </div>
       <div class="card-body">
-        <table><thead><tr><th>ID</th><th>User</th><th>Amount</th><th>Network</th><th>Wallet</th><th>Status</th><th>Time</th><th>Actions</th></tr></thead><tbody>
-        ${rows.length===0?'<tr><td colspan="8" class="empty">No withdrawals</td></tr>':
+        <table><thead><tr><th>ID</th><th>用户</th><th>金额</th><th>网络</th><th>钱包地址</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>
+        ${rows.length===0?'<tr><td colspan="8" class="empty">暂无提现记录</td></tr>':
           rows.map(w=>`<tr>
             <td>#${w.id}</td><td>${w.user_name||w.user_email} (#${w.user_id})</td>
             <td style="font-weight:700">$${Number(w.amount).toFixed(2)}</td>
             <td>${w.network||'-'}</td>
             <td style="font-size:10px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.wallet_address||'-'}</td>
-            <td><span class="badge ${w.status==='completed'?'badge-green':w.status==='pending'?'badge-yellow':'badge-red'}">${w.status}</span></td>
+            <td><span class="badge ${w.status==='completed'?'badge-green':w.status==='pending'?'badge-yellow':'badge-red'}">${w.status==='completed'?'已完成':w.status==='pending'?'待审批':'已拒绝'}</span></td>
             <td style="font-size:10px">${new Date(w.created_at).toLocaleString()}</td>
             <td>${w.status==='pending'?`
-              <button class="btn btn-xs btn-green" onclick="approveWithdrawal(${w.id})">✅ Approve</button>
-              <button class="btn btn-xs btn-red" onclick="rejectWithdrawal(${w.id})">❌ Reject</button>`:'-'}
+              <button class="btn btn-xs btn-green" onclick="approveWithdrawal(${w.id})">✅ 通过</button>
+              <button class="btn btn-xs btn-red" onclick="rejectWithdrawal(${w.id})">❌ 拒绝</button>`:'-'}
             </td>
           </tr>`).join('')}
         </tbody></table>
-        ${d.total?`<div class="pagination"><button class="btn btn-gray btn-sm" ${wPage<=1?'disabled':''} onclick="wPage--;loadWithdrawals(document.getElementById('content'))">Prev</button><span>Page ${wPage}/${Math.ceil(d.total/20)}</span><button class="btn btn-gray btn-sm" ${wPage>=Math.ceil(d.total/20)?'disabled':''} onclick="wPage++;loadWithdrawals(document.getElementById('content'))">Next</button></div>`:''}
+        ${d.total?`<div class="pagination"><button class="btn btn-gray btn-sm" ${wPage<=1?'disabled':''} onclick="wPage--;loadWithdrawals(document.getElementById('content'))">上一页</button><span>第 ${wPage}/${Math.ceil(d.total/20)} 页</span><button class="btn btn-gray btn-sm" ${wPage>=Math.ceil(d.total/20)?'disabled':''} onclick="wPage++;loadWithdrawals(document.getElementById('content'))">下一页</button></div>`:''}
       </div></div>`;
-  }catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}
+  }catch(e){c.innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
 }
 
 async function approveWithdrawal(id){
-  if(!confirm('Approve withdrawal #'+id+'?'))return;
-  try{await api('PUT','/admin/withdrawals/'+id,{status:'completed'});showToast('Withdrawal approved!');loadWithdrawals(document.getElementById('content'))}catch(e){showToast(e.message,1)}
+  if(!confirm('确认通过这笔提现？资金将从用户余额扣除。'))return;
+  try{await api('PUT','/admin/withdrawals/'+id,{status:'completed'});showToast('提现已通过!');loadWithdrawals(document.getElementById('content'))}catch(e){showToast(e.message,1)}
 }
 async function rejectWithdrawal(id){
-  if(!confirm('Reject withdrawal #'+id+'?'))return;
-  try{await api('PUT','/admin/withdrawals/'+id,{status:'rejected'});showToast('Withdrawal rejected');loadWithdrawals(document.getElementById('content'))}catch(e){showToast(e.message,1)}
+  if(!confirm('拒绝这笔提现？资金将退回用户余额。'))return;
+  try{await api('PUT','/admin/withdrawals/'+id,{status:'rejected'});showToast('提现已拒绝');loadWithdrawals(document.getElementById('content'))}catch(e){showToast(e.message,1)}
 }
 
-// ========== KYC ==========
 async function loadKyc(c){
-  c.innerHTML='<div class="empty">Loading...</div>';
+  c.innerHTML='<div class="empty">加载中...</div>';
   try{
     const rows=await api('GET','/kyc/admin/list');
     c.innerHTML=`
-      <div class="card"><div class="card-header">🛂 KYC Verifications</div>
+      <div class="card"><div class="card-header">🛂 实名认证审核</div>
       <div class="card-body">
-        <table><thead><tr><th>ID</th><th>User</th><th>Real Name</th><th>ID Number</th><th>Doc Type</th><th>Photos</th><th>Status</th><th>Submitted</th><th>Actions</th></tr></thead><tbody>
-        ${rows.length===0?'<tr><td colspan="9" class="empty">No KYC submissions</td></tr>':
+        <table><thead><tr><th>ID</th><th>用户</th><th>真实姓名</th><th>证件号码</th><th>类型</th><th>证件照片</th><th>状态</th><th>提交时间</th><th>操作</th></tr></thead><tbody>
+        ${rows.length===0?'<tr><td colspan="9" class="empty">暂无认证申请</td></tr>':
           rows.map(k=>`<tr>
             <td>#${k.id}</td><td>${k.user_name||k.user_email} (#${k.user_id})</td>
             <td>${k.real_name||'-'}</td>
             <td style="font-size:11px">${k.id_number||'-'}</td>
             <td>${k.doc_type||'-'}</td>
-            <td>${k.front_image?`<a href="${k.front_image}" target="_blank" style="color:var(--blue);font-size:11px">Front</a>`:''} ${k.back_image?`<a href="${k.back_image}" target="_blank" style="color:var(--blue);font-size:11px">Back</a>`:''}</td>
-            <td><span class="badge ${k.status==='approved'?'badge-green':k.status==='pending'?'badge-yellow':'badge-red'}">${k.status}</span></td>
+            <td>${k.front_image?`<a href="${k.front_image}" target="_blank" style="color:var(--blue);font-size:11px">正面</a>`:''} ${k.back_image?`<a href="${k.back_image}" target="_blank" style="color:var(--blue);font-size:11px">反面</a>`:''}</td>
+            <td><span class="badge ${k.status==='approved'?'badge-green':k.status==='pending'?'badge-yellow':'badge-red'}">${k.status==='approved'?'已通过':k.status==='pending'?'待审核':'已拒绝'}</span></td>
             <td style="font-size:10px">${new Date(k.submitted_at).toLocaleString()}</td>
             <td>${k.status==='pending'?`
-              <button class="btn btn-xs btn-green" onclick="approveKyc(${k.id})">✅ Approve</button>
-              <button class="btn btn-xs btn-red" onclick="rejectKyc(${k.id})">❌ Reject</button>`:'-'}
+              <button class="btn btn-xs btn-green" onclick="approveKyc(${k.id})">✅ 通过</button>
+              <button class="btn btn-xs btn-red" onclick="rejectKyc(${k.id})">❌ 拒绝</button>`:'-'}
             </td>
           </tr>`).join('')}
         </tbody></table>
       </div></div>`;
-  }catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}
+  }catch(e){c.innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
 }
 
 async function approveKyc(id){
-  try{await api('PUT','/kyc/admin/'+id,{status:'approved'});showToast('KYC approved!');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}
+  try{await api('PUT','/kyc/admin/'+id,{status:'approved'});showToast('实名认证已通过!');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}
 }
 async function rejectKyc(id){
-  try{await api('PUT','/kyc/admin/'+id,{status:'rejected'});showToast('KYC rejected');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}
+  try{await api('PUT','/kyc/admin/'+id,{status:'rejected'});showToast('实名认证已拒绝');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}
 }
 
-// ========== Boot ==========
 document.addEventListener('DOMContentLoaded', () => {
   try { initApp(); } catch(e) {
     console.error('Admin init error:', e);
     document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('loginErr').textContent = 'Init error: ' + e.message;
+    document.getElementById('loginErr').textContent = '初始化错误: ' + e.message;
   }
 });
 </script>
