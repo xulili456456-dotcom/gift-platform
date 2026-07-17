@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>后台管理系统</title>
 <style>
 :root{--red:#C41E3A;--red-dark:#8B0000;--gold:#D4A574;--bg:#FFF8F0;--white:#FFF;--text:#2D2D2D;--muted:#8B7355;--success:#2E7D32;--danger:#DC2626;--blue:#2563EB;--border:#e5e7eb}
@@ -12,9 +11,9 @@ body.login-body{display:flex;align-items:center;justify-content:center}
 .login-box{background:var(--white);border-radius:20px;padding:40px 32px;width:380px;max-width:90vw;box-shadow:0 8px 40px rgba(0,0,0,.08);text-align:center}
 .login-box h1{font-size:24px;margin-bottom:4px}
 .login-box .sub{color:var(--muted);font-size:13px;margin-bottom:24px}
-.login-box input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;margin-bottom:12px;outline:none;transition:border-color .2s}
+.login-box input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;margin-bottom:12px;outline:none}
 .login-box input:focus{border-color:var(--red)}
-.login-box button{width:100%;padding:13px;background:linear-gradient(135deg,var(--red),var(--red-dark));color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:transform .1s}
+.login-box button{width:100%;padding:13px;background:linear-gradient(135deg,var(--red),var(--red-dark));color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer}
 .login-box button:active{transform:scale(.97)}
 .login-box .err{color:var(--danger);font-size:13px;margin-bottom:12px;min-height:20px}
 header{background:linear-gradient(135deg,var(--red),var(--red-dark));color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
@@ -28,9 +27,7 @@ main{padding:20px;max-width:1400px;margin:0 auto}
 .stat-card{background:var(--white);border-radius:12px;padding:16px;border:1px solid var(--border)}
 .stat-card .label{font-size:11px;color:var(--muted);margin-bottom:4px}
 .stat-card .value{font-size:24px;font-weight:700}
-.stat-card .value.red{color:var(--red)}
-.stat-card .value.green{color:var(--success)}
-.stat-card .value.blue{color:var(--blue)}
+.stat-card .value.red{color:var(--red)}.stat-card .value.green{color:var(--success)}.stat-card .value.blue{color:var(--blue)}
 .card{background:var(--white);border-radius:12px;border:1px solid var(--border);margin-bottom:16px;overflow:hidden}
 .card-header{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:space-between}
 .card-body{padding:18px}
@@ -39,427 +36,255 @@ th{text-align:left;padding:10px 12px;background:#fafafa;color:var(--muted);font-
 td{padding:10px 12px;border-bottom:1px solid var(--border)}
 tr:hover{background:#fdf5f5}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.badge-green{background:#e8f5e9;color:var(--success)}
-.badge-red{background:#fce4ec;color:var(--danger)}
-.badge-yellow{background:#fff8e1;color:#f57c00}
-.badge-gray{background:#f5f5f5;color:#9e9e9e}
-.badge-blue{background:#e3f2fd;color:var(--blue)}
+.badge-green{background:#e8f5e9;color:var(--success)}.badge-red{background:#fce4ec;color:var(--danger)}
+.badge-yellow{background:#fff8e1;color:#f57c00}.badge-gray{background:#f5f5f5;color:#9e9e9e}.badge-blue{background:#e3f2fd;color:var(--blue)}
 .btn{padding:8px 16px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
-.btn:active{transform:scale(.96)}
-.btn-green{background:var(--success);color:#fff}
-.btn-red{background:var(--danger);color:#fff}
-.btn-blue{background:var(--blue);color:#fff}
-.btn-gray{background:#f0f0f0;color:var(--text)}
-.btn-sm{padding:5px 12px;font-size:11px}
-.btn-xs{padding:3px 8px;font-size:10px;border-radius:6px}
+.btn:active{transform:scale(.96)}.btn-green{background:var(--success);color:#fff}.btn-red{background:var(--danger);color:#fff}
+.btn-blue{background:var(--blue);color:#fff}.btn-gray{background:#f0f0f0;color:var(--text)}
+.btn-sm{padding:5px 12px;font-size:11px}.btn-xs{padding:3px 8px;font-size:10px;border-radius:6px}
 input,select{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;outline:none}
 input:focus,select:focus{border-color:var(--red)}
-.search-row{display:flex;gap:8px;margin-bottom:16px}
-.search-row input{flex:1}
-.search-row select{width:auto;min-width:120px}
-.search-row button{width:auto;padding:10px 20px}
+.search-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.search-row input{flex:1;min-width:150px}.search-row select{width:auto;min-width:100px}.search-row button{width:auto;padding:10px 20px}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
-.modal{background:var(--white);border-radius:16px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
-.modal h2{font-size:18px;margin-bottom:16px}
-.modal .row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid #f5f5f5}
-.modal .row .key{color:var(--muted)}
-.modal .row .val{font-weight:500}
-.modal .actions{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.modal{background:var(--white);border-radius:16px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-body{padding:24px}.modal h2{font-size:18px;margin-bottom:16px}
 .pagination{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:16px;font-size:13px}
-.pagination button{padding:6px 14px}
-.empty{text-align:center;padding:40px;color:var(--muted);font-size:14px}
-.toast{position:fixed;top:20px;right:20px;z-index:999;background:var(--success);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.2);display:none;animation:slideIn .3s}
+.pagination button{padding:6px 14px}.empty{text-align:center;padding:40px;color:var(--muted);font-size:14px}
+.toast{position:fixed;top:20px;right:20px;z-index:999;background:var(--success);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.2);display:none}
 .toast.error{background:var(--danger)}
-@keyframes slideIn{from{transform:translateX(100px);opacity:0}to{transform:translateX(0);opacity:1}}
 .kv{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:12px;margin:8px 0}
 .kv .k{color:var(--muted)}.kv .v{font-weight:500}
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:16px}
+.tabs button{padding:8px 16px;border:none;background:none;font-size:12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;font-weight:500}
+.tabs button.active{color:var(--red);border-bottom-color:var(--red)}
+.batch-bar{background:var(--blue);color:#fff;padding:8px 16px;border-radius:8px;display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:13px}
 </style>
 </head>
 <body class="login-body">
 <div id="loginPage">
 <div class="login-box">
-<h1>管理后台</h1>
-<p class="sub">请使用管理员账号登录</p>
+<h1>管理后台</h1><p class="sub">请使用管理员账号登录</p>
 <input id="loginEmail" placeholder="管理员邮箱" value="admin@gift.com">
 <input id="loginPass" type="password" placeholder="密码" value="admin888">
 <div class="err" id="loginErr"></div>
 <button onclick="doLogin()">登 录</button>
-</div>
-</div>
+</div></div>
 
 <div id="mainApp" style="display:none;width:100%">
-<header>
-<h1>🛡️ 管理后台</h1>
-<button class="logout" onclick="logout()">退出登录</button>
-</header>
-<nav id="nav"></nav>
-<main id="content"></main>
-</div>
-
+<header><h1>🛡️ 管理后台</h1><button class="logout" onclick="logout()">退出登录</button></header>
+<nav id="nav"></nav><main id="content"></main></div>
 <div class="toast" id="toast"></div>
 
 <script>
-const API='/api';
-let token='';
-let currentTab='dashboard';
+const API='/api';let token='',currentTab='dashboard';
 
 async function doLogin(){
-  const e=document.getElementById('loginEmail').value.trim();
-  const p=document.getElementById('loginPass').value;
-  const err=document.getElementById('loginErr');
+  const e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPass').value;
   try{
     const r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})});
     const d=await r.json();
-    if(!r.ok||!d.user?.is_admin){err.textContent='需要管理员账号';return;}
-    token=d.access_token;
-    localStorage.setItem('admin_token',token);
-    document.getElementById('loginPage').style.display='none';
-    document.getElementById('mainApp').style.display='block';
-    document.body.classList.remove('login-body');
-    initApp();
-  }catch(ex){err.textContent='登录失败，请重试'}
+    if(!r.ok||!d.user?.is_admin){document.getElementById('loginErr').textContent='需要管理员账号';return;}
+    token=d.access_token;localStorage.setItem('admin_token',token);
+    document.getElementById('loginPage').style.display='none';document.getElementById('mainApp').style.display='block';
+    document.body.classList.remove('login-body');initApp();
+  }catch(ex){document.getElementById('loginErr').textContent='登录失败'}
 }
-
 function logout(){localStorage.removeItem('admin_token');location.reload()}
-
 async function api(method,path,body){
-  const opts={method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}};
+  const opts={method,headers:{'Content-Type':'application/json',Authorization:'Bearer '+token}};
   if(body)opts.body=JSON.stringify(body);
-  const r=await fetch(API+path,opts);
-  const d=await r.json();
-  if(!r.ok)throw new Error(d.error||'请求失败');
-  return d;
+  const r=await fetch(API+path,opts);const d=await r.json();
+  if(!r.ok)throw new Error(d.error||'请求失败');return d;
 }
-
-function showToast(msg,isErr){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.className='toast'+(isErr?' error':'');
-  t.style.display='block';
-  setTimeout(()=>t.style.display='none',3000);
-}
+function showToast(msg,isErr){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(isErr?' error':'');t.style.display='block';setTimeout(()=>t.style.display='none',3000)}
 
 async function initApp(){
   const saved=localStorage.getItem('admin_token');
   if(saved){token=saved;try{await api('GET','/auth/me');document.getElementById('loginPage').style.display='none';document.getElementById('mainApp').style.display='block';document.body.classList.remove('login-body');}catch(e){logout();return}}
   renderNav();switchTab('dashboard');
 }
-
 function renderNav(){
-  const tabs=[['dashboard','📊 仪表盘'],['users','👥 用户管理'],['orders','📦 订单'],['deposits','💵 充值审批'],['withdrawals','💸 提现审批'],['kyc','🛂 实名认证']];
+  const tabs=[['dashboard','📊 仪表盘'],['users','👥 用户管理'],['orders','📦 订单'],['deposits','💵 充值审批'],['withdrawals','💸 提现审批'],['kyc','🛂 实名认证'],['audit','📋 操作日志']];
   document.getElementById('nav').innerHTML=tabs.map(([k,v])=>`<button class="${k===currentTab?'active':''}" onclick="switchTab('${k}')">${v}</button>`).join('');
 }
-
-async function switchTab(tab){
-  currentTab=tab;renderNav();
-  const c=document.getElementById('content');
-  c.innerHTML='<div class="empty">加载中...</div>';
-  if(tab==='dashboard')await loadDashboard(c);
-  else if(tab==='users')await loadUsers(c);
-  else if(tab==='orders')await loadOrders(c);
-  else if(tab==='deposits')await loadDeposits(c);
-  else if(tab==='withdrawals')await loadWithdrawals(c);
-  else if(tab==='kyc')await loadKyc(c);
+async function switchTab(tab){currentTab=tab;renderNav();const c=document.getElementById('content');c.innerHTML='<div class="empty">加载中...</div>';
+  if(tab==='dashboard')await loadDashboard(c);else if(tab==='users')await loadUsers(c);else if(tab==='orders')await loadOrders(c);
+  else if(tab==='deposits')await loadDeposits(c);else if(tab==='withdrawals')await loadWithdrawals(c);
+  else if(tab==='kyc')await loadKyc(c);else if(tab==='audit')await loadAuditLog(c);
 }
 
 async function loadDashboard(c){
-  let stats={};
-  try{stats=await api('GET','/admin/enhanced-stats');}catch(e){}
-  c.innerHTML=`
-    <div class="stats-grid">
-      <div class="stat-card"><div class="label">总用户数</div><div class="value blue">${stats.totalUsers||0}</div></div>
-      <div class="stat-card"><div class="label">活跃店铺</div><div class="value">${stats.totalStores||0}</div></div>
-      <div class="stat-card"><div class="label">总余额</div><div class="value green">$${(stats.totalBalance||0).toFixed(0)}</div></div>
-      <div class="stat-card"><div class="label">总保证金</div><div class="value">$${(stats.totalDeposit||0).toFixed(0)}</div></div>
-      <div class="stat-card"><div class="label">今日订单</div><div class="value">${stats.ordersToday||0}</div></div>
-      <div class="stat-card"><div class="label">待审批充值</div><div class="value red">${stats.pendingDeposits||0}</div></div>
-      <div class="stat-card"><div class="label">待审批提现</div><div class="value red">${stats.pendingWithdrawals||0}</div></div>
-      <div class="stat-card"><div class="label">待审核认证</div><div class="value red">${stats.pendingKyc||0}</div></div>
-    </div>
-  `;
+  let stats={};try{stats=await api('GET','/admin/enhanced-stats')}catch(e){}
+  c.innerHTML=`<div class="stats-grid">
+    <div class="stat-card"><div class="label">总用户数</div><div class="value blue">${stats.totalUsers||0}</div></div>
+    <div class="stat-card"><div class="label">活跃店铺</div><div class="value">${stats.totalStores||0}</div></div>
+    <div class="stat-card"><div class="label">总余额</div><div class="value green">$${(stats.totalBalance||0).toFixed(0)}</div></div>
+    <div class="stat-card"><div class="label">总保证金</div><div class="value">$${(stats.totalDeposit||0).toFixed(0)}</div></div>
+    <div class="stat-card"><div class="label">今日订单</div><div class="value">${stats.ordersToday||0}</div></div>
+    <div class="stat-card"><div class="label">待审批充值</div><div class="value red">${stats.pendingDeposits||0}</div></div>
+    <div class="stat-card"><div class="label">待审批提现</div><div class="value red">${stats.pendingWithdrawals||0}</div></div>
+    <div class="stat-card"><div class="label">待审核认证</div><div class="value red">${stats.pendingKyc||0}</div></div>
+  </div>`;
 }
 
-let usersPage=1,usersSearch='';
+// ========== USERS ==========
+let usersPage=1,usersSearch='',uFilterKyc='',uFilterFrozen='',uFilterTier='',selectedUsers=[];
 async function loadUsers(c){
-  c.innerHTML=`
-    <div class="card"><div class="card-body">
-      <div class="search-row">
-        <input id="userSearch" placeholder="搜索邮箱/姓名/手机..." value="${usersSearch}" onkeydown="if(event.key==='Enter'){usersSearch=this.value;usersPage=1;loadUsers(document.getElementById('content'))}">
-        <button class="btn btn-blue" onclick="usersSearch=document.getElementById('userSearch').value;usersPage=1;loadUsers(document.getElementById('content'))">搜索</button>
-      </div>
-      <div id="userTable"></div>
-      <div id="userPager" class="pagination"></div>
-    </div></div>
-  `;
+  c.innerHTML=`<div class="card"><div class="card-body">
+    <div class="search-row">
+      <input id="userSearch" placeholder="搜索邮箱/姓名/手机..." value="${usersSearch}" onkeydown="if(event.key==='Enter'){usersSearch=this.value;usersPage=1;loadUsers(document.getElementById('content'))}">
+      <select id="filterKyc" onchange="uFilterKyc=this.value;usersPage=1;selectedUsers=[];loadUsers(document.getElementById('content'))"><option value="">KYC:全部</option><option value="approved" ${uFilterKyc==='approved'?'selected':''}>已通过</option><option value="pending" ${uFilterKyc==='pending'?'selected':''}>待审核</option><option value="none" ${uFilterKyc==='none'?'selected':''}>未提交</option></select>
+      <select id="filterFrozen" onchange="uFilterFrozen=this.value;usersPage=1;selectedUsers=[];loadUsers(document.getElementById('content'))"><option value="">状态:全部</option><option value="no" ${uFilterFrozen==='no'?'selected':''}>正常</option><option value="yes" ${uFilterFrozen==='yes'?'selected':''}>已冻结</option></select>
+      <select id="filterTier" onchange="uFilterTier=this.value;usersPage=1;selectedUsers=[];loadUsers(document.getElementById('content'))"><option value="">店铺:全部</option><option value="small" ${uFilterTier==='small'?'selected':''}>小型</option><option value="medium" ${uFilterTier==='medium'?'selected':''}>中型</option><option value="large" ${uFilterTier==='large'?'selected':''}>大型</option><option value="none" ${uFilterTier==='none'?'selected':''}>无</option></select>
+      <button class="btn btn-blue" onclick="usersSearch=document.getElementById('userSearch').value;uFilterKyc=document.getElementById('filterKyc').value;uFilterFrozen=document.getElementById('filterFrozen').value;uFilterTier=document.getElementById('filterTier').value;usersPage=1;selectedUsers=[];loadUsers(document.getElementById('content'))">搜索</button>
+    </div>
+    <div id="batchBar"></div>
+    <div id="userTable"></div><div id="userPager" class="pagination"></div>
+  </div></div>`;
   try{
-    const d=await api('GET',`/admin/users-enhanced?page=${usersPage}&limit=15&search=${encodeURIComponent(usersSearch)}`);
+    const q=new URLSearchParams({page:usersPage,limit:15,search:usersSearch,kyc:uFilterKyc,frozen:uFilterFrozen,tier:uFilterTier});
+    const d=await api('GET','/admin/users-filtered?'+q.toString());
     renderUserTable(d);
   }catch(e){document.getElementById('userTable').innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
 }
-
 function renderUserTable(d){
   const users=d.users||[];
-  document.getElementById('userTable').innerHTML=`
-    <table><thead><tr>
-      <th>ID</th><th>邮箱</th><th>姓名</th><th>手机</th><th>邀请码</th><th>余额</th><th>保证金</th><th>店铺</th><th>实名</th><th>冻结</th><th>IP</th><th>操作</th>
-    </tr></thead><tbody>
-    ${users.length===0?'<tr><td colspan="12" class="empty">暂无用户</td></tr>':
-      users.map(u=>`<tr>
-        <td>${u.id}</td><td>${u.email}</td><td>${u.name||'-'}</td><td>${u.phone||'-'}</td>
-        <td style="font-size:10px;color:var(--blue)">${u.referral_code||'-'}</td>
-        <td style="color:var(--success);font-weight:600">$${u.balance.toFixed(2)}</td>
-        <td>$${u.store_deposit.toFixed(2)}</td>
-        <td><span class="badge ${u.store_status==='active'?'badge-green':'badge-gray'}">${u.tier==='small'?'小型':u.tier==='medium'?'中型':u.tier==='large'?'大型':'无'}</span></td>
-        <td><span class="badge ${u.kyc_status==='approved'?'badge-green':u.kyc_status==='pending'?'badge-yellow':'badge-gray'}">${u.kyc_status==='approved'?'已通过':u.kyc_status==='pending'?'待审核':'未提交'}</span></td>
-        <td>${u.frozen?'<span class="badge badge-red">已冻结</span>':'<span class="badge badge-green">正常</span>'}</td>
-        <td style="font-size:10px;color:var(--muted)">${u.ip_address||'-'}</td>
-        <td><button class="btn btn-sm btn-blue" onclick="showUserDetail(${u.id})">管理</button></td>
-      </tr>`).join('')}
-    </tbody></table>`;
-  const total=Number(d.total)||0;
-  const pages=Math.ceil(total/15);
-  document.getElementById('userPager').innerHTML=`
-    <button class="btn btn-gray btn-sm" ${usersPage<=1?'disabled':''} onclick="usersPage--;loadUsers(document.getElementById('content'))">上一页</button>
-    <span>第 ${usersPage} / ${pages||1} 页</span>
-    <button class="btn btn-gray btn-sm" ${usersPage>=pages?'disabled':''} onclick="usersPage++;loadUsers(document.getElementById('content'))">下一页</button>
-  `;
+  document.getElementById('batchBar').innerHTML=selectedUsers.length>0?`<div class="batch-bar">已选 ${selectedUsers.length} 个用户 <button class="btn btn-xs" style="background:#fff;color:var(--blue)" onclick="batchAction('freeze')">批量冻结</button><button class="btn btn-xs" style="background:#fff;color:var(--success)" onclick="batchAction('unfreeze')">批量解冻</button><button class="btn btn-xs" style="background:#fff;color:var(--danger)" onclick="batchAction('delete')">批量删除</button><button class="btn btn-xs btn-gray" onclick="selectedUsers=[];loadUsers(document.getElementById('content'))">取消</button></div>`:'';
+  document.getElementById('userTable').innerHTML=`<table><thead><tr>
+    <th><input type="checkbox" onchange="toggleAllUsers(this,${JSON.stringify(users.map(u=>u.id))})"></th>
+    <th>ID</th><th>邮箱</th><th>姓名</th><th>手机</th><th>邀请码</th><th>余额</th><th>保证金</th><th>店铺</th><th>实名</th><th>冻结</th><th>备注</th><th>操作</th>
+  </tr></thead><tbody>${users.length===0?'<tr><td colspan="13" class="empty">暂无用户</td></tr>':
+    users.map(u=>`<tr>
+      <td><input type="checkbox" ${selectedUsers.includes(u.id)?'checked':''} onchange="toggleUser(${u.id},this.checked)"></td>
+      <td>${u.id}</td><td>${u.email}</td><td>${u.name||'-'}</td><td>${u.phone||'-'}</td>
+      <td style="font-size:10px;color:var(--blue)">${u.referral_code||'-'}</td>
+      <td style="color:var(--success);font-weight:600">$${u.balance.toFixed(2)}</td><td>$${u.store_deposit.toFixed(2)}</td>
+      <td><span class="badge ${u.store_status==='active'?'badge-green':'badge-gray'}">${u.tier==='small'?'小型':u.tier==='medium'?'中型':u.tier==='large'?'大型':'无'}</span></td>
+      <td><span class="badge ${u.kyc_status==='approved'?'badge-green':u.kyc_status==='pending'?'badge-yellow':'badge-gray'}">${u.kyc_status==='approved'?'已通过':u.kyc_status==='pending'?'待审核':'未提交'}</span></td>
+      <td>${u.frozen?'<span class="badge badge-red">已冻结</span>':'<span class="badge badge-green">正常</span>'}</td>
+      <td style="font-size:10px">${u.admin_notes?'📝':''}</td>
+      <td><button class="btn btn-sm btn-blue" onclick="showUserDetail(${u.id})">管理</button></td>
+    </tr>`).join('')}</tbody></table>`;
+  const total=Number(d.total)||0,pages=Math.ceil(total/15);
+  document.getElementById('userPager').innerHTML=`<button class="btn btn-gray btn-sm" ${usersPage<=1?'disabled':''} onclick="usersPage--;selectedUsers=[];loadUsers(document.getElementById('content'))">上一页</button><span>第 ${usersPage}/${pages||1} 页</span><button class="btn btn-gray btn-sm" ${usersPage>=pages?'disabled':''} onclick="usersPage++;selectedUsers=[];loadUsers(document.getElementById('content'))">下一页</button>`;
+}
+function toggleUser(id,checked){if(checked)selectedUsers.push(id);else selectedUsers=selectedUsers.filter(x=>x!==id);loadUsers(document.getElementById('content'))}
+function toggleAllUsers(cb,ids){selectedUsers=cb.checked?[...ids]:[];loadUsers(document.getElementById('content'))}
+async function batchAction(action){
+  if(!confirm(`确定批量${action==='freeze'?'冻结':action==='unfreeze'?'解冻':'删除'} ${selectedUsers.length} 个用户？`))return;
+  try{const r=await api('POST','/admin/users/batch',{ids:selectedUsers,action});showToast(`${r.affected} 个用户已${action==='freeze'?'冻结':action==='unfreeze'?'解冻':'删除'}`);selectedUsers=[];loadUsers(document.getElementById('content'))}catch(e){showToast(e.message,1)}
 }
 
+// ========== USER DETAIL (multi-tab) ==========
 async function showUserDetail(id){
-  const c=document.getElementById('content');
-  c.innerHTML='<div class="empty">加载中...</div>';
+  const c=document.getElementById('content');c.innerHTML='<div class="empty">加载中...</div>';
   try{
-    const u=await api('GET',`/admin/users/${id}`);
-    c.innerHTML=`
-      <div class="modal-overlay" onclick="this.style.display='none'">
-        <div class="modal" onclick="event.stopPropagation()" style="max-width:560px">
-          <h2>👤 ${u.name||'用户'} #${u.id}</h2>
-          <div class="kv">
-            <div class="k">邮箱</div><div class="v">${u.email}</div>
-            <div class="k">手机</div><div class="v">${u.phone||'-'}</div>
-            <div class="k">邀请码</div><div class="v">${u.referral_code}</div>
-            <div class="k">注册时间</div><div class="v">${new Date(u.created_at).toLocaleString()}</div>
-            <div class="k">状态</div><div class="v">${u.frozen?'<span class="badge badge-red">已冻结</span>':'<span class="badge badge-green">正常</span>'}</div>
-            <div class="k">IP地址</div><div class="v">${u.ip_address||'-'}</div>
-          </div>
-          <div class="actions">
-            <button class="btn btn-sm btn-blue" onclick="editUserName(${u.id},'${(u.name||'').replace(/'/g,"\\'")}','${(u.phone||'').replace(/'/g,"\\'")}')">✏️ 编辑</button>
-            <button class="btn btn-sm btn-red" onclick="resetUserPw(${u.id})">🔑 重置密码</button>
-            <button class="btn btn-sm ${u.frozen?'btn-green':'btn-red'}" onclick="toggleFreeze(${u.id},${u.frozen})">${u.frozen?'✅ 解冻':'❄️ 冻结'}</button>
-            <button class="btn btn-sm btn-red" onclick="deleteUser(${u.id})">🗑️ 删除</button>
-            <button class="btn btn-sm btn-gray" onclick="switchTab('users')">← 返回</button>
-            <hr style="margin:12px 0;border-color:#eee">
-            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">💰 余额调整</div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <input id="balAddAmt" type="number" placeholder="金额" style="flex:1" min="1">
-              <input id="balNote" type="text" placeholder="备注" style="width:80px">
-              <button class="btn btn-sm btn-green" onclick="adjustBalance(${u.id},1)">上分</button>
-              <button class="btn btn-sm btn-red" onclick="adjustBalance(${u.id},-1)">下分</button>
-            </div>
-          </div>
-        </div>
+    const u=await api('GET','/admin/users/'+id);
+    c.innerHTML=`<div class="modal-overlay" onclick="switchTab('users')"><div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-body">
+      <h2>👤 ${u.name||'用户'} #${u.id}</h2>
+      <div class="tabs">
+        <button class="active" onclick="switchDetailTab(this,'info',${id})">📋 信息</button>
+        <button onclick="switchDetailTab(this,'finance',${id})">💰 财务</button>
+        <button onclick="switchDetailTab(this,'invite',${id})">👥 邀请</button>
+        <button onclick="switchDetailTab(this,'actions',${id})">⚡ 操作</button>
       </div>
-    `;
+      <div id="detailContent"></div></div></div></div>`;
+    await renderDetailTab('info',u);
   }catch(e){c.innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
 }
-
-function editUserName(id,name,phone){
-  const n=prompt('新姓名:',name);
-  if(n===null)return;
-  const p=prompt('新手机号:',phone);
-  if(p===null)return;
-  api('PUT','/admin/users/'+id,{name:n,phone:p}).then(()=>{showToast('用户信息已更新');showUserDetail(id)}).catch(e=>showToast(e.message,1));
+async function switchDetailTab(btn,tab,id){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  try{var u=await api('GET','/admin/users/'+id);await renderDetailTab(tab,u,id)}catch(e){}
 }
-
-function resetUserPw(id){
-  const pw=prompt('请输入新密码（至少8位）:');
-  if(!pw||pw.length<8){showToast('密码至少需要8位',1);return;}
-  api('POST','/admin/users/'+id+'/reset-password',{newPassword:pw}).then(()=>showToast('密码已重置!')).catch(e=>showToast(e.message,1));
+async function renderDetailTab(tab,u,id){
+  const dc=document.getElementById('detailContent');
+  if(tab==='info'){
+    dc.innerHTML=`<div class="kv">
+      <div class="k">邮箱</div><div class="v">${u.email}</div><div class="k">手机</div><div class="v">${u.phone||'-'}</div>
+      <div class="k">邀请码</div><div class="v">${u.referral_code}</div><div class="k">注册时间</div><div class="v">${new Date(u.created_at).toLocaleString()}</div>
+      <div class="k">IP地址</div><div class="v">${u.ip_address||'-'}</div>
+      <div class="k">冻结</div><div class="v">${u.frozen?'<span class="badge badge-red">已冻结</span>':'<span class="badge badge-green">正常</span>'}</div>
+    </div>
+    <div style="margin-top:8px"><span class="k" style="color:var(--muted);font-size:12px">备注</span>
+      <textarea id="adminNotes" style="width:100%;min-height:60px;margin-top:4px;padding:8px;border-radius:8px;border:1px solid var(--border);font-size:12px">${u.admin_notes||''}</textarea>
+      <button class="btn btn-sm btn-blue" style="margin-top:4px" onclick="saveNotes(${id})">保存备注</button>
+    </div>`;
+  }else if(tab==='finance'){
+    dc.innerHTML='<div class="empty">加载中...</div>';
+    try{
+      const f=await api('GET','/admin/users/'+id+'/finance');
+      let html='<div style="font-size:11px">';
+      html+=`<p style="font-weight:700;margin-bottom:4px">💰 余额流水 (${f.earnings.length})</p>`;
+      f.earnings.slice(0,10).forEach(e=>html+=`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f0f0f0"><span>${e.type}</span><span style="color:var(--success)">+$${Number(e.amount).toFixed(2)}</span><span style="color:var(--muted);font-size:10px">${new Date(e.created_at).toLocaleString()}</span></div>`);
+      html+=`<p style="font-weight:700;margin:8px 0 4px">📦 订单 (${f.orders.length})</p>`;
+      f.orders.slice(0,10).forEach(o=>html+=`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f0f0f0"><span>#${o.id} ${o.product_name||''}</span><span class="badge ${o.status==='done'?'badge-green':'badge-yellow'}">${o.status==='done'?'已完成':'持仓中'}</span><span style="color:var(--muted);font-size:10px">${new Date(o.created_at).toLocaleString()}</span></div>`);
+      html+=`<p style="font-weight:700;margin:8px 0 4px">💵 充值 (${f.deposits.length})</p>`;
+      f.deposits.slice(0,5).forEach(d=>html+=`<div style="display:flex;justify-content:space-between;padding:3px 0"><span>${d.network}</span><span>$${Number(d.amount).toFixed(2)}</span><span class="badge ${d.status==='confirmed'?'badge-green':'badge-yellow'}">${d.status}</span></div>`);
+      html+=`<p style="font-weight:700;margin:8px 0 4px">💸 提现 (${f.withdrawals.length})</p>`;
+      f.withdrawals.slice(0,5).forEach(w=>html+=`<div style="display:flex;justify-content:space-between;padding:3px 0"><span>${w.network||''}</span><span>$${Number(w.amount).toFixed(2)}</span><span class="badge ${w.status==='completed'?'badge-green':w.status==='pending'?'badge-yellow':'badge-red'}">${w.status}</span></div>`);
+      html+='</div>';dc.innerHTML=html;
+    }catch(e){dc.innerHTML='<div class="empty">加载失败</div>'}
+  }else if(tab==='invite'){
+    dc.innerHTML='<div class="empty">加载中...</div>';
+    try{
+      let inv='';
+      if(u.parent_id){try{const p=await api('GET','/admin/users/'+u.parent_id);inv+=`<p style="font-size:12px;margin-bottom:8px">⬆️ 上级: <b>${p.name||p.email}</b></p>`}catch(e){}}
+      else inv+='<p style="font-size:12px;margin-bottom:8px;color:var(--muted)">⬆️ 无上级</p>';
+      try{const t=await api('GET','/admin/users/'+id+'/tree');inv+=`<p style="font-size:12px;font-weight:700">⬇️ 下级邀请 (${t.length||0}人)</p>`;if(t.length)inv+='<table style="margin-top:4px"><tr><th>等级</th><th>用户</th></tr>'+t.map(i=>`<tr><td>Lv${i.level}</td><td>${i.name||i.email}</td></tr>`).join('')+'</table>'}catch(e){inv+='<p style="color:var(--muted)">无下级</p>'}
+      dc.innerHTML=inv;
+    }catch(e){dc.innerHTML='<div class="empty">加载失败</div>'}
+  }else if(tab==='actions'){
+    dc.innerHTML=`
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:8px;align-items:center"><input id="balAmt" type="number" placeholder="金额" style="flex:1" min="1"><input id="balNote" type="text" placeholder="备注" style="width:80px"><button class="btn btn-sm btn-green" onclick="adjustBalance(${id},1)">上分</button><button class="btn btn-sm btn-red" onclick="adjustBalance(${id},-1)">下分</button></div>
+        <div style="display:flex;gap:8px"><button class="btn btn-sm btn-blue" onclick="editUserName(${id},'${(u.name||'').replace(/'/g,\"\\\\'\")}','${(u.phone||'').replace(/'/g,\"\\\\'\")}')">✏️ 编辑</button><button class="btn btn-sm btn-red" onclick="resetUserPw(${id})">🔑 重置密码</button><button class="btn btn-sm ${u.frozen?'btn-green':'btn-red'}" onclick="toggleFreeze(${id},${u.frozen})">${u.frozen?'✅ 解冻':'❄️ 冻结'}</button><button class="btn btn-sm btn-red" onclick="deleteUser(${id})">🗑️ 删除</button><button class="btn btn-sm" style="background:#8B5CF6;color:#fff" onclick="loginAs(${id})">🔮 模拟登录</button></div>
+      </div>`;
+  }
 }
-
-function toggleFreeze(id,current){
-  api('PUT','/admin/users/'+id+'/freeze',{frozen:!current}).then(()=>{showToast(current?'用户已解冻':'用户已冻结');showUserDetail(id)}).catch(e=>showToast(e.message,1));
-}
-function deleteUser(id){
-  if(!confirm('确定删除此用户？此操作不可恢复！'))return;
-  api('DELETE','/admin/users/'+id).then(()=>{showToast('用户已删除');switchTab('users')}).catch(e=>showToast(e.message,1));
-}
+function saveNotes(id){var n=document.getElementById('adminNotes').value;api('PUT','/admin/users/'+id+'/notes',{notes:n}).then(()=>showToast('备注已保存')).catch(e=>showToast(e.message,1))}
 function adjustBalance(id,sign){
-  var amt=parseFloat(document.getElementById('balAddAmt').value);
-  if(!amt||amt<0){showToast('请输入有效金额',1);return;}
-  var note=document.getElementById('balNote').value||'';
-  var total=sign>0?amt:-amt;
-  var label=sign>0?'上分 $'+amt:'下分 $'+amt;
-  if(!confirm('确认'+label+'？'+(note?' 备注: '+note:'')))return;
-  api('POST','/admin/users/'+id+'/balance',{amount:total,note:note}).then(d=>{
-    showToast(label+' 成功，余额: $'+d.newBalance.toFixed(2));
-    showUserDetail(id);
-  }).catch(e=>showToast(e.message,1));
+  var amt=parseFloat(document.getElementById('balAmt').value);if(!amt||amt<0){showToast('请输入有效金额',1);return}
+  var note=document.getElementById('balNote').value||'',total=sign>0?amt:-amt,label=sign>0?'上分 $'+amt:'下分 $'+amt;
+  if(!confirm('确认'+label+'？'))return;
+  api('POST','/admin/users/'+id+'/balance',{amount:total,note:note}).then(d=>{showToast(label+' 成功，余额:$'+d.newBalance.toFixed(2));switchTab('users')}).catch(e=>showToast(e.message,1));
 }
+function editUserName(id,name,phone){const n=prompt('新姓名:',name);if(n===null)return;const p=prompt('新手机号:',phone);if(p===null)return;api('PUT','/admin/users/'+id,{name:n,phone:p}).then(()=>{showToast('已更新');switchTab('users')}).catch(e=>showToast(e.message,1))}
+function resetUserPw(id){const pw=prompt('新密码(8位以上):');if(!pw||pw.length<8){showToast('至少8位',1);return}api('POST','/admin/users/'+id+'/reset-password',{newPassword:pw}).then(()=>showToast('密码已重置')).catch(e=>showToast(e.message,1))}
+function toggleFreeze(id,c){api('PUT','/admin/users/'+id+'/freeze',{frozen:!c}).then(()=>{showToast(c?'已解冻':'已冻结');switchTab('users')}).catch(e=>showToast(e.message,1))}
+function deleteUser(id){if(!confirm('确定删除？不可恢复！'))return;api('DELETE','/admin/users/'+id).then(()=>{showToast('已删除');switchTab('users')}).catch(e=>showToast(e.message,1))}
+function loginAs(id){api('POST','/admin/users/'+id+'/login-as').then(d=>{window.open(d.redirect,'_blank')}).catch(e=>showToast(e.message,1))}
 
+// ========== ORDERS / DEPOSITS / WITHDRAWALS / KYC ==========
 let ordersPage=1,ordersStatus='',ordersUser='';
 async function loadOrders(c){
-  c.innerHTML=`
-    <div class="card"><div class="card-body">
-      <div class="search-row">
-        <input id="orderUser" placeholder="用户ID（可选）" value="${ordersUser}">
-        <select id="orderStatus"><option value="">全部状态</option><option value="holding" ${ordersStatus==='holding'?'selected':''}>持仓中</option><option value="done" ${ordersStatus==='done'?'selected':''}>已完成</option></select>
-        <button class="btn btn-blue" onclick="ordersUser=document.getElementById('orderUser').value;ordersStatus=document.getElementById('orderStatus').value;ordersPage=1;loadOrders(document.getElementById('content'))">筛选</button>
-      </div>
-      <div id="orderTable"></div>
-      <div id="orderPager" class="pagination"></div>
-    </div></div>
-  `;
+  c.innerHTML=`<div class="card"><div class="card-body"><div class="search-row">
+    <input id="orderUser" placeholder="用户ID" value="${ordersUser}"><select id="orderStatus"><option value="">全部</option><option value="holding" ${ordersStatus==='holding'?'selected':''}>持仓中</option><option value="done" ${ordersStatus==='done'?'selected':''}>已完成</option></select>
+    <button class="btn btn-blue" onclick="ordersUser=document.getElementById('orderUser').value;ordersStatus=document.getElementById('orderStatus').value;ordersPage=1;loadOrders(document.getElementById('content'))">筛选</button></div>
+    <div id="orderTable"></div><div id="orderPager" class="pagination"></div></div></div>`;
   try{
-    const d=await api('GET',`/admin/orders?page=${ordersPage}&limit=20&user_id=${ordersUser}&status=${ordersStatus}`);
-    const orders=d.orders||[];
-    document.getElementById('orderTable').innerHTML=`<table><thead><tr><th>ID</th><th>用户</th><th>产品</th><th>成本</th><th>利润</th><th>状态</th><th>时间</th></tr></thead><tbody>
-    ${orders.length===0?'<tr><td colspan="7" class="empty">暂无订单</td></tr>':
-      orders.map(o=>`<tr>
-        <td>#${o.id}</td><td>${o.user_name||o.user_email} (#${o.user_id})</td>
-        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.product_name||'-'}</td>
-        <td>$${Number(o.amount||0).toFixed(2)}</td>
-        <td style="color:var(--success);font-weight:600">+$${(Number(o.amount||0)*0.15/0.85).toFixed(2)}</td>
-        <td><span class="badge ${o.status==='done'?'badge-green':o.status==='holding'?'badge-yellow':'badge-gray'}">${o.status==='done'?'已完成':'持仓中'}</span></td>
-        <td style="font-size:10px">${new Date(o.created_at).toLocaleString()}</td>
-      </tr>`).join('')}
-    </tbody></table>`;
-    const total=Number(d.total)||0;
-    const pages=Math.ceil(total/20);
-    document.getElementById('orderPager').innerHTML=`<button class="btn btn-gray btn-sm" ${ordersPage<=1?'disabled':''} onclick="ordersPage--;loadOrders(document.getElementById('content'))">上一页</button>
-      <span>第 ${ordersPage} / ${pages||1} 页 (共${total}条)</span>
-      <button class="btn btn-gray btn-sm" ${ordersPage>=pages?'disabled':''} onclick="ordersPage++;loadOrders(document.getElementById('content'))">下一页</button>`;
+    const d=await api('GET',`/admin/orders?page=${ordersPage}&limit=20&user_id=${ordersUser}&status=${ordersStatus}`);const orders=d.orders||[];
+    document.getElementById('orderTable').innerHTML=`<table><thead><tr><th>ID</th><th>用户</th><th>产品</th><th>成本</th><th>利润</th><th>状态</th><th>时间</th></tr></thead><tbody>${orders.length===0?'<tr><td colspan="7" class="empty">暂无订单</td></tr>':orders.map(o=>`<tr><td>#${o.id}</td><td>${o.user_name||o.user_email} (#${o.user_id})</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${o.product_name||'-'}</td><td>$${Number(o.amount||0).toFixed(2)}</td><td style="color:var(--success);font-weight:600">+$${(Number(o.amount||0)*0.15/0.85).toFixed(2)}</td><td><span class="badge ${o.status==='done'?'badge-green':'badge-yellow'}">${o.status==='done'?'已完成':'持仓中'}</span></td><td style="font-size:10px">${new Date(o.created_at).toLocaleString()}</td></tr>`).join('')}</tbody></table>`;
+    const total=Number(d.total)||0,pages=Math.ceil(total/20);
+    document.getElementById('orderPager').innerHTML=`<button class="btn btn-gray btn-sm" ${ordersPage<=1?'disabled':''} onclick="ordersPage--;loadOrders(document.getElementById('content'))">上一页</button><span>第 ${ordersPage}/${pages||1} 页 (${total})</span><button class="btn btn-gray btn-sm" ${ordersPage>=pages?'disabled':''} onclick="ordersPage++;loadOrders(document.getElementById('content'))">下一页</button>`;
   }catch(e){document.getElementById('orderTable').innerHTML='<div class="empty">'+e.message+'</div>'}
 }
-
-async function loadDeposits(c){
-  c.innerHTML='<div class="empty">加载中...</div>';
-  try{
-    const rows=await api('GET','/deposits/admin');
-    c.innerHTML=`
-      <div class="card"><div class="card-header">💵 充值审批 <span style="font-weight:400;font-size:12px;color:var(--muted)">加密货币充值审核</span></div>
-      <div class="card-body">
-        <table><thead><tr><th>ID</th><th>用户</th><th>网络</th><th>金额</th><th>交易哈希</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>
-        ${rows.length===0?'<tr><td colspan="8" class="empty">暂无充值记录</td></tr>':
-          rows.map(d=>`<tr>
-            <td>#${d.id}</td><td>${d.name||d.email} (#${d.user_id})</td>
-            <td><span class="badge badge-blue">${d.network.toUpperCase()}</span></td>
-            <td style="font-weight:700">$${Number(d.amount).toFixed(2)}</td>
-            <td style="font-size:10px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${d.tx_hash}">${d.tx_hash}</td>
-            <td><span class="badge ${d.status==='confirmed'?'badge-green':d.status==='pending'?'badge-yellow':'badge-red'}">${d.status==='confirmed'?'已确认':d.status==='pending'?'待审核':'已拒绝'}</span></td>
-            <td style="font-size:10px">${new Date(d.created_at).toLocaleString()}</td>
-            <td>${d.status==='pending'?`
-              <button class="btn btn-xs btn-green" onclick="confirmDeposit(${d.id})">✅ 确认</button>
-              <button class="btn btn-xs btn-red" onclick="rejectDeposit(${d.id})">❌ 拒绝</button>`:'-'}
-            </td>
-          </tr>`).join('')}
-        </tbody></table>
-      </div></div>`;
-  }catch(e){c.innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
-}
-
-async function confirmDeposit(id){
-  if(!confirm('确认这笔充值？资金将转入用户余额。'))return;
-  try{await api('PUT','/deposits/'+id+'/confirm',{});showToast('充值已确认，资金已到账');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}
-}
-async function rejectDeposit(id){
-  if(!confirm('拒绝这笔充值？'))return;
-  try{await api('PUT','/deposits/'+id+'/reject',{});showToast('充值已拒绝');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}
-}
-
+async function loadDeposits(c){c.innerHTML='<div class="empty">加载中...</div>';try{const rows=await api('GET','/deposits/admin');c.innerHTML=`<div class="card"><div class="card-header">💵 充值审批</div><div class="card-body"><table><thead><tr><th>ID</th><th>用户</th><th>网络</th><th>金额</th><th>哈希</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="8" class="empty">暂无</td></tr>':rows.map(d=>`<tr><td>#${d.id}</td><td>${d.name||d.email} (#${d.user_id})</td><td><span class="badge badge-blue">${d.network.toUpperCase()}</span></td><td style="font-weight:700">$${Number(d.amount).toFixed(2)}</td><td style="font-size:10px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.tx_hash}</td><td><span class="badge ${d.status==='confirmed'?'badge-green':d.status==='pending'?'badge-yellow':'badge-red'}">${d.status==='confirmed'?'已确认':d.status==='pending'?'待审核':'已拒绝'}</span></td><td style="font-size:10px">${new Date(d.created_at).toLocaleString()}</td><td>${d.status==='pending'?`<button class="btn btn-xs btn-green" onclick="confirmDeposit(${d.id})">✅</button><button class="btn btn-xs btn-red" onclick="rejectDeposit(${d.id})">❌</button>`:'-'}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
+async function confirmDeposit(id){if(!confirm('确认充值？'))return;try{await api('PUT','/deposits/'+id+'/confirm',{});showToast('已确认');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
+async function rejectDeposit(id){if(!confirm('拒绝充值？'))return;try{await api('PUT','/deposits/'+id+'/reject',{});showToast('已拒绝');loadDeposits(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
 let wPage=1,wFilter='';
-async function loadWithdrawals(c){
-  c.innerHTML='<div class="empty">加载中...</div>';
-  try{
-    const d=await api('GET',`/admin/withdrawals?page=${wPage}&limit=20&status=${wFilter}`);
-    const rows=d.withdrawals||[];
-    c.innerHTML=`
-      <div class="card"><div class="card-header">💸 提现审批
-        <div style="display:flex;gap:4px">${['','pending','completed','rejected'].map(s=>`<button class="btn btn-xs ${wFilter===s?'btn-blue':'btn-gray'}" onclick="wFilter='${s}';wPage=1;loadWithdrawals(document.getElementById('content'))">${!s?'全部':s==='pending'?'待审批':s==='completed'?'已完成':'已拒绝'}</button>`).join('')}</div>
-      </div>
-      <div class="card-body">
-        <table><thead><tr><th>ID</th><th>用户</th><th>金额</th><th>网络</th><th>钱包地址</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>
-        ${rows.length===0?'<tr><td colspan="8" class="empty">暂无提现记录</td></tr>':
-          rows.map(w=>`<tr>
-            <td>#${w.id}</td><td>${w.user_name||w.user_email} (#${w.user_id})</td>
-            <td style="font-weight:700">$${Number(w.amount).toFixed(2)}</td>
-            <td>${w.network||'-'}</td>
-            <td style="font-size:10px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.wallet_address||'-'}</td>
-            <td><span class="badge ${w.status==='completed'?'badge-green':w.status==='pending'?'badge-yellow':'badge-red'}">${w.status==='completed'?'已完成':w.status==='pending'?'待审批':'已拒绝'}</span></td>
-            <td style="font-size:10px">${new Date(w.created_at).toLocaleString()}</td>
-            <td>${w.status==='pending'?`
-              <button class="btn btn-xs btn-green" onclick="approveWithdrawal(${w.id})">✅ 通过</button>
-              <button class="btn btn-xs btn-red" onclick="rejectWithdrawal(${w.id})">❌ 拒绝</button>`:'-'}
-            </td>
-          </tr>`).join('')}
-        </tbody></table>
-        ${d.total?`<div class="pagination"><button class="btn btn-gray btn-sm" ${wPage<=1?'disabled':''} onclick="wPage--;loadWithdrawals(document.getElementById('content'))">上一页</button><span>第 ${wPage}/${Math.ceil(d.total/20)} 页</span><button class="btn btn-gray btn-sm" ${wPage>=Math.ceil(d.total/20)?'disabled':''} onclick="wPage++;loadWithdrawals(document.getElementById('content'))">下一页</button></div>`:''}
-      </div></div>`;
-  }catch(e){c.innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
-}
+async function loadWithdrawals(c){c.innerHTML='<div class="empty">加载中...</div>';try{const d=await api('GET',`/admin/withdrawals?page=${wPage}&limit=20&status=${wFilter}`);const rows=d.withdrawals||[];c.innerHTML=`<div class="card"><div class="card-header">💸 提现审批<div style="display:flex;gap:4px">${['','pending','completed','rejected'].map(s=>`<button class="btn btn-xs ${wFilter===s?'btn-blue':'btn-gray'}" onclick="wFilter='${s}';wPage=1;loadWithdrawals(document.getElementById('content'))">${!s?'全部':s==='pending'?'待审批':s==='completed'?'已完成':'已拒绝'}</button>`).join('')}</div></div><div class="card-body"><table><thead><tr><th>ID</th><th>用户</th><th>金额</th><th>网络</th><th>地址</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="8" class="empty">暂无</td></tr>':rows.map(w=>`<tr><td>#${w.id}</td><td>${w.user_name||w.user_email} (#${w.user_id})</td><td style="font-weight:700">$${Number(w.amount).toFixed(2)}</td><td>${w.network||'-'}</td><td style="font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${w.wallet_address||'-'}</td><td><span class="badge ${w.status==='completed'?'badge-green':w.status==='pending'?'badge-yellow':'badge-red'}">${w.status==='completed'?'已完成':w.status==='pending'?'待审批':'已拒绝'}</span></td><td style="font-size:10px">${new Date(w.created_at).toLocaleString()}</td><td>${w.status==='pending'?`<button class="btn btn-xs btn-green" onclick="approveWithdrawal(${w.id})">✅</button><button class="btn btn-xs btn-red" onclick="rejectWithdrawal(${w.id})">❌</button>`:'-'}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
+async function approveWithdrawal(id){if(!confirm('确认通过？'))return;try{await api('PUT','/admin/withdrawals/'+id,{status:'completed'});showToast('已通过');loadWithdrawals(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
+async function rejectWithdrawal(id){if(!confirm('确认拒绝？'))return;try{await api('PUT','/admin/withdrawals/'+id,{status:'rejected'});showToast('已拒绝');loadWithdrawals(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
+async function loadKyc(c){c.innerHTML='<div class="empty">加载中...</div>';try{const rows=await api('GET','/kyc/admin/list');c.innerHTML=`<div class="card"><div class="card-header">🛂 实名认证</div><div class="card-body"><table><thead><tr><th>ID</th><th>用户</th><th>姓名</th><th>证件号</th><th>照片</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="8" class="empty">暂无</td></tr>':rows.map(k=>`<tr><td>#${k.id}</td><td>${k.user_name||k.user_email} (#${k.user_id})</td><td>${k.real_name||'-'}</td><td style="font-size:11px">${k.id_number||'-'}</td><td style="display:flex;gap:8px">${k.front_image?`<img src="${k.front_image}" onclick="viewKycImage(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer">`:'无'}${k.back_image?`<img src="${k.back_image}" onclick="viewKycImage(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer">`:''}</td><td><span class="badge ${k.status==='approved'?'badge-green':k.status==='pending'?'badge-yellow':'badge-red'}">${k.status==='approved'?'已通过':k.status==='pending'?'待审核':'已拒绝'}</span></td><td style="font-size:10px">${new Date(k.submitted_at).toLocaleString()}</td><td>${k.status==='pending'?`<button class="btn btn-xs btn-green" onclick="approveKyc(${k.id})">✅</button><button class="btn btn-xs btn-red" onclick="rejectKyc(${k.id})">❌</button>`:'-'}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
+async function approveKyc(id){try{await api('PUT','/kyc/admin/'+id,{status:'approved'});showToast('已通过');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
+async function rejectKyc(id){try{await api('PUT','/kyc/admin/'+id,{status:'rejected'});showToast('已拒绝');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}}
+function viewKycImage(el){var s=el.getAttribute('src');var d=document.createElement('div');d.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;cursor:pointer';d.onclick=function(){d.remove()};var i=document.createElement('img');i.src=s;i.style.cssText='max-width:95vw;max-height:95vh;object-fit:contain;pointer-events:none';d.appendChild(i);document.body.appendChild(d)}
 
-async function approveWithdrawal(id){
-  if(!confirm('确认通过这笔提现？资金将从用户余额扣除。'))return;
-  try{await api('PUT','/admin/withdrawals/'+id,{status:'completed'});showToast('提现已通过!');loadWithdrawals(document.getElementById('content'))}catch(e){showToast(e.message,1)}
-}
-async function rejectWithdrawal(id){
-  if(!confirm('拒绝这笔提现？资金将退回用户余额。'))return;
-  try{await api('PUT','/admin/withdrawals/'+id,{status:'rejected'});showToast('提现已拒绝');loadWithdrawals(document.getElementById('content'))}catch(e){showToast(e.message,1)}
-}
+// ========== AUDIT LOG ==========
+async function loadAuditLog(c){c.innerHTML='<div class="empty">加载中...</div>';try{const rows=await api('GET','/admin/audit-log');c.innerHTML=`<div class="card"><div class="card-header">📋 操作日志</div><div class="card-body"><table><thead><tr><th>时间</th><th>管理员</th><th>操作</th><th>目标</th><th>详情</th></tr></thead><tbody>${rows.length===0?'<tr><td colspan="5" class="empty">暂无记录</td></tr>':rows.map(a=>`<tr><td style="font-size:10px">${new Date(a.created_at).toLocaleString()}</td><td>${a.admin_name||a.admin_email}</td><td><span class="badge badge-blue">${a.action}</span></td><td>${a.target_user_id||'-'}</td><td style="font-size:10px">${a.detail||''}</td></tr>`).join('')}</tbody></table></div></div>`}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>'}}
 
-async function loadKyc(c){
-  c.innerHTML='<div class="empty">加载中...</div>';
-  try{
-    const rows=await api('GET','/kyc/admin/list');
-    c.innerHTML=`
-      <div class="card"><div class="card-header">🛂 实名认证审核</div>
-      <div class="card-body">
-        <table><thead><tr><th>ID</th><th>用户</th><th>真实姓名</th><th>证件号码</th><th>类型</th><th>证件照片</th><th>状态</th><th>提交时间</th><th>操作</th></tr></thead><tbody>
-        ${rows.length===0?'<tr><td colspan="9" class="empty">暂无认证申请</td></tr>':
-          rows.map(k=>`<tr>
-            <td>#${k.id}</td><td>${k.user_name||k.user_email} (#${k.user_id})</td>
-            <td>${k.real_name||'-'}</td>
-            <td style="font-size:11px">${k.id_number||'-'}</td>
-            <td>${k.doc_type||'-'}</td>
-            <td style="display:flex;gap:8px">${k.front_image?`<img src="${k.front_image}" onclick="viewKycImage(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer" title="点击查看大图">`:'无'} ${k.back_image?`<img src="${k.back_image}" onclick="viewKycImage(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);cursor:pointer" title="点击查看大图">`:''}</td>
-            <td><span class="badge ${k.status==='approved'?'badge-green':k.status==='pending'?'badge-yellow':'badge-red'}">${k.status==='approved'?'已通过':k.status==='pending'?'待审核':'已拒绝'}</span></td>
-            <td style="font-size:10px">${new Date(k.submitted_at).toLocaleString()}</td>
-            <td>${k.status==='pending'?`
-              <button class="btn btn-xs btn-green" onclick="approveKyc(${k.id})">✅ 通过</button>
-              <button class="btn btn-xs btn-red" onclick="rejectKyc(${k.id})">❌ 拒绝</button>`:'-'}
-            </td>
-          </tr>`).join('')}
-        </tbody></table>
-      </div></div>`;
-  }catch(e){c.innerHTML='<div class="empty">加载失败: '+e.message+'</div>'}
-}
-
-async function approveKyc(id){
-  try{await api('PUT','/kyc/admin/'+id,{status:'approved'});showToast('实名认证已通过!');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}
-}
-async function rejectKyc(id){
-  try{await api('PUT','/kyc/admin/'+id,{status:'rejected'});showToast('实名认证已拒绝');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}
-}
-
-function viewKycImage(el) {
-  var src = el.getAttribute('src');
-  var div = document.createElement('div');
-  div.id = 'kycPreview';
-  div.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;cursor:pointer';
-  div.onclick = function(){ div.remove(); };
-  var img = document.createElement('img');
-  img.src = src;
-  img.style.cssText = 'max-width:95vw;max-height:95vh;object-fit:contain;pointer-events:none';
-  div.appendChild(img);
-  document.body.appendChild(div);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  try { initApp(); } catch(e) {
-    console.error('Admin init error:', e);
-    document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('loginErr').textContent = '初始化错误: ' + e.message;
-  }
-});
-</script>
-</body>
-</html>
+document.addEventListener('DOMContentLoaded',()=>{try{initApp()}catch(e){document.getElementById('loginPage').style.display='flex';document.getElementById('loginErr').textContent='错误: '+e.message}});
+</script></body></html>

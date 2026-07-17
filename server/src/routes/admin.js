@@ -248,6 +248,89 @@ router.post('/users/:id/balance', async (req, res) => {
 
   const bal = await get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [id, 'delivered']);
   res.json({ ok: true, newBalance: Number(bal?.total || 0) });
+  // Audit log
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, amount>0?'credit':'debit', id, `$${Math.abs(amount).toFixed(2)} ${note}`]); } catch {}
+});
+
+// ========== User Finance Summary ==========
+router.get('/users/:id/finance', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const earnings = await all("SELECT amount, type, created_at FROM task_earnings WHERE user_id = ? ORDER BY created_at DESC LIMIT 30", [id]);
+  const orders = await all("SELECT o.*, o.product_name FROM store_orders o WHERE o.user_id = ? ORDER BY o.created_at DESC LIMIT 30", [id]);
+  const deposits = await all("SELECT * FROM deposits WHERE user_id = ? ORDER BY created_at DESC LIMIT 10", [id]);
+  const withdrawals = await all("SELECT * FROM withdrawals WHERE user_id = ? ORDER BY created_at DESC LIMIT 10", [id]);
+  res.json({ earnings, orders, deposits, withdrawals });
+});
+
+// ========== User Notes ==========
+router.put('/users/:id/notes', async (req, res) => {
+  const id = parseInt(req.params.id);
+  await run('UPDATE users SET admin_notes = ? WHERE id = ?', [req.body.notes || '', id]);
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, 'notes', id, '']); } catch {}
+  res.json({ ok: true });
+});
+
+// ========== Login As User ==========
+router.post('/users/:id/login-as', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const user = await userModel.findById(id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  const { signAccessToken } = require('../utils/jwt');
+  const token = signAccessToken({ id: user.id, email: user.email, is_admin: false });
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, 'login_as', id, user.email]); } catch {}
+  res.json({ token, redirect: '/store?token=' + token });
+});
+
+// ========== Batch Operations ==========
+router.post('/users/batch', async (req, res) => {
+  const { ids, action } = req.body;
+  if (!ids || !ids.length) return res.status(400).json({ error: 'No users selected' });
+  let affected = 0;
+  for (const id of ids) {
+    const user = await userModel.findById(parseInt(id));
+    if (!user || user.is_admin) continue;
+    if (action === 'freeze') { await run('UPDATE users SET frozen = TRUE WHERE id = ?', [id]); affected++; }
+    else if (action === 'unfreeze') { await run('UPDATE users SET frozen = FALSE WHERE id = ?', [id]); affected++; }
+    else if (action === 'delete') { await run('DELETE FROM users WHERE id = ?', [id]); affected++; }
+  }
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, detail) VALUES (?,?,?)', [req.user.id, 'batch_'+action, `${affected} users: ${ids.join(',')}`]); } catch {}
+  res.json({ ok: true, affected });
+});
+
+// ========== Audit Log ==========
+router.get('/audit-log', async (req, res) => {
+  const rows = await all(
+    `SELECT a.*, u.name as admin_name, u.email as admin_email
+     FROM admin_audit_log a JOIN users u ON u.id = a.admin_id
+     ORDER BY a.created_at DESC LIMIT 100`
+  );
+  res.json(rows);
+});
+
+// ========== Enhanced Users with Filters ==========
+router.get('/users-filtered', async (req, res) => {
+  const { page = 1, limit = 20, search = '', kyc = '', frozen = '', tier = '' } = req.query;
+  const offset = (page - 1) * limit;
+  let where = 'WHERE 1=1';
+  const params = [];
+  if (search) { where += ' AND (u.email ILIKE ? OR u.name ILIKE ? OR u.phone ILIKE ?)'; params.push('%'+search+'%', '%'+search+'%', '%'+search+'%'); }
+  if (kyc) { where += kyc==='none' ? ' AND (k.status IS NULL OR k.status = ?)' : ' AND k.status = ?'; params.push(kyc==='none'?'rejected':kyc); }
+  if (frozen === 'yes') { where += ' AND u.frozen = TRUE'; }
+  else if (frozen === 'no') { where += ' AND u.frozen = FALSE'; }
+  if (tier === 'none') { where += ' AND s.id IS NULL'; }
+  else if (tier) { where += ' AND s.tier = ?'; params.push(tier); }
+
+  const total = await get(`SELECT COUNT(*) as c FROM users u LEFT JOIN stores s ON s.user_id = u.id LEFT JOIN kyc_submissions k ON k.user_id = u.id ${where}`, params);
+  const users = await all(
+    `SELECT u.id, u.email, u.phone, u.name, u.referral_code, u.is_admin, u.is_active, u.frozen, u.created_at, u.ip_address, u.admin_notes,
+            COALESCE(s.id, 0) as store_id, s.tier, s.deposit as store_deposit, s.status as store_status,
+            COALESCE((SELECT SUM(amount) FROM task_earnings WHERE user_id = u.id AND status = 'delivered'), 0) as balance,
+            COALESCE(k.status, '') as kyc_status
+     FROM users u LEFT JOIN stores s ON s.user_id = u.id LEFT JOIN kyc_submissions k ON k.user_id = u.id
+     ${where} ORDER BY u.id DESC LIMIT ? OFFSET ?`,
+    [...params, limit, offset]
+  );
+  res.json({ users: users.map(u => ({ ...u, balance: Number(u.balance), store_deposit: Number(u.store_deposit || 0) })), total: Number(total?.c || 0), page, limit });
 });
 
 // DELETE /api/admin/users/:id
@@ -343,6 +426,7 @@ router.put('/users/:id/freeze', async (req, res) => {
   const id = parseInt(req.params.id);
   const { frozen } = req.body;
   await run('UPDATE users SET frozen = ? WHERE id = ?', [!!frozen, id]);
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, frozen?'freeze':'unfreeze', id, '']); } catch {}
   res.json({ ok: true, frozen: !!frozen });
 });
 
@@ -355,6 +439,7 @@ router.post('/users/:id/reset-password', async (req, res) => {
   const { hashPassword } = require('../utils/password');
   const hash = await hashPassword(newPassword);
   await run('UPDATE users SET password_hash = ? WHERE id = ?', [hash, id]);
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, 'reset_pw', id, '']); } catch {}
   res.json({ ok: true });
 });
 

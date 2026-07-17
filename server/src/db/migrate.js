@@ -289,6 +289,20 @@ async function migrate() {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
   } catch (e) { console.log('Transaction requests migration skipped:', e.message); }
+  // Admin notes on users
+  try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS admin_notes TEXT DEFAULT ''`); } catch (e) { console.log('admin_notes skipped:', e.message); }
+  // Admin audit log
+  try {
+    await exec(`CREATE TABLE IF NOT EXISTS admin_audit_log (
+      id SERIAL PRIMARY KEY,
+      admin_id INTEGER NOT NULL,
+      action TEXT NOT NULL,
+      target_user_id INTEGER,
+      detail TEXT DEFAULT '',
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE CASCADE
+    )`);
+  } catch (e) { console.log('Audit log migration skipped:', e.message); }
   await exec(defaultSettings);
   // One-time cleanup: remove legacy Chinese notifications
   try {
