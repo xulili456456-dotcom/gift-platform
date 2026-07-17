@@ -161,8 +161,7 @@ router.post('/orders/process', async (req, res) => {
 
   // Check available balance (exclude locked in holdings)
   const availBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
-  const lockedBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = ?", [store.id, 'holding']);
-  const available = Number(availBal?.total || 0) - Number(lockedBal?.total || 0);
+  const available = Number(availBal?.total || 0);
 
   // Deposit check: cost must not exceed deposit (skip for free orders)
   const deposit = Number(store.deposit || 0);
