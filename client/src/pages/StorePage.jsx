@@ -368,6 +368,19 @@ export default function StorePage() {
   const [showDailyFull, setShowDailyFull] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [expandedHolding, setExpandedHolding] = useState(null);
+  const [showDeposit, setShowDeposit] = useState(false);
+  const [depositAmount, setDepositAmount] = useState('');
+  const [depositMsg, setDepositMsg] = useState('');
+  const handleDeposit = async () => {
+    const amt = parseFloat(depositAmount);
+    if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
+    try { const { data } = await client.post('/store/deposit', { amount: amt }); setDepositMsg(`Deposited $${amt}!`); setDepositAmount(''); loadStatus(); loadEarnings(); }
+    catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
+  };
+  const handleWithdrawDeposit = async () => {
+    try { const { data } = await client.post('/store/withdraw-deposit', {}); toast.success(`$${data.returned} returned to balance`); loadStatus(); loadEarnings(); }
+    catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
+  };
   const handleBuy = async (product) => {
     // Pre-check locally first, then let backend verify
     if (s.remaining <= 0) { setShowDailyFull(true); return; }
@@ -377,7 +390,8 @@ export default function StorePage() {
       loadStatus(); loadHoldings(); loadEarnings();
     } catch (err) {
       const d = err.response?.data;
-      if (d?.shortage) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage });
+      if (d?.depositRequired) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, isDeposit: true });
+      else if (d?.shortage) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage });
       else if (d?.error?.includes('daily') || d?.error?.includes('limit')) setShowDailyFull(true);
       else toast.error(d?.error || t('common.operationFailed'));
     }
@@ -491,7 +505,7 @@ export default function StorePage() {
         {showInsufficient && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowInsufficient(null)}>
             <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
-              <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {t('store.insufficient') || 'Insufficient Balance'}</p>
+              <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {showInsufficient?.isDeposit ? (t('store.depositRequired')||'Deposit Required') : (t('store.insufficient')||'Insufficient Balance')}</p>
               <div className="space-y-1.5 mb-4 text-sm">
                 <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#FFB84D]">${showInsufficient.need?.toFixed(2)}</b></p>
                 <p className="text-[#565959]">{t('store.have') || 'Available'}: <b className="text-[#0F1111]">${showInsufficient.have?.toFixed(2)}</b></p>
@@ -729,8 +743,11 @@ export default function StorePage() {
           <div>
             <span className="text-[11px] text-[#565959]">{t('store.balance')}</span>
             <p className="text-[28px] font-bold text-[#0F1111] leading-tight">${s.balance.toFixed(2)}</p>
+            <span className="text-[10px] text-[#565959]">{t('store.deposit') || 'Deposit'}: <b className="text-[#0F1111]">${(s.deposit||0).toFixed(2)}</b> · {t('store.maxTrade') || 'Max Trade'}: <b className="text-[#0F1111]">${(s.maxTrade||0).toFixed(2)}</b></span>
           </div>
-          <button onClick={() => navigate('/mine/deposit')} className="text-[11px] px-3 py-1.5 rounded-full bg-[#FFD814] text-[#0F1111] font-medium">{t('store.deposit') || 'Deposit'}</button>
+          <div className="flex gap-1.5">
+            <button onClick={() => setShowDeposit(true)} className="text-[10px] px-2.5 py-1.5 rounded-full bg-[#FFD814] text-[#0F1111] font-medium">{t('store.addDeposit') || '+Deposit'}</button>
+          </div>
         </div>
         <div className="flex items-center gap-4 text-[11px]">
           <span className="text-[#067D62] font-bold">+${earnings.todayProfit.toFixed(2)} {t('store.today')}</span>
@@ -839,7 +856,7 @@ export default function StorePage() {
       {showInsufficient && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowInsufficient(null)}>
           <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
-            <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {t('store.insufficient') || 'Insufficient Balance'}</p>
+            <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {showInsufficient?.isDeposit ? (t('store.depositRequired')||'Deposit Required') : (t('store.insufficient')||'Insufficient Balance')}</p>
             <div className="space-y-1.5 mb-4 text-sm">
               <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#FFB84D]">${showInsufficient.need?.toFixed(2)}</b></p>
               <p className="text-[#565959]">{t('store.have') || 'Available'}: <b className="text-[#0F1111]">${showInsufficient.have?.toFixed(2)}</b></p>
@@ -874,6 +891,27 @@ export default function StorePage() {
             </div>
             <p className="text-[9px] text-[#999999] text-center mb-3">{t('store.shareHint')}</p>
             <button onClick={() => setShareProduct(null)} className="w-full py-2.5 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">{t('common.close')}</button>
+          </div>
+        </div>
+      )}
+
+      {/* Deposit Modal */}
+      {showDeposit && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => { setShowDeposit(false); setDepositMsg(''); }}>
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
+            <h3 className="text-base font-bold text-[#0F1111] mb-1">{t('store.deposit') || 'Deposit'}</h3>
+            <p className="text-xs text-[#565959] mb-3">{t('store.depositDesc') || 'Lock funds as collateral to trade bigger items. 1:1 ratio.'}</p>
+            {depositMsg && <p className="text-xs text-[#067D62] font-bold mb-3">{depositMsg}</p>}
+            {!depositMsg && <>
+              <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="100" className="w-full px-3 py-2.5 border border-[#e7e7e7] rounded-lg text-sm mb-3 outline-none focus:border-[#FF9900]" autoFocus />
+              <p className="text-[9px] text-[#999] mb-3">Available balance: ${s.balance.toFixed(2)} · Max trade will be ${((s.deposit||0) + parseFloat(depositAmount||0)).toFixed(2)}</p>
+              <div className="flex gap-2">
+                <button onClick={() => { setShowDeposit(false); setDepositMsg(''); }} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#f0f2f2] text-[#0F1111]">{t('common.cancel')}</button>
+                <button onClick={handleDeposit} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111]">{t('store.confirmDeposit') || 'Confirm'}</button>
+              </div>
+              {(s.deposit||0) > 0 && <button onClick={handleWithdrawDeposit} className="w-full mt-2 py-2 rounded-lg text-xs text-[#CC0C39] font-medium">{t('store.withdrawDeposit') || 'Withdraw All Deposit'}</button>}
+            </>}
+            {depositMsg && <button onClick={() => { setShowDeposit(false); setDepositMsg(''); }} className="w-full py-2.5 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">Close</button>}
           </div>
         </div>
       )}

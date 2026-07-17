@@ -790,7 +790,12 @@
     "shareGenerated": "¡Enlace generado!",
     "shareFailed": "Error al compartir",
     "linkCopiedMsg": "¡Enlace copiado! Compártelo.",
-    "itemsSold": "¡{{n}} artículo(s) vendido(s)!"
+    "itemsSold": "¡{{n}} artículo(s) vendido(s)!",
+    "depositRequired": "Depósito Requerido",
+    "depositShortage": "Necesita más depósito",
+    "maxTrade": "Comercio Máx",
+    "addDeposit": "+Depósito",
+    "withdrawDeposit": "Retirar Depósito"
   },
   "specs": {
     "产地": "Origen",

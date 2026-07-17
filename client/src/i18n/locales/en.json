@@ -802,7 +802,12 @@
     "shareGenerated": "Share link generated!",
     "shareFailed": "Share failed",
     "linkCopiedMsg": "Link copied! Share it with friends.",
-    "itemsSold": "{{n}} item(s) sold!"
+    "itemsSold": "{{n}} item(s) sold!",
+    "depositRequired": "Deposit Required",
+    "depositShortage": "Need more deposit to trade this item",
+    "maxTrade": "Max Trade",
+    "addDeposit": "+Deposit",
+    "withdrawDeposit": "Withdraw Deposit"
   },
   "specs": {
     "产地": "Origin",

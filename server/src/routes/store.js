@@ -91,6 +91,8 @@ router.get('/status', async (req, res) => {
       totalEarnings: Number(totalEarnings?.total) || 0,
       remaining: Math.max(0, tier.dailyOrders - (Number(doneToday?.c) || 0)),
       balance: Number(taskBal?.total || 0),
+      deposit: Number(store.deposit || 0),
+      maxTrade: Number(store.deposit || 0), // Max cost user can trade = deposit amount
       nextTier: next ? { name: next.name, threshold: next.threshold, remaining: next.threshold - totalOrders } : null,
     },
   });
@@ -146,6 +148,16 @@ router.post('/orders/process', async (req, res) => {
   const availBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
   const lockedBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = ?", [store.id, 'holding']);
   const available = Number(availBal?.total || 0) - Number(lockedBal?.total || 0);
+
+  // Deposit check: cost must not exceed deposit
+  const deposit = Number(store.deposit || 0);
+  if (cost > deposit) {
+    return res.status(400).json({
+      error: 'Insufficient deposit',
+      need: cost, have: deposit, shortage: Math.round((cost - deposit) * 100) / 100,
+      depositRequired: true
+    });
+  }
 
   if (available < cost) {
     return res.status(400).json({
@@ -366,6 +378,61 @@ router.get('/orders-history', async (req, res) => {
     orders: orders.map(o => ({ ...o, profit: Number(o.profit) })),
     summary: { count: Number(summary?.count || 0), totalProfit: Number(summary?.totalprofit || 0) },
   });
+});
+
+// POST /api/store/deposit — move funds from balance to deposit
+router.post('/deposit', authMiddleware, async (req, res) => {
+  const amount = parseFloat(req.body.amount);
+  if (!amount || amount < 1) return res.status(400).json({ error: 'Minimum deposit is $1' });
+
+  const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
+  if (!store) return res.status(400).json({ error: 'Please open a store first' });
+
+  const bal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
+  const available = Number(bal?.total || 0) - Number(store.deposit || 0); // exclude already-locked deposit
+  if (amount > available) return res.status(400).json({ error: `Insufficient available balance. Available: $${available.toFixed(2)}` });
+
+  const t = await tx();
+  try {
+    let remaining = amount;
+    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE', [req.user.id, 'delivered']);
+    for (const task of tasks) {
+      if (remaining <= 0) break;
+      const deduct = Math.min(Number(task.amount), remaining);
+      await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
+      const rest = Number(task.amount) - deduct;
+      if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, rest, 'bonus', 'delivered']);
+      remaining -= deduct;
+    }
+    const newDeposit = Number(store.deposit || 0) + amount;
+    await t.run('UPDATE stores SET deposit = ? WHERE id = ?', [newDeposit, store.id]);
+    await t.commit();
+    try { require('./notifications').notify(req.user.id, '🔒 Deposit Added', `$${amount} locked as deposit. Max trade: $${newDeposit.toFixed(2)}`, 'success'); } catch {}
+    res.json({ deposit: newDeposit, maxTrade: newDeposit });
+  } catch (err) { await t.rollback().catch(() => {}); throw err; }
+});
+
+// POST /api/store/withdraw-deposit — return deposit to balance (if no active holdings exceed new limit)
+router.post('/withdraw-deposit', authMiddleware, async (req, res) => {
+  const amount = parseFloat(req.body.amount);
+  const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
+  if (!store) return res.status(400).json({ error: 'Please open a store first' });
+
+  const currentDeposit = Number(store.deposit || 0);
+  const withdrawAmt = amount ? Math.min(amount, currentDeposit) : currentDeposit;
+  if (withdrawAmt <= 0) return res.status(400).json({ error: 'No deposit to withdraw' });
+
+  // Check: active holdings must not exceed remaining deposit
+  const maxHolding = await get("SELECT COALESCE(MAX(amount), 0) as max_cost FROM store_orders WHERE store_id = ? AND status = 'holding'", [store.id]);
+  const newDeposit = currentDeposit - withdrawAmt;
+  if (Number(maxHolding?.max_cost || 0) > newDeposit) {
+    return res.status(400).json({ error: `Cannot withdraw: you have active holdings up to $${Number(maxHolding.max_cost).toFixed(2)}. Clear them first.` });
+  }
+
+  const result = await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, withdrawAmt, 'bonus', 'delivered']);
+  await run('UPDATE stores SET deposit = ? WHERE id = ?', [newDeposit, store.id]);
+  try { require('./notifications').notify(req.user.id, '🔓 Deposit Returned', `$${withdrawAmt} returned to balance`, 'info'); } catch {}
+  res.json({ deposit: newDeposit, maxTrade: newDeposit, returned: withdrawAmt });
 });
 
 module.exports = router;

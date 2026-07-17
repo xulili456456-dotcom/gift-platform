@@ -850,7 +850,12 @@
     "shareGenerated": "Pautan kongsi dijana!",
     "shareFailed": "Gagal berkongsi",
     "linkCopiedMsg": "Pautan disalin! Kongsi dengan rakan.",
-    "itemsSold": "{{n}} item dijual!"
+    "itemsSold": "{{n}} item dijual!",
+    "depositRequired": "Deposit Diperlukan",
+    "depositShortage": "Perlu lebih banyak deposit",
+    "maxTrade": "Maks Dagangan",
+    "addDeposit": "+Deposit",
+    "withdrawDeposit": "Keluarkan Deposit"
   },
   "notifications": {
     "title": "Notifikasi",
