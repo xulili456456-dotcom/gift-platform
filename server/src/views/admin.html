@@ -420,15 +420,11 @@ async function rejectKyc(id){
   try{await api('PUT','/kyc/admin/'+id,{status:'rejected'});showToast('实名认证已拒绝');loadKyc(document.getElementById('content'))}catch(e){showToast(e.message,1)}
 }
 
-function viewKycImage(img) {
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center';
-  overlay.onclick = function() { overlay.remove(); };
-  const bigImg = document.createElement('img');
-  bigImg.src = img.src;
-  bigImg.style.cssText = 'max-width:95%;max-height:95%;object-fit:contain';
-  overlay.appendChild(bigImg);
-  document.body.appendChild(overlay);
+function viewKycImage(el) {
+  var src = el.getAttribute('src');
+  var w = window.open('');
+  w.document.write('<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="' + src + '" style="max-width:100vw;max-height:100vh;cursor:pointer" onclick="window.close()"></body></html>');
+  w.document.close();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
