@@ -307,6 +307,19 @@ router.get('/audit-log', async (req, res) => {
   res.json(rows);
 });
 
+// ========== Convert referral codes to numeric ==========
+router.post('/convert-referral-codes', async (req, res) => {
+  const users = await all("SELECT id FROM users WHERE NOT (referral_code ~ '^[0-9]+$') ORDER BY id");
+  let count = 0;
+  for (const u of users) {
+    await run('UPDATE users SET referral_code = ? WHERE id = ?', [String(100001 + count), u.id]);
+    count++;
+  }
+  await run("INSERT INTO admin_settings (key, value) VALUES ('referral_counter', ?) ON CONFLICT (key) DO UPDATE SET value = ?", [String(100000 + count), String(100000 + count)]);
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, detail) VALUES (?,?,?)', [req.user.id, 'convert_codes', count+' users']); } catch {}
+  res.json({ ok: true, converted: count });
+});
+
 // ========== Enhanced Users with Filters ==========
 router.get('/users-filtered', async (req, res) => {
   const { page = 1, limit = 20, search = '', kyc = '', frozen = '', tier = '' } = req.query;
