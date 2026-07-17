@@ -529,34 +529,52 @@ export default function StorePage() {
     );
   }
 
-  // ==== Product List Page ====
+  // ==== Product List Page (Amazon-style) ====
   return (
-    <div className="bg-white safe-top flex flex-col min-h-screen">
-      {/* Header with Search */}
-      <div className="shrink-0 bg-[#FF5000] px-4 pt-10 pb-3">
-        <div className="flex items-center bg-white/20 rounded-full px-4 py-2">
-          <Search size={16} className="text-white/70" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..." className="flex-1 ml-2 text-sm text-white bg-transparent outline-none placeholder:text-white/50" />
-          {search && <button onClick={() => setSearch('')} className="text-white/70"><X size={16} /></button>}
+    <div className="bg-[#ffffff] safe-top flex flex-col min-h-screen">
+      {/* Top Nav Bar */}
+      <div className="shrink-0 bg-[#FF5000] text-white">
+        <div className="px-3 py-2 flex items-center gap-3">
+          <div className="flex items-center gap-1.5 bg-white/10 rounded-full px-3 py-1">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{background: ti.color}}><Store size={12} className="text-white" /></div>
+            <span className="text-[11px] font-medium">{t(ti.nameKey)}</span>
+          </div>
+          <span className="text-[10px] text-white/60 flex-1">{t('store.today')}: <b className="text-white">${s.todayEarnings.toFixed(2)}</b></span>
+          <button onClick={() => navigate('/mine/notifications')} className="relative p-1" title={t('store.bellHint')} aria-label={t('store.bellHint')}>
+            <Bell size={18} />
+            {notifCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#CC0C39] text-white text-[9px] font-bold rounded-full flex items-center justify-center">{notifCount}</span>}
+          </button>
+        </div>
+        <div className="px-3 pb-2.5">
+          <div className="flex items-center bg-white rounded-lg overflow-hidden">
+            <Search size={14} className="ml-3 text-[#565959]" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('store.searchPlaceholder')} className="flex-1 px-2 py-2.5 text-[13px] text-[#0F1111] bg-transparent outline-none placeholder:text-[#999999]" />
+            {search && <button onClick={() => setSearch('')} className="px-3 text-[#565959]"><X size={14} /></button>}
+          </div>
         </div>
       </div>
 
-      {/* Simple Filter Pills */}
-      <div className="shrink-0 bg-white px-4 py-2 flex gap-2 border-b border-gray-100">
-        {['All','Digital','Home','Beauty','Food','Auto'].map(cat => (
-          <button key={cat} onClick={() => setCatIdx(CAT_VALUES.indexOf(cat === 'All' ? 'All' : cat))}
-            className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
-              CAT_VALUES[catIdx] === cat || (cat === 'All' && catIdx === 0) ? 'bg-[#FF5000] text-white' : 'bg-gray-100 text-gray-600'
-            }`}>{cat}</button>
+      {/* Category Chips */}
+      <div className="shrink-0 bg-white border-b border-[#e7e7e7] px-2 flex gap-1.5 overflow-x-auto scrollbar-none py-2.5">
+        {CAT_KEYS.map((c, i) => (
+          <button key={c} onClick={() => setCatIdx(i)}
+            className={`shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-medium transition-colors ${
+              catIdx === i ? 'bg-[#FF5000] text-white' : 'text-[#0F1111] bg-gray-50 hover:bg-[#e7e7e7]'
+            }`}>{t(c)}</button>
         ))}
       </div>
 
-      {/* Sort Row */}
-      <div className="shrink-0 bg-white px-4 py-2 flex gap-3 border-b border-gray-100">
-        <button onClick={() => { setSortMode('profit'); setAffordableOnly(false); }} className={`text-xs font-medium ${sortMode==='profit'?'text-[#FF5000]':'text-gray-500'}`}>🔥 Hot</button>
-        <button onClick={() => { setSortMode('price'); setAffordableOnly(false); }} className={`text-xs font-medium ${sortMode==='price'?'text-[#FF5000]':'text-gray-500'}`}>💰 Price</button>
-        <button onClick={() => { setSortMode('free'); setAffordableOnly(false); }} className={`text-xs font-medium ${sortMode==='free'?'text-[#FF5000]':'text-gray-500'}`}>🎁 Free ({s.freeRemaining||0})</button>
-        <button onClick={() => setTab('funds')} className="text-xs text-gray-400 ml-auto">Funds →</button>
+      {/* Tab Bar */}
+      <div className="shrink-0 bg-white border-b border-[#e7e7e7] flex">
+        {[
+          ['products', '🛒', t('store.products') || 'Products'],
+          ['funds', '💰', 'Funds'],
+        ].map(([key, icon, label]) => (
+          <button key={key} onClick={() => setTab(key)}
+            className={`flex-1 py-2.5 text-[11px] font-bold text-center border-b-2 transition-colors ${
+              tab === key ? 'border-[#FF5000] text-[#FF5000]' : 'border-transparent text-[#565959]'
+            }`}>{icon} {label}</button>
+        ))}
       </div>
 
       {/* Products Tab */}
