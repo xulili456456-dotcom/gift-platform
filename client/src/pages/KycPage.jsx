@@ -44,6 +44,8 @@ export default function KycPage() {
     unverified: { icon: AlertCircle, color: 'text-text-muted', bg: 'bg-bg', label: t('kyc.unverified'), desc: t('kyc.unverifiedDesc') },
     pending: { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50', label: t('kyc.pending'), desc: t('kyc.pendingDesc') },
     verified: { icon: CheckCircle, color: 'text-success', bg: 'bg-success/5', label: t('kyc.verified'), desc: t('kyc.verifiedDesc') },
+    approved: { icon: CheckCircle, color: 'text-success', bg: 'bg-success/5', label: t('kyc.verified'), desc: t('kyc.verifiedDesc') },
+    rejected: { icon: AlertCircle, color: 'text-text-muted', bg: 'bg-bg', label: t('kyc.unverified'), desc: t('kyc.unverifiedDesc') },
   };
 
   const current = statusCfg[kyc?.status || 'unverified'];
@@ -72,7 +74,7 @@ export default function KycPage() {
           </div>
         </div>
 
-        {kyc && kyc.status !== 'unverified' && (
+        {kyc && kyc.status !== 'unverified' && kyc.status !== 'rejected' && (
           <div className="bg-white rounded-2xl p-5 border border-separator shadow-sm space-y-3">
             <h3 className="text-[14px] font-bold text-text">{t('kyc.submittedInfo')}</h3>
             <div className="grid grid-cols-2 gap-3 text-[12px]">
@@ -92,7 +94,7 @@ export default function KycPage() {
           </div>
         )}
 
-        {(!kyc || kyc.status === 'unverified') && (
+        {(!kyc || kyc.status === 'unverified' || kyc.status === 'rejected') && (
           <div className="bg-white rounded-2xl p-5 border border-separator shadow-sm space-y-4">
             <h3 className="text-[14px] font-bold text-text">{t('kyc.submitForm')}</h3>
 
