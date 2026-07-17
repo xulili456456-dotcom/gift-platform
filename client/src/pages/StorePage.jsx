@@ -338,6 +338,9 @@ export default function StorePage() {
   useEffect(() => { loadStatus(); loadEarnings(); checkSell(); loadHoldings(); client.get('/notifications').then(({data}) => setNotifCount(data.unread||0)).catch(()=>{}); }, []);
   useEffect(() => { client.get('/store/analytics').then(({data}) => setAnalytics(data)).catch(()=>{}); }, [status?.store?.doneToday]);
   useEffect(() => { client.get(`/store/orders-history?period=${orderPeriod}`).then(({data}) => setOrderHistory(data)).catch(()=>{}); }, [orderPeriod, status?.store?.doneToday]);
+  const [freeProducts, setFreeProducts] = useState([]);
+  const [freeRemaining, setFreeRemaining] = useState(0);
+  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); }).catch(()=>{}); }, [status?.store?.doneToday]);
 
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
@@ -373,9 +376,6 @@ export default function StorePage() {
   const [showDeposit, setShowDeposit] = useState(false);
   const [depositAmount, setDepositAmount] = useState('');
   const [depositMsg, setDepositMsg] = useState('');
-  const [freeProducts, setFreeProducts] = useState([]);
-  const [freeRemaining, setFreeRemaining] = useState(0);
-  useEffect(() => { client.get('/store/free-products').then(({data}) => { console.log('Free products:', data); setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); }).catch(err => console.error('Free products error:', err)); }, [status?.store?.doneToday]);
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
     if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
