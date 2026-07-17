@@ -368,6 +368,9 @@ export default function StorePage() {
   const [showDailyFull, setShowDailyFull] = useState(false);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [expandedHolding, setExpandedHolding] = useState(null);
+  const [showDeposit, setShowDeposit] = useState(false);
+  const [depositAmount, setDepositAmount] = useState('');
+  const [depositMsg, setDepositMsg] = useState('');
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
     if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
@@ -392,15 +395,6 @@ export default function StorePage() {
       else if (d?.error?.includes('daily') || d?.error?.includes('limit')) setShowDailyFull(true);
       else toast.error(d?.error || t('common.operationFailed'));
     }
-  };
-  const [showDeposit, setShowDeposit] = useState(false);
-  const [depositAmount, setDepositAmount] = useState('');
-  const [depositMsg, setDepositMsg] = useState('');
-  const handleDeposit = async () => {
-    const amt = parseFloat(depositAmount);
-    if (!amt || amt < 1) { toast.error(t('store.depositMinMax')); return; }
-    try { await client.post('/store/deposit', { amount: amt }); toast.success(t('store.depositSuccess') || 'Deposited!'); setShowDeposit(false); setDepositAmount(''); loadStatus(); loadEarnings(); }
-    catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
   };
   const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
 
