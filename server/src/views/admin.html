@@ -400,7 +400,7 @@ async function loadKyc(c){
             <td>${k.real_name||'-'}</td>
             <td style="font-size:11px">${k.id_number||'-'}</td>
             <td>${k.doc_type||'-'}</td>
-            <td>${k.front_image?`<a href="${k.front_image}" target="_blank" style="color:var(--blue);font-size:11px">正面</a>`:''} ${k.back_image?`<a href="${k.back_image}" target="_blank" style="color:var(--blue);font-size:11px">反面</a>`:''}</td>
+            <td style="display:flex;gap:8px">${k.front_image?`<a href="${k.front_image}" target="_blank"><img src="${k.front_image}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border)" title="正面"></a>`:'无'} ${k.back_image?`<a href="${k.back_image}" target="_blank"><img src="${k.back_image}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border)" title="反面"></a>`:''}</td>
             <td><span class="badge ${k.status==='approved'?'badge-green':k.status==='pending'?'badge-yellow':'badge-red'}">${k.status==='approved'?'已通过':k.status==='pending'?'待审核':'已拒绝'}</span></td>
             <td style="font-size:10px">${new Date(k.submitted_at).toLocaleString()}</td>
             <td>${k.status==='pending'?`
