@@ -58,7 +58,7 @@ export default function NotificationsPage() {
                       {!n.is_read && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
                     </div>
                     {n.body && <p className="text-[12px] text-text-muted mt-0.5">{n.body}</p>}
-                    <p className="text-[10px] text-text-muted mt-1">{n.created_at?.slice(0, 16)}</p>
+                    <p className="text-[10px] text-text-muted mt-1">{n.created_at ? new Date(n.created_at).toLocaleString() : ''}</p>
                   </div>
                 </div>
               </div>
