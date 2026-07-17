@@ -388,17 +388,24 @@ export default function StorePage() {
       toast.error(d?.detail ? `${d.error}\n\n${d.detail}` : (d?.error || 'Withdraw failed'), { duration: 8000 });
     }
   };
-  const handleBuy = async (product) => {
+  const [buyConfirm, setBuyConfirm] = useState(null);
+  const [buying, setBuying] = useState(false);
+  const handleBuy = (product) => { setBuyConfirm(product); };
+  const handleConfirmBuy = async () => {
+    if (!buyConfirm) return;
+    setBuying(true);
     try {
-      const { data } = await client.post('/store/orders/process', { productPrice: product.price, productName: product.name });
+      const { data } = await client.post('/store/orders/process', { productPrice: buyConfirm.price, productName: buyConfirm.name });
       toast.success(`${t('store.boughtMsg')} ${new Date(data.sellBy).toLocaleDateString()}`);
+      setBuyConfirm(null);
       loadStatus(); loadHoldings(); loadEarnings();
     } catch (err) {
       const d = err.response?.data;
-      if (d?.depositRequired) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, isDeposit: true, balance: d.balance });
-      else if (d?.shortage) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, balance: d.balance, deposit: d.deposit });
+      if (d?.depositRequired) { setBuyConfirm(null); setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, isDeposit: true, balance: d.balance }); }
+      else if (d?.shortage) { setBuyConfirm(null); setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, balance: d.balance, deposit: d.deposit }); }
       else toast.error(d?.error || t('common.operationFailed'));
     }
+    setBuying(false);
   };
   const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
 
@@ -995,6 +1002,33 @@ export default function StorePage() {
         </div>
       </div>
       </>)}
+
+      {/* Buy Confirmation Modal */}
+      {buyConfirm && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setBuyConfirm(null)}>
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
+            <span className="text-3xl block text-center mb-3">🛒</span>
+            <h3 className="text-base font-bold text-[#0F1111] mb-1">Confirm Purchase</h3>
+            <p className="text-[11px] text-[#565959] mb-3 line-clamp-2">{buyConfirm.name}</p>
+            <div className="bg-[#f0f2f2] rounded-lg p-3 mb-4 space-y-1.5 text-sm">
+              <div className="flex justify-between"><span className="text-[#565959]">Market Price</span><span className="font-bold text-[#0F1111]">${buyConfirm.price.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-[#565959]">Cost (85%)</span><span className="font-bold text-[#0F1111]">${buyConfirm.costPrice.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-[#565959]">Profit</span><span className="font-bold text-[#067D62]">+${buyConfirm.profit.toFixed(2)}</span></div>
+              <div className="flex justify-between border-t border-[#ddd] pt-1.5 mt-1.5"><span className="text-[#565959]">Total Return</span><span className="font-bold text-[#0F1111]">${(buyConfirm.costPrice + buyConfirm.profit).toFixed(2)}</span></div>
+            </div>
+            <div className="text-[10px] text-[#565959] mb-4">
+              <p>💰 Balance: ${s.balance.toFixed(2)} · 🔒 Deposit: ${(s.deposit||0).toFixed(2)}</p>
+              <p>Hold time: 6-30 hours · Profit: {PROFIT_RATE * 100}%</p>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setBuyConfirm(null)} className="flex-1 py-2.5 rounded-lg text-sm font-medium bg-[#f0f2f2] text-[#0F1111]">Cancel</button>
+              <button onClick={handleConfirmBuy} disabled={buying} className="flex-1 py-2.5 rounded-lg text-sm font-bold bg-[#FFD814] text-[#0F1111] border border-[#FCD200]">
+                {buying ? '...' : `Buy $${buyConfirm.costPrice.toFixed(2)}`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
