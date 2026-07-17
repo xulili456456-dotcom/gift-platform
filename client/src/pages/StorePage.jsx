@@ -933,7 +933,8 @@ export default function StorePage() {
           <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in text-center" onClick={e => e.stopPropagation()}>
             <span className="text-5xl mb-3 block">📅</span>
             <h3 className="text-lg font-bold text-[#0F1111] mb-1">{t('store.dailyLimitReached')}</h3>
-            <p className="text-sm text-[#565959] mb-4">{t('store.dailyLimitMsg')}</p>
+            <p className="text-sm text-[#565959] mb-1">{t('store.dailyLimitMsg')}</p>
+            <p className="text-xs text-[#999] mb-4">Today: <b className="text-[#0F1111]">{s.doneToday}/{s.dailyOrders}</b> · Balance: <b className="text-[#0F1111]">${s.balance.toFixed(2)}</b> · Deposit: <b className="text-[#0F1111]">${(s.deposit||0).toFixed(2)}</b></p>
             <button onClick={() => setShowDailyFull(false)} className="w-full py-2.5 bg-[#FFD814] text-[#0F1111] font-bold rounded-xl text-sm">{t('store.gotIt')}</button>
           </div>
         </div>
