@@ -28,18 +28,19 @@ function toPgInsert(sql) {
 
 function getPool() {
   if (!pool) {
-    const pgOpts = config.DATABASE_URL.includes('?')
-      ? config.DATABASE_URL + '&options=-c+client_encoding%3DUTF8'
-      : config.DATABASE_URL + '?options=-c+client_encoding%3DUTF8';
+    // Force UTF-8 at the process level and connection level
+    process.env.PGCLIENTENCODING = 'UTF8';
     pool = new Pool({
-      connectionString: pgOpts,
+      connectionString: config.DATABASE_URL,
       ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
       max: 5,
       idleTimeoutMillis: 30000,
     });
     pool.on('connect', async (client) => {
       await client.query("SET client_encoding TO 'UTF8'");
-      await client.query("SET lc_messages TO 'en_US.UTF-8'");
+    });
+    pool.on('error', (err) => {
+      console.error('PG Pool error:', err.message);
     });
   }
   return pool;
