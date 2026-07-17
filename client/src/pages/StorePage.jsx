@@ -395,8 +395,8 @@ export default function StorePage() {
       loadStatus(); loadHoldings(); loadEarnings();
     } catch (err) {
       const d = err.response?.data;
-      if (d?.depositRequired) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, isDeposit: true });
-      else if (d?.shortage) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage });
+      if (d?.depositRequired) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, isDeposit: true, balance: d.balance });
+      else if (d?.shortage) setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, balance: d.balance, deposit: d.deposit });
       else toast.error(d?.error || t('common.operationFailed'));
     }
   };
@@ -506,6 +506,7 @@ export default function StorePage() {
                 <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#FFB84D]">${showInsufficient.need?.toFixed(2)}</b></p>
                 <p className="text-[#565959]">{t('store.have') || 'Available'}: <b className="text-[#0F1111]">${showInsufficient.have?.toFixed(2)}</b></p>
                 <p className="text-[#565959]">{t('store.shortage') || 'Shortage'}: <b className="text-[#FFB84D]">${showInsufficient.shortage?.toFixed(2)}</b></p>
+                {showInsufficient.balance != null && <p className="text-[10px] text-[#999]">💰 Balance: ${showInsufficient.balance?.toFixed(2)} · 🔒 Deposit: ${(showInsufficient.deposit||0).toFixed(2)}</p>}
               </div>
               <div className="bg-[#f0f2f2] rounded-lg p-3 mb-4 text-xs text-[#565959] space-y-1">
                 <p className="font-bold text-[#0F1111]">💡 {t('store.howToEarn') || 'How to get funds'}:</p>
@@ -848,6 +849,7 @@ export default function StorePage() {
               <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#FFB84D]">${showInsufficient.need?.toFixed(2)}</b></p>
               <p className="text-[#565959]">{t('store.have') || 'Available'}: <b className="text-[#0F1111]">${showInsufficient.have?.toFixed(2)}</b></p>
               <p className="text-[#565959]">{t('store.shortage') || 'Shortage'}: <b className="text-[#FFB84D]">${showInsufficient.shortage?.toFixed(2)}</b></p>
+              {showInsufficient.balance != null && <p className="text-[10px] text-[#999]">💰 Balance: ${showInsufficient.balance?.toFixed(2)} · 🔒 Deposit: ${(showInsufficient.deposit||0).toFixed(2)}</p>}
             </div>
             <div className="bg-[#f0f2f2] rounded-lg p-3 mb-4 text-xs text-[#565959] space-y-1">
               <p className="font-bold text-[#0F1111]">💡 {t('store.howToEarn') || 'How to get funds'}:</p>

@@ -176,7 +176,8 @@ router.post('/orders/process', async (req, res) => {
   if (available < cost) {
     return res.status(400).json({
       error: 'Insufficient balance',
-      need: cost, have: Math.max(0, available), shortage: Math.max(0, Math.round((cost - available) * 100) / 100)
+      need: cost, have: Math.max(0, available), shortage: Math.max(0, Math.round((cost - available) * 100) / 100),
+      balance: Number(availBal?.total || 0), deposit,
     });
   }
 
