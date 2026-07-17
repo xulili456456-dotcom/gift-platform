@@ -397,6 +397,8 @@ export default function StorePage() {
     try {
       const { data } = await client.post('/store/orders/process', { productPrice: buyConfirm.price, productName: buyConfirm.name });
       toast.success(`${t('store.boughtMsg')} ${new Date(data.sellBy).toLocaleDateString()}`);
+      // Instant balance update
+      setStatus(prev => prev?.store ? { ...prev, store: { ...prev.store, balance: prev.store.balance - buyConfirm.costPrice, doneToday: prev.store.doneToday + 1 } } : prev);
       setBuyConfirm(null);
       loadStatus(); loadHoldings(); loadEarnings();
     } catch (err) {
