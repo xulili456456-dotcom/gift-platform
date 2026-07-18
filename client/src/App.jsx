@@ -99,6 +99,7 @@ export default function App() {
           <Route path="/home" element={<HomePage />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/store" element={<StorePage />} />
+          <Route path="/store/funds" element={<StorePage tab="funds" />} />
           <Route path="/mine" element={<MinePage />} />
           <Route path="/mine/team" element={<Lazy Comp={TeamPage} />} />
           <Route path="/mine/wallet" element={<Lazy Comp={WalletPage} />} />
