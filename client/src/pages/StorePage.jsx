@@ -582,9 +582,9 @@ export default function StorePage() {
           <div style={{fontSize:9,color:'#999',marginTop:1}}>Free Orders</div>
         </div>
         <div style={{width:1,background:'#f0f0f0',margin:'4px 0'}} />
-        <div onClick={() => navigate('/store/funds')} style={{flex:1,textAlign:'center',cursor:'pointer'}}>
+        <div style={{flex:1,textAlign:'center'}}>
           <div style={{fontSize:17,fontWeight:800,color:'#333'}}>${(s.deposit||0).toFixed(0)}</div>
-          <span style={{display:'inline-block',marginTop:2,padding:'2px 10px',background:'#f0f0f0',borderRadius:8,fontSize:9,color:'#666',fontWeight:600}}>Security →</span>
+          <div style={{fontSize:9,color:'#999',marginTop:1}}>Guarantee</div>
         </div>
         <div style={{width:1,background:'#f0f0f0',margin:'4px 0'}} />
         <div style={{flex:1,textAlign:'center'}}>
