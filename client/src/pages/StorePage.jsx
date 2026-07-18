@@ -321,7 +321,7 @@ export default function StorePage() {
   const [earnings, setEarnings] = useState({ todayProfit: 0, totalProfit: 0, totalOrders: 0, balance: 0, tomorrowEstimate: 0, dailyGoal: 20 });
   const [sortMode, setSortMode] = useState('profit'); // 'profit' | 'price' | 'sales'
   const [affordableOnly, setAffordableOnly] = useState(false);
-  const [tab, setTab] = useState('products');
+  const [tab, setTab] = useState('products'); // 'dashboard' | 'products' | 'orders'
   const [analytics, setAnalytics] = useState(null);
   const [orderHistory, setOrderHistory] = useState(null);
   const [orderPeriod, setOrderPeriod] = useState('today');
@@ -543,62 +543,6 @@ export default function StorePage() {
             </div>
           </div>
         )}
-      </div>
-    );
-  }
-
-  // ==== Funds Fullscreen ====
-  if (tab === 'funds') {
-    return (
-      <div style={{position:'fixed',inset:0,zIndex:999,background:'#fff',overflowY:'auto'}}>
-        <div style={{background:'#0f0f0f',padding:'6px 16px 10px',display:'flex',alignItems:'center',gap:12}}>
-          <button onClick={() => setTab('products')} style={{background:'none',border:'none',cursor:'pointer',padding:4}}>
-            <ChevronLeft size={22} color="#fff" />
-          </button>
-          <span style={{fontSize:14,fontWeight:700,color:'#fff'}}>Funds</span>
-        </div>
-        <div className="p-3 space-y-3">
-          {/* Balance & Deposit Cards */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-white rounded-xl p-4 border border-gray-100">
-              <p className="text-[10px] text-[#565959] mb-1">💰 Balance</p>
-              <p className="text-2xl font-bold text-[#0F1111]">${s.balance.toFixed(2)}</p>
-            </div>
-            <div className="bg-white rounded-xl p-4 border border-gray-100">
-              <p className="text-[10px] text-[#565959] mb-1">🔒 Deposit</p>
-              <p className="text-2xl font-bold text-[#0F1111]">${(s.deposit||0).toFixed(2)}</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
-              <p className="text-[9px] text-[#565959]">📊 Max Trade</p>
-              <p className="text-sm font-bold text-[#0F1111]">${(s.maxTrade||0).toFixed(0)}</p>
-            </div>
-            <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
-              <p className="text-[9px] text-[#565959]">🔥 Free Orders</p>
-              <p className="text-sm font-bold text-[#0F1111]">{s.freeRemaining||0}/5</p>
-            </div>
-            <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
-              <p className="text-[9px] text-[#565959]">📈 Today Earned</p>
-              <p className="text-sm font-bold text-[#067D62]">+${earnings.todayProfit.toFixed(2)}</p>
-            </div>
-          </div>
-          <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <h3 className="text-sm font-bold text-[#0F1111] mb-3">💳 Manage Deposit</h3>
-            <p className="text-[10px] text-[#565959] mb-2">Deposit acts as collateral. 1:1 ratio.</p>
-            <div className="flex items-center gap-2 mb-3">
-              <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="Amount" className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none" />
-              <button onClick={handleDeposit} className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[#FF5000] text-white">+ Deposit</button>
-            </div>
-            {depositMsg && <p className="text-xs text-[#067D62] font-bold mb-2">{depositMsg}</p>}
-            {(s.deposit||0) > 0 && (
-              <button onClick={handleWithdrawDeposit} className="w-full py-2.5 rounded-xl text-sm font-bold bg-[#FFF0F0] text-[#CC0C39] border border-[#FFCDD2]">
-                ↩ Withdraw All Deposit (${(s.deposit||0).toFixed(2)})
-              </button>
-            )}
-          </div>
-          <div className="h-4" />
-        </div>
       </div>
     );
   }
