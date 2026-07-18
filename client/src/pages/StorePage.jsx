@@ -557,10 +557,10 @@ export default function StorePage() {
           <span style={{fontSize:14,fontWeight:700,color:'#fff'}}>My Little Shop</span>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
-          <span style={{fontSize:12,color:'#999',fontWeight:500}}>${s.balance.toFixed(0)}</span>
-          <button onClick={() => navigate('/store/funds')} style={{padding:'4px 10px',background:'rgba(255,80,0,.15)',color:'#FF5000',borderRadius:14,border:'none',fontSize:10,fontWeight:600,cursor:'pointer'}}>💰 Funds</button>
-          <button onClick={() => navigate('/mine/notifications')} style={{position:'relative',padding:2,background:'none',border:'none',cursor:'pointer'}}>
-            <Bell size={20} color="#fff" />
+          <span style={{fontSize:14,color:'#999',fontWeight:600}}>${s.balance.toFixed(0)}</span>
+          <button onClick={() => navigate('/store/funds')} style={{padding:'5px 12px',background:'rgba(255,80,0,.15)',color:'#FF5000',borderRadius:14,border:'none',fontSize:11,fontWeight:600,cursor:'pointer'}}>💰 Funds</button>
+          <button onClick={() => navigate('/mine/notifications')} style={{position:'relative',padding:3,background:'none',border:'none',cursor:'pointer'}}>
+            <Bell size={22} color="#fff" />
             {notifCount > 0 && <span style={{position:'absolute',top:2,right:3,width:7,height:7,background:'#FF3B30',borderRadius:'50%',border:'2px solid #0f0f0f'}} />}
           </button>
         </div>
