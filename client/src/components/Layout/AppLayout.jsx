@@ -26,7 +26,7 @@ export default function AppLayout() {
   const showTopBar = !isAdminPage && !isHomePage && !isMineRoot && !isMineSubPage;
 
   return (
-    <div className="page-container flex flex-col min-h-dvh bg-bg">
+    <div className="page-container flex flex-col h-dvh bg-bg overflow-hidden">
       {/* TopBar - Tasks page (in-flow, not fixed) */}
       {showTopBar && <TopBar title={title} fixed={false} />}
 
@@ -35,7 +35,7 @@ export default function AppLayout() {
 
       {/* Mine sub-pages: no TopBar, own header */}
 
-      <main className="flex-1">
+      <main className="flex-1 overflow-y-auto">
         <Outlet />
       </main>
 
