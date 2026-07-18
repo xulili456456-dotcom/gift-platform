@@ -46,7 +46,7 @@ export default function StoreFundsPage() {
   const s = status.store;
 
   return (
-    <div className="min-h-screen bg-gray-50" style={{maxWidth:430,margin:'0 auto'}}>
+    <div className="min-h-screen bg-gray-50" style={{maxWidth:430,margin:'0 auto',paddingBottom:80}}>
       {/* Header */}
       <div style={{background:'#0f0f0f',padding:'8px 16px 12px',display:'flex',alignItems:'center',gap:12}}>
         <button onClick={() => navigate('/store')} style={{background:'none',border:'none',cursor:'pointer',padding:0,fontSize:20,color:'#fff'}}>←</button>

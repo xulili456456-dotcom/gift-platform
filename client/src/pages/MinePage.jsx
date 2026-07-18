@@ -59,7 +59,7 @@ export default function MinePage() {
   );
 
   return (
-    <div style={{background:'#f2f2f7',minHeight:'100vh',maxWidth:430,margin:'0 auto'}}>
+    <div style={{background:'#f2f2f7',minHeight:'100vh',paddingBottom:80,maxWidth:430,margin:'0 auto'}}>
       {/* Profile Header */}
       <div style={{padding:'44px 20px 24px',background:'#fff'}}>
         <div style={{display:'flex',alignItems:'center',gap:14}}>
