@@ -92,12 +92,12 @@ export default function WithdrawPage() {
 
             <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Network</div>
             <div style={{background:'#f5f5f5',borderRadius:12,padding:'12px 14px',marginBottom:12,fontSize:13,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-              <span>{wallet.network?.toUpperCase()} (USDT)</span>
+              <span>{wallet?.network?.toUpperCase()||'Not set'} (USDT)</span>
               <button onClick={()=>navigate('/mine/wallet')} style={{background:'none',border:'none',color:'#FF5000',fontSize:11,cursor:'pointer'}}>Change</button>
             </div>
 
             <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Wallet Address</div>
-            <div style={{background:'#f5f5f5',borderRadius:12,padding:'12px 14px',fontSize:11,color:'#999',wordBreak:'break-all',marginBottom:4}}>{wallet.address}</div>
+            <div style={{background:'#f5f5f5',borderRadius:12,padding:'12px 14px',fontSize:11,color:'#999',wordBreak:'break-all',marginBottom:4}}>{wallet?.address||'Not set'}</div>
             <div style={{fontSize:10,color:'#999',marginBottom:12}}>Double-check your address. Withdrawals cannot be reversed.</div>
 
             <button onClick={()=>{if(parseFloat(amount)<10){toast.error('Minimum $10');return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0}
