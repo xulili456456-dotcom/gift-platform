@@ -773,6 +773,13 @@ export default function StorePage() {
       </>)}
       {/* Funds Tab */}
       {tab === 'funds' && (<>
+      {/* Funds Header with back button */}
+      <div style={{background:'#0f0f0f',padding:'6px 16px 10px',display:'flex',alignItems:'center',gap:12}}>
+        <button onClick={() => setTab('products')} style={{background:'none',border:'none',cursor:'pointer',padding:4}}>
+          <ChevronLeft size={22} color="#fff" />
+        </button>
+        <span style={{fontSize:14,fontWeight:700,color:'#fff'}}>Funds</span>
+      </div>
       <div className="flex-1 overflow-y-auto bg-[#ffffff]">
         <div className="p-3 space-y-3">
           {/* Balance & Deposit Cards */}
