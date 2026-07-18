@@ -475,9 +475,9 @@ export default function StorePage() {
 
             {/* Deposit Check */}
             <div style={{background:'#f8f8f8',borderRadius:12,padding:14,marginBottom:12}}>
-              <div style={{fontSize:10,color:'#999',marginBottom:8}}>DEPOSIT CHECK</div>
+              <div style={{fontSize:10,color:'#999',marginBottom:8}}>SECURITY CHECK</div>
               <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:12}}><span style={{color:'#666'}}>Required</span><span style={{fontWeight:600,color:'#333'}}>${p.costPrice.toFixed(2)}</span></div>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:12}}><span style={{color:'#666'}}>Your Deposit</span><span style={{fontWeight:600,color:'#333'}}>${(s.deposit||0).toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:12}}><span style={{color:'#666'}}>Your Security Deposit</span><span style={{fontWeight:600,color:'#333'}}>${(s.deposit||0).toFixed(2)}</span></div>
               <div style={{display:'flex',justifyContent:'space-between',fontSize:12}}><span style={{color:'#666'}}>Status</span>{(s.deposit||0)>=p.costPrice?<span style={{fontWeight:700,color:'#00A86B'}}>✓ Covered</span>:<span style={{fontWeight:700,color:'#CC0C39'}}>Short ${(p.costPrice-(s.deposit||0)).toFixed(2)}</span>}</div>
             </div>
 
@@ -512,8 +512,8 @@ export default function StorePage() {
                 <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Total Return</span><span style={{fontWeight:700}}>${(buyConfirm.costPrice+buyConfirm.profit).toFixed(2)}</span></div>
               </div>
               <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:12}}>
-                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Required Deposit</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
-                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Your Deposit</span><span style={{fontWeight:600}}>${(s.deposit||0).toFixed(2)}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Required Security</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Your Security Deposit</span><span style={{fontWeight:600}}>${(s.deposit||0).toFixed(2)}</span></div>
                 <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Status</span>{(s.deposit||0)>=buyConfirm.costPrice?<span style={{fontWeight:700,color:'#00A86B'}}>✓ Covered</span>:<span style={{fontWeight:700,color:'#CC0C39'}}>Short ${(buyConfirm.costPrice-(s.deposit||0)).toFixed(2)}</span>}</div>
               </div>
               <div style={{display:'flex',gap:8}}>
@@ -527,7 +527,7 @@ export default function StorePage() {
         {showInsufficient && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowInsufficient(null)}>
             <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
-              <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {showInsufficient?.isDeposit ? (t('store.depositRequired')||'Deposit Required') : (t('store.insufficient')||'Insufficient Balance')}</p>
+              <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {showInsufficient?.isDeposit ? (t('store.depositRequired')||'Security Security Deposit Required') : (t('store.insufficient')||'Insufficient Balance')}</p>
               <div className="space-y-1.5 mb-4 text-sm">
                 <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#FFB84D]">${showInsufficient.need?.toFixed(2)}</b></p>
                 <p className="text-[#565959]">{t('store.have') || 'Available'}: <b className="text-[#0F1111]">${showInsufficient.have?.toFixed(2)}</b></p>
@@ -590,7 +590,7 @@ export default function StorePage() {
         <div style={{width:1,background:'#f0f0f0',margin:'4px 0'}} />
         <div onClick={() => navigate('/store/funds')} style={{flex:1,textAlign:'center',cursor:'pointer'}}>
           <div style={{fontSize:17,fontWeight:800,color:'#333'}}>${(s.deposit||0).toFixed(0)}</div>
-          <span style={{display:'inline-block',marginTop:2,padding:'2px 10px',background:'#f0f0f0',borderRadius:8,fontSize:9,color:'#666',fontWeight:600}}>Deposit →</span>
+          <span style={{display:'inline-block',marginTop:2,padding:'2px 10px',background:'#f0f0f0',borderRadius:8,fontSize:9,color:'#666',fontWeight:600}}>Security →</span>
         </div>
         <div style={{width:1,background:'#f0f0f0',margin:'4px 0'}} />
         <div style={{flex:1,textAlign:'center'}}>
@@ -625,7 +625,7 @@ export default function StorePage() {
           <span style={{fontSize:16}}>🔥</span>
           <div style={{flex:1}}>
             <div style={{fontSize:12,fontWeight:600,color:'#FF5000'}}>{s.freeRemaining} free trades remaining</div>
-            <div style={{fontSize:10,color:'#999',marginTop:1}}>No deposit needed for items under $50</div>
+            <div style={{fontSize:10,color:'#999',marginTop:1}}>No security deposit needed for items under $50</div>
           </div>
         </div>
       )}
@@ -643,7 +643,7 @@ export default function StorePage() {
         {(s.freeRemaining || 0) > 0 && (
           <div className="mt-1.5 bg-[#FFF8E1] border border-[#FFB800] rounded-xl px-3 py-1.5 flex items-center gap-2">
             <span className="text-sm">🔥</span>
-            <span className="text-[10px] text-[#0F1111] font-bold">{s.freeRemaining} free orders left today! No deposit needed for items ≤ $50</span>
+            <span className="text-[10px] text-[#0F1111] font-bold">{s.freeRemaining} free orders left today! No security deposit needed for items ≤ $50</span>
           </div>
         )}
       </div>
@@ -731,7 +731,7 @@ export default function StorePage() {
       {showInsufficient && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowInsufficient(null)}>
           <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
-            <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {showInsufficient?.isDeposit ? (t('store.depositRequired')||'Deposit Required') : (t('store.insufficient')||'Insufficient Balance')}</p>
+            <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {showInsufficient?.isDeposit ? (t('store.depositRequired')||'Security Security Deposit Required') : (t('store.insufficient')||'Insufficient Balance')}</p>
             <div className="space-y-1.5 mb-4 text-sm">
               <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#FFB84D]">${showInsufficient.need?.toFixed(2)}</b></p>
               <p className="text-[#565959]">{t('store.have') || 'Available'}: <b className="text-[#0F1111]">${showInsufficient.have?.toFixed(2)}</b></p>
@@ -789,7 +789,7 @@ export default function StorePage() {
               <p className="text-2xl font-bold text-[#0F1111]">${s.balance.toFixed(2)}</p>
             </div>
             <div className="bg-white rounded-xl p-4 border border-gray-100">
-              <p className="text-[10px] text-[#565959] mb-1">🔒 Deposit</p>
+              <p className="text-[10px] text-[#565959] mb-1">🔒 Security</p>
               <p className="text-2xl font-bold text-[#0F1111]">${(s.deposit||0).toFixed(2)}</p>
             </div>
           </div>
@@ -812,8 +812,8 @@ export default function StorePage() {
 
           {/* Deposit / Withdraw Form */}
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <h3 className="text-sm font-bold text-[#0F1111] mb-3">💳 Manage Deposit</h3>
-            <p className="text-[10px] text-[#565959] mb-2">Deposit acts as collateral. 1:1 ratio — $1 deposit lets you trade $1 cost. Deposit is locked but can be withdrawn when no active holdings exceed the remaining amount.</p>
+            <h3 className="text-sm font-bold text-[#0F1111] mb-3">💳 Manage Security Deposit</h3>
+            <p className="text-[10px] text-[#565959] mb-2">Security deposit is locked collateral. 1:1 ratio — $1 deposit lets you trade $1 cost. Security deposit is locked but can be withdrawn when no active holdings exceed the remaining amount.</p>
             <div className="flex items-center gap-2 mb-3">
               <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="Amount" className="flex-1 px-3 py-2.5 border border-gray-100 rounded-xl text-sm outline-none focus:border-[#FF5000]" />
               <button onClick={handleDeposit} className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[#FF5000] text-[#0F1111] shrink-0">+ Deposit</button>
@@ -912,8 +912,8 @@ export default function StorePage() {
               <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Total Return</span><span style={{fontWeight:700}}>${(buyConfirm.costPrice+buyConfirm.profit).toFixed(2)}</span></div>
             </div>
             <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:12}}>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Required Deposit</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Your Deposit</span><span style={{fontWeight:600}}>${(s.deposit||0).toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Required Security</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Your Security Deposit</span><span style={{fontWeight:600}}>${(s.deposit||0).toFixed(2)}</span></div>
               <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Status</span>{(s.deposit||0)>=buyConfirm.costPrice?<span style={{fontWeight:700,color:'#00A86B'}}>✓ Covered</span>:<span style={{fontWeight:700,color:'#CC0C39'}}>Short ${(buyConfirm.costPrice-(s.deposit||0)).toFixed(2)}</span>}</div>
             </div>
             <div style={{display:'flex',gap:8}}>

@@ -57,11 +57,11 @@ export default function StoreFundsPage() {
       <div className="p-3 space-y-3">
         <div className="grid grid-cols-2 gap-2">
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-[10px] text-gray-400 mb-1">Balance</p>
+            <p className="text-[10px] text-gray-400 mb-1">Available Balance</p>
             <p className="text-2xl font-bold">${s.balance.toFixed(2)}</p>
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-[10px] text-gray-400 mb-1">Deposit</p>
+            <p className="text-[10px] text-gray-400 mb-1">Security Deposit</p>
             <p className="text-2xl font-bold">${(s.deposit||0).toFixed(2)}</p>
           </div>
         </div>
@@ -80,16 +80,16 @@ export default function StoreFundsPage() {
           </div>
         </div>
         <div className="bg-white rounded-xl p-4 border border-gray-100">
-          <h3 className="text-sm font-bold mb-3">Manage Deposit</h3>
-          <p className="text-[10px] text-gray-400 mb-2">Deposit acts as collateral. 1:1 ratio.</p>
+          <h3 className="text-sm font-bold mb-3">Manage Security Deposit</h3>
+          <p className="text-[10px] text-gray-400 mb-2">Security deposit is locked collateral. 1:1 ratio.</p>
           <div className="flex items-center gap-2 mb-3">
             <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="Amount" className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none" />
-            <button onClick={handleDeposit} className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[#FF5000] text-white">+ Deposit</button>
+            <button onClick={handleDeposit} className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[#FF5000] text-white">Add Security</button>
           </div>
           {depositMsg && <p className="text-xs text-green-600 font-bold mb-2">{depositMsg}</p>}
           {(s.deposit||0) > 0 && (
             <button onClick={handleWithdrawDeposit} className="w-full py-2.5 rounded-xl text-sm font-bold bg-red-50 text-red-500 border border-red-200">
-              Withdraw All Deposit (${(s.deposit||0).toFixed(2)})
+              Withdraw ${(s.deposit||0).toFixed(0)} to Balance
             </button>
           )}
         </div>
