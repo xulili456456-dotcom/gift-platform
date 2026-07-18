@@ -4,9 +4,9 @@ import client from '../api/client';
 import toast from 'react-hot-toast';
 
 const NETWORKS = [
-  { id: 'trc20', name: 'TRC20', color: '#FF5000' },
-  { id: 'erc20', name: 'ERC20', color: '#8B5CF6' },
-  { id: 'bep20', name: 'BEP20', color: '#F59E0B' },
+  { id: 'trc20', name: 'TRC20', color: '#FF5000', desc: 'TRON Network · Low fee', emoji: '🔵' },
+  { id: 'erc20', name: 'ERC20', color: '#8B5CF6', desc: 'Ethereum Network', emoji: '🟣' },
+  { id: 'bep20', name: 'BEP20', color: '#F59E0B', desc: 'BSC Network', emoji: '🟡' },
 ];
 
 export default function DepositPage() {
@@ -24,7 +24,6 @@ export default function DepositPage() {
   }, []);
 
   const currentAddress = addresses[network] || '';
-
   const handleSubmit = async () => {
     const amt = parseFloat(amount);
     if (!amt || amt < 10) { toast.error('Minimum deposit is $10'); return; }
@@ -38,13 +37,7 @@ export default function DepositPage() {
     } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
     finally { setSubmitting(false); }
   };
-
-  const copyAddress = () => {
-    if (!currentAddress) return;
-    navigator.clipboard.writeText(currentAddress);
-    toast.success('Address copied');
-  };
-
+  const copyAddress = () => { if (!currentAddress) return; navigator.clipboard.writeText(currentAddress); toast.success('Address copied'); };
   const contactSupport = () => document.dispatchEvent(new CustomEvent('showContactSupport'));
 
   return (
@@ -55,8 +48,11 @@ export default function DepositPage() {
       </div>
       <div style={{padding:16}}>
         <div style={{background:'#FFF5F0',borderRadius:14,padding:14,marginBottom:14,fontSize:11,color:'#FF5000',display:'flex',alignItems:'center',gap:10}}>
-          <span>Deposits are reviewed manually within 24 hours.</span>
+          <span style={{fontSize:20}}>💡</span>
+          <div>Deposits are reviewed manually. Submit and our team will credit your account within 24 hours.</div>
         </div>
+
+        {/* STEP 1 */}
         <div style={{background:'#fff',borderRadius:20,padding:20,marginBottom:14}}>
           <div style={{fontSize:10,fontWeight:700,color:'#999',marginBottom:8,letterSpacing:1}}>STEP 1</div>
           <div style={{fontSize:14,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Choose Network</div>
@@ -64,13 +60,15 @@ export default function DepositPage() {
             {NETWORKS.map(n => (
               <div key={n.id} onClick={()=>setNetwork(n.id)}
                 style={{display:'flex',alignItems:'center',padding:14,background:network===n.id?'#FFF5F0':'#f8f8f8',borderRadius:12,cursor:'pointer',border:network===n.id?'2px solid #FF5000':'2px solid transparent'}}>
-                <div style={{width:36,height:36,borderRadius:9,display:'flex',alignItems:'center',justifyContent:'center',marginRight:10,fontSize:14,fontWeight:700,color:n.color}}>{n.name[0]}</div>
-                <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600}}>{n.name}</div><div style={{fontSize:10,color:'#999'}}>{n.id==='trc20'?'TRON':n.id==='erc20'?'Ethereum':'BSC'}</div></div>
-                {network===n.id && <span style={{color:'#FF5000',fontWeight:700,fontSize:14}}>OK</span>}
+                <span style={{fontSize:20,marginRight:10}}>{n.emoji}</span>
+                <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600}}>{n.name}</div><div style={{fontSize:10,color:'#999'}}>{n.desc}</div></div>
+                {network===n.id && <span style={{background:'#FF5000',color:'#fff',borderRadius:'50%',width:20,height:20,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12}}>✓</span>}
               </div>
             ))}
           </div>
         </div>
+
+        {/* STEP 2 */}
         <div style={{background:'#fff',borderRadius:20,padding:20,marginBottom:14}}>
           <div style={{fontSize:10,fontWeight:700,color:'#999',marginBottom:8,letterSpacing:1}}>STEP 2</div>
           <div style={{fontSize:14,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Send USDT to this Address</div>
@@ -82,11 +80,13 @@ export default function DepositPage() {
           <div style={{background:'#F0FAF4',borderRadius:10,padding:10,fontSize:10,color:'#00A86B',textAlign:'center',marginBottom:4}}>
             Need another network? <button onClick={contactSupport} style={{background:'#E8F5E9',color:'#00A86B',border:'1px solid #00A86B',borderRadius:8,padding:'4px 10px',fontSize:10,fontWeight:600,cursor:'pointer'}}>Contact Support</button>
           </div>
-          <div style={{background:'#F0FAF4',borderRadius:10,padding:10,fontSize:10,color:'#00A86B',textAlign:'center'}}>
+          <div style={{background:'#F0FAF4',borderRadius:10,padding:10,fontSize:10,color:'#00A86B',textAlign:'center',marginBottom:4}}>
             Want faster confirmation? <button onClick={contactSupport} style={{background:'#E8F5E9',color:'#00A86B',border:'1px solid #00A86B',borderRadius:8,padding:'4px 10px',fontSize:10,fontWeight:600,cursor:'pointer'}}>Contact Support</button>
           </div>
-          <div style={{fontSize:10,color:'#999',textAlign:'center',marginTop:8}}>Send only USDT · Minimum $10</div>
+          <div style={{fontSize:10,color:'#999',textAlign:'center'}}>Send only USDT · Minimum $10 · Usually arrives in 10-30 min</div>
         </div>
+
+        {/* STEP 3 */}
         <div style={{background:'#fff',borderRadius:20,padding:20,marginBottom:14}}>
           <div style={{fontSize:10,fontWeight:700,color:'#999',marginBottom:8,letterSpacing:1}}>STEP 3</div>
           <div style={{fontSize:14,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Submit Deposit Request</div>
@@ -96,9 +96,11 @@ export default function DepositPage() {
             style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:submitting?0.6:1}}>{submitting?'Submitting...':'Submit Deposit'}</button>
           <div style={{marginTop:12,padding:'10px 12px',background:'#f8f8f8',borderRadius:10,fontSize:10,color:'#999',lineHeight:1.5}}>
             <div style={{fontWeight:600,color:'#666',marginBottom:2}}>Important Notice</div>
-            Send only USDT to the address above. Transfers to wrong addresses or wrong networks cannot be recovered.
+            Send only USDT to the address above. Transfers to wrong addresses or wrong networks cannot be recovered. The platform is not responsible for any loss caused by incorrect transfers.
           </div>
         </div>
+
+        {/* History */}
         {deposits.length > 0 && (
           <div style={{background:'#fff',borderRadius:20,padding:16,marginBottom:14}}>
             <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Deposit History</div>
@@ -110,7 +112,7 @@ export default function DepositPage() {
                 </div>
                 {expandedId===d.id && (
                   <div style={{marginTop:6,padding:8,background:'#f8f8f8',borderRadius:8,fontSize:10,color:'#666'}}>
-                    <div>Network: {d.network}</div>
+                    <div>Network: {d.network?.toUpperCase()}</div>
                     <div>Amount: ${Number(d.amount||0).toFixed(2)}</div>
                     <div>Time: {new Date(d.created_at).toLocaleString()}</div>
                   </div>
