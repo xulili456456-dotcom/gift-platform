@@ -499,7 +499,7 @@ export default function StorePage() {
           <button onClick={() => handleBuy(p)} style={{padding:'12px 40px',background:'#00A86B',color:'#fff',border:'none',borderRadius:12,fontSize:15,fontWeight:700,cursor:'pointer'}}>Buy</button>
         </div>
 
-        {/* Buy Confirm Modal */}
+        {/* Buy Confirm Modal (detail view) */}
         {buyConfirm && (
           <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={() => setBuyConfirm(null)}>
             <div style={{background:'#fff',borderRadius:16,padding:24,width:'100%',maxWidth:340}} onClick={e => e.stopPropagation()}>
@@ -510,6 +510,11 @@ export default function StorePage() {
                 <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Cost</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
                 <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Profit</span><span style={{fontWeight:600,color:'#00A86B'}}>+${buyConfirm.profit.toFixed(2)}</span></div>
                 <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Total Return</span><span style={{fontWeight:700}}>${(buyConfirm.costPrice+buyConfirm.profit).toFixed(2)}</span></div>
+              </div>
+              <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:12}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Required Deposit</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Your Deposit</span><span style={{fontWeight:600}}>${(s.deposit||0).toFixed(2)}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Status</span>{(s.deposit||0)>=buyConfirm.costPrice?<span style={{fontWeight:700,color:'#00A86B'}}>✓ Covered</span>:<span style={{fontWeight:700,color:'#CC0C39'}}>Short ${(buyConfirm.costPrice-(s.deposit||0)).toFixed(2)}</span>}</div>
               </div>
               <div style={{display:'flex',gap:8}}>
                 <button onClick={() => setBuyConfirm(null)} style={{flex:1,padding:'10px 0',background:'#f5f5f5',border:'none',borderRadius:10,fontSize:14,fontWeight:600,color:'#666',cursor:'pointer'}}>Cancel</button>
@@ -852,37 +857,26 @@ export default function StorePage() {
       </div>
       </>)}
 
-      {/* Buy Confirmation Modal */}
+      {/* Buy Confirmation Modal (list view) */}
       {buyConfirm && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setBuyConfirm(null)}>
-          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
-            <span className="text-3xl block text-center mb-3">🛒</span>
-            <h3 className="text-base font-bold text-[#0F1111] mb-1">Confirm Purchase</h3>
-            <p className="text-[11px] text-[#565959] mb-3 line-clamp-2">{buyConfirm.name}</p>
-            <div className="bg-gray-50 rounded-xl p-3 mb-4 space-y-1.5 text-sm">
-              <div className="flex justify-between"><span className="text-[#565959]">Cost (85%)</span><span className="font-bold text-[#0F1111]">${buyConfirm.costPrice.toFixed(2)}</span></div>
-              <div className="flex justify-between"><span className="text-[#565959]">Profit</span><span className="font-bold text-[#067D62]">+${buyConfirm.profit.toFixed(2)}</span></div>
-              <div className="flex justify-between border-t border-[#ddd] pt-1.5 mt-1.5"><span className="text-[#565959]">Total Return</span><span className="font-bold text-[#0F1111]">${(buyConfirm.costPrice + buyConfirm.profit).toFixed(2)}</span></div>
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={() => setBuyConfirm(null)}>
+          <div style={{background:'#fff',borderRadius:16,padding:24,width:'100%',maxWidth:340}} onClick={e => e.stopPropagation()}>
+            <div style={{textAlign:'center',fontSize:32,marginBottom:12}}>🛒</div>
+            <div style={{fontSize:15,fontWeight:700,color:'#222',marginBottom:2}}>Confirm Purchase</div>
+            <div style={{fontSize:11,color:'#999',marginBottom:12,lineHeight:1.4}}>{buyConfirm.name}</div>
+            <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:13}}>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Cost</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Profit</span><span style={{fontWeight:600,color:'#00A86B'}}>+${buyConfirm.profit.toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Total Return</span><span style={{fontWeight:700}}>${(buyConfirm.costPrice+buyConfirm.profit).toFixed(2)}</span></div>
             </div>
-            <div className="bg-[#f0f2f2] rounded-xl p-3 mb-4 text-sm space-y-1.5">
-              <div className="flex justify-between"><span className="text-[#565959]">Required Deposit</span><span className="font-bold text-[#0F1111]">${buyConfirm.costPrice.toFixed(2)}</span></div>
-              <div className="flex justify-between"><span className="text-[#565959]">Your Deposit</span><span className="font-bold text-[#0F1111]">${(s.deposit||0).toFixed(2)}</span></div>
-              <div className="flex justify-between border-t border-[#ddd] pt-1.5 mt-1.5">
-                <span className="text-[#565959]">Deposit Status</span>
-                {(s.deposit||0) >= buyConfirm.costPrice
-                  ? <span className="font-bold text-[#067D62]">Covered</span>
-                  : <span className="font-bold text-[#CC0C39]">Short ${(buyConfirm.costPrice - (s.deposit||0)).toFixed(2)}</span>
-                }
-              </div>
+            <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:12}}>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Required Deposit</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Your Deposit</span><span style={{fontWeight:600}}>${(s.deposit||0).toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Status</span>{(s.deposit||0)>=buyConfirm.costPrice?<span style={{fontWeight:700,color:'#00A86B'}}>✓ Covered</span>:<span style={{fontWeight:700,color:'#CC0C39'}}>Short ${(buyConfirm.costPrice-(s.deposit||0)).toFixed(2)}</span>}</div>
             </div>
-            <div className="text-[10px] text-[#565959] mb-4">
-              <p>💰 Balance: ${s.balance.toFixed(2)} · Hold time: 6-30 hours · Profit: {PROFIT_RATE * 100}%</p>
-            </div>
-            <div className="flex gap-2">
-              <button onClick={() => setBuyConfirm(null)} className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-gray-50 text-[#0F1111]">Cancel</button>
-              <button onClick={handleConfirmBuy} disabled={buying} className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-[#FF5000] text-[#0F1111] border border-[#FF5000]">
-                {buying ? '...' : `Buy $${buyConfirm.costPrice.toFixed(2)}`}
-              </button>
+            <div style={{display:'flex',gap:8}}>
+              <button onClick={() => setBuyConfirm(null)} style={{flex:1,padding:'10px 0',background:'#f5f5f5',border:'none',borderRadius:10,fontSize:14,fontWeight:600,color:'#666',cursor:'pointer'}}>Cancel</button>
+              <button onClick={handleConfirmBuy} disabled={buying} style={{flex:1,padding:'10px 0',background:'#00A86B',border:'none',borderRadius:10,fontSize:14,fontWeight:700,color:'#fff',cursor:'pointer'}}>{buying?'...':`Buy $${buyConfirm.costPrice.toFixed(2)}`}</button>
             </div>
           </div>
         </div>
