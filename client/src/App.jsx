@@ -98,7 +98,6 @@ export default function App() {
         <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
           <Route path="/home" element={<HomePage />} />
           <Route path="/tasks" element={<TasksPage />} />
-          <Route path="/store/funds" element={<StorePage tab="funds" />} />
           <Route path="/store" element={<StorePage />} />
           <Route path="/mine" element={<MinePage />} />
           <Route path="/mine/team" element={<Lazy Comp={TeamPage} />} />
