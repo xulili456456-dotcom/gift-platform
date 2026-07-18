@@ -550,12 +550,6 @@ export default function StorePage() {
   // ==== Product List Page ====
   return (
     <div className="bg-white safe-top flex flex-col min-h-screen">
-      {/* Status Bar */}
-      <div style={{height:44,background:'#0f0f0f',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 20px',color:'#fff',fontSize:12,fontWeight:600}}>
-        <span>9:41</span>
-        <span style={{display:'flex',gap:2}}>●●●●<span style={{opacity:.3}}>○</span></span>
-      </div>
-
       {/* Brand Bar */}
       <div style={{background:'#0f0f0f',padding:'6px 16px 10px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{display:'flex',alignItems:'center',gap:6}}>
