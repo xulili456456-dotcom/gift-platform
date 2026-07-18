@@ -143,9 +143,9 @@ export default function MinePage() {
           </div>
         )}
 
-{/* Withdraw */}
+<div className="bg-white rounded-2xl overflow-hidden">
         <button onClick={() => navigate('/mine/withdraw')}
-          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+          className="w-full p-3.5 flex items-center gap-3 border-b border-gray-50">
           <ArrowUpRight size={22} className="text-green-500 shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('withdraw.title')}</p>
@@ -175,8 +175,12 @@ export default function MinePage() {
           </div>
           <ChevronRight size={16} className="text-text-muted shrink-0" />
         </button>
+      </div>
 
-        {/* ═══ Sub-pages ═══ */}
+      <div style={{height:8}}></div>
+
+      <div className="bg-white rounded-2xl overflow-hidden">
+        {/* Sub-pages */}
         {[
           { Icon: Users, label: t('mine.myTeam'), desc: t('mine.myTeamDesc'), to: '/mine/team' },
           { Icon: CreditCard, label: t('mine.myWallet'), desc: t('mine.myWalletDesc'), to: '/mine/wallet' },
@@ -193,7 +197,11 @@ export default function MinePage() {
             <ChevronRight size={16} className="text-text-muted shrink-0" />
           </button>
         ))}
+      </div>
 
+      <div style={{height:8}}></div>
+
+      <div className="bg-white rounded-2xl overflow-hidden">
         {/* Language */}
         <button onClick={() => setShowLang(!showLang)}
           className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
@@ -249,7 +257,11 @@ export default function MinePage() {
           </div>
           <ChevronRight size={16} className="text-text-muted shrink-0" />
         </button>
+      </div>
 
+      <div style={{height:8}}></div>
+
+      <div className="bg-white rounded-2xl overflow-hidden">
         {/* Support */}
         <button onClick={() => document.dispatchEvent(new CustomEvent('showContactSupport'))}
           className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
@@ -296,7 +308,11 @@ export default function MinePage() {
           </button>
         )}
 
-        {/* Logout */}
+      </div>
+
+      <div style={{height:8}}></div>
+
+      {/* Logout */}
         <button onClick={handleLogout}
           className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <LogOut size={22} className="text-red-400 shrink-0" />
