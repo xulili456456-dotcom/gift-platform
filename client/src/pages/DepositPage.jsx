@@ -1,176 +1,124 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import client from '../api/client';
 import toast from 'react-hot-toast';
-import { ChevronLeft, Copy, CheckCircle, Clock, XCircle, Shield, AlertTriangle } from 'lucide-react';
 
 const NETWORKS = [
-  { id: 'trc20', label: 'TRC20', desc: 'Tron Network · Fast & Low Fee', icon: '🌐' },
-  { id: 'erc20', label: 'ERC20', desc: 'Ethereum Network · Widely Used', icon: '🔷' },
-  { id: 'bep20', label: 'BEP20', desc: 'BSC Network · Cheap & Fast', icon: '💛' },
+  { id: 'trc20', name: 'TRC20', color: '#FF5000' },
+  { id: 'erc20', name: 'ERC20', color: '#8B5CF6' },
+  { id: 'bep20', name: 'BEP20', color: '#F59E0B' },
 ];
 
 export default function DepositPage() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [network, setNetwork] = useState('trc20');
-  const [addresses, setAddresses] = useState({});
   const [amount, setAmount] = useState('');
-  const [txHash, setTxHash] = useState('');
+  const [deposits, setDeposits] = useState([]);
+  const [addresses, setAddresses] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [history, setHistory] = useState([]);
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
-    client.get('/deposits/addresses').then(({ data }) => setAddresses(data)).catch(() => {});
-    client.get('/deposits').then(({ data }) => setHistory(data)).catch(() => {});
+    client.get('/deposits/addresses').then(({data}) => setAddresses(data)).catch(()=>{});
+    client.get('/deposits').then(({data}) => setDeposits(data||[])).catch(()=>{});
   }, []);
 
-  const addr = addresses[network] || '';
-  const copyAddr = () => {
-    if (!addr) return;
-    navigator.clipboard.writeText(addr);
-    toast.success('Address copied!');
-  };
+  const currentAddress = addresses[network] || '';
 
-  const submit = async () => {
+  const handleSubmit = async () => {
     const amt = parseFloat(amount);
-    if (!amt || amt < 1) { toast.error(t('store.depositMinMax')); return; }
-    if (!txHash.trim()) { toast.error('Please enter transaction hash'); return; }
+    if (!amt || amt < 10) { toast.error('Minimum deposit is $10'); return; }
     setSubmitting(true);
     try {
-      const { data } = await client.post('/deposits', { network, amount: amt, tx_hash: txHash.trim() });
-      toast.success('Deposit submitted for review!');
-      setAmount(''); setTxHash('');
-      setHistory(prev => [data, ...prev]);
-    } catch (err) { toast.error(err.response?.data?.error || 'Operation failed'); }
+      await client.post('/deposits', { network, amount: amt, tx_hash: 'manual-review' });
+      toast.success('Deposit submitted for review');
+      setAmount('');
+      const {data} = await client.get('/deposits');
+      setDeposits(data||[]);
+    } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
     finally { setSubmitting(false); }
   };
 
+  const copyAddress = () => {
+    if (!currentAddress) return;
+    navigator.clipboard.writeText(currentAddress);
+    toast.success('Address copied');
+  };
+
+  const contactSupport = () => document.dispatchEvent(new CustomEvent('showContactSupport'));
+
   return (
-    <div className="min-h-screen bg-[#eaeded] safe-top safe-bottom flex flex-col">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-[#eaeded] border-b border-[#e7e7e7]">
-        <button onClick={() => navigate(-1)}><ChevronLeft size={22} className="text-[#0F1111]" /></button>
-        <h1 className="text-base font-bold text-[#0F1111]">Deposit USDT</h1>
+    <div style={{background:'#f2f2f7',minHeight:'100vh',maxWidth:430,margin:'0 auto',paddingBottom:80}}>
+      <div style={{background:'#0f0f0f',padding:'8px 16px 12px',display:'flex',alignItems:'center',gap:12,color:'#fff'}}>
+        <button onClick={() => navigate('/mine')} style={{background:'none',border:'none',fontSize:20,cursor:'pointer',color:'#fff'}}>Back</button>
+        <span style={{fontSize:14,fontWeight:700}}>Deposit</span>
       </div>
-
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4 space-y-5">
-          {/* Step 1: Network */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-6 h-6 rounded-full bg-[#FF9900] text-[#0d0d1a] text-[11px] font-bold flex items-center justify-center">1</span>
-              <span className="text-sm font-bold text-[#0F1111]">Select Network</span>
-            </div>
-            <div className="space-y-2">
-              {NETWORKS.map(n => (
-                <button key={n.id} onClick={() => setNetwork(n.id)}
-                  className={`w-full text-left p-4 rounded-xl border transition-all ${
-                    network === n.id
-                      ? 'bg-[#FF9900]/10 border-[#FF9900]'
-                      : 'bg-white border-[#e7e7e7] hover:border-[#3a3a4a]'
-                  }`}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{n.icon}</span>
-                      <div>
-                        <p className={`text-[13px] font-bold ${network === n.id ? 'text-[#FF9900]' : 'text-[#0F1111]'}`}>{n.label}</p>
-                        <p className="text-[10px] text-[#999]">{n.desc}</p>
-                      </div>
-                    </div>
-                    {network === n.id && <div className="w-5 h-5 rounded-full bg-[#FF9900] flex items-center justify-center"><CheckCircle size={12} className="text-[#0d0d1a]" /></div>}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Step 2: Address */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-6 h-6 rounded-full bg-[#FF9900] text-[#0d0d1a] text-[11px] font-bold flex items-center justify-center">2</span>
-              <span className="text-sm font-bold text-[#0F1111]">Send USDT to This Address</span>
-            </div>
-            <div className="bg-white rounded-xl border border-[#e7e7e7] overflow-hidden">
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[11px] font-bold text-[#565959] uppercase tracking-wider">{network.toUpperCase()} Address</span>
-                  <button onClick={copyAddr} className="flex items-center gap-1 text-[11px] text-[#FF9900] font-medium"><Copy size={12} /> Copy</button>
-                </div>
-                <div className="bg-[#eaeded] rounded-lg p-3">
-                  <p className="text-[11px] text-[#0F1111] font-mono break-all leading-relaxed">{addr || 'Not configured yet'}</p>
-                </div>
-              </div>
-              <div className="px-4 py-3 bg-[#f0f2f2]/50 border-t border-[#e7e7e7] flex items-start gap-2">
-                <AlertTriangle size={14} className="text-[#FF9900] shrink-0 mt-0.5" />
-                <p className="text-[10px] text-[#999] leading-relaxed">
-                  Only send <b className="text-[#0F1111]">USDT</b> on the <b className="text-[#0F1111]">{network.toUpperCase()}</b> network.
-                  Sending other tokens or using the wrong network will result in permanent loss of funds.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Step 3: Submit */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="w-6 h-6 rounded-full bg-[#FF9900] text-[#0d0d1a] text-[11px] font-bold flex items-center justify-center">3</span>
-              <span className="text-sm font-bold text-[#0F1111]">Confirm Your Deposit</span>
-            </div>
-            <div className="bg-white rounded-xl border border-[#e7e7e7] p-4 space-y-3">
-              <div>
-                <label className="text-[10px] font-bold text-[#565959] uppercase tracking-wider block mb-1">Amount (USDT)</label>
-                <div className="relative">
-                  <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00"
-                    className="w-full px-4 py-3 bg-[#eaeded] border border-[#e7e7e7] rounded-lg text-lg font-bold text-[#0F1111] outline-none focus:border-[#FF9900] placeholder:text-[#3a3a4a]" />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[11px] font-bold text-[#565959]">USDT</span>
-                </div>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold text-[#565959] uppercase tracking-wider block mb-1">Transaction Hash (TXID)</label>
-                <input type="text" value={txHash} onChange={e => setTxHash(e.target.value)} placeholder="Paste your transaction hash here"
-                  className="w-full px-4 py-3 bg-[#eaeded] border border-[#e7e7e7] rounded-lg text-[12px] text-[#0F1111] font-mono outline-none focus:border-[#FF9900] placeholder:text-[#3a3a4a]" />
-              </div>
-              <button onClick={submit} disabled={submitting || !addr}
-                className="w-full py-3.5 bg-[#FF9900] text-[#0d0d1a] font-bold rounded-xl text-sm active:scale-[0.98] disabled:opacity-40 transition-all">
-                {!addr ? 'Deposit address not configured' : submitting ? 'Submitting...' : 'Submit Deposit'}
-              </button>
-              <div className="flex items-center gap-1.5 justify-center">
-                <Shield size={12} className="text-[#999]" />
-                <p className="text-[9px] text-[#999]">Admin review required · Funds credited within 24h</p>
-              </div>
-            </div>
-          </div>
-
-          {/* History */}
-          {history.length > 0 && (
-            <div>
-              <p className="text-[11px] font-bold text-[#565959] uppercase tracking-wider mb-3">Deposit History</p>
-              <div className="bg-white rounded-xl border border-[#e7e7e7] divide-y divide-[#262636]">
-                {history.map(d => (
-                  <div key={d.id} className="px-4 py-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-[13px] font-bold text-[#0F1111]">${Number(d.amount).toFixed(2)}</p>
-                      <p className="text-[10px] text-[#999]">{d.network.toUpperCase()} · {new Date(d.created_at).toLocaleDateString()}</p>
-                    </div>
-                    <span className={`text-[10px] px-2.5 py-1 rounded-full font-bold flex items-center gap-1 ${
-                      d.status === 'confirmed' ? 'bg-[#067D62]/15 text-[#067D62]' :
-                      d.status === 'rejected' ? 'bg-[#CC0C39]/15 text-[#fb2c36]' :
-                      'bg-[#FF9900]/15 text-[#FF9900]'
-                    }`}>
-                      {d.status === 'confirmed' ? <CheckCircle size={10} /> :
-                       d.status === 'rejected' ? <XCircle size={10} /> : <Clock size={10} />}
-                      {d.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="h-4" />
+      <div style={{padding:16}}>
+        <div style={{background:'#FFF5F0',borderRadius:14,padding:14,marginBottom:14,fontSize:11,color:'#FF5000',display:'flex',alignItems:'center',gap:10}}>
+          <span>Deposits are reviewed manually within 24 hours.</span>
         </div>
+        <div style={{background:'#fff',borderRadius:20,padding:20,marginBottom:14}}>
+          <div style={{fontSize:10,fontWeight:700,color:'#999',marginBottom:8,letterSpacing:1}}>STEP 1</div>
+          <div style={{fontSize:14,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Choose Network</div>
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            {NETWORKS.map(n => (
+              <div key={n.id} onClick={()=>setNetwork(n.id)}
+                style={{display:'flex',alignItems:'center',padding:14,background:network===n.id?'#FFF5F0':'#f8f8f8',borderRadius:12,cursor:'pointer',border:network===n.id?'2px solid #FF5000':'2px solid transparent'}}>
+                <div style={{width:36,height:36,borderRadius:9,display:'flex',alignItems:'center',justifyContent:'center',marginRight:10,fontSize:14,fontWeight:700,color:n.color}}>{n.name[0]}</div>
+                <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600}}>{n.name}</div><div style={{fontSize:10,color:'#999'}}>{n.id==='trc20'?'TRON':n.id==='erc20'?'Ethereum':'BSC'}</div></div>
+                {network===n.id && <span style={{color:'#FF5000',fontWeight:700,fontSize:14}}>OK</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{background:'#fff',borderRadius:20,padding:20,marginBottom:14}}>
+          <div style={{fontSize:10,fontWeight:700,color:'#999',marginBottom:8,letterSpacing:1}}>STEP 2</div>
+          <div style={{fontSize:14,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Send USDT to this Address</div>
+          <div style={{background:'#f5f5f5',borderRadius:12,padding:14,textAlign:'center',marginBottom:12}}>
+            <div style={{fontSize:10,color:'#999',marginBottom:4}}>{network.toUpperCase()} Deposit Address</div>
+            <div style={{fontSize:13,fontWeight:600,color:'#0f0f0f',wordBreak:'break-all',marginBottom:8}}>{currentAddress || 'Contact support for address'}</div>
+            {currentAddress && <button onClick={copyAddress} style={{padding:'6px 14px',background:'#FF5000',color:'#fff',border:'none',borderRadius:8,fontSize:11,fontWeight:600,cursor:'pointer'}}>Copy Address</button>}
+          </div>
+          <div style={{background:'#F0FAF4',borderRadius:10,padding:10,fontSize:10,color:'#00A86B',textAlign:'center',marginBottom:4}}>
+            Need another network? <button onClick={contactSupport} style={{background:'#E8F5E9',color:'#00A86B',border:'1px solid #00A86B',borderRadius:8,padding:'4px 10px',fontSize:10,fontWeight:600,cursor:'pointer'}}>Contact Support</button>
+          </div>
+          <div style={{background:'#F0FAF4',borderRadius:10,padding:10,fontSize:10,color:'#00A86B',textAlign:'center'}}>
+            Want faster confirmation? <button onClick={contactSupport} style={{background:'#E8F5E9',color:'#00A86B',border:'1px solid #00A86B',borderRadius:8,padding:'4px 10px',fontSize:10,fontWeight:600,cursor:'pointer'}}>Contact Support</button>
+          </div>
+          <div style={{fontSize:10,color:'#999',textAlign:'center',marginTop:8}}>Send only USDT · Minimum $10</div>
+        </div>
+        <div style={{background:'#fff',borderRadius:20,padding:20,marginBottom:14}}>
+          <div style={{fontSize:10,fontWeight:700,color:'#999',marginBottom:8,letterSpacing:1}}>STEP 3</div>
+          <div style={{fontSize:14,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Submit Deposit Request</div>
+          <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Amount</div>
+          <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="Enter USDT amount" style={{width:'100%',padding:'12px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:14,fontWeight:600,outline:'none',marginBottom:12}} />
+          <button onClick={handleSubmit} disabled={submitting}
+            style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:submitting?0.6:1}}>{submitting?'Submitting...':'Submit Deposit'}</button>
+          <div style={{marginTop:12,padding:'10px 12px',background:'#f8f8f8',borderRadius:10,fontSize:10,color:'#999',lineHeight:1.5}}>
+            <div style={{fontWeight:600,color:'#666',marginBottom:2}}>Important Notice</div>
+            Send only USDT to the address above. Transfers to wrong addresses or wrong networks cannot be recovered.
+          </div>
+        </div>
+        {deposits.length > 0 && (
+          <div style={{background:'#fff',borderRadius:20,padding:16,marginBottom:14}}>
+            <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Deposit History</div>
+            {deposits.slice(0,20).map(d => (
+              <div key={d.id} style={{padding:'8px 0',borderBottom:'1px solid #f5f5f5',fontSize:11,cursor:'pointer'}} onClick={()=>setExpandedId(expandedId===d.id?null:d.id)}>
+                <div style={{display:'flex',justifyContent:'space-between'}}>
+                  <div><div style={{fontWeight:600}}>${Number(d.amount||0).toFixed(2)}</div><div style={{color:'#999',fontSize:9}}>{d.network} · {String(d.created_at||'').slice(0,10)}</div></div>
+                  <span style={{background:d.status==='confirmed'?'#E8F5E9':'#FFF8E1',color:d.status==='confirmed'?'#00A86B':'#F59E0B',borderRadius:8,padding:'2px 8px',fontSize:10,fontWeight:600}}>{d.status==='confirmed'?'Confirmed':'Pending'}</span>
+                </div>
+                {expandedId===d.id && (
+                  <div style={{marginTop:6,padding:8,background:'#f8f8f8',borderRadius:8,fontSize:10,color:'#666'}}>
+                    <div>Network: {d.network}</div>
+                    <div>Amount: ${Number(d.amount||0).toFixed(2)}</div>
+                    <div>Time: {new Date(d.created_at).toLocaleString()}</div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

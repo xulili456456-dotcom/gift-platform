@@ -13,6 +13,7 @@ import TasksPage from './pages/TasksPage';
 import MinePage from './pages/MinePage';
 import StorePage from './pages/StorePage';
 import StoreFundsPage from './pages/StoreFundsPage';
+import DepositPage from './pages/DepositPage';
 import OnboardingPage from './pages/OnboardingPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import BuyPage from './pages/BuyPage';
@@ -110,6 +111,7 @@ export default function App() {
           <Route path="/mine/legal" element={<Lazy Comp={LegalPage} />} />
           <Route path="/mine/vip" element={<Lazy Comp={VipPage} />} />
           <Route path="/mine/withdraw" element={<Lazy Comp={WithdrawPage} />} />
+          <Route path="/mine/deposit" element={<DepositPage />} />
           <Route path="/mine/staking" element={<Lazy Comp={StakingPage} />} />
           <Route path="/mine/deposit" element={<Lazy Comp={DepositPage} />} />
           <Route path="/mine/verify" element={<Lazy Comp={VerifyPage} />} />
