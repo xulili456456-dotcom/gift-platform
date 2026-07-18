@@ -23,6 +23,7 @@ export default function WithdrawPage() {
   const [withdrawals, setWithdrawals] = useState([]);
   const [amount, setAmount] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const loadData = () => {
     Promise.all([claimsApi.list(), client.get('/tasks/balance'), client.get('/withdrawals').catch(() => ({ data: [] }))])
@@ -52,81 +53,102 @@ export default function WithdrawPage() {
     } finally { setSubmitting(false); }
   };
 
-  if (loading) return <div className="min-h-screen bg-bg p-4"><div className="skeleton h-40 rounded-2xl" /></div>;
+  if (loading) return <div className="min-h-screen bg-gray-50 p-4"><div className="skeleton h-40 rounded-2xl" /></div>;
+
+  const fee = parseFloat(amount) > 0 ? Math.round(parseFloat(amount) * 0.01 * 100) / 100 : 0;
+  const receive = parseFloat(amount) > 0 ? parseFloat(amount) - fee : 0;
+  const totalWithdrawn = withdrawals.filter(w => w.status === 'completed').reduce((s, w) => s + (Number(w.amount) || 0), 0);
 
   return (
-    <div className="min-h-screen bg-bg animate-fade-in">
-      <div className="bg-white px-4 py-3 flex items-center gap-3 border-b border-separator">
-        <button onClick={() => navigate('/mine')} className="flex items-center gap-1 text-primary font-medium text-sm pr-2 py-1">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
-          {t('common.back')}
-        </button>
-        <h2 className="text-[16px] font-bold text-text">{t('withdraw.title')}</h2>
+    <div style={{background:'#f2f2f7',minHeight:'100vh',maxWidth:430,margin:'0 auto'}}>
+      {/* Header */}
+      <div style={{background:'#0f0f0f',padding:'8px 16px 12px',display:'flex',alignItems:'center',gap:12,color:'#fff'}}>
+        <button onClick={() => navigate('/mine')} style={{background:'none',border:'none',fontSize:20,cursor:'pointer',color:'#fff'}}>←</button>
+        <span style={{fontSize:14,fontWeight:700}}>{t('withdraw.title')}</span>
       </div>
-      <div className="p-4 space-y-5">
-        <div className="bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] rounded-2xl p-5 text-white shadow-xl">
-          <div className="flex items-center gap-2 mb-3"><Wallet size={18} className="text-white/60" /><span className="text-white/60 text-[11px] uppercase">{t('withdraw.balance')}</span></div>
-          <p className="text-3xl font-black">${availableBalance.toFixed(2)}</p>
-          <div className="flex gap-4 mt-4 pt-4 border-t border-white/10 text-[12px]">
-            <div><p className="text-white/40">{t('withdraw.pending')}</p><p className="font-bold">${pendingBalance.toFixed(2)}</p></div>
-            <div><p className="text-white/40">{t('withdraw.totalWithdrawn')}</p><p className="font-bold">${withdrawals.filter(w => w.status === 'completed').reduce((s, w) => s + (w.amount || 0), 0).toFixed(2)}</p></div>
-          </div>
+
+      <div style={{padding:16}}>
+        {/* Available Balance */}
+        <div style={{background:'#fff',borderRadius:20,padding:20,textAlign:'center',marginBottom:14}}>
+          <div style={{fontSize:11,color:'#999',marginBottom:4}}>Available Balance</div>
+          <div style={{fontSize:36,fontWeight:800,color:'#0f0f0f'}}>${availableBalance.toFixed(2)}</div>
+          {pendingBalance > 0 && <div style={{fontSize:11,color:'#999',marginTop:4}}>Pending: ${pendingBalance.toFixed(2)} · Withdrawn: ${totalWithdrawn.toFixed(2)}</div>}
         </div>
 
-        {wallet ? (
-          <div className="bg-white rounded-2xl p-5 border border-separator shadow-sm space-y-4">
-            <h3 className="text-[14px] font-bold text-text">{t('withdraw.withdrawNow')}</h3>
-            <div className="bg-bg rounded-xl p-3 flex items-center gap-2 text-[12px]">
-              <span className="text-text-muted">{t('withdraw.to')}:</span>
-              <span className="font-mono font-semibold text-[11px] break-all">{wallet.address}</span>
-              <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">{wallet.network.toUpperCase()}</span>
+        {wallet ? (<>
+          {/* Withdraw Form */}
+          <div style={{background:'#fff',borderRadius:20,padding:20,marginBottom:14}}>
+            <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Amount</div>
+            <div style={{fontSize:10,color:'#999',marginBottom:6}}>Min $10 · Fee 1%</div>
+            <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Enter amount" style={{width:'100%',padding:'12px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:24,fontWeight:700,outline:'none',marginBottom:12}} />
+            <div style={{display:'flex',gap:8,marginBottom:14}}>
+              {[100,500,1000].map(v=><button key={v} onClick={()=>setAmount(String(v))} style={{flex:1,padding:8,background:'#f5f5f5',border:'none',borderRadius:10,fontSize:12,fontWeight:600,color:'#666',cursor:'pointer'}}>${v}</button>)}
+              <button onClick={()=>setAmount(String(Math.floor(availableBalance)))} style={{flex:1,padding:8,background:'#f5f5f5',border:'none',borderRadius:10,fontSize:12,fontWeight:600,color:'#00A86B',cursor:'pointer'}}>Max</button>
             </div>
-            <div>
-              <label className="text-[11px] text-text-muted font-medium mb-1.5 block">{t('withdraw.amount')}</label>
-              <div className="relative"><span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted font-bold">$</span>
-                <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder={t('withdraw.minPlaceholder')} min="20" step="1"
-                  className="w-full pl-8 pr-4 py-3 rounded-xl border border-separator bg-bg text-lg font-bold focus:outline-none focus:border-primary" />
-              </div>
-              <p className="text-[10px] text-text-muted mt-1.5">{t('withdraw.available')}: ${availableBalance.toFixed(2)}</p>
+
+            {/* Fee Info */}
+            {parseFloat(amount) > 0 && (<div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:11}}>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Network Fee (1%)</span><span style={{fontWeight:600,color:'#111'}}>-${fee.toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#999'}}>You Receive</span><span style={{fontWeight:700,color:'#00A86B'}}>${receive.toFixed(2)}</span></div>
+            </div>)}
+
+            <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Network</div>
+            <div style={{background:'#f5f5f5',borderRadius:12,padding:'12px 14px',marginBottom:12,fontSize:13,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <span>{wallet.network?.toUpperCase()} (USDT)</span>
+              <button onClick={()=>navigate('/mine/wallet')} style={{background:'none',border:'none',color:'#FF5000',fontSize:11,cursor:'pointer'}}>Change</button>
             </div>
-            <button onClick={handleWithdraw} disabled={submitting || !amount || availableBalance <= 0}
-              className="w-full py-3.5 bg-primary text-white rounded-xl text-[14px] font-bold active:scale-[0.98] disabled:opacity-40">
-              {submitting ? t('withdraw.submitting') : t('withdraw.submit')}
-            </button>
+
+            <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Wallet Address</div>
+            <div style={{background:'#f5f5f5',borderRadius:12,padding:'12px 14px',fontSize:11,color:'#999',wordBreak:'break-all',marginBottom:4}}>{wallet.address}</div>
+            <div style={{fontSize:10,color:'#999',marginBottom:12}}>Double-check your address. Withdrawals cannot be reversed.</div>
+
+            <button onClick={()=>{if(parseFloat(amount)<10){toast.error('Minimum $10');return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0}
+              style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:!amount||availableBalance<=0?.4:1}}>Submit Withdrawal</button>
+
+            {/* Contact Support */}
+            <div style={{background:'#FFF5F0',borderRadius:12,padding:14,marginTop:12,display:'flex',alignItems:'center',gap:12}}>
+              <span style={{fontSize:24}}>💬</span>
+              <div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:'#FF5000'}}>Need faster approval?</div><div style={{fontSize:10,color:'#999'}}>Contact support to expedite your withdrawal</div></div>
+              <button onClick={()=>document.dispatchEvent(new CustomEvent('showContactSupport'))} style={{padding:'8px 16px',background:'#E8F5E9',color:'#00A86B',border:'1px solid #00A86B',borderRadius:10,fontSize:11,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap'}}>Contact →</button>
+            </div>
           </div>
-        ) : (
-          <div className="bg-white rounded-2xl p-6 border border-separator shadow-sm text-center">
-            <p className="text-3xl mb-2">🔐</p>
-            <p className="text-[13px] font-semibold text-text mb-1">{t('withdraw.bindFirst')}</p>
-            <button onClick={() => navigate('/mine/wallet')} className="bg-primary text-white px-5 py-2.5 rounded-xl text-[13px] font-bold">{t('wallet.bindBtn')}</button>
+        </>) : (
+          <div style={{background:'#fff',borderRadius:16,padding:32,textAlign:'center',marginBottom:14}}>
+            <div style={{fontSize:40,marginBottom:8}}>🔐</div>
+            <div style={{fontSize:14,fontWeight:600,color:'#333',marginBottom:4}}>{t('withdraw.bindFirst')}</div>
+            <button onClick={()=>navigate('/mine/wallet')} style={{marginTop:12,padding:'10px 24px',background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:13,fontWeight:600,cursor:'pointer'}}>{t('wallet.bindBtn')}</button>
           </div>
         )}
 
-        {withdrawals.length > 0 && (
-          <div>
-            <h3 className="text-[13px] font-bold text-text-secondary uppercase tracking-wider mb-2 ml-1">{t('withdraw.history')}</h3>
-            <div className="bg-white rounded-2xl border border-separator divide-y divide-separator">
-              {withdrawals.slice(0, 10).map(w => (
-                <div key={w.id} className="px-4 py-3 flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center ${w.status === 'completed' ? 'bg-success/10' : w.status === 'pending' ? 'bg-yellow-100' : 'bg-red-100'}`}>
-                    {w.status === 'completed' ? <CheckCircle size={16} className="text-success" /> : w.status === 'pending' ? <Clock size={16} className="text-yellow-600" /> : <AlertCircle size={16} className="text-red-500" />}
-                  </div>
-                  <div className="flex-1"><p className="text-[13px] font-medium">${w.amount} → {w.network?.toUpperCase()}</p><p className="text-[10px] text-text-muted break-all font-mono">{w.wallet_address || ''}</p><p className="text-[10px] text-text-muted">{w.created_at?.slice(0, 10)}</p></div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${w.status === 'completed' ? 'bg-success/10 text-success' : w.status === 'pending' ? 'bg-yellow-100 text-yellow-600' : 'bg-red-100 text-red-500'}`}>
-                      {w.status === 'completed' ? t('withdraw.done') : w.status === 'pending' ? t('withdraw.pending') : t('withdraw.failed')}
-                    </span>
-                    {w.status === 'pending' && (
-                      <button onClick={async () => { if (confirm(t('withdraw.cancelConfirm'))) { try { await client.delete('/withdrawals/' + w.id); loadData(); toast.success(t('withdraw.cancelled')); } catch { toast.error(t('common.operationFailed')); } } }}
-                        className="text-[10px] text-red-400 underline font-medium">{t('common.cancel')}</button>
-                    )}
-                  </div>
-                </div>
-              ))}
+        {/* History */}
+        {withdrawals.length > 0 && (<div style={{background:'#fff',borderRadius:20,padding:16}}>
+          <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Recent Withdrawals</div>
+          {withdrawals.slice(0,10).map(w=>(<div key={w.id} style={{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom:'1px solid #f5f5f5',fontSize:11}}>
+            <div><div style={{fontWeight:600}}>${Number(w.amount||0).toFixed(2)}</div><div style={{color:'#999',fontSize:9}}>{w.network?.toUpperCase()} · {String(w.wallet_address||'').slice(0,10)}...</div></div>
+            <div style={{textAlign:'right'}}>
+              <span style={{fontSize:10,color:w.status==='completed'?'#00A86B':w.status==='pending'?'#F59E0B':'#EF4444',fontWeight:600}}>{w.status==='completed'?t('withdraw.done'):w.status==='pending'?t('withdraw.pending'):t('withdraw.failed')}</span>
+              {w.status==='pending'&&<button onClick={async()=>{if(confirm(t('withdraw.cancelConfirm'))){try{await client.delete('/withdrawals/'+w.id);loadData();toast.success(t('withdraw.cancelled'))}catch{toast.error(t('common.operationFailed'))}}}} style={{display:'block',fontSize:9,color:'#EF4444',background:'none',border:'none',cursor:'pointer',marginTop:2}}>{t('common.cancel')}</button>}
             </div>
-          </div>
-        )}
+          </div>))}
+        </div>)}
       </div>
+
+      {/* Confirm Modal */}
+      {showConfirm && (<div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',zIndex:999,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={()=>setShowConfirm(false)}>
+        <div style={{background:'#fff',borderRadius:20,padding:24,width:'100%',maxWidth:340,textAlign:'center'}} onClick={e=>e.stopPropagation()}>
+          <div style={{fontSize:12,fontWeight:700,color:'#999',marginBottom:4}}>CONFIRM WITHDRAWAL</div>
+          <div style={{fontSize:32,fontWeight:800,color:'#0f0f0f',marginBottom:16}}>${parseFloat(amount||0).toFixed(2)}</div>
+          <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:16,fontSize:11,textAlign:'left'}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Network</span><span style={{fontWeight:600}}>{wallet?.network?.toUpperCase()}</span></div>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Fee</span><span style={{fontWeight:600}}>-${fee.toFixed(2)}</span></div>
+            <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#999'}}>You Receive</span><span style={{fontWeight:700,color:'#00A86B'}}>${receive.toFixed(2)}</span></div>
+          </div>
+          <div style={{display:'flex',gap:8}}>
+            <button onClick={()=>setShowConfirm(false)} style={{flex:1,padding:12,background:'#f5f5f5',border:'none',borderRadius:12,fontSize:14,fontWeight:600,cursor:'pointer'}}>Cancel</button>
+            <button onClick={()=>{setShowConfirm(false);handleWithdraw()}} disabled={submitting} style={{flex:1,padding:12,background:'#00A86B',color:'#fff',border:'none',borderRadius:12,fontSize:14,fontWeight:700,cursor:'pointer'}}>{submitting?'...':'Confirm'}</button>
+          </div>
+        </div>
+      </div>)}
     </div>
   );
 }
