@@ -857,14 +857,23 @@ export default function StorePage() {
             <h3 className="text-base font-bold text-[#0F1111] mb-1">Confirm Purchase</h3>
             <p className="text-[11px] text-[#565959] mb-3 line-clamp-2">{buyConfirm.name}</p>
             <div className="bg-gray-50 rounded-xl p-3 mb-4 space-y-1.5 text-sm">
-              <div className="flex justify-between"><span className="text-[#565959]">Market Price</span><span className="font-bold text-[#0F1111]">${buyConfirm.price.toFixed(2)}</span></div>
               <div className="flex justify-between"><span className="text-[#565959]">Cost (85%)</span><span className="font-bold text-[#0F1111]">${buyConfirm.costPrice.toFixed(2)}</span></div>
               <div className="flex justify-between"><span className="text-[#565959]">Profit</span><span className="font-bold text-[#067D62]">+${buyConfirm.profit.toFixed(2)}</span></div>
               <div className="flex justify-between border-t border-[#ddd] pt-1.5 mt-1.5"><span className="text-[#565959]">Total Return</span><span className="font-bold text-[#0F1111]">${(buyConfirm.costPrice + buyConfirm.profit).toFixed(2)}</span></div>
             </div>
+            <div className="bg-[#f0f2f2] rounded-xl p-3 mb-4 text-sm space-y-1.5">
+              <div className="flex justify-between"><span className="text-[#565959]">Required Deposit</span><span className="font-bold text-[#0F1111]">${buyConfirm.costPrice.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-[#565959]">Your Deposit</span><span className="font-bold text-[#0F1111]">${(s.deposit||0).toFixed(2)}</span></div>
+              <div className="flex justify-between border-t border-[#ddd] pt-1.5 mt-1.5">
+                <span className="text-[#565959]">Deposit Status</span>
+                {(s.deposit||0) >= buyConfirm.costPrice
+                  ? <span className="font-bold text-[#067D62]">Covered</span>
+                  : <span className="font-bold text-[#CC0C39]">Short ${(buyConfirm.costPrice - (s.deposit||0)).toFixed(2)}</span>
+                }
+              </div>
+            </div>
             <div className="text-[10px] text-[#565959] mb-4">
-              <p>💰 Balance: ${s.balance.toFixed(2)} · 🔒 Deposit: ${(s.deposit||0).toFixed(2)}</p>
-              <p>Hold time: 6-30 hours · Profit: {PROFIT_RATE * 100}%</p>
+              <p>💰 Balance: ${s.balance.toFixed(2)} · Hold time: 6-30 hours · Profit: {PROFIT_RATE * 100}%</p>
             </div>
             <div className="flex gap-2">
               <button onClick={() => setBuyConfirm(null)} className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-gray-50 text-[#0F1111]">Cancel</button>
