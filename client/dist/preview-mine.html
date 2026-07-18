@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mine Page Preview</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:#f5f5f5;display:flex;justify-content:center}
+.phone{width:390px;min-height:100vh;background:#f5f5f5;position:relative}
+h2{text-align:center;padding:14px;font-size:14px;color:#FF5000;border-bottom:1px solid #f0f0f0;background:#fff}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- ====== A: Clean list ====== -->
+<h2>方案 A：简洁列表</h2>
+<div style="padding:16px">
+  <!-- Profile card -->
+  <div style="background:#fff;border-radius:20px;padding:20px;margin-bottom:12px;display:flex;align-items:center;gap:14px">
+    <div style="width:52px;height:52px;background:#0f0f0f;border-radius:26px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700">K</div>
+    <div style="flex:1">
+      <div style="font-size:16px;font-weight:700">kk</div>
+      <div style="font-size:11px;color:#999">ID: 100003</div>
+    </div>
+    <span style="font-size:18px;color:#ccc">›</span>
+  </div>
+
+  <!-- Stats -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+    <div style="background:#fff;border-radius:16px;padding:14px;text-align:center">
+      <div style="font-size:20px;font-weight:800">12</div>
+      <div style="font-size:10px;color:#999">Invites</div>
+    </div>
+    <div style="background:#fff;border-radius:16px;padding:14px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:#00A86B">+$777</div>
+      <div style="font-size:10px;color:#999">Earned</div>
+    </div>
+    <div style="background:#fff;border-radius:16px;padding:14px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:#FF5000">Lv.1</div>
+      <div style="font-size:10px;color:#999">VIP</div>
+    </div>
+  </div>
+
+  <!-- Menu list -->
+  <div style="background:#fff;border-radius:20px;overflow:hidden">
+    <div style="padding:14px 16px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;gap:12px;font-size:13px;cursor:pointer">
+      <span style="font-size:18px">👥</span> My Team <span style="flex:1"></span><span style="color:#ccc">›</span>
+    </div>
+    <div style="padding:14px 16px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;gap:12px;font-size:13px;cursor:pointer">
+      <span style="font-size:18px">💰</span> Wallet <span style="flex:1"></span><span style="color:#ccc">›</span>
+    </div>
+    <div style="padding:14px 16px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;gap:12px;font-size:13px;cursor:pointer">
+      <span style="font-size:18px">🛡️</span> KYC Verification <span style="flex:1"></span><span style="color:#00A86B;font-size:10px">Verified ›</span>
+    </div>
+    <div style="padding:14px 16px;border-bottom:1px solid #f5f5f5;display:flex;align-items:center;gap:12px;font-size:13px;cursor:pointer">
+      <span style="font-size:18px">🔔</span> Notifications <span style="flex:1"></span><span style="background:#FF3B30;color:#fff;border-radius:10px;padding:'0 6px';font-size:10px">3</span><span style="color:#ccc">›</span>
+    </div>
+    <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;font-size:13px;cursor:pointer">
+      <span style="font-size:18px">⚙️</span> Settings <span style="flex:1"></span><span style="color:#ccc">›</span>
+    </div>
+  </div>
+</div>
+
+<!-- ====== B: Card-style ====== -->
+<h2>方案 B：大卡风格</h2>
+<div style="padding:16px">
+  <!-- Big profile card -->
+  <div style="background:linear-gradient(135deg,#0f0f0f,#1a1a2e);border-radius:24px;padding:24px;margin-bottom:16px;color:#fff">
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+      <div style="width:56px;height:56px;background:rgba(255,80,0,.2);border-radius:28px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;border:2px solid rgba(255,80,0,.3)">K</div>
+      <div>
+        <div style="font-size:18px;font-weight:700">kk</div>
+        <div style="font-size:11px;opacity:.5">ID: 100003 · Lv.1</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:800">12</div>
+        <div style="font-size:10px;opacity:.5">Invites</div>
+      </div>
+      <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:800;color:#00A86B">+$777</div>
+        <div style="font-size:10px;opacity:.5">Earned</div>
+      </div>
+      <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:22px;font-weight:800">$30K</div>
+        <div style="font-size:10px;opacity:.5">Balance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu cards (each in own card) -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+    <div style="background:#fff;border-radius:16px;padding:16px;text-align:center;cursor:pointer">
+      <div style="font-size:28px;margin-bottom:4px">👥</div>
+      <div style="font-size:11px;font-weight:600">My Team</div>
+    </div>
+    <div style="background:#fff;border-radius:16px;padding:16px;text-align:center;cursor:pointer">
+      <div style="font-size:28px;margin-bottom:4px">💰</div>
+      <div style="font-size:11px;font-weight:600">Wallet</div>
+    </div>
+    <div style="background:#fff;border-radius:16px;padding:16px;text-align:center;cursor:pointer">
+      <div style="font-size:28px;margin-bottom:4px">🛡️</div>
+      <div style="font-size:11px;font-weight:600">KYC</div>
+    </div>
+    <div style="background:#fff;border-radius:16px;padding:16px;text-align:center;cursor:pointer">
+      <div style="font-size:28px;margin-bottom:4px">🔔</div>
+      <div style="font-size:11px;font-weight:600">Inbox <span style="background:#FF3B30;color:#fff;border-radius:8px;padding:'2px 6px';font-size:9px">3</span></div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div style="background:#fff;border-radius:16px;padding:14px 16px;text-align:center;font-size:13px;color:#999;cursor:pointer">Settings</div>
+</div>
+
+</div>
+</body>
+</html>

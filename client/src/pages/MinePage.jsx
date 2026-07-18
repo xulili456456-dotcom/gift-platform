@@ -79,49 +79,19 @@ export default function MinePage() {
   const current = langs.find(l => l.code === i18n.language) || langs[0];
 
   return (
-    <div className="tab-enter bg-gradient-to-b from-[#ffffff] to-[#f5f5f5] min-h-screen">
+    <div className="bg-[#f2f2f7] min-h-screen" style={{maxWidth:430,margin:'0 auto'}}>
       {/* Hero */}
-      <div className="relative bg-gradient-to-br from-[#FF5000] via-[#FF5000] to-[#E04500] px-5 pt-10 pb-5 shadow-xl shadow-purple-500/20 overflow-hidden"
-        style={{ backgroundSize: '200% 200%', animation: 'gradientShift 4s ease-in-out infinite' }}>
-        {/* Floating particles */}
-        {[...Array(12)].map((_, i) => (
-          <div key={i} className="absolute rounded-full bg-white"
-            style={{
-              width: `${3 + Math.random() * 6}px`, height: `${3 + Math.random() * 6}px`,
-              left: `${5 + i * 8}%`, top: `${10 + Math.random() * 80}%`,
-              opacity: 0.1 + Math.random() * 0.2,
-              animation: `particleFloat ${2.5 + Math.random() * 3}s ease-in-out ${i * 0.3}s infinite`,
-            }} />
-        ))}
-        <div className="h-4 relative z-10" />
-        <div className="flex items-center gap-4 relative z-10">
-          <div className="w-[64px] h-[64px] rounded-full bg-white/20 flex items-center justify-center text-white text-2xl font-bold ring-3 ring-white/10 shrink-0">
-            {(user?.name || user?.email || '?')[0].toUpperCase()}
-          </div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-white font-bold text-lg">{user?.name || user?.email}</h2>
-            <div className="mt-1 bg-white/15 rounded-full px-2.5 py-0.5 inline-block">
-              <span className="text-white/50 text-[12px]">{t('mine.myCode')}: </span>
-              <span className="text-gold font-mono font-bold text-xs tracking-widest">{user?.referral_code || '------'}</span>
-            </div>
-          </div>
+      <div style={{padding:'48px 20px 24px',background:'#fff'}}>
+        <div style={{display:'flex',alignItems:'center',gap:14}}>
+          <div style={{width:52,height:52,borderRadius:14,background:'#0f0f0f',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:20,fontWeight:700}}>{(user?.name||user?.email||'?')[0].toUpperCase()}</div>
+          <div><div style={{fontSize:16,fontWeight:700,color:'#111'}}>{user?.name||user?.email}</div><div style={{fontSize:11,color:'#999'}}>UID {user?.id} · Code {user?.referral_code||'------'}</div></div>
         </div>
-        <div className="flex justify-around mt-4 bg-white/10 backdrop-blur rounded-xl py-2.5 relative z-10">
-          {[
-            { v: stats?.direct_count || 0, l: t('mine.directInvites') },
-            { v: effectiveInvites, l: t('mine.effectiveInvites') },
-            { v: pendingClaims.length, l: t('claim.pending') },
-            { v: deliveredClaims.length, l: t('claim.delivered') },
-          ].map((x, i) => (
-            <div key={i} className="text-center"><p className="text-white font-bold text-lg">{x.v}</p><p className="text-white/40 text-[12px]">{x.l}</p></div>
-          ))}
+        <div style={{display:'flex',gap:0,marginTop:14,background:'#f5f5f5',borderRadius:12,overflow:'hidden'}}>
+          {[{v:stats?.direct_count||0,l:t('mine.directInvites')},{v:effectiveInvites,l:t('mine.effectiveInvites')},{v:pendingClaims.length,l:t('claim.pending')},{v:deliveredClaims.length,l:t('claim.delivered')}].map((x,i)=><div key={i} style={{flex:1,textAlign:'center',padding:10,borderLeft:i>0?'1px solid #eee':'none'}}><div style={{fontSize:17,fontWeight:700,color:'#111'}}>{x.v}</div><div style={{fontSize:10,color:'#999'}}>{x.l}</div></div>)}
         </div>
       </div>
 
-
-      {/* ═══ Membership Tier ═══ */}
-      <div className="mx-4 mb-3 cursor-pointer" onClick={() => navigate('/mine/vip')}>
-        <MembershipCard effectiveInvites={effectiveInvites} t={t} /></div>
+      <div style={{height:8}}></div>
 
       <div className="mx-4 space-y-4">
         {/* ═══ Claimable ═══ */}
