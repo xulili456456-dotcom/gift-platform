@@ -79,25 +79,55 @@ export default function MinePage() {
   const current = langs.find(l => l.code === i18n.language) || langs[0];
 
   return (
-    <div className="bg-[#f2f2f7] min-h-screen" style={{maxWidth:430,margin:'0 auto'}}>
+    <div className="tab-enter bg-gradient-to-b from-[#ffffff] to-[#f5f5f5] min-h-screen">
       {/* Hero */}
-      <div style={{padding:'48px 20px 24px',background:'#fff'}}>
-        <div style={{display:'flex',alignItems:'center',gap:14}}>
-          <div style={{width:52,height:52,borderRadius:14,background:'#0f0f0f',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:20,fontWeight:700}}>{(user?.name||user?.email||'?')[0].toUpperCase()}</div>
-          <div><div style={{fontSize:16,fontWeight:700,color:'#111'}}>{user?.name||user?.email}</div><div style={{fontSize:11,color:'#999'}}>UID {user?.id} · Code {user?.referral_code||'------'}</div></div>
+      <div className="relative bg-gradient-to-br from-[#FF5000] via-[#FF5000] to-[#E04500] px-5 pt-10 pb-5 shadow-xl shadow-purple-500/20 overflow-hidden"
+        style={{ backgroundSize: '200% 200%', animation: 'gradientShift 4s ease-in-out infinite' }}>
+        {/* Floating particles */}
+        {[...Array(12)].map((_, i) => (
+          <div key={i} className="absolute rounded-full bg-white"
+            style={{
+              width: `${3 + Math.random() * 6}px`, height: `${3 + Math.random() * 6}px`,
+              left: `${5 + i * 8}%`, top: `${10 + Math.random() * 80}%`,
+              opacity: 0.1 + Math.random() * 0.2,
+              animation: `particleFloat ${2.5 + Math.random() * 3}s ease-in-out ${i * 0.3}s infinite`,
+            }} />
+        ))}
+        <div className="h-4 relative z-10" />
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="w-[64px] h-[64px] rounded-full bg-white/20 flex items-center justify-center text-white text-2xl font-bold ring-3 ring-white/10 shrink-0">
+            {(user?.name || user?.email || '?')[0].toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-white font-bold text-lg">{user?.name || user?.email}</h2>
+            <div className="mt-1 bg-white/15 rounded-full px-2.5 py-0.5 inline-block">
+              <span className="text-white/50 text-[12px]">{t('mine.myCode')}: </span>
+              <span className="text-gold font-mono font-bold text-xs tracking-widest">{user?.referral_code || '------'}</span>
+            </div>
+          </div>
         </div>
-        <div style={{display:'flex',gap:0,marginTop:14,background:'#f5f5f5',borderRadius:12,overflow:'hidden'}}>
-          {[{v:stats?.direct_count||0,l:t('mine.directInvites')},{v:effectiveInvites,l:t('mine.effectiveInvites')},{v:pendingClaims.length,l:t('claim.pending')},{v:deliveredClaims.length,l:t('claim.delivered')}].map((x,i)=><div key={i} style={{flex:1,textAlign:'center',padding:10,borderLeft:i>0?'1px solid #eee':'none'}}><div style={{fontSize:17,fontWeight:700,color:'#111'}}>{x.v}</div><div style={{fontSize:10,color:'#999'}}>{x.l}</div></div>)}
+        <div className="flex justify-around mt-4 bg-white/10 backdrop-blur rounded-xl py-2.5 relative z-10">
+          {[
+            { v: stats?.direct_count || 0, l: t('mine.directInvites') },
+            { v: effectiveInvites, l: t('mine.effectiveInvites') },
+            { v: pendingClaims.length, l: t('claim.pending') },
+            { v: deliveredClaims.length, l: t('claim.delivered') },
+          ].map((x, i) => (
+            <div key={i} className="text-center"><p className="text-white font-bold text-lg">{x.v}</p><p className="text-white/40 text-[12px]">{x.l}</p></div>
+          ))}
         </div>
       </div>
 
-      <div style={{height:8}}></div>
+
+      {/* ═══ Membership Tier ═══ */}
+      <div className="mx-4 mb-3 cursor-pointer" onClick={() => navigate('/mine/vip')}>
+        <MembershipCard effectiveInvites={effectiveInvites} t={t} /></div>
 
       <div className="mx-4 space-y-4">
         {/* ═══ Claimable ═══ */}
         {eligibleGifts.length > 0 && (
-          <div className="bg-white rounded-2xl overflow-hidden">
-            <div className="px-4 py-3 border-b border-separator bg-gray-50 flex items-center gap-2">
+          <div className="bg-white rounded-2xl border border-separator">
+            <div className="px-4 py-3 border-b border-separator bg-gradient-to-r from-[#1E1E32]/50 to-transparent flex items-center gap-2">
               <span className="text-lg">🎁</span>
               <span className="text-[14px] font-bold text-text">{t('claim.available')}</span>
               <span className="text-[12px] bg-gold text-white px-2 py-0.5 rounded-full font-bold animate-bounce-pulse">{eligibleGifts.length}</span>
@@ -121,7 +151,7 @@ export default function MinePage() {
 
         {/* ═══ Under Review ═══ */}
         {pendingClaims.length > 0 && (
-          <div className="bg-white rounded-2xl overflow-hidden">
+          <div className="bg-white rounded-2xl border border-separator">
             <div className="px-4 py-3 border-b border-separator flex items-center gap-2">
               <span className="text-lg">⏳</span>
               <span className="text-[14px] font-bold text-text">{t('claim.pending')}</span>
@@ -143,9 +173,9 @@ export default function MinePage() {
           </div>
         )}
 
-<div className="bg-white rounded-2xl overflow-hidden">
+{/* Withdraw */}
         <button onClick={() => navigate('/mine/withdraw')}
-          className="w-full p-3.5 flex items-center gap-3 border-b border-gray-50">
+          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
           <ArrowUpRight size={22} className="text-green-500 shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('withdraw.title')}</p>
@@ -157,7 +187,7 @@ export default function MinePage() {
 
         {/* Deposit */}
         <button onClick={() => document.dispatchEvent(new CustomEvent('showContactSupport'))}
-          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
           <CreditCard size={22} className="text-[#FF5000] shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">Deposit</p>
@@ -167,7 +197,7 @@ export default function MinePage() {
         </button>
         {/* Staking */}
         <button onClick={() => navigate('/mine/staking')}
-          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
           <Lock size={22} className="text-amber-500 shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('stake.title')}</p>
@@ -175,12 +205,8 @@ export default function MinePage() {
           </div>
           <ChevronRight size={16} className="text-text-muted shrink-0" />
         </button>
-      </div>
 
-      <div style={{height:8}}></div>
-
-      <div className="bg-white rounded-2xl overflow-hidden">
-        {/* Sub-pages */}
+        {/* ═══ Sub-pages ═══ */}
         {[
           { Icon: Users, label: t('mine.myTeam'), desc: t('mine.myTeamDesc'), to: '/mine/team' },
           { Icon: CreditCard, label: t('mine.myWallet'), desc: t('mine.myWalletDesc'), to: '/mine/wallet' },
@@ -188,7 +214,7 @@ export default function MinePage() {
           { Icon: Bell, label: t('mine.messages'), desc: t('mine.messagesDesc'), to: '/mine/messages' },
         ].map(({ Icon, label, desc, to }, i) => (
           <button key={i} onClick={() => navigate(to)}
-            className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+            className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
             <Icon size={22} className="text-primary shrink-0" />
             <div className="flex-1 text-left">
               <p className="text-[14px] font-bold text-text">{label}</p>
@@ -197,14 +223,10 @@ export default function MinePage() {
             <ChevronRight size={16} className="text-text-muted shrink-0" />
           </button>
         ))}
-      </div>
 
-      <div style={{height:8}}></div>
-
-      <div className="bg-white rounded-2xl overflow-hidden">
         {/* Language */}
         <button onClick={() => setShowLang(!showLang)}
-          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
           <Globe size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('common.language')}</p>
@@ -213,7 +235,7 @@ export default function MinePage() {
           <ChevronRight size={16} className={`text-text-muted shrink-0 transition-transform ${showLang ? 'rotate-90' : ''}`} />
         </button>
         {showLang && (
-          <div className="bg-white rounded-2xl overflow-hidden p-2 grid grid-cols-4 gap-2 animate-scale-in">
+          <div className="bg-white rounded-2xl border border-separator p-2 grid grid-cols-4 gap-2 animate-scale-in">
             {langs.map((l) => (
               <button key={l.code}
                 onClick={() => { i18n.changeLanguage(l.code); localStorage.setItem('lang', l.code); setShowLang(false); }}
@@ -227,7 +249,7 @@ export default function MinePage() {
 
         {/* KYC */}
         <button onClick={() => navigate('/mine/kyc')}
-          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
           <Shield size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('kyc.title')}</p>
@@ -238,7 +260,7 @@ export default function MinePage() {
 
         {/* Notifications */}
         <button onClick={() => navigate('/mine/notifications')}
-          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
           <Bell size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">Notification Center</p>
@@ -249,7 +271,7 @@ export default function MinePage() {
 
         {/* Verify */}
         <button onClick={() => navigate('/mine/verify')}
-          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
           <Camera size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('verify.title')}</p>
@@ -257,14 +279,10 @@ export default function MinePage() {
           </div>
           <ChevronRight size={16} className="text-text-muted shrink-0" />
         </button>
-      </div>
 
-      <div style={{height:8}}></div>
-
-      <div className="bg-white rounded-2xl overflow-hidden">
         {/* Support */}
         <button onClick={() => document.dispatchEvent(new CustomEvent('showContactSupport'))}
-          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
           <MessageCircle size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('support.title')}</p>
@@ -275,7 +293,7 @@ export default function MinePage() {
 
         {/* Legal */}
         <button onClick={() => navigate('/mine/legal')}
-          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
           <Info size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('legal.title')}</p>
@@ -286,7 +304,7 @@ export default function MinePage() {
 
         {/* Security */}
         <button onClick={() => navigate('/mine/security')}
-          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
           <Lock size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('security.title')}</p>
@@ -298,7 +316,7 @@ export default function MinePage() {
         {/* Admin */}
         {user?.is_admin == true && (
           <button onClick={() => navigate('/admin')}
-            className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+            className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
             <Lock size={22} className="text-primary shrink-0" />
             <div className="flex-1 text-left">
               <p className="text-[14px] font-bold text-text">{t('mine.adminPanel')}</p>
@@ -308,13 +326,9 @@ export default function MinePage() {
           </button>
         )}
 
-      </div>
-
-      <div style={{height:8}}></div>
-
-      {/* Logout */}
+        {/* Logout */}
         <button onClick={handleLogout}
-          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
+          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
           <LogOut size={22} className="text-red-400 shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-red-500">{t('mine.logout')}</p>
@@ -373,7 +387,7 @@ function MembershipCard({ effectiveInvites, t }) {
   const needMore = nextTier ? nextTier.min - effectiveInvites : 0;
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden overflow-hidden">
+    <div className="bg-white rounded-2xl border border-separator overflow-hidden">
       {/* Header */}
       <div className="relative bg-gradient-to-r from-[#1a1a2e] via-[#16213e] to-[#0f3460] p-5 text-white overflow-hidden"
         style={{ backgroundSize: '200% 200%', animation: 'gradientShift 5s ease-in-out infinite' }}>
