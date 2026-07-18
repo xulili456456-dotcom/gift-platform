@@ -490,30 +490,6 @@ export default function StorePage() {
                 </div>
               </div>
             )}
-              </div>
-              <p className="text-[10px] text-[#565959] mt-1.5">{t('store.capitalFlow')}</p>
-            </div>
-
-            <div className="flex flex-col gap-1.5 mt-3 mb-2 text-xs text-[#0F1111]">
-              <div className="flex items-center gap-2"><Truck size={14} className="text-[#565959]" />{t('store.freeShipping')}</div>
-              <div className="flex items-center gap-2"><Shield size={14} className="text-[#565959]" />{t('store.capitalGuarantee')}</div>
-              <div className="flex items-center gap-2"><RotateCcw size={14} className="text-[#565959]" />{t('store.profitInstant')}</div>
-            </div>
-
-            <div className="my-3 border-t border-gray-100" />
-
-            {Object.keys(p.specs || {}).length > 0 && (
-              <div className="mb-3">
-                <h3 className="text-base font-bold text-[#0F1111] mb-2">{t('store.specs')}</h3>
-                <div className="space-y-1.5">
-                  {Object.entries(p.specs || {}).slice(0, 8).map(([k, v]) => (
-                    <div key={k} className="flex justify-between text-xs py-1.5 border-b border-gray-100 last:border-0"><span className="text-[#565959]">{tSpec(k)}</span><span className="text-[#0F1111] font-medium text-right max-w-[60%]">{v}</span></div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {p.desc && <div className="mb-3"><h3 className="text-base font-bold text-[#0F1111] mb-1">{t('store.description')}</h3><p className="text-xs text-[#0F1111] leading-relaxed">{p.desc}</p></div>}
           </div>
         </div>
 
