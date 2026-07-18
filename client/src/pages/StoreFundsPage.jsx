@@ -16,6 +16,7 @@ export default function StoreFundsPage() {
   const [depositMsg, setDepositMsg] = useState('');
   const [orderHistory, setOrderHistory] = useState(null);
   const [expandedOrder, setExpandedOrder] = useState(null);
+  const [expandedHolding, setExpandedHolding] = useState(null);
 
   const loadStatus = useCallback(async () => {
     try { const { data } = await client.get('/store/status'); setStatus(data); } catch {}
@@ -90,9 +91,11 @@ export default function StoreFundsPage() {
           {holdings.length === 0 && <p style={{fontSize:11,color:'#999',textAlign:'center',padding:20}}>No active holdings</p>}
           {holdings.map(h => {
             const profit = Math.round((Number(h.cost) / COST_RATE * PROFIT_RATE) * 100) / 100;
+            const isOpen = expandedHolding === h.id;
+            const totalReturn = Number(h.cost) + profit;
             return (
             <div key={h.id} style={{borderBottom:'1px solid #f5f5f5',paddingBottom:10,marginBottom:10}}>
-              <div style={{display:'flex',justifyContent:'space-between'}}>
+              <div onClick={() => setExpandedHolding(isOpen ? null : h.id)} style={{display:'flex',justifyContent:'space-between',cursor:'pointer'}}>
                 <div style={{flex:1,minWidth:0,paddingRight:8}}>
                   <div style={{fontSize:13,fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{h.product_name || `Order #${h.id}`}</div>
                   <div style={{fontSize:10,color:'#999',marginTop:2}}>Cost ${Number(h.cost).toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</div>
@@ -105,6 +108,14 @@ export default function StoreFundsPage() {
               <div style={{width:'100%',height:3,background:'#f0f0f0',borderRadius:2,marginTop:6}}>
                 <div style={{width:`${h.progress}%`,height:'100%',background:h.progress>60?'#00A86B':'#FF5000',borderRadius:2}}></div>
               </div>
+              {isOpen && (
+                <div style={{marginTop:8,padding:8,background:'#f8f8f8',borderRadius:8,fontSize:10,color:'#666'}}>
+                  <div style={{display:'flex',justifyContent:'space-between'}}><span>Product</span><span style={{color:'#333',fontWeight:500,textAlign:'right',flex:1,marginLeft:8}}>{h.product_name || '-'}</span></div>
+                  <div style={{display:'flex',justifyContent:'space-between',marginTop:3}}><span>Created</span><span style={{color:'#333'}}>{new Date(h.created_at).toLocaleString()}</span></div>
+                  <div style={{display:'flex',justifyContent:'space-between',marginTop:3}}><span>Sell By</span><span style={{color:'#333'}}>{new Date(h.sell_by).toLocaleString()}</span></div>
+                  <div style={{display:'flex',justifyContent:'space-between',marginTop:3,fontWeight:600}}><span>Total Return</span><span style={{color:'#00A86B'}}>${totalReturn.toFixed(2)}</span></div>
+                </div>
+              )}
             </div>
           )})}
         </div>
