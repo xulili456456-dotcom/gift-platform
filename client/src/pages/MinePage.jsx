@@ -94,7 +94,6 @@ export default function MinePage() {
       {/* Business Group */}
       <div style={{margin:'0 16px 8px',background:'#fff',borderRadius:14,overflow:'hidden'}}>
         <MenuRow icon={<Users size={17} color="#4C6EF5"/>} iconBg="#EEF2FF" label={t('mine.myTeam')} desc={t('mine.myTeamDesc')} onClick={()=>navigate('/mine/team')}/>
-        <MenuRow icon={<CreditCard size={17} color="#00A86B"/>} iconBg="#E8F5E9" label={t('mine.myWallet')} desc={t('mine.myWalletDesc')} onClick={()=>navigate('/mine/wallet')}/>
         <MenuRow icon={<Store size={17} color="#FF5000"/>} iconBg="#FFF5F0" label={t('mine.myStore')} desc={t('mine.myStoreDesc')} onClick={()=>navigate('/store')}/>
         <MenuRow icon={<Bell size={17} color="#8B5CF6"/>} iconBg="#F3E5F5" label={t('mine.messages')} desc={t('mine.messagesDesc')} onClick={()=>navigate('/mine/messages')}/>
       </div>
