@@ -63,11 +63,11 @@ router.get('/status', async (req, res) => {
   const next = nextTier(store.tier);
 
   const doneToday = await get(
-    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND created_at::date = ?::date",
+    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND processed_at::date = ?::date",
     [store.id, today]
   );
   const earningsToday = await get(
-    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND processed_at::date = ?::date",
     [store.id, today]
   );
   const totalEarnings = await get("SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ?", [store.id]);
@@ -244,7 +244,7 @@ router.post('/check-sell', async (req, res) => {
       const { profit, totalReturn } = calcProduct(price);
       const t = await tx();
       try {
-        await t.run("UPDATE store_orders SET status = 'done', amount = ? WHERE id = ?", [profit, order.id]);
+        await t.run("UPDATE store_orders SET status = 'done', amount = ?, processed_at = NOW() WHERE id = ?", [profit, order.id]);
         await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, totalReturn, 'bonus', 'delivered']);
         await t.commit();
         settled.push({ id: order.id, cost: Number(order.cost), profit, totalReturn });
@@ -270,7 +270,7 @@ router.get('/earnings-stats', async (req, res) => {
   const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
 
   const todayProfit = await get(
-    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND processed_at::date = ?::date",
     [store?.id || 0, today]
   );
   const totalProfit = await get(
@@ -309,7 +309,7 @@ router.get('/analytics', async (req, res) => {
   for (let i = 6; i >= 0; i--) {
     const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
     const r = await get(
-      "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+      "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND processed_at::date = ?::date",
       [store?.id || 0, d]);
     trend.push({ date: d.slice(5), profit: Number(r?.total || 0) });
   }
@@ -325,10 +325,10 @@ router.get('/analytics', async (req, res) => {
 
   // Today's stats
   const todayProfit = await get(
-    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND processed_at::date = ?::date",
     [store?.id || 0, today]);
   const todayOrders = await get(
-    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done' AND created_at::date = ?::date",
+    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done' AND processed_at::date = ?::date",
     [store?.id || 0, today]);
 
   const totalProfit = await get(
