@@ -436,78 +436,67 @@ export default function StorePage() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="bg-gray-50">
-            <img src={p.img} alt={p.name} className="w-full aspect-square object-cover" />
+          <div style={{background:'#f5f5f5'}}>
+            <img src={p.img} alt={p.name} style={{width:'100%',aspectRatio:'1',objectFit:'cover'}} />
           </div>
 
-          <div className="px-4">
-            <h1 className="text-[15px] font-semibold text-gray-900 leading-snug mt-4">{p.name}</h1>
-            <div className="flex items-center gap-3 mt-2 text-[11px] text-gray-400">
-              <span>{p.sold.toLocaleString()}+ sold</span>
-              <span>{p.rating} rating</span>
-            </div>
+          <div style={{padding:16}}>
+            <h1 style={{fontSize:15,fontWeight:600,color:'#222',lineHeight:1.4,margin:'0 0 8px 0'}}>{p.name}</h1>
+            <div style={{fontSize:11,color:'#999',marginBottom:12}}>{p.sold.toLocaleString()}+ sold · {p.rating} rating</div>
 
-            {/* Trade Data Card */}
-            <div className="bg-[#f8faf8] border border-[#e0f0e0] rounded-2xl p-4 mt-4">
-              <div className="flex justify-between items-start mb-3">
+            {/* Profit Card */}
+            <div style={{background:'linear-gradient(135deg,#f0faf4,#e8f5e9)',borderRadius:16,padding:16,marginBottom:12}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
                 <div>
-                  <div className="text-[10px] text-gray-400 mb-0.5">Profit</div>
-                  <div className="text-[26px] font-extrabold text-[#00A86B]">+${p.profit.toFixed(2)}</div>
+                  <div style={{fontSize:10,color:'#888',marginBottom:2}}>Profit</div>
+                  <div style={{fontSize:32,fontWeight:800,color:'#00A86B',lineHeight:1}}>+${p.profit.toFixed(2)}</div>
                 </div>
-                <div className="text-right">
-                  <div className="text-[10px] text-gray-400 mb-0.5">Cost (85%)</div>
-                  <div className="text-lg font-bold text-gray-900">${p.costPrice.toFixed(2)}</div>
+                <div style={{textAlign:'right'}}>
+                  <div style={{fontSize:10,color:'#888',marginBottom:2}}>Cost</div>
+                  <div style={{fontSize:20,fontWeight:700,color:'#333'}}>${p.costPrice.toFixed(2)}</div>
+                  <div style={{fontSize:10,color:'#888',marginTop:2}}>Market ${p.price.toFixed(2)}</div>
                 </div>
               </div>
-              <div className="flex justify-between pt-3 border-t border-[#e0f0e0] text-[11px]">
-                <span className="text-gray-400">Market <b className="text-gray-700">${p.price.toFixed(2)}</b></span>
-                <span className="text-gray-400">Return <b className="text-gray-700">${(p.costPrice + p.profit).toFixed(2)}</b></span>
-                <span className="text-gray-400">6-30h</span>
+              <div style={{display:'flex',gap:8}}>
+                <div style={{flex:1,background:'#fff',borderRadius:10,padding:8,textAlign:'center'}}>
+                  <div style={{fontSize:9,color:'#999'}}>Return</div>
+                  <div style={{fontSize:14,fontWeight:700,color:'#333'}}>${(p.costPrice + p.profit).toFixed(2)}</div>
+                </div>
+                <div style={{flex:1,background:'#fff',borderRadius:10,padding:8,textAlign:'center'}}>
+                  <div style={{fontSize:9,color:'#999'}}>Hold Time</div>
+                  <div style={{fontSize:14,fontWeight:700,color:'#333'}}>6-30h</div>
+                </div>
+                <div style={{flex:1,background:'#fff',borderRadius:10,padding:8,textAlign:'center'}}>
+                  <div style={{fontSize:9,color:'#999'}}>ROI</div>
+                  <div style={{fontSize:14,fontWeight:700,color:'#00A86B'}}>15%</div>
+                </div>
               </div>
             </div>
 
             {/* Deposit Check */}
-            <div className="bg-gray-50 rounded-2xl p-4 mt-3 text-[12px] space-y-2">
-              <div className="flex justify-between"><span className="text-gray-400">Required Deposit</span><span className="font-semibold">${p.costPrice.toFixed(2)}</span></div>
-              <div className="flex justify-between"><span className="text-gray-400">Your Deposit</span><span className="font-semibold">${(s.deposit||0).toFixed(2)}</span></div>
-              <div className="flex justify-between pt-2 border-t border-gray-200">
-                <span className="text-gray-400">Status</span>
-                {(s.deposit||0) >= p.costPrice
-                  ? <span className="font-bold text-[#00A86B]">Covered</span>
-                  : <span className="font-bold text-[#CC0C39]">Short ${(p.costPrice - (s.deposit||0)).toFixed(2)}</span>
-                }
-              </div>
+            <div style={{background:'#f8f8f8',borderRadius:12,padding:14,marginBottom:12}}>
+              <div style={{fontSize:10,color:'#999',marginBottom:8}}>DEPOSIT CHECK</div>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:12}}><span style={{color:'#666'}}>Required</span><span style={{fontWeight:600,color:'#333'}}>${p.costPrice.toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:6,fontSize:12}}><span style={{color:'#666'}}>Your Deposit</span><span style={{fontWeight:600,color:'#333'}}>${(s.deposit||0).toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:12}}><span style={{color:'#666'}}>Status</span>{(s.deposit||0)>=p.costPrice?<span style={{fontWeight:700,color:'#00A86B'}}>✓ Covered</span>:<span style={{fontWeight:700,color:'#CC0C39'}}>Short ${(p.costPrice-(s.deposit||0)).toFixed(2)}</span>}</div>
             </div>
 
             {/* Specs */}
-            {Object.keys(p.specs || {}).length > 0 && (
-              <div className="mt-4 mb-2">
-                <div className="text-xs font-semibold text-gray-700 mb-2">Specifications</div>
-                <div className="space-y-1.5 text-[11px]">
-                  {Object.entries(p.specs || {}).slice(0, 6).map(([k, v]) => (
-                    <div key={k} className="flex justify-between py-1 border-b border-gray-100 last:border-0"><span className="text-gray-400">{k}</span><span className="text-gray-700">{v}</span></div>
-                  ))}
-                </div>
+            {Object.keys(p.specs||{}).length>0&&<div style={{marginBottom:8}}>
+              <div style={{fontSize:10,color:'#999',marginBottom:6}}>SPECIFICATIONS</div>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4px 16px',fontSize:11}}>
+                {Object.entries(p.specs||{}).slice(0,6).map(([k,v])=><div key={k} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:'1px solid #f5f5f5'}}><span style={{color:'#999'}}>{k}</span><span style={{color:'#333',fontWeight:500}}>{v}</span></div>)}
               </div>
-            )}
+            </div>}
           </div>
         </div>
 
-        <div className="shrink-0 px-4 py-3 border-t border-gray-100 bg-white flex items-center gap-3 safe-bottom">
-          <div className="flex-1">
-            <p className="text-lg font-bold text-[#0F1111]">${p.costPrice.toFixed(2)} <span className="text-xs font-normal text-[#565959]">{t('store.costPrice')}</span></p>
-            <p className="text-xs text-[#067D62] font-bold">{t('store.earn')} +${p.profit.toFixed(2)}</p>
+        <div style={{padding:'12px 16px',borderTop:'1px solid #eee',background:'#fff',display:'flex',alignItems:'center',gap:12}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:18,fontWeight:700,color:'#333'}}>${p.costPrice.toFixed(2)} <span style={{fontSize:12,fontWeight:400,color:'#999'}}>cost</span></div>
+            <div style={{fontSize:12,fontWeight:600,color:'#00A86B'}}>+${p.profit.toFixed(2)} profit</div>
           </div>
-          {tradeMode === 'share' ? (
-            <button onClick={() => handleShare(p)} className="px-10 py-3 rounded-xl font-bold text-sm bg-[#067D62] text-white active:scale-95 transition-all">
-              🔗 Share & Earn 3%
-            </button>
-          ) : (
-            <button onClick={() => handleBuy(p)}
-              className="px-10 py-3 rounded-xl font-bold text-sm bg-[#00A86B] text-white active:scale-95 transition-all">
-              Buy ${p.costPrice.toFixed(2)}
-            </button>
-          )}
+          <button onClick={() => handleBuy(p)} style={{padding:'12px 40px',background:'#00A86B',color:'#fff',border:'none',borderRadius:12,fontSize:15,fontWeight:700,cursor:'pointer'}}>Buy</button>
         </div>
 
         {showInsufficient && (
