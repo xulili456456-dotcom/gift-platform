@@ -499,6 +499,26 @@ export default function StorePage() {
           <button onClick={() => handleBuy(p)} style={{padding:'12px 40px',background:'#00A86B',color:'#fff',border:'none',borderRadius:12,fontSize:15,fontWeight:700,cursor:'pointer'}}>Buy</button>
         </div>
 
+        {/* Buy Confirm Modal */}
+        {buyConfirm && (
+          <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={() => setBuyConfirm(null)}>
+            <div style={{background:'#fff',borderRadius:16,padding:24,width:'100%',maxWidth:340}} onClick={e => e.stopPropagation()}>
+              <div style={{textAlign:'center',fontSize:32,marginBottom:12}}>🛒</div>
+              <div style={{fontSize:15,fontWeight:700,color:'#222',marginBottom:2}}>Confirm Purchase</div>
+              <div style={{fontSize:11,color:'#999',marginBottom:12,lineHeight:1.4}}>{buyConfirm.name}</div>
+              <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:13}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Cost</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Profit</span><span style={{fontWeight:600,color:'#00A86B'}}>+${buyConfirm.profit.toFixed(2)}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Total Return</span><span style={{fontWeight:700}}>${(buyConfirm.costPrice+buyConfirm.profit).toFixed(2)}</span></div>
+              </div>
+              <div style={{display:'flex',gap:8}}>
+                <button onClick={() => setBuyConfirm(null)} style={{flex:1,padding:'10px 0',background:'#f5f5f5',border:'none',borderRadius:10,fontSize:14,fontWeight:600,color:'#666',cursor:'pointer'}}>Cancel</button>
+                <button onClick={handleConfirmBuy} disabled={buying} style={{flex:1,padding:'10px 0',background:'#00A86B',border:'none',borderRadius:10,fontSize:14,fontWeight:700,color:'#fff',cursor:'pointer'}}>{buying?'...':`Buy $${buyConfirm.costPrice.toFixed(2)}`}</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {showInsufficient && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowInsufficient(null)}>
             <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
