@@ -18,10 +18,10 @@ export default function WithdrawPage() {
   const [claims, setClaims] = useState([]);
   const [taskBalance, setTaskBalance] = useState({ available: 0, total: 0 });
   const [loading, setLoading] = useState(true);
-  const [wallet, setWallet] = useState(null);
-  useEffect(() => { client.get('/wallet').then(({ data }) => data && setWallet(data)).catch(() => toast.error(t('common.loadingFailed'))); }, []);
   const [withdrawals, setWithdrawals] = useState([]);
   const [amount, setAmount] = useState('');
+  const [network, setNetwork] = useState('trc20');
+  const [walletAddress, setWalletAddress] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -41,10 +41,10 @@ export default function WithdrawPage() {
     const amt = parseFloat(amount);
     if (!amt || amt < 1) { toast.error(t('withdraw.minAmount')); return; }
     if (amt > availableBalance) { toast.error(t('withdraw.insufficient')); return; }
-    if (!wallet) { toast.error(t('withdraw.noWallet')); return; }
+    if (!walletAddress) { toast.error('Please enter wallet address'); return; }
     setSubmitting(true);
     try {
-      await client.post('/withdrawals', { amount: amt, network: wallet.network, wallet_address: wallet.address });
+      await client.post('/withdrawals', { amount: amt, network: network, wallet_address: walletAddress });
       setAmount('');
       toast.success(t('withdraw.success'));
       loadData();
@@ -91,13 +91,14 @@ export default function WithdrawPage() {
             </div>)}
 
             <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Network</div>
-            <div style={{background:'#f5f5f5',borderRadius:12,padding:'12px 14px',marginBottom:12,fontSize:13,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-              <span>{wallet?.network?.toUpperCase()||'Not set'} (USDT)</span>
-              <button onClick={()=>navigate('/mine/wallet')} style={{background:'none',border:'none',color:'#FF5000',fontSize:11,cursor:'pointer'}}>Change</button>
-            </div>
+            <select value={network} onChange={e=>setNetwork(e.target.value)} style={{width:'100%',padding:'12px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:14,outline:'none',marginBottom:12}}>
+              <option value="trc20">TRC20 (USDT)</option>
+              <option value="erc20">ERC20 (USDT)</option>
+              <option value="bep20">BEP20 (USDT)</option>
+            </select>
 
             <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Wallet Address</div>
-            <div style={{background:'#f5f5f5',borderRadius:12,padding:'12px 14px',fontSize:11,color:'#999',wordBreak:'break-all',marginBottom:4}}>{wallet?.address||'Not set'}</div>
+            <input value={walletAddress} onChange={e=>setWalletAddress(e.target.value)} placeholder="Enter your wallet address" style={{width:'100%',padding:'12px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:13,outline:'none',marginBottom:4}} />
             <div style={{fontSize:10,color:'#999',marginBottom:12}}>Double-check your address. Withdrawals cannot be reversed.</div>
 
             <button onClick={()=>{if(parseFloat(amount)<10){toast.error('Minimum $10');return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0}
@@ -130,7 +131,7 @@ export default function WithdrawPage() {
           <div style={{fontSize:12,fontWeight:700,color:'#999',marginBottom:4}}>CONFIRM WITHDRAWAL</div>
           <div style={{fontSize:32,fontWeight:800,color:'#0f0f0f',marginBottom:16}}>${parseFloat(amount||0).toFixed(2)}</div>
           <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:16,fontSize:11,textAlign:'left'}}>
-            <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Network</span><span style={{fontWeight:600}}>{wallet?.network?.toUpperCase()}</span></div>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Network</span><span style={{fontWeight:600}}>{network.toUpperCase()}</span></div>
             <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Fee</span><span style={{fontWeight:600}}>-${fee.toFixed(2)}</span></div>
             <div style={{display:'flex',justifyContent:'space-between'}}><span style={{color:'#999'}}>You Receive</span><span style={{fontWeight:700,color:'#00A86B'}}>${receive.toFixed(2)}</span></div>
           </div>
