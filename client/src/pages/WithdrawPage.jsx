@@ -75,9 +75,7 @@ export default function WithdrawPage() {
           {pendingBalance > 0 && <div style={{fontSize:11,color:'#999',marginTop:4}}>Pending: ${pendingBalance.toFixed(2)} · Withdrawn: ${totalWithdrawn.toFixed(2)}</div>}
         </div>
 
-        {wallet ? (<>
-          {/* Withdraw Form */}
-          <div style={{background:'#fff',borderRadius:20,padding:20,marginBottom:14}}>
+        <div style={{background:'#fff',borderRadius:20,padding:20,marginBottom:14}}>
             <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Amount</div>
             <div style={{fontSize:10,color:'#999',marginBottom:6}}>Min $10 · Fee 1%</div>
             <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Enter amount" style={{width:'100%',padding:'12px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:24,fontWeight:700,outline:'none',marginBottom:12}} />
@@ -112,13 +110,6 @@ export default function WithdrawPage() {
               <button onClick={()=>document.dispatchEvent(new CustomEvent('showContactSupport'))} style={{padding:'8px 16px',background:'#E8F5E9',color:'#00A86B',border:'1px solid #00A86B',borderRadius:10,fontSize:11,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap'}}>Contact →</button>
             </div>
           </div>
-        </>) : (
-          <div style={{background:'#fff',borderRadius:16,padding:32,textAlign:'center',marginBottom:14}}>
-            <div style={{fontSize:40,marginBottom:8}}>🔐</div>
-            <div style={{fontSize:14,fontWeight:600,color:'#333',marginBottom:4}}>{t('withdraw.bindFirst')}</div>
-            <button onClick={()=>navigate('/mine/wallet')} style={{marginTop:12,padding:'10px 24px',background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:13,fontWeight:600,cursor:'pointer'}}>{t('wallet.bindBtn')}</button>
-          </div>
-        )}
 
         {/* History */}
         {withdrawals.length > 0 && (<div style={{background:'#fff',borderRadius:20,padding:16}}>
