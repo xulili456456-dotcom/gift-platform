@@ -64,7 +64,7 @@ export default function MinePage() {
       <div style={{padding:'44px 20px 24px',background:'#fff'}}>
         <div style={{display:'flex',alignItems:'center',gap:14}}>
           <div style={{width:52,height:52,borderRadius:14,background:'#0f0f0f',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontSize:20,fontWeight:700}}>{(user?.name||user?.email||'?')[0].toUpperCase()}</div>
-          <div><div style={{fontSize:16,fontWeight:700,color:'#111'}}>{user?.name||user?.email}</div><div style={{fontSize:11,color:'#999'}}>UID {user?.id} · Code {user?.referral_code||'------'}</div></div>
+          <div><div style={{fontSize:16,fontWeight:700,color:'#111'}}>{user?.name||user?.email}</div><div style={{fontSize:11,color:'#999'}}>UID {user?.referral_code||user?.id}</div></div>
         </div>
         <div style={{display:'flex',gap:0,marginTop:14,background:'#f5f5f5',borderRadius:12,overflow:'hidden'}}>
           {[{v:stats?.direct_count||0,l:t('mine.directInvites')},{v:effectiveInvites,l:t('mine.effectiveInvites')},{v:pendingClaims.length,l:t('claim.pending')},{v:deliveredClaims.length,l:t('claim.delivered')}].map((x,i)=><div key={i} style={{flex:1,textAlign:'center',padding:10,borderLeft:i>0?'1px solid #eee':'none'}}><div style={{fontSize:17,fontWeight:700,color:'#111'}}>{x.v}</div><div style={{fontSize:10,color:'#999'}}>{x.l}</div></div>)}
