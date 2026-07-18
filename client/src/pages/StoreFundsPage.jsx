@@ -14,10 +14,7 @@ export default function StoreFundsPage() {
   const [earnings, setEarnings] = useState({ todayProfit: 0, totalProfit: 0 });
   const [depositAmount, setDepositAmount] = useState('');
   const [depositMsg, setDepositMsg] = useState('');
-  const [expandedHolding, setExpandedHolding] = useState(null);
-  const [expandedOrder, setExpandedOrder] = useState(null);
   const [orderHistory, setOrderHistory] = useState(null);
-  const [orderPeriod, setOrderPeriod] = useState('today');
 
   const loadStatus = useCallback(async () => {
     try { const { data } = await client.get('/store/status'); setStatus(data); } catch {}
@@ -42,102 +39,87 @@ export default function StoreFundsPage() {
     catch (err) { toast.error(err.response?.data?.detail || err.response?.data?.error || 'Failed'); }
   };
 
-  if (!status?.hasStore) return <div className="min-h-screen bg-white flex items-center justify-center"><p className="text-gray-400">No store opened</p></div>;
+  if (!status?.hasStore) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><p className="text-gray-400">No store opened</p></div>;
 
   const s = status.store;
 
   return (
-    <div className="min-h-screen bg-white" style={{maxWidth:430,margin:'0 auto'}}>
-      <div style={{background:'#0f0f0f',padding:'6px 16px 10px',display:'flex',alignItems:'center',gap:12}}>
-        <button onClick={() => navigate('/store')} style={{background:'none',border:'none',cursor:'pointer',padding:4}}>
-          <ChevronLeft size={22} color="#fff" />
-        </button>
-        <span style={{fontSize:14,fontWeight:700,color:'#fff'}}>Funds</span>
+    <div className="min-h-screen bg-gray-50" style={{maxWidth:430,margin:'0 auto'}}>
+      {/* Header */}
+      <div style={{background:'#0f0f0f',padding:'8px 16px 12px',display:'flex',alignItems:'center',gap:12}}>
+        <button onClick={() => navigate('/store')} style={{background:'none',border:'none',cursor:'pointer',padding:0,fontSize:20,color:'#fff'}}>←</button>
+        <span style={{color:'#fff',fontSize:14,fontWeight:700}}>Funds</span>
       </div>
-      <div className="p-3 space-y-3">
-        <div className="grid grid-cols-2 gap-2">
-          <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-[10px] text-gray-400 mb-1">Available Balance</p>
-            <p className="text-2xl font-bold">${s.balance.toFixed(2)}</p>
+
+      <div style={{padding:16}}>
+        {/* Available Balance Card */}
+        <div style={{background:'#fff',borderRadius:20,padding:20,textAlign:'center',marginBottom:14}}>
+          <div style={{fontSize:11,color:'#999',marginBottom:4}}>Available Balance</div>
+          <div style={{fontSize:42,fontWeight:800,color:'#0f0f0f',lineHeight:1}}>
+            ${Math.floor(s.balance)}<span style={{fontSize:20,color:'#ccc'}}>.{(s.balance%1).toFixed(2).substring(2)}</span>
           </div>
-          <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <p className="text-[10px] text-gray-400 mb-1">Security Deposit</p>
-            <p className="text-2xl font-bold">${(s.deposit||0).toFixed(2)}</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
-            <p className="text-[9px] text-gray-400">Max Trade</p>
-            <p className="text-sm font-bold">${(s.maxTrade||0).toFixed(0)}</p>
-          </div>
-          <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
-            <p className="text-[9px] text-gray-400">Free Orders</p>
-            <p className="text-sm font-bold">{s.freeRemaining||0}/5</p>
-          </div>
-          <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
-            <p className="text-[9px] text-gray-400">Today Earned</p>
-            <p className="text-sm font-bold text-green-600">+${earnings.todayProfit.toFixed(2)}</p>
+          <div style={{display:'flex',justifyContent:'center',gap:24,marginTop:10}}>
+            <div><span style={{fontSize:10,color:'#999'}}>Security </span><span style={{fontSize:14,fontWeight:700}}>${(s.deposit||0).toFixed(0)}</span></div>
+            <div><span style={{fontSize:10,color:'#999'}}>Free </span><span style={{fontSize:14,fontWeight:700,color:'#FF5000'}}>{s.freeRemaining||0}/5</span></div>
+            <div><span style={{fontSize:10,color:'#999'}}>Today </span><span style={{fontSize:14,fontWeight:700,color:'#00A86B'}}>+${earnings.todayProfit.toFixed(2)}</span></div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-gray-100">
-          <h3 className="text-sm font-bold mb-3">Manage Security Deposit</h3>
-          <p className="text-[10px] text-gray-400 mb-2">Security deposit is locked collateral. 1:1 ratio.</p>
-          <div className="flex items-center gap-2 mb-3">
-            <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="Amount" className="flex-1 px-3 py-2.5 border border-gray-200 rounded-xl text-sm outline-none" />
-            <button onClick={handleDeposit} className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[#FF5000] text-white">Add Security</button>
+
+        {/* Security Deposit Card */}
+        <div style={{background:'#fff',borderRadius:20,padding:16,marginBottom:14}}>
+          <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Security Deposit</div>
+          <div style={{display:'flex',gap:8,marginBottom:8}}>
+            <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="Amount" style={{flex:1,padding:'10px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:14,outline:'none'}} />
+            <button onClick={handleDeposit} style={{padding:'10px 20px',background:'#00A86B',color:'#fff',border:'none',borderRadius:12,fontSize:13,fontWeight:700,cursor:'pointer'}}>Add Security</button>
           </div>
-          {depositMsg && <p className="text-xs text-green-600 font-bold mb-2">{depositMsg}</p>}
+          {depositMsg && <p style={{fontSize:11,color:'#00A86B',fontWeight:600,marginBottom:8}}>{depositMsg}</p>}
           {(s.deposit||0) > 0 && (
-            <button onClick={handleWithdrawDeposit} className="w-full py-2.5 rounded-xl text-sm font-bold bg-red-50 text-red-500 border border-red-200">
+            <button onClick={handleWithdrawDeposit} style={{width:'100%',padding:10,background:'none',color:'#CC0C39',border:'1px solid #FFCDD2',borderRadius:12,fontSize:12,fontWeight:600,cursor:'pointer'}}>
               Withdraw ${(s.deposit||0).toFixed(0)} to Balance
             </button>
           )}
         </div>
-        {/* Holdings */}
-        <div className="bg-white rounded-xl p-4 border border-gray-100">
-          <h3 className="text-sm font-bold mb-2">Active Holdings ({holdings.length})</h3>
-          {holdings.length === 0 && <p className="text-xs text-gray-400 text-center py-4">No active holdings</p>}
+
+        {/* Active Holdings */}
+        <div style={{background:'#fff',borderRadius:20,padding:16,marginBottom:14}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+            <span style={{fontSize:12,fontWeight:700,color:'#0f0f0f'}}>Active Holdings</span>
+            <span style={{fontSize:10,color:'#999'}}>{holdings.length} orders</span>
+          </div>
+          {holdings.length === 0 && <p style={{fontSize:11,color:'#999',textAlign:'center',padding:20}}>No active holdings</p>}
           {holdings.map(h => {
             const profit = Math.round((Number(h.cost) / COST_RATE * PROFIT_RATE) * 100) / 100;
-            const isOpen = expandedHolding === h.id;
             return (
-            <div key={h.id} className="border-b border-gray-100 last:border-0">
-              <div className="py-2 cursor-pointer" onClick={() => setExpandedHolding(isOpen ? null : h.id)}>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="font-medium truncate max-w-[70%]">{h.product_name || `Order #${h.id}`}</span>
-                  <span className="text-green-600 font-bold">+${profit.toFixed(2)}</span>
+            <div key={h.id} style={{borderBottom:'1px solid #f5f5f5',paddingBottom:10,marginBottom:10}}>
+              <div style={{display:'flex',justifyContent:'space-between'}}>
+                <div style={{flex:1,minWidth:0,paddingRight:8}}>
+                  <div style={{fontSize:13,fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{h.product_name || `Order #${h.id}`}</div>
+                  <div style={{fontSize:10,color:'#999',marginTop:2}}>Cost ${Number(h.cost).toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</div>
                 </div>
-                <div className="flex items-center justify-between text-[9px] text-gray-400 mt-0.5">
-                  <span>Cost ${Number(h.cost).toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</span>
-                  <span>{h.progress}%</span>
+                <div style={{textAlign:'right',flexShrink:0}}>
+                  <div style={{fontSize:15,fontWeight:700,color:'#00A86B'}}>+${profit.toFixed(2)}</div>
+                  <div style={{fontSize:10,color:'#999'}}>{h.progress}%</div>
                 </div>
-                <div className="w-full h-1 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                  <div className="h-full bg-[#FF5000] rounded-full" style={{width:`${h.progress}%`}} />
-                </div>
+              </div>
+              <div style={{width:'100%',height:3,background:'#f0f0f0',borderRadius:2,marginTop:6}}>
+                <div style={{width:`${h.progress}%`,height:'100%',background:h.progress>60?'#00A86B':'#FF5000',borderRadius:2}}></div>
               </div>
             </div>
           )})}
         </div>
+
         {/* Today's Orders */}
-        <div className="bg-white rounded-xl p-4 border border-gray-100">
-          <h3 className="text-sm font-bold mb-2">Today's Orders</h3>
-          {(!orderHistory?.orders || orderHistory.orders.length === 0) && <p className="text-xs text-gray-400 text-center py-4">No orders today</p>}
-          {orderHistory?.orders?.slice(0,20).map(o => {
-            const profit = Number(o.profit) || 0;
-            const isOpen = expandedOrder === o.id;
-            return (
-            <div key={o.id} className="border-b border-gray-100 last:border-0">
-              <div className="flex items-center justify-between py-2 cursor-pointer" onClick={() => setExpandedOrder(isOpen ? null : o.id)}>
-                <div className="flex-1 min-w-0 mr-2">
-                  <p className="text-[11px] font-medium truncate">{o.product_name || `Order #${o.id}`}</p>
-                  <p className="text-[9px] text-gray-400">{new Date(o.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</p>
-                </div>
-                <span className="text-[11px] font-bold text-green-600">+${profit.toFixed(2)}</span>
-              </div>
+        <div style={{background:'#fff',borderRadius:20,padding:16}}>
+          <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Today's Orders</div>
+          {(!orderHistory?.orders || orderHistory.orders.length === 0) && <p style={{fontSize:11,color:'#999',textAlign:'center',padding:20}}>No orders today</p>}
+          {orderHistory?.orders?.slice(0,20).map(o => (
+            <div key={o.id} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:11,borderBottom:'1px solid #f5f5f5'}}>
+              <span>#{o.id} {o.product_name||''}</span>
+              <span style={{color:'#00A86B'}}>+${Number(o.profit||0).toFixed(2)}</span>
+              <span style={{color:'#999'}}>{new Date(o.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
             </div>
-          )})}
+          ))}
         </div>
-        <div className="h-4" />
       </div>
     </div>
   );
