@@ -96,8 +96,8 @@ export default function MinePage() {
       <div className="mx-4 space-y-4">
         {/* ═══ Claimable ═══ */}
         {eligibleGifts.length > 0 && (
-          <div className="bg-white rounded-2xl border border-separator">
-            <div className="px-4 py-3 border-b border-separator bg-gradient-to-r from-[#1E1E32]/50 to-transparent flex items-center gap-2">
+          <div className="bg-white rounded-2xl overflow-hidden">
+            <div className="px-4 py-3 border-b border-separator bg-gray-50 flex items-center gap-2">
               <span className="text-lg">🎁</span>
               <span className="text-[14px] font-bold text-text">{t('claim.available')}</span>
               <span className="text-[12px] bg-gold text-white px-2 py-0.5 rounded-full font-bold animate-bounce-pulse">{eligibleGifts.length}</span>
@@ -121,7 +121,7 @@ export default function MinePage() {
 
         {/* ═══ Under Review ═══ */}
         {pendingClaims.length > 0 && (
-          <div className="bg-white rounded-2xl border border-separator">
+          <div className="bg-white rounded-2xl overflow-hidden">
             <div className="px-4 py-3 border-b border-separator flex items-center gap-2">
               <span className="text-lg">⏳</span>
               <span className="text-[14px] font-bold text-text">{t('claim.pending')}</span>
@@ -145,7 +145,7 @@ export default function MinePage() {
 
 {/* Withdraw */}
         <button onClick={() => navigate('/mine/withdraw')}
-          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <ArrowUpRight size={22} className="text-green-500 shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('withdraw.title')}</p>
@@ -157,7 +157,7 @@ export default function MinePage() {
 
         {/* Deposit */}
         <button onClick={() => document.dispatchEvent(new CustomEvent('showContactSupport'))}
-          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <CreditCard size={22} className="text-[#FF5000] shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">Deposit</p>
@@ -167,7 +167,7 @@ export default function MinePage() {
         </button>
         {/* Staking */}
         <button onClick={() => navigate('/mine/staking')}
-          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <Lock size={22} className="text-amber-500 shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('stake.title')}</p>
@@ -184,7 +184,7 @@ export default function MinePage() {
           { Icon: Bell, label: t('mine.messages'), desc: t('mine.messagesDesc'), to: '/mine/messages' },
         ].map(({ Icon, label, desc, to }, i) => (
           <button key={i} onClick={() => navigate(to)}
-            className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+            className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
             <Icon size={22} className="text-primary shrink-0" />
             <div className="flex-1 text-left">
               <p className="text-[14px] font-bold text-text">{label}</p>
@@ -196,7 +196,7 @@ export default function MinePage() {
 
         {/* Language */}
         <button onClick={() => setShowLang(!showLang)}
-          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <Globe size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('common.language')}</p>
@@ -205,7 +205,7 @@ export default function MinePage() {
           <ChevronRight size={16} className={`text-text-muted shrink-0 transition-transform ${showLang ? 'rotate-90' : ''}`} />
         </button>
         {showLang && (
-          <div className="bg-white rounded-2xl border border-separator p-2 grid grid-cols-4 gap-2 animate-scale-in">
+          <div className="bg-white rounded-2xl overflow-hidden p-2 grid grid-cols-4 gap-2 animate-scale-in">
             {langs.map((l) => (
               <button key={l.code}
                 onClick={() => { i18n.changeLanguage(l.code); localStorage.setItem('lang', l.code); setShowLang(false); }}
@@ -219,7 +219,7 @@ export default function MinePage() {
 
         {/* KYC */}
         <button onClick={() => navigate('/mine/kyc')}
-          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <Shield size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('kyc.title')}</p>
@@ -230,7 +230,7 @@ export default function MinePage() {
 
         {/* Notifications */}
         <button onClick={() => navigate('/mine/notifications')}
-          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <Bell size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">Notification Center</p>
@@ -241,7 +241,7 @@ export default function MinePage() {
 
         {/* Verify */}
         <button onClick={() => navigate('/mine/verify')}
-          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <Camera size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('verify.title')}</p>
@@ -252,7 +252,7 @@ export default function MinePage() {
 
         {/* Support */}
         <button onClick={() => document.dispatchEvent(new CustomEvent('showContactSupport'))}
-          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <MessageCircle size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('support.title')}</p>
@@ -263,7 +263,7 @@ export default function MinePage() {
 
         {/* Legal */}
         <button onClick={() => navigate('/mine/legal')}
-          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <Info size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('legal.title')}</p>
@@ -274,7 +274,7 @@ export default function MinePage() {
 
         {/* Security */}
         <button onClick={() => navigate('/mine/security')}
-          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <Lock size={22} className="text-primary shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-text">{t('security.title')}</p>
@@ -286,7 +286,7 @@ export default function MinePage() {
         {/* Admin */}
         {user?.is_admin == true && (
           <button onClick={() => navigate('/admin')}
-            className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+            className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
             <Lock size={22} className="text-primary shrink-0" />
             <div className="flex-1 text-left">
               <p className="text-[14px] font-bold text-text">{t('mine.adminPanel')}</p>
@@ -298,7 +298,7 @@ export default function MinePage() {
 
         {/* Logout */}
         <button onClick={handleLogout}
-          className="w-full bg-white rounded-2xl p-5 flex items-center gap-4 border border-separator active:bg-bg transition-colors">
+          className="w-full bg-white rounded-none p-3.5 flex items-center gap-3 border-b border-gray-100 last:border-b-0">
           <LogOut size={22} className="text-red-400 shrink-0" />
           <div className="flex-1 text-left">
             <p className="text-[14px] font-bold text-red-500">{t('mine.logout')}</p>
@@ -357,7 +357,7 @@ function MembershipCard({ effectiveInvites, t }) {
   const needMore = nextTier ? nextTier.min - effectiveInvites : 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-separator overflow-hidden">
+    <div className="bg-white rounded-2xl overflow-hidden overflow-hidden">
       {/* Header */}
       <div className="relative bg-gradient-to-r from-[#1a1a2e] via-[#16213e] to-[#0f3460] p-5 text-white overflow-hidden"
         style={{ backgroundSize: '200% 200%', animation: 'gradientShift 5s ease-in-out infinite' }}>
