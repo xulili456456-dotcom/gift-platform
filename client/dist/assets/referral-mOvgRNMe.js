@@ -1,1 +1,0 @@
-import{t as e}from"./client-CeLWhyip.js";var t={getCode(){return e.get(`/referral/code`)},getStats(){return e.get(`/referral/stats`)}};export{t};

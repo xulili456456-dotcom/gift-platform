@@ -1,1 +1,0 @@
-import{t as e}from"./client-CeLWhyip.js";var t={list(){return e.get(`/claims`)},create(t){return e.post(`/claims`,{gift_id:t})}};export{t};
