@@ -436,32 +436,60 @@ export default function StorePage() {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="relative bg-gray-50">
-            <img src={p.img} alt={p.name} className="w-full aspect-square object-contain" />
-            {savingsPct >= 30 && <span className="absolute top-3 left-3 bg-[#CC0C39] text-white text-xs font-bold px-2 py-1 rounded">-{savingsPct}%</span>}
+          <div className="bg-gray-50">
+            <img src={p.img} alt={p.name} className="w-full aspect-square object-cover" />
           </div>
 
           <div className="px-4">
-            <h1 className="text-base font-medium text-[#0F1111] leading-snug mt-3">{p.name}</h1>
-            <div className="flex items-center gap-2 mt-1.5">
-              <Stars rating={p.rating} reviews={p.reviews} />
-              <span className="text-xs text-[#565959]">|</span>
-              <span className="text-xs text-[#FFB84D]">{p.sold.toLocaleString()}+ {t('store.sold')}</span>
+            <h1 className="text-[15px] font-semibold text-gray-900 leading-snug mt-4">{p.name}</h1>
+            <div className="flex items-center gap-3 mt-2 text-[11px] text-gray-400">
+              <span>{p.sold.toLocaleString()}+ sold</span>
+              <span>{p.rating} rating</span>
             </div>
 
-            <div className="my-3 border-t border-gray-100" />
+            {/* Trade Data Card */}
+            <div className="bg-[#f8faf8] border border-[#e0f0e0] rounded-2xl p-4 mt-4">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="text-[10px] text-gray-400 mb-0.5">Profit</div>
+                  <div className="text-[26px] font-extrabold text-[#00A86B]">+${p.profit.toFixed(2)}</div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[10px] text-gray-400 mb-0.5">Cost (85%)</div>
+                  <div className="text-lg font-bold text-gray-900">${p.costPrice.toFixed(2)}</div>
+                </div>
+              </div>
+              <div className="flex justify-between pt-3 border-t border-[#e0f0e0] text-[11px]">
+                <span className="text-gray-400">Market <b className="text-gray-700">${p.price.toFixed(2)}</b></span>
+                <span className="text-gray-400">Return <b className="text-gray-700">${(p.costPrice + p.profit).toFixed(2)}</b></span>
+                <span className="text-gray-400">6-30h</span>
+              </div>
+            </div>
 
-            <div className="bg-gray-50 border border-[#FF5000] rounded-xl p-3">
-              <div className="flex items-baseline gap-2">
-                {savingsPct > 0 && <span className="text-xs bg-[#CC0C39] text-white px-1.5 py-0.5 rounded font-bold">-{savingsPct}%</span>}
-                <span className="text-[28px] font-normal text-[#FFB84D]">${p.price.toFixed(2)}</span>
+            {/* Deposit Check */}
+            <div className="bg-gray-50 rounded-2xl p-4 mt-3 text-[12px] space-y-2">
+              <div className="flex justify-between"><span className="text-gray-400">Required Deposit</span><span className="font-semibold">${p.costPrice.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span className="text-gray-400">Your Deposit</span><span className="font-semibold">${(s.deposit||0).toFixed(2)}</span></div>
+              <div className="flex justify-between pt-2 border-t border-gray-200">
+                <span className="text-gray-400">Status</span>
+                {(s.deposit||0) >= p.costPrice
+                  ? <span className="font-bold text-[#00A86B]">Covered</span>
+                  : <span className="font-bold text-[#CC0C39]">Short ${(p.costPrice - (s.deposit||0)).toFixed(2)}</span>
+                }
               </div>
-              <div className="text-xs text-[#565959] mt-0.5">
-                {t('store.marketPrice')}: <span className="line-through">${p.price.toFixed(2)}</span>
+            </div>
+
+            {/* Specs */}
+            {Object.keys(p.specs || {}).length > 0 && (
+              <div className="mt-4 mb-2">
+                <div className="text-xs font-semibold text-gray-700 mb-2">Specifications</div>
+                <div className="space-y-1.5 text-[11px]">
+                  {Object.entries(p.specs || {}).slice(0, 6).map(([k, v]) => (
+                    <div key={k} className="flex justify-between py-1 border-b border-gray-100 last:border-0"><span className="text-gray-400">{k}</span><span className="text-gray-700">{v}</span></div>
+                  ))}
+                </div>
               </div>
-              <div className="flex gap-4 mt-2 pt-2 border-t border-[#FF5000]">
-                <div><span className="text-[11px] text-[#565959]">{t('store.costPrice')}</span><span className="text-sm font-bold text-[#0F1111] ml-1">${p.costPrice.toFixed(2)}</span></div>
-                <div><span className="text-[11px] text-[#565959]">{t('store.earn')}</span><span className="text-sm font-bold text-[#067D62] ml-1">+${p.profit.toFixed(2)}</span></div>
+            )}
               </div>
               <p className="text-[10px] text-[#565959] mt-1.5">{t('store.capitalFlow')}</p>
             </div>
@@ -620,46 +648,40 @@ export default function StorePage() {
           🔥 {t('store.freeOrders') || 'Free'} ({s.freeRemaining || 0})
         </button>
       </div>
-      {/* Product Grid - 2 columns */}
-      <div className="flex-1 overflow-y-auto px-2 pt-2">
-        <div className="grid grid-cols-2 gap-2">
+      {/* Product List - Plan B: data cards */}
+      <div className="flex-1 overflow-y-auto px-4 pt-2">
+        <div className="flex flex-col gap-3">
           {products.map(p => {
             const isFreeProduct = freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0));
             const isFreeSoldOut = sortMode === 'free' && freeRemaining <= 0 && isFreeProduct;
             return (
-            <div key={p.id} onClick={() => !isFreeSoldOut && setDetail(p)} className={`bg-white rounded-xl border border-gray-100 overflow-hidden hover:border-[#ddd] transition-colors ${isFreeSoldOut ? 'opacity-50' : 'active:shadow-md cursor-pointer'}`}>
-              <div className="relative bg-gray-50 aspect-square">
-                <img src={p.img} alt={p.name} className="w-full h-full object-contain p-3" loading="lazy" />
-                {p.sold > 5000 && <span className="absolute top-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#CC0C39] text-white font-bold uppercase tracking-wide">Best</span>}
-                {p.sold > 1000 && p.sold <= 5000 && <span className="absolute top-1.5 left-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#FF5000] text-white font-bold">Top</span>}
-                {isFreeSoldOut && <span className="absolute top-1.5 right-1.5 text-[8px] px-1.5 py-0.5 rounded bg-[#999] text-white font-bold">已抢完</span>}
-              </div>
-              <div className="p-2.5">
-                <p className="text-[11px] text-[#0F1111] leading-tight font-medium line-clamp-2 mb-1.5" style={{minHeight:'2.6em'}}>{p.name}</p>
-                <Stars rating={p.rating} reviews={p.reviews} />
-                <div className="flex items-baseline gap-1.5 mt-1">
-                  <span className="text-lg font-normal text-[#FFB84D] leading-none">${Math.floor(p.price)}<sup className="text-[10px]">{(p.price % 1).toFixed(2).substring(1)}</sup></span>
-                  <span className="text-[10px] text-[#565959] line-through">${p.price.toFixed(2)}</span>
+            <div key={p.id} onClick={() => !isFreeSoldOut && setDetail(p)} className={`bg-white rounded-2xl p-3 active:scale-[0.99] transition-all ${isFreeSoldOut ? 'opacity-50' : 'cursor-pointer'}`}>
+              <div className="flex gap-3">
+                <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+                  <img src={p.img} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
                 </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[10px] text-[#565959]">{t('store.costPrice')} <b className="text-[#0F1111]">${p.costPrice.toFixed(0)}</b></span>
-                  <span className="text-[10px] font-bold text-[#067D62]">+${p.profit.toFixed(2)}</span>
-                </div>
-                <div className="flex items-center justify-between mt-1.5">
-                  <span className="text-[9px] text-[#565959]">{p.sold.toLocaleString()}+ {t('store.sold')}</span>
-                  {tradeMode === 'share' ? (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleShare(p); }}
-                      className="text-[10px] px-2.5 py-1 rounded font-medium bg-[#067D62] hover:bg-[#00e060] text-white"
-                    >🔗 {t('store.share') || 'Share'} 3%</button>
-                  ) : isFreeSoldOut ? (
-                    <button disabled className="text-[10px] px-3 py-1.5 rounded font-medium bg-[#ddd] text-[#999] cursor-not-allowed">已抢完</button>
-                  ) : (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleBuy(p); }}
-                      className="text-[12px] px-4 py-2 rounded font-bold active:scale-95 transition-all bg-[#FF5000] hover:bg-[#E04500] text-[#0F1111] border border-[#FF5000]"
-                    >{t('store.buy')}</button>
-                  )}
+                <div className="flex-1 min-w-0 flex flex-col gap-1">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <span className="text-lg font-extrabold text-[#00A86B]">+${p.profit.toFixed(2)}</span>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[#00A86B] font-bold">15% ROI</span>
+                  </div>
+                  <p className="text-[11px] text-gray-600 leading-snug line-clamp-2">{p.name}</p>
+                  <div className="flex items-center gap-3 text-[10px] text-gray-400">
+                    <span>Cost <b className="text-gray-700">${p.costPrice.toFixed(2)}</b></span>
+                    <span>6-30h</span>
+                    <span>{p.sold.toLocaleString()}+ sold</span>
+                  </div>
+                  <div className="flex gap-2 mt-1">
+                    {tradeMode === 'share' ? (
+                      <button onClick={(e) => { e.stopPropagation(); handleShare(p); }} className="text-[10px] px-3 py-1 rounded-lg font-medium bg-[#067D62] text-white">🔗 Share 3%</button>
+                    ) : isFreeSoldOut ? (
+                      <button disabled className="text-[10px] px-3 py-1 rounded-lg font-medium bg-gray-100 text-gray-400">已抢完</button>
+                    ) : (
+                      <button onClick={(e) => { e.stopPropagation(); handleBuy(p); }} className="text-[11px] px-4 py-1.5 rounded-lg font-bold bg-[#00A86B] text-white active:scale-95 transition-all">Buy</button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
