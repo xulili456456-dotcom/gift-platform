@@ -553,7 +553,7 @@ export default function StorePage() {
       {/* Brand Bar */}
       <div style={{background:'#0f0f0f',padding:'6px 16px 10px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{display:'flex',alignItems:'center',gap:6}}>
-          <div style={{width:20,height:20,background:'#FF5000',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,color:'#fff'}}>🛍</div>
+          <div style={{width:20,height:20,background:'#FF5000',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center'}}><Store size={12} color="#fff" /></div>
           <span style={{fontSize:14,fontWeight:700,color:'#fff'}}>My Little Shop</span>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
