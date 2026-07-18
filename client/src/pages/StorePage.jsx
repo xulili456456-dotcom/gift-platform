@@ -547,53 +547,88 @@ export default function StorePage() {
     );
   }
 
-  // ==== Product List Page (Amazon-style) ====
+  // ==== Product List Page ====
   return (
-    <div className="bg-[#ffffff] safe-top flex flex-col min-h-screen">
-      {/* Top Nav Bar */}
-      <div className="shrink-0 bg-[#FF5000] text-white">
-        <div className="px-3 py-2 flex items-center gap-3">
-          <div className="flex items-center gap-1.5 bg-white/10 rounded-full px-3 py-1">
-            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{background: ti.color}}><Store size={12} className="text-white" /></div>
-            <span className="text-[11px] font-medium">{t(ti.nameKey)}</span>
-          </div>
-          <span className="text-[10px] text-white/60 flex-1">{t('store.today')}: <b className="text-white">${s.todayEarnings.toFixed(2)}</b></span>
-          <button onClick={() => navigate('/mine/notifications')} className="relative p-1" title={t('store.bellHint')} aria-label={t('store.bellHint')}>
-            <Bell size={18} />
-            {notifCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#CC0C39] text-white text-[9px] font-bold rounded-full flex items-center justify-center">{notifCount}</span>}
+    <div className="bg-white safe-top flex flex-col min-h-screen">
+      {/* Status Bar */}
+      <div style={{height:44,background:'#0f0f0f',display:'flex',alignItems:'center',justifyContent:'space-between',padding:'0 20px',color:'#fff',fontSize:12,fontWeight:600}}>
+        <span>9:41</span>
+        <span style={{display:'flex',gap:2}}>●●●●<span style={{opacity:.3}}>○</span></span>
+      </div>
+
+      {/* Brand Bar */}
+      <div style={{background:'#0f0f0f',padding:'6px 16px 10px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+        <div style={{display:'flex',alignItems:'center',gap:6}}>
+          <div style={{width:20,height:20,background:'#FF5000',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800,color:'#fff'}}>S</div>
+          <span style={{fontSize:14,fontWeight:700,color:'#fff'}}>Trading</span>
+        </div>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <span style={{fontSize:12,color:'#999',fontWeight:500}}>${s.balance.toFixed(0)}</span>
+          <button onClick={() => setTab('funds')} style={{padding:'4px 10px',background:'rgba(255,80,0,.15)',color:'#FF5000',borderRadius:14,border:'none',fontSize:10,fontWeight:600,cursor:'pointer'}}>💰 Funds</button>
+          <button onClick={() => navigate('/mine/notifications')} style={{position:'relative',padding:2,background:'none',border:'none',cursor:'pointer'}}>
+            <Bell size={20} color="#fff" />
+            {notifCount > 0 && <span style={{position:'absolute',top:2,right:3,width:7,height:7,background:'#FF3B30',borderRadius:'50%',border:'2px solid #0f0f0f'}} />}
           </button>
         </div>
-        <div className="px-3 pb-2.5">
-          <div className="flex items-center bg-white rounded-xl overflow-hidden">
-            <Search size={14} className="ml-3 text-[#565959]" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('store.searchPlaceholder')} className="flex-1 px-2 py-2.5 text-[13px] text-[#0F1111] bg-transparent outline-none placeholder:text-[#999999]" />
-            {search && <button onClick={() => setSearch('')} className="px-3 text-[#565959]"><X size={14} /></button>}
-          </div>
+      </div>
+
+      {/* Search */}
+      <div style={{background:'#0f0f0f',padding:'0 16px 12px'}}>
+        <div style={{background:'#1a1a1a',borderRadius:12,padding:'10px 14px',display:'flex',alignItems:'center',gap:8}}>
+          <Search size={16} color="#666" />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..." style={{flex:1,background:'transparent',border:'none',outline:'none',color:'#fff',fontSize:13}} />
+          {search && <button onClick={() => setSearch('')} style={{background:'none',border:'none',cursor:'pointer'}}><X size={14} color="#666" /></button>}
         </div>
       </div>
 
-      {/* Category Chips */}
-      <div className="shrink-0 bg-white border-b border-gray-100 px-2 flex gap-1.5 overflow-x-auto scrollbar-none py-2.5">
+      {/* Stats Strip */}
+      <div style={{display:'flex',padding:'10px 16px',gap:0,borderBottom:'1px solid #f5f5f5',background:'#fff'}}>
+        <div style={{flex:1,textAlign:'center'}}>
+          <div style={{fontSize:17,fontWeight:800,color:'#FF5000'}}>{s.freeRemaining||0}/5</div>
+          <div style={{fontSize:9,color:'#999',marginTop:1}}>Free Orders</div>
+        </div>
+        <div style={{width:1,background:'#f0f0f0',margin:'4px 0'}} />
+        <div onClick={() => setTab('funds')} style={{flex:1,textAlign:'center',cursor:'pointer'}}>
+          <div style={{fontSize:17,fontWeight:800,color:'#333'}}>${(s.deposit||0).toFixed(0)}</div>
+          <span style={{display:'inline-block',marginTop:2,padding:'2px 10px',background:'#f0f0f0',borderRadius:8,fontSize:9,color:'#666',fontWeight:600}}>Deposit →</span>
+        </div>
+        <div style={{width:1,background:'#f0f0f0',margin:'4px 0'}} />
+        <div style={{flex:1,textAlign:'center'}}>
+          <div style={{fontSize:17,fontWeight:800,color:'#00A86B'}}>+${earnings.todayProfit.toFixed(2)}</div>
+          <div style={{fontSize:9,color:'#999',marginTop:1}}>Today Earned</div>
+        </div>
+      </div>
+
+      {/* Category Scroll */}
+      <div style={{display:'flex',gap:6,padding:'10px 16px',overflowX:'auto',background:'#fff'}}>
         {CAT_KEYS.map((c, i) => (
           <button key={c} onClick={() => setCatIdx(i)}
-            className={`shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-medium transition-colors ${
-              catIdx === i ? 'bg-[#FF5000] text-white' : 'text-[#0F1111] bg-gray-50 hover:bg-[#e7e7e7]'
-            }`}>{t(c)}</button>
+            style={{padding:'7px 16px',borderRadius:18,fontSize:12,fontWeight:catIdx===i?600:500,whiteSpace:'nowrap',background:catIdx===i?'#0f0f0f':'#f5f5f5',color:catIdx===i?'#fff':'#666',border:'none',cursor:'pointer'}}>{t(c)}</button>
         ))}
       </div>
 
-      {/* Tab Bar */}
-      <div className="shrink-0 bg-white border-b border-gray-100 flex">
-        {[
-          ['products', '🛒', t('store.products') || 'Products'],
-          ['funds', '💰', 'Funds'],
-        ].map(([key, icon, label]) => (
-          <button key={key} onClick={() => setTab(key)}
-            className={`flex-1 py-2.5 text-[11px] font-bold text-center border-b-2 transition-colors ${
-              tab === key ? 'border-[#FF5000] text-[#FF5000]' : 'border-transparent text-[#565959]'
-            }`}>{icon} {label}</button>
-        ))}
+      {/* Sort + Trade Mode Toggle */}
+      <div style={{display:'flex',alignItems:'center',padding:'6px 16px 8px',gap:0,borderBottom:'1px solid #f0f0f0',background:'#fff'}}>
+        <button onClick={() => { setSortMode('profit'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='profit'?700:400,color:sortMode==='profit'?'#0f0f0f':'#999',marginRight:14,background:'none',border:'none',cursor:'pointer'}}>Hot</button>
+        <button onClick={() => { setSortMode('price'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='price'?700:400,color:sortMode==='price'?'#0f0f0f':'#999',marginRight:14,background:'none',border:'none',cursor:'pointer'}}>Price</button>
+        <button onClick={() => { setSortMode('free'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='free'?700:400,color:sortMode==='free'?'#0f0f0f':'#999',background:'none',border:'none',cursor:'pointer'}}>Free</button>
+        <span style={{flex:1}} />
+        <div style={{display:'flex',background:'#f5f5f5',borderRadius:10,padding:2}}>
+          <button onClick={() => setTradeMode('holding')} style={{padding:'5px 12px',borderRadius:8,fontSize:10,fontWeight:600,background:tradeMode==='holding'?'#0f0f0f':'transparent',color:tradeMode==='holding'?'#fff':'#999',border:'none',cursor:'pointer'}}>Trade</button>
+          <button onClick={() => setTradeMode('share')} style={{padding:'5px 12px',borderRadius:8,fontSize:10,fontWeight:600,background:tradeMode==='share'?'#0f0f0f':'transparent',color:tradeMode==='share'?'#fff':'#999',border:'none',cursor:'pointer'}}>Share</button>
+        </div>
       </div>
+
+      {/* Free Orders Banner */}
+      {(s.freeRemaining||0) > 0 && (
+        <div style={{margin:'8px 16px',padding:'10px 14px',background:'#FFF8F0',borderRadius:12,display:'flex',alignItems:'center',gap:8}}>
+          <span style={{fontSize:16}}>🔥</span>
+          <div style={{flex:1}}>
+            <div style={{fontSize:12,fontWeight:600,color:'#FF5000'}}>{s.freeRemaining} free trades remaining</div>
+            <div style={{fontSize:10,color:'#999',marginTop:1}}>No deposit needed for items under $50</div>
+          </div>
+        </div>
+      )}
 
       {/* Products Tab */}
       {tab === 'products' && (<>
