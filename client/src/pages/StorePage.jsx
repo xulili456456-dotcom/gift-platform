@@ -631,31 +631,31 @@ export default function StorePage() {
             const isFreeProduct = freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0));
             const isFreeSoldOut = sortMode === 'free' && freeRemaining <= 0 && isFreeProduct;
             return (
-            <div key={p.id} onClick={() => !isFreeSoldOut && setDetail(p)} className={`bg-white rounded-2xl p-3 active:scale-[0.99] transition-all ${isFreeSoldOut ? 'opacity-50' : 'cursor-pointer'}`}>
-              <div className="flex gap-3">
-                <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
-                  <img src={p.img} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
+            <div key={p.id} onClick={() => !isFreeSoldOut && setDetail(p)} style={{background:'#fff',borderRadius:16,padding:14,cursor:'pointer',display:'flex',flexDirection:'column',gap:8,opacity:isFreeSoldOut?0.5:1}}>
+              <div style={{display:'flex',gap:12}}>
+                <div style={{width:80,height:80,background:'#f8f8f8',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,overflow:'hidden'}}>
+                  <img src={p.img} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover'}} loading="lazy" />
                 </div>
-                <div className="flex-1 min-w-0 flex flex-col gap-2">
-                  <div className="flex items-start justify-between">
-                    <span className="text-[20px] font-extrabold text-[#00A86B]">+${p.profit.toFixed(2)}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-[10px] bg-[#E8F5E9] text-[#00A86B] font-semibold">15% ROI</span>
+                <div style={{flex:1,display:'flex',flexDirection:'column',gap:4}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+                    <span style={{fontSize:20,fontWeight:800,color:'#00A86B'}}>+${p.profit.toFixed(2)}</span>
+                    <span style={{fontSize:10,padding:'2px 8px',borderRadius:10,background:'#E8F5E9',color:'#00A86B',fontWeight:600}}>15% ROI</span>
                   </div>
-                  <p className="text-[11px] text-gray-500 leading-[1.4] line-clamp-2">{p.name}</p>
-                  <div className="flex justify-between text-[10px] text-gray-400">
-                    <span>Cost <b className="text-gray-700">${p.costPrice.toFixed(2)}</b></span>
+                  <p style={{fontSize:11,color:'#666',lineHeight:1.4,display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden',margin:0}}>{p.name}</p>
+                  <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'#999'}}>
+                    <span>Cost <b style={{color:'#555'}}>${p.costPrice.toFixed(2)}</b></span>
                     <span>6-30h</span>
                     <span>{p.sold.toLocaleString()}+ sold</span>
                   </div>
-                  {tradeMode === 'share' ? (
-                    <button onClick={(e) => { e.stopPropagation(); handleShare(p); }} className="self-end text-[10px] px-5 py-1.5 rounded-lg font-semibold bg-[#067D62] text-white">🔗 Share 3%</button>
-                  ) : isFreeSoldOut ? (
-                    <button disabled className="self-end text-[10px] px-5 py-1.5 rounded-lg font-semibold bg-gray-100 text-gray-400">已抢完</button>
-                  ) : (
-                    <button onClick={(e) => { e.stopPropagation(); handleBuy(p); }} className="self-end text-xs px-5 py-1.5 rounded-lg font-semibold bg-[#00A86B] text-white active:scale-95 transition-all">Buy</button>
-                  )}
                 </div>
               </div>
+              {tradeMode === 'share' ? (
+                <button onClick={(e) => { e.stopPropagation(); handleShare(p); }} style={{alignSelf:'flex-end',padding:'6px 20px',background:'#067D62',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:600,cursor:'pointer'}}>🔗 Share 3%</button>
+              ) : isFreeSoldOut ? (
+                <button disabled style={{alignSelf:'flex-end',padding:'6px 20px',background:'#eee',color:'#999',border:'none',borderRadius:8,fontSize:12,fontWeight:600}}>已抢完</button>
+              ) : (
+                <button onClick={(e) => { e.stopPropagation(); handleBuy(p); }} style={{alignSelf:'flex-end',padding:'6px 20px',background:'#00A86B',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:600,cursor:'pointer'}}>Buy</button>
+              )}
             </div>
           )})}
         </div>
