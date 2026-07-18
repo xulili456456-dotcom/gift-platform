@@ -15,6 +15,7 @@ export default function StoreFundsPage() {
   const [depositAmount, setDepositAmount] = useState('');
   const [depositMsg, setDepositMsg] = useState('');
   const [orderHistory, setOrderHistory] = useState(null);
+  const [expandedOrder, setExpandedOrder] = useState(null);
 
   const loadStatus = useCallback(async () => {
     try { const { data } = await client.get('/store/status'); setStatus(data); } catch {}
@@ -112,13 +113,26 @@ export default function StoreFundsPage() {
         <div style={{background:'#fff',borderRadius:20,padding:16}}>
           <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Today's Orders</div>
           {(!orderHistory?.orders || orderHistory.orders.length === 0) && <p style={{fontSize:11,color:'#999',textAlign:'center',padding:20}}>No orders today</p>}
-          {orderHistory?.orders?.slice(0,20).map(o => (
-            <div key={o.id} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:11,borderBottom:'1px solid #f5f5f5'}}>
-              <span>#{o.id} {o.product_name||''}</span>
-              <span style={{color:'#00A86B'}}>+${Number(o.profit||0).toFixed(2)}</span>
-              <span style={{color:'#999'}}>{new Date(o.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+          {orderHistory?.orders?.slice(0,20).map(o => {
+            const profit = Number(o.profit) || 0;
+            const cost = profit > 0 ? Math.round((profit / PROFIT_RATE * COST_RATE) * 100) / 100 : 0;
+            const isOpen = expandedOrder === o.id;
+            return (
+            <div key={o.id} style={{borderBottom:'1px solid #f5f5f5'}}>
+              <div onClick={() => setExpandedOrder(isOpen ? null : o.id)} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',fontSize:11,cursor:'pointer'}}>
+                <span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1,marginRight:8}}>#{o.id} {o.product_name||''}</span>
+                <span style={{color:'#00A86B',flexShrink:0}}>+${profit.toFixed(2)}</span>
+                <span style={{color:'#999',marginLeft:8,flexShrink:0}}>{new Date(o.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+              </div>
+              {isOpen && (
+                <div style={{padding:'0 0 8px 0',fontSize:10,color:'#666',display:'flex',justifyContent:'space-between'}}>
+                  <span>Cost ${cost.toFixed(2)}</span>
+                  <span style={{color:'#00A86B'}}>+${profit.toFixed(2)}</span>
+                  <span>Return ${(cost+profit).toFixed(2)}</span>
+                </div>
+              )}
             </div>
-          ))}
+          )})}
         </div>
       </div>
     </div>
