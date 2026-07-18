@@ -636,28 +636,24 @@ export default function StorePage() {
                 <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
                   <img src={p.img} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
                 </div>
-                <div className="flex-1 min-w-0 flex flex-col gap-1">
+                <div className="flex-1 min-w-0 flex flex-col gap-2">
                   <div className="flex items-start justify-between">
-                    <div>
-                      <span className="text-lg font-extrabold text-[#00A86B]">+${p.profit.toFixed(2)}</span>
-                    </div>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[#00A86B] font-bold">15% ROI</span>
+                    <span className="text-[20px] font-extrabold text-[#00A86B]">+${p.profit.toFixed(2)}</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-[10px] bg-[#E8F5E9] text-[#00A86B] font-semibold">15% ROI</span>
                   </div>
-                  <p className="text-[11px] text-gray-600 leading-snug line-clamp-2">{p.name}</p>
-                  <div className="flex items-center gap-3 text-[10px] text-gray-400">
+                  <p className="text-[11px] text-gray-500 leading-[1.4] line-clamp-2">{p.name}</p>
+                  <div className="flex justify-between text-[10px] text-gray-400">
                     <span>Cost <b className="text-gray-700">${p.costPrice.toFixed(2)}</b></span>
                     <span>6-30h</span>
                     <span>{p.sold.toLocaleString()}+ sold</span>
                   </div>
-                  <div className="flex gap-2 mt-1">
-                    {tradeMode === 'share' ? (
-                      <button onClick={(e) => { e.stopPropagation(); handleShare(p); }} className="text-[10px] px-3 py-1 rounded-lg font-medium bg-[#067D62] text-white">🔗 Share 3%</button>
-                    ) : isFreeSoldOut ? (
-                      <button disabled className="text-[10px] px-3 py-1 rounded-lg font-medium bg-gray-100 text-gray-400">已抢完</button>
-                    ) : (
-                      <button onClick={(e) => { e.stopPropagation(); handleBuy(p); }} className="text-[11px] px-4 py-1.5 rounded-lg font-bold bg-[#00A86B] text-white active:scale-95 transition-all">Buy</button>
-                    )}
-                  </div>
+                  {tradeMode === 'share' ? (
+                    <button onClick={(e) => { e.stopPropagation(); handleShare(p); }} className="self-end text-[10px] px-5 py-1.5 rounded-lg font-semibold bg-[#067D62] text-white">🔗 Share 3%</button>
+                  ) : isFreeSoldOut ? (
+                    <button disabled className="self-end text-[10px] px-5 py-1.5 rounded-lg font-semibold bg-gray-100 text-gray-400">已抢完</button>
+                  ) : (
+                    <button onClick={(e) => { e.stopPropagation(); handleBuy(p); }} className="self-end text-xs px-5 py-1.5 rounded-lg font-semibold bg-[#00A86B] text-white active:scale-95 transition-all">Buy</button>
+                  )}
                 </div>
               </div>
             </div>
