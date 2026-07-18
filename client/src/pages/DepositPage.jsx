@@ -106,7 +106,7 @@ export default function DepositPage() {
               <div key={d.id} style={{padding:'8px 0',borderBottom:'1px solid #f5f5f5',fontSize:11,cursor:'pointer'}} onClick={()=>setExpandedId(expandedId===d.id?null:d.id)}>
                 <div style={{display:'flex',justifyContent:'space-between'}}>
                   <div><div style={{fontWeight:600}}>${Number(d.amount||0).toFixed(2)}</div><div style={{color:'#999',fontSize:9}}>{d.network} · {String(d.created_at||'').slice(0,10)}</div></div>
-                  <span style={{background:d.status==='confirmed'?'#E8F5E9':'#FFF8E1',color:d.status==='confirmed'?'#00A86B':'#F59E0B',borderRadius:8,padding:'2px 8px',fontSize:10,fontWeight:600}}>{d.status==='confirmed'?'Confirmed':'Pending'}</span>
+                  <span style={{background:d.status==='confirmed'?'#E8F5E9':d.status==='rejected'?'#f5f5f5':'#FFF8E1',color:d.status==='confirmed'?'#00A86B':d.status==='rejected'?'#999':'#F59E0B',borderRadius:8,padding:'2px 8px',fontSize:10,fontWeight:600}}>{d.status==='confirmed'?'Confirmed':d.status==='rejected'?'Rejected':'Pending'}</span>
                 </div>
                 {expandedId===d.id && (
                   <div style={{marginTop:6,padding:8,background:'#f8f8f8',borderRadius:8,fontSize:10,color:'#666'}}>
