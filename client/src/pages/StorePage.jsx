@@ -302,7 +302,7 @@ function Stars({ rating, reviews, showCount }) {
   );
 }
 
-export default function StorePage() {
+export default function StorePage({ tab: initialTab = 'products' }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const tSpec = (k) => {
@@ -321,7 +321,7 @@ export default function StorePage() {
   const [earnings, setEarnings] = useState({ todayProfit: 0, totalProfit: 0, totalOrders: 0, balance: 0, tomorrowEstimate: 0, dailyGoal: 20 });
   const [sortMode, setSortMode] = useState('profit'); // 'profit' | 'price' | 'sales'
   const [affordableOnly, setAffordableOnly] = useState(false);
-  const [tab, setTab] = useState('products');
+  const [tab, setTab] = useState(initialTab);
   const [analytics, setAnalytics] = useState(null);
   const [orderHistory, setOrderHistory] = useState(null);
   const [orderPeriod, setOrderPeriod] = useState('today');
@@ -564,7 +564,7 @@ export default function StorePage() {
         </div>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <span style={{fontSize:12,color:'#999',fontWeight:500}}>${s.balance.toFixed(0)}</span>
-          <button onClick={() => setTab('funds')} style={{padding:'4px 10px',background:'rgba(255,80,0,.15)',color:'#FF5000',borderRadius:14,border:'none',fontSize:10,fontWeight:600,cursor:'pointer'}}>💰 Funds</button>
+          <button onClick={() => navigate('/store/funds')} style={{padding:'4px 10px',background:'rgba(255,80,0,.15)',color:'#FF5000',borderRadius:14,border:'none',fontSize:10,fontWeight:600,cursor:'pointer'}}>💰 Funds</button>
           <button onClick={() => navigate('/mine/notifications')} style={{position:'relative',padding:2,background:'none',border:'none',cursor:'pointer'}}>
             <Bell size={20} color="#fff" />
             {notifCount > 0 && <span style={{position:'absolute',top:2,right:3,width:7,height:7,background:'#FF3B30',borderRadius:'50%',border:'2px solid #0f0f0f'}} />}
@@ -588,7 +588,7 @@ export default function StorePage() {
           <div style={{fontSize:9,color:'#999',marginTop:1}}>Free Orders</div>
         </div>
         <div style={{width:1,background:'#f0f0f0',margin:'4px 0'}} />
-        <div onClick={() => setTab('funds')} style={{flex:1,textAlign:'center',cursor:'pointer'}}>
+        <div onClick={() => navigate('/store/funds')} style={{flex:1,textAlign:'center',cursor:'pointer'}}>
           <div style={{fontSize:17,fontWeight:800,color:'#333'}}>${(s.deposit||0).toFixed(0)}</div>
           <span style={{display:'inline-block',marginTop:2,padding:'2px 10px',background:'#f0f0f0',borderRadius:8,fontSize:9,color:'#666',fontWeight:600}}>Deposit →</span>
         </div>
@@ -734,7 +734,7 @@ export default function StorePage() {
       {tab === 'funds' && (<>
       {/* Funds Header with back button */}
       <div style={{background:'#0f0f0f',padding:'6px 16px 10px',display:'flex',alignItems:'center',gap:12}}>
-        <button onClick={() => setTab('products')} style={{background:'none',border:'none',cursor:'pointer',padding:4}}>
+        <button onClick={() => navigate('/store')} style={{background:'none',border:'none',cursor:'pointer',padding:4}}>
           <ChevronLeft size={22} color="#fff" />
         </button>
         <span style={{fontSize:14,fontWeight:700,color:'#fff'}}>Funds</span>
