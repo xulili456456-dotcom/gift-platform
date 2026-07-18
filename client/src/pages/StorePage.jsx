@@ -499,13 +499,13 @@ export default function StorePage() {
             <p className="text-xs text-[#067D62] font-bold">{t('store.earn')} +${p.profit.toFixed(2)}</p>
           </div>
           {tradeMode === 'share' ? (
-            <button onClick={() => handleShare(p)} className="px-10 py-3 rounded-full font-bold text-sm bg-[#067D62] hover:bg-[#00e060] text-white active:scale-95 transition-all">
-              🔗 {t('store.shareEarn') || 'Share & Earn'} 3%
+            <button onClick={() => handleShare(p)} className="px-10 py-3 rounded-xl font-bold text-sm bg-[#067D62] text-white active:scale-95 transition-all">
+              🔗 Share & Earn 3%
             </button>
           ) : (
             <button onClick={() => handleBuy(p)}
-              className="px-10 py-3 rounded-full font-bold text-sm bg-[#FF5000] hover:bg-[#E04500] text-[#0F1111] active:scale-95 border border-[#FF5000] transition-all">
-              {t('store.buyNow')}
+              className="px-10 py-3 rounded-xl font-bold text-sm bg-[#00A86B] text-white active:scale-95 transition-all">
+              Buy ${p.costPrice.toFixed(2)}
             </button>
           )}
         </div>
