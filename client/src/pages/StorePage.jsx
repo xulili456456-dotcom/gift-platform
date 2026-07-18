@@ -632,6 +632,47 @@ export default function StorePage() {
 
       {/* Products Tab */}
       {tab === 'products' && (<>
+      {/* Asset Summary Bar */}
+      <div className="shrink-0 bg-white border-b border-gray-100 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-[11px] text-[#565959]">{t('store.balance')}</span>
+            <p className="text-[28px] font-bold text-[#0F1111] leading-tight">${s.balance.toFixed(2)}</p>
+          </div>
+        </div>
+        {(s.freeRemaining || 0) > 0 && (
+          <div className="mt-1.5 bg-[#FFF8E1] border border-[#FFB800] rounded-xl px-3 py-1.5 flex items-center gap-2">
+            <span className="text-sm">🔥</span>
+            <span className="text-[10px] text-[#0F1111] font-bold">{s.freeRemaining} free orders left today! No deposit needed for items ≤ $50</span>
+          </div>
+        )}
+      </div>
+
+      {/* Trade Mode Toggle */}
+      <div className="shrink-0 bg-white border-b border-gray-100 px-3 py-2 flex items-center gap-2">
+        <button onClick={() => setTradeMode('holding')}
+          className={`flex-1 py-2 rounded-xl text-[11px] font-bold transition-colors ${tradeMode==='holding'?'bg-[#FF5000] text-[#0F1111]':'bg-gray-50 text-[#565959]'}`}>
+          📦 {t('store.holdingMode') || 'Holding'} <span className="text-[9px] ml-0.5 opacity-60">15%</span>
+        </button>
+        <button onClick={() => setTradeMode('share')}
+          className={`flex-1 py-2 rounded-xl text-[11px] font-bold transition-colors ${tradeMode==='share'?'bg-[#067D62] text-white':'bg-gray-50 text-[#565959]'}`}>
+          🔗 {t('store.shareMode') || 'Share'} <span className="text-[9px] ml-0.5 opacity-60">3%</span>
+        </button>
+      </div>
+
+      {/* Sort & Filter Row */}
+      <div className="shrink-0 bg-white border-b border-gray-100 px-3 py-2 flex items-center gap-2 overflow-x-auto scrollbar-none">
+        <button onClick={() => setSortMode('profit')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='profit'?'bg-[#0F1111] text-white':'bg-gray-50 text-[#0F1111]'}`}>💰 {t('store.sortProfit') || 'Profit'}</button>
+        <button onClick={() => setSortMode('price')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='price'?'bg-[#0F1111] text-white':'bg-gray-50 text-[#0F1111]'}`}>📊 {t('store.sortPrice') || 'Price'}</button>
+        <button onClick={() => setSortMode('sales')} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium ${sortMode==='sales'?'bg-[#0F1111] text-white':'bg-gray-50 text-[#0F1111]'}`}>🔥 {t('store.sortSales') || 'Top'}</button>
+        <span className="text-[#ddd]">|</span>
+        <button onClick={() => setAffordableOnly(!affordableOnly)} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${affordableOnly?'bg-[#067D62] text-white':'bg-gray-50 text-[#0F1111]'}`}>
+          {affordableOnly ? '✅' : '💰'} {t('store.affordable') || 'Affordable'}
+        </button>
+        <button onClick={() => { setSortMode('free'); setAffordableOnly(false); }} className={`shrink-0 text-[10px] px-2.5 py-1 rounded-full font-medium flex items-center gap-1 ${sortMode==='free'?'bg-[#CC0C39] text-white':'bg-[#FFF8E1] text-[#CC0C39] border border-[#FFB800]'}`}>
+          🔥 {t('store.freeOrders') || 'Free'} ({s.freeRemaining || 0})
+        </button>
+      </div>
       {/* Product List - Plan B: data cards */}
       <div className="flex-1 overflow-y-auto px-4 pt-2">
         <div className="flex flex-col gap-3">
