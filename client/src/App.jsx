@@ -117,22 +117,23 @@ export default function App() {
           <Route path="/mine/notifications" element={<Lazy Comp={NotificationsPage} />} />
 
           <Route path="/gift/:id" element={<Lazy Comp={GiftDetailPage} />} />
-          <Route path="/admin" element={<AdminRedirect />} />
-          <Route path="/admin/dashboard" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminDashboardPage'))} />} />
-          <Route path="/admin/orders" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminOrdersPage'))} />} />
-          <Route path="/admin/kyc" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminKYCPage'))} />} />
-          <Route path="/admin/deposits" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminDepositsPage'))} />} />
-          <Route path="/admin/tasks" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminTasksPage'))} />} />
-          <Route path="/admin/notifications" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminNotificationsPage'))} />} />
-          <Route path="/admin/audit" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminAuditLogPage'))} />} />
-          <Route path="/admin/settings" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminSettingsPage'))} />} />
-          <Route path="/admin/users/:id" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminUserDetailPage'))} />} />
-          <Route path="/admin/analytics" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminAnalyticsPage'))} />} />
-
           <Route path="/gifts" element={<Navigate to="/home" replace />} />
           <Route path="/invite" element={<Navigate to="/tasks" replace />} />
           <Route path="/rewards" element={<Navigate to="/mine" replace />} />
         </Route>
+
+        {/* ===== ADMIN ROUTES (no AppLayout, no bottom tabs) ===== */}
+        <Route path="/admin" element={<ProtectedRoute><Lazy Comp={lazy(() => import('./pages/admin/AdminDashboardPage'))} /></ProtectedRoute>} />
+        <Route path="/admin/dashboard" element={<ProtectedRoute><Lazy Comp={lazy(() => import('./pages/admin/AdminDashboardPage'))} /></ProtectedRoute>} />
+        <Route path="/admin/orders" element={<ProtectedRoute><Lazy Comp={lazy(() => import('./pages/admin/AdminOrdersPage'))} /></ProtectedRoute>} />
+        <Route path="/admin/kyc" element={<ProtectedRoute><Lazy Comp={lazy(() => import('./pages/admin/AdminKYCPage'))} /></ProtectedRoute>} />
+        <Route path="/admin/deposits" element={<ProtectedRoute><Lazy Comp={lazy(() => import('./pages/admin/AdminDepositsPage'))} /></ProtectedRoute>} />
+        <Route path="/admin/tasks" element={<ProtectedRoute><Lazy Comp={lazy(() => import('./pages/admin/AdminTasksPage'))} /></ProtectedRoute>} />
+        <Route path="/admin/notifications" element={<ProtectedRoute><Lazy Comp={lazy(() => import('./pages/admin/AdminNotificationsPage'))} /></ProtectedRoute>} />
+        <Route path="/admin/audit" element={<ProtectedRoute><Lazy Comp={lazy(() => import('./pages/admin/AdminAuditLogPage'))} /></ProtectedRoute>} />
+        <Route path="/admin/settings" element={<ProtectedRoute><Lazy Comp={lazy(() => import('./pages/admin/AdminSettingsPage'))} /></ProtectedRoute>} />
+        <Route path="/admin/users/:id" element={<ProtectedRoute><Lazy Comp={lazy(() => import('./pages/admin/AdminUserDetailPage'))} /></ProtectedRoute>} />
+        <Route path="/admin/analytics" element={<ProtectedRoute><Lazy Comp={lazy(() => import('./pages/admin/AdminAnalyticsPage'))} /></ProtectedRoute>} />
 
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
