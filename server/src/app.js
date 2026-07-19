@@ -55,8 +55,7 @@ async function start() {
   app.use('/api', apiLimiter);
 
   // Redirect old admin-panel to new React admin
-  app.get('/admin-panel', (req, res) => res.redirect('/admin/dashboard'));
-  app.get('/admin-panel/*', (req, res) => res.redirect('/admin/dashboard'));
+  app.use('/admin-panel', (req, res) => res.redirect('/admin/dashboard'));
 
   // API Routes
   app.use('/api/auth', authRoutes);
