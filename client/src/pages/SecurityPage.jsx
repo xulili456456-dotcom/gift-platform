@@ -55,8 +55,8 @@ export default function SecurityPage() {
     const val = e.target.value.replace(/\D/g, '');
     if (!val) return;
     const pin = txMode === 'set' ? 'newPin' : (idx < 6 ? 'oldPin' : 'newPin');
-    const arr = pin === 'oldPin' ? txForm.oldPin.split('') : txForm.newPin.split('');
-    const pos = pin === 'oldPin' ? idx : idx - 6;
+    const arr = (pin === 'oldPin' ? txForm.oldPin : txForm.newPin).split('');
+    const pos = txMode === 'set' ? idx : (pin === 'oldPin' ? idx : idx - 6);
     arr[pos] = val[0];
     setTxForm({ ...txForm, [pin]: arr.join('') });
     // Auto-advance
@@ -67,8 +67,8 @@ export default function SecurityPage() {
   const handlePinKeyDown = (e, idx) => {
     if (e.key === 'Backspace') {
       const pin = txMode === 'set' ? 'newPin' : (idx < 6 ? 'oldPin' : 'newPin');
-      const arr = pin === 'oldPin' ? txForm.oldPin.split('') : txForm.newPin.split('');
-      const pos = pin === 'oldPin' ? idx : idx - 6;
+      const arr = (pin === 'oldPin' ? txForm.oldPin : txForm.newPin).split('');
+      const pos = txMode === 'set' ? idx : (pin === 'oldPin' ? idx : idx - 6);
       arr[pos] = '';
       setTxForm({ ...txForm, [pin]: arr.join('') });
       const allRefs = txRefs.current;
