@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const rateLimit = require('express-rate-limit');
 const { hashPassword, verifyPassword } = require('../utils/password');
+const { updateTaskProgress } = require('./tasks');
 const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../utils/jwt');
 const { generateReferralCode } = require('../utils/referralCode');
 const userModel = require('../models/user');
@@ -90,6 +91,11 @@ router.post('/register', registerLimiter, async (req, res) => {
       access_token: accessToken,
       refresh_token: refreshToken,
     });
+    // Track invite progress for the inviter
+    if (parentId) {
+      updateTaskProgress(parentId, 'invite_3_weekly', 1).catch(()=>{});
+      updateTaskProgress(parentId, 'referral_trade', 1).catch(()=>{});
+    }
   } catch (err) {
     console.error('Register error:', err);
     res.status(500).json({ error: 'Registration failed, please try again later' });

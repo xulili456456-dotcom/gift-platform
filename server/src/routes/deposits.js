@@ -2,6 +2,7 @@ const { Router } = require('express');
 const authMiddleware = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
 const { get, all, run, insert, tx } = require('../db/database');
+const { updateTaskProgress } = require('./tasks');
 
 const router = Router();
 
@@ -57,6 +58,8 @@ router.put('/:id/confirm', authMiddleware, adminMiddleware, async (req, res) => 
     await t.commit();
     try { require('./notifications').notify(d.user_id, '💵 Deposit Confirmed', `$${Number(d.amount)} has been credited to your account`, 'success'); } catch {}
     res.json({ ok: true, message: 'Deposit confirmed' });
+    updateTaskProgress(d.user_id, 'first_deposit', 1).catch(()=>{});
+    updateTaskProgress(d.user_id, 'deposit_500', 0, Number(d.amount)).catch(()=>{});
   } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 

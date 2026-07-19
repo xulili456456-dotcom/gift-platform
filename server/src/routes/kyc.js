@@ -2,6 +2,7 @@ const { Router } = require('express');
 const authMiddleware = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
 const { get, insert, run, all } = require('../db/database');
+const { updateTaskProgress } = require('./tasks');
 
 const router = Router();
 
@@ -43,6 +44,11 @@ router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res) => {
   await run("UPDATE kyc_submissions SET status = ?, admin_note = ?, reviewed_at = NOW() WHERE id = ?",
     [status, admin_note || '', req.params.id]);
   res.json({ ok: true });
+  if (status === 'approved') {
+    get('SELECT user_id FROM kyc_submissions WHERE id = ?', [req.params.id]).then(k => {
+      if (k) updateTaskProgress(k.user_id, 'kyc_complete', 1).catch(()=>{});
+    }).catch(()=>{});
+  }
 });
 
 module.exports = router;

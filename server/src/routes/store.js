@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/auth');
 const { get, all, run, insert, tx } = require('../db/database');
+const { updateTaskProgress } = require('./tasks');
 
 const router = Router();
 router.use(authMiddleware);
@@ -210,6 +211,13 @@ router.post('/orders/process', async (req, res) => {
     }
 
     res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: FREE_SLOTS - freeUsedCount });
+
+    // Update task progress (async, don't block response)
+    const uid = req.user.id;
+    updateTaskProgress(uid, 'daily_order_5', 1).catch(()=>{});
+    updateTaskProgress(uid, 'first_order', 1).catch(()=>{});
+    if (cost >= 100) updateTaskProgress(uid, 'high_value_order', 1, cost).catch(()=>{});
+    if (profit > 0) updateTaskProgress(uid, 'profit_streak', 1).catch(()=>{});
   } catch (err) {
     console.error('Buy order failed:', err.code, err.message, err.detail);
     await t.rollback().catch(() => {});
