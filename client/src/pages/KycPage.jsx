@@ -279,7 +279,7 @@ export default function KycPage() {
           <div style={{display:'flex',flexDirection:'column',gap:8}}>
             <div style={{display:'flex',alignItems:'center',gap:10,padding:10,background:'#f8f8f8',borderRadius:12}}>
               <span style={{fontSize:20}}>💸</span>
-              <div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:'#333'}}>Withdrawals</div><div style={{fontSize:10,color:'#999'}}>Transfer earnings to your bank</div></div>
+              <div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:'#333'}}>Withdrawals</div><div style={{fontSize:10,color:'#999'}}>Transfer the earnings to your wallet account</div></div>
               <span style={{color:'#00A86B',fontWeight:700,fontSize:11}}>Active</span>
             </div>
             <div style={{display:'flex',alignItems:'center',gap:10,padding:10,background:'#f8f8f8',borderRadius:12}}>
