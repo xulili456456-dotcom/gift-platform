@@ -23,6 +23,7 @@ router.get('/me', async (req, res) => {
     avatar_url: user.avatar_url,
     referral_code: user.referral_code,
     is_admin: user.is_admin,
+    has_tx_pin: !!user.tx_pin,
     created_at: user.created_at,
   });
 });
@@ -105,6 +106,49 @@ router.put('/me/contact', async (req, res) => {
     res.json({ message: 'Updated successfully', ...updates });
   } catch (err) {
     res.status(500).json({ error: 'Update failed' });
+  }
+});
+
+// POST /api/users/me/tx-pin — set transaction PIN
+router.post('/me/tx-pin', async (req, res) => {
+  try {
+    const { pin } = req.body;
+    if (!pin || !/^\d{6}$/.test(pin)) {
+      return res.status(400).json({ error: 'Please enter a 6-digit numeric PIN' });
+    }
+    const user = await userModel.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (user.tx_pin) return res.status(400).json({ error: 'Transaction PIN already set. Use change PIN instead.' });
+
+    const pinHash = await hashPassword(pin);
+    const { run } = require('../db/database');
+    await run("UPDATE users SET tx_pin = ? WHERE id = ?", [pinHash, req.user.id]);
+    res.json({ message: 'Transaction PIN set successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to set transaction PIN' });
+  }
+});
+
+// PUT /api/users/me/tx-pin — change transaction PIN
+router.put('/me/tx-pin', async (req, res) => {
+  try {
+    const { old_pin, new_pin } = req.body;
+    if (!old_pin || !new_pin || !/^\d{6}$/.test(new_pin)) {
+      return res.status(400).json({ error: 'Please enter valid 6-digit PINs' });
+    }
+    const user = await userModel.findById(req.user.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user.tx_pin) return res.status(400).json({ error: 'No transaction PIN set. Please set one first.' });
+
+    const valid = await verifyPassword(old_pin, user.tx_pin);
+    if (!valid) return res.status(403).json({ error: 'Current PIN is incorrect' });
+
+    const pinHash = await hashPassword(new_pin);
+    const { run } = require('../db/database');
+    await run("UPDATE users SET tx_pin = ? WHERE id = ?", [pinHash, req.user.id]);
+    res.json({ message: 'Transaction PIN changed successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to change transaction PIN' });
   }
 });
 

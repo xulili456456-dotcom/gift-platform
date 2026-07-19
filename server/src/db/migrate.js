@@ -291,6 +291,8 @@ async function migrate() {
   } catch (e) { console.log('Transaction requests migration skipped:', e.message); }
   // Admin notes on users
   try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS admin_notes TEXT DEFAULT ''`); } catch (e) { console.log('admin_notes skipped:', e.message); }
+  // Transaction PIN
+  try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS tx_pin TEXT DEFAULT NULL`); } catch (e) { console.log('tx_pin skipped:', e.message); }
   // Admin audit log
   try {
     await exec(`CREATE TABLE IF NOT EXISTS admin_audit_log (
