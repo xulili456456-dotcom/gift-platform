@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { referralApi } from '../api/referral';
+import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
 
 export default function TeamPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const authUser = useAuthStore(s => s.user);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [filterLevel, setFilterLevel] = useState(0);
@@ -14,7 +16,7 @@ export default function TeamPage() {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    referralApi.getStats().then(({ data }) => setStats(data)).catch(() => toast.error('Failed to load')).finally(() => setLoading(false));
+    referralApi.getStats().then(({ data }) => setStats(data)).catch(() => toast.error('Failed to load team stats')).finally(() => setLoading(false));
   }, []);
 
   if (loading) return <div className="min-h-screen bg-gray-50 p-4"><div className="skeleton h-40 rounded-2xl" /></div>;
@@ -33,10 +35,14 @@ export default function TeamPage() {
     return true;
   });
 
+  const referralCode = stats?.referral_code || (authUser && authUser.referral_code) || '';
+
   const copyCode = () => {
-    const code = stats?.referral_code || '';
-    if (!code) return;
-    navigator.clipboard.writeText(code);
+    if (!referralCode) {
+      toast.error('No invite code available. Please try again later.');
+      return;
+    }
+    navigator.clipboard.writeText(referralCode);
     toast.success('Code copied');
   };
 
@@ -123,7 +129,7 @@ export default function TeamPage() {
         {/* Invite Code */}
         <div style={{background:'#fff',borderRadius:20,padding:18,textAlign:'center'}}>
           <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Your Invite Code</div>
-          <div style={{fontSize:28,fontWeight:800,color:'#FF5000',letterSpacing:2,marginBottom:8}}>{stats?.referral_code||'------'}</div>
+          <div style={{fontSize:28,fontWeight:800,color:'#FF5000',letterSpacing:2,marginBottom:8}}>{referralCode||'------'}</div>
           <button onClick={copyCode} style={{width:'100%',padding:10,background:'#FF5000',color:'#fff',border:'none',borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer'}}>Copy Invite Code</button>
         </div>
       </div>

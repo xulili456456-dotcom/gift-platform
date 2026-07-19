@@ -43,6 +43,7 @@ router.get('/stats', async (req, res) => {
   const level1Invitees = await invitationModel.getInvitees(req.user.id, 1, 1, 5);
 
   res.json({
+    referral_code: user.referral_code,
     direct_count: rawStats.level1,
     level2_count: rawStats.level2,
     level3_count: rawStats.level3,
