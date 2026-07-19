@@ -84,9 +84,9 @@ router.post('/:taskType/claim', async (req, res) => {
     if (!progress || !progress.completed) return res.status(400).json({ error: 'Task not completed' });
     if (progress.claimed) return res.status(400).json({ error: 'Already claimed' });
 
-    await run("UPDATE task_progress SET claimed = TRUE, claimed_at = datetime('now') WHERE id = ?", [progress.id]);
-    await run('INSERT INTO task_reward_log (user_id, task_type, task_title, amount) VALUES (?,?,?,?)',
-      [userId, taskType, task.title, task.reward]);
+    await run("UPDATE task_progress SET claimed = TRUE, claimed_at = ? WHERE id = ?", [new Date().toISOString(), progress.id]);
+    await run('INSERT INTO task_reward_log (user_id, task_type, task_title, amount, created_at) VALUES (?,?,?,?,?)',
+      [userId, taskType, task.title, task.reward, new Date().toISOString()]);
 
     res.json({ message: 'Reward claimed', amount: Number(task.reward) });
   } catch (err) {
