@@ -74,7 +74,8 @@ router.put('/me/password', async (req, res) => {
     await run("UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?", [newHash, req.user.id]);
     res.json({ message: 'Password changed successfully' });
   } catch (err) {
-    res.status(500).json({ error: 'Password change failed' });
+    console.error('Password change error:', err);
+    res.status(500).json({ error: 'Password change failed: ' + (err.message || 'unknown') });
   }
 });
 
