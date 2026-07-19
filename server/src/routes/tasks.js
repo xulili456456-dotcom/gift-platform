@@ -147,8 +147,8 @@ router.get('/balance', async (req, res) => {
   try {
     const [earningsRow, checkinRows, totalRow] = await Promise.all([
       get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ?", [req.user.id]),
-      all("SELECT created_at FROM task_earnings WHERE user_id = ? AND source = 'checkin' ORDER BY id DESC LIMIT 7", [req.user.id]),
-      get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND source = 'checkin'", [req.user.id]),
+      all("SELECT created_at FROM task_earnings WHERE user_id = ? AND type = 'checkin' ORDER BY id DESC LIMIT 7", [req.user.id]),
+      get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND type = 'checkin'", [req.user.id]),
     ]);
     const today = new Date().toISOString().slice(0, 10);
     const checkedToday = checkinRows.length > 0 && new Date(checkinRows[0].created_at).toISOString().slice(0, 10) === today;
@@ -169,18 +169,18 @@ router.post('/checkin', async (req, res) => {
   try {
     const today = new Date().toISOString().slice(0, 10);
     const last = await t.get(
-      "SELECT id, created_at FROM task_earnings WHERE user_id = ? AND source = 'checkin' ORDER BY id DESC LIMIT 1",
+      "SELECT id, created_at FROM task_earnings WHERE user_id = ? AND type = 'checkin' ORDER BY id DESC LIMIT 1",
       [req.user.id]);
     if (last) {
       const lastDate = new Date(last.created_at).toISOString().slice(0, 10);
       if (lastDate === today) { await t.rollback(); return res.status(400).json({ error: 'Already checked in today' }); }
     }
     const rows = await t.all(
-      "SELECT created_at FROM task_earnings WHERE user_id = ? AND source = 'checkin' ORDER BY id DESC LIMIT 7",
+      "SELECT created_at FROM task_earnings WHERE user_id = ? AND type = 'checkin' ORDER BY id DESC LIMIT 7",
       [req.user.id]);
     const streak = calcStreak(rows, true);
     const reward = CHECKIN_REWARDS[streak] || CHECKIN_REWARDS[0];
-    await t.run("INSERT INTO task_earnings (user_id, amount, source) VALUES (?, ?, 'checkin')", [req.user.id, reward]);
+    await t.run("INSERT INTO task_earnings (user_id, amount, type) VALUES (?, ?, 'checkin')", [req.user.id, reward]);
     await t.commit();
     res.json({ amount: reward, streak: streak + 1 });
     // Update check-in task progress
