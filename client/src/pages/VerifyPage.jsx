@@ -2,17 +2,17 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import client from '../api/client';
-import { Upload, CheckCircle, Clock, X, Sparkles } from 'lucide-react';
+import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
 
 export default function VerifyPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const fileRef = useRef(null);
+  const authUser = useAuthStore(s => s.user);
   const [proofs, setProofs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [burst, setBurst] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     client.get('/proofs').then(({ data }) => setProofs(data || [])).catch(() => {}).finally(() => setLoading(false));
@@ -22,12 +22,13 @@ export default function VerifyPage() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = async () => {
+      setSubmitting(true);
       try {
         const { data } = await client.post('/proofs', { image: reader.result });
         setProofs(prev => [{ id: data.id, image: reader.result, status: 'pending', submitted_at: new Date().toISOString() }, ...prev]);
-        setBurst(true); setTimeout(() => setBurst(false), 1200);
         toast.success(t('verify.uploaded'));
       } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
+      finally { setSubmitting(false); }
     };
     reader.readAsDataURL(file);
   };
@@ -37,51 +38,158 @@ export default function VerifyPage() {
     e.target.value = '';
   };
 
-  const removeProof = async (id) => {
+  const removeProof = (id) => {
     setProofs(prev => prev.filter(p => p.id !== id));
   };
 
-  if (loading) return <div className="min-h-screen bg-bg p-4"><div className="skeleton h-40 rounded-2xl" /></div>;
+  const copyCode = () => {
+    const code = authUser?.referral_code || '';
+    if (!code) { toast.error('No invite code available'); return; }
+    navigator.clipboard.writeText(code);
+    toast.success('Code copied');
+  };
+
+  const approvedCount = proofs.filter(p => p.status === 'approved').length;
+  const referralCode = authUser?.referral_code || '------';
+
+  if (loading) return (
+    <div style={{background:'#f2f2f7',minHeight:'100vh',maxWidth:430,margin:'0 auto'}}>
+      <div style={{background:'#0f0f0f',padding:'8px 16px 12px',display:'flex',alignItems:'center',gap:12,color:'#fff'}}>
+        <span style={{fontSize:20}}>←</span><span style={{fontSize:14,fontWeight:700}}>{t('verify.title')}</span>
+      </div>
+      <div style={{padding:16}}>
+        <div style={{background:'#fff',borderRadius:16,height:60,marginBottom:12}} />
+        <div style={{background:'#fff',borderRadius:16,height:60,marginBottom:12}} />
+        <div style={{background:'#fff',borderRadius:16,height:60,marginBottom:12}} />
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-bg animate-fade-in">
-      <div className="bg-white px-4 py-3 flex items-center gap-3 border-b border-separator">
-        <button onClick={() => navigate('/mine')} className="flex items-center gap-1 text-primary font-medium text-sm pr-2 py-1">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
-          {t('common.back')}
-        </button>
-        <h2 className="text-[16px] font-bold text-text">{t('verify.title')}</h2>
+    <div style={{background:'#f2f2f7',minHeight:'100vh',maxWidth:430,margin:'0 auto',paddingBottom:80}}>
+      {/* Header */}
+      <div style={{background:'#0f0f0f',padding:'8px 16px 12px',display:'flex',alignItems:'center',gap:12,color:'#fff'}}>
+        <button onClick={() => navigate('/mine')} style={{background:'none',border:'none',fontSize:20,cursor:'pointer',color:'#fff'}}>←</button>
+        <span style={{fontSize:14,fontWeight:700}}>{t('verify.title')}</span>
       </div>
-      <div className="p-4 space-y-5">
-        <div className="relative rounded-2xl p-4 text-[12px] leading-relaxed overflow-hidden" style={{ background: 'linear-gradient(135deg, #c8a06e, #b8905e, #a07840, #c8a06e)', backgroundSize: '200% 200%', animation: 'gradientShift 4s ease-in-out infinite' }}>
-          {[...Array(6)].map((_, i) => (<div key={i} className="absolute rounded-full bg-white/10" style={{ width: 4+Math.random()*8, height: 4+Math.random()*8, left: 10+i*16+'%', top: 20+Math.random()*60+'%', animation: 'particleFloat '+(2+Math.random()*3)+'s ease-in-out '+i*0.4+'s infinite' }} />))}
-          <div className="relative z-10 text-white">
-            <div className="flex items-center gap-2 mb-2"><Sparkles size={16} className="animate-pulse" /><p className="text-[13px] font-bold">{t('verify.howTo')}</p></div>
-            <p className="text-white/80">1. {t('verify.step1')}</p><p className="text-white/80">2. {t('verify.step2')}</p><p className="text-white/80">3. {t('verify.step3')}</p>
+
+      <div style={{padding:16}}>
+        {/* Verified Count Bar */}
+        <div style={{background:'#fff',borderRadius:14,padding:14,marginBottom:12,display:'flex',alignItems:'center',gap:10}}>
+          <div style={{width:40,height:40,borderRadius:20,background: approvedCount > 0 ? '#E8F5E9' : '#f5f5f5',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18}}>🎯</div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f'}}>{approvedCount} Verified Invitation{approvedCount !== 1 ? 's' : ''}</div>
+            <div style={{fontSize:10,color: approvedCount > 0 ? '#00A86B' : '#bbb',fontWeight: approvedCount > 0 ? 600 : 400,marginTop:1}}>
+              {approvedCount > 0 ? `+$${(approvedCount * 5).toFixed(2)} earned in commissions` : 'Start inviting to earn commissions'}
+            </div>
+          </div>
+          <span onClick={() => navigate('/mine/team')} style={{fontSize:11,color:'#FF5000',fontWeight:600,cursor:'pointer'}}>
+            {approvedCount > 0 ? 'View Team ›' : 'Invite Now ›'}
+          </span>
+        </div>
+
+        {/* Invite Code */}
+        <div style={{background:'#fff',borderRadius:14,padding:14,marginBottom:12,display:'flex',alignItems:'center',gap:10}}>
+          <div style={{fontSize:22,flexShrink:0}}>🔗</div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:10,color:'#999',marginBottom:2}}>Your Invite Code</div>
+            <div style={{fontSize:20,fontWeight:800,color:'#FF5000',letterSpacing:2}}>{referralCode}</div>
+          </div>
+          <button onClick={copyCode} style={{padding:'8px 14px',background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:11,fontWeight:700,cursor:'pointer'}}>Copy</button>
+        </div>
+
+        {/* Instructions */}
+        <div style={{background:'linear-gradient(135deg,#FF5000,#E04500)',borderRadius:16,padding:16,marginBottom:12,position:'relative',overflow:'hidden'}}>
+          <div style={{position:'relative',zIndex:1}}>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+              <span style={{fontSize:18}}>✨</span>
+              <span style={{fontSize:13,fontWeight:700,color:'#fff'}}>How It Works</span>
+            </div>
+            <div style={{fontSize:11,color:'rgba(255,255,255,.85)',lineHeight:1.8}}>
+              <div>1. Share your invite code with a friend</div>
+              <div>2. They register and complete their first task</div>
+              <div>3. Screenshot the proof and upload here</div>
+            </div>
           </div>
         </div>
-        <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
-        <button onClick={() => fileRef.current?.click()} onDragOver={e => { e.preventDefault(); setIsDragOver(true); }} onDragLeave={() => setIsDragOver(false)} onDrop={e => { e.preventDefault(); setIsDragOver(false); if (e.dataTransfer.files[0]) { uploadFile(e.dataTransfer.files[0]); } }}
-          className={`w-full bg-white rounded-2xl border-2 border-dashed p-10 text-center transition-all duration-300 ${isDragOver ? 'border-primary bg-primary/5 scale-[1.02] shadow-lg' : 'border-primary/30 hover:border-primary/50'}`}>
-          <Upload size={40} className="text-primary mx-auto mb-3" /><p className="text-[15px] font-bold text-text">{isDragOver ? t('verify.releaseHere') : t('verify.dropHere')}</p><p className="text-[12px] text-text-muted mt-1">{t('verify.dropHint')}</p>
+
+        {/* Screenshot Requirements */}
+        <div style={{background:'#fff',borderRadius:14,padding:14,marginBottom:12}}>
+          <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:8}}>📸 Your Screenshot Must Show</div>
+          <div style={{display:'flex',flexDirection:'column',gap:6,fontSize:11,color:'#666',lineHeight:1.5}}>
+            <div style={{display:'flex',alignItems:'center',gap:8,padding:8,background:'#f8f8f8',borderRadius:10}}>
+              <span style={{color:'#FF5000',fontWeight:700,flexShrink:0}}>01</span>
+              <span>The friend's <b>registered username</b> visible</span>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:8,padding:8,background:'#f8f8f8',borderRadius:10}}>
+              <span style={{color:'#FF5000',fontWeight:700,flexShrink:0}}>02</span>
+              <span>Proof of <b>completed registration</b> (confirmation page)</span>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:8,padding:8,background:'#f8f8f8',borderRadius:10}}>
+              <span style={{color:'#FF5000',fontWeight:700,flexShrink:0}}>03</span>
+              <span>Proof of <b>first task or purchase</b> completed</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Upload Area */}
+        <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{display:'none'}} />
+        <button onClick={() => fileRef.current?.click()} disabled={submitting}
+          style={{
+            width:'100%',background:'#fff',borderRadius:16,border:'2px dashed #ddd',padding: proofs.length === 0 ? '48px 16px' : '36px 16px',
+            textAlign:'center',marginBottom:16,cursor:'pointer',transition:'all .2s'
+          }}>
+          <div style={{fontSize: proofs.length === 0 ? 48 : 36,marginBottom:8,opacity:.5}}>📤</div>
+          <div style={{fontSize: proofs.length === 0 ? 15 : 14,fontWeight:700,color:'#333',marginBottom:4}}>
+            {submitting ? 'Uploading...' : proofs.length === 0 ? 'Upload Your First Proof' : 'Upload Screenshot'}
+          </div>
+          <div style={{fontSize:11,color:'#bbb'}}>Tap to browse or drag & drop</div>
         </button>
-        {burst && (<div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">{['🎉','✨','💫','🌟','🎊'].map((e, i) => (<span key={i} className="absolute text-2xl animate-float-up" style={{ left: 40+i*12+'%', top: '50%', animationDelay: i*0.1+'s' }}>{e}</span>))}</div>)}
+
+        {/* Proofs List */}
         {proofs.length > 0 && (
-          <div><h3 className="text-[14px] font-bold text-text mb-3">{t('verify.uploadedList')} ({proofs.length})</h3>
-            <div className="space-y-2">{proofs.map((p, idx) => (
-              <div key={p.id} className="bg-white rounded-2xl border border-separator p-3 flex items-center gap-3 stagger-item" style={{ animationDelay: idx*0.08+'s' }}>
-                <img src={p.image} alt="proof" className="w-16 h-16 rounded-xl object-cover shrink-0" />
-                <div className="flex-1 min-w-0"><p className="text-[12px] text-text-muted">{(p.submitted_at||'').slice(0,10)}</p>
-                  <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full mt-1 ${p.status==='pending'?'bg-yellow-50 text-yellow-600':p.status==='approved'?'bg-success/5 text-success':'bg-red-100 text-red-500'}`}>
-                    {p.status==='pending'?<Clock size={12}/>:p.status==='approved'?<CheckCircle size={12}/>:<X size={12}/>}
-                    {p.status==='pending'?t('verify.underReview'):p.status==='approved'?t('verify.confirmed'):'Rejected'}
-                  </span>
+          <>
+            <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Uploaded Proofs ({proofs.length})</div>
+            {proofs.map(p => {
+              const sCfg = p.status === 'approved' ? { icon: '✅', bg: '#E8F5E9', badgeBg: '#E8F5E9', badgeColor: '#0B5E2E', label: '✓ Confirmed' }
+                : p.status === 'rejected' ? { icon: '❌', bg: '#FFF0F0', badgeBg: '#FFF0F0', badgeColor: '#C0392B', label: '✕ Rejected' }
+                : { icon: '📱', bg: '#f5f5f5', badgeBg: '#FFF8E1', badgeColor: '#B45309', label: '⏳ Under Review' };
+              return (
+                <div key={p.id} style={{background:'#fff',borderRadius:14,padding:12,marginBottom:8,display:'flex',alignItems:'center',gap:12}}>
+                  <div style={{width:56,height:56,borderRadius:12,background:sCfg.bg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:24}}>
+                    {p.image ? <img src={p.image} alt="proof" style={{width:'100%',height:'100%',borderRadius:10,objectFit:'cover'}} /> : sCfg.icon}
+                  </div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:10,color:'#bbb'}}>{p.submitted_at ? new Date(p.submitted_at).toLocaleString() : ''}</div>
+                    <span style={{display:'inline-flex',alignItems:'center',gap:4,fontSize:10,fontWeight:600,padding:'3px 10px',borderRadius:10,background:sCfg.badgeBg,color:sCfg.badgeColor,marginTop:4}}>{sCfg.label}</span>
+                    {p.status === 'rejected' && p.admin_note && (
+                      <div style={{fontSize:10,color:'#E04500',marginTop:4,lineHeight:1.4}}>Reason: {p.admin_note}</div>
+                    )}
+                  </div>
+                  {p.status !== 'approved' && (
+                    <button onClick={() => removeProof(p.id)} style={{background:'none',border:'none',color:'#ccc',fontSize:16,cursor:'pointer',padding:4}}>✕</button>
+                  )}
                 </div>
-                <button onClick={()=>removeProof(p.id)} className="text-red-400 p-1"><X size={16}/></button>
-              </div>
-            ))}</div>
+              );
+            })}
+          </>
+        )}
+
+        {/* Empty state */}
+        {!loading && proofs.length === 0 && (
+          <div style={{textAlign:'center',padding:'10px 20px 30px'}}>
+            <div style={{fontSize:36,marginBottom:8,opacity:.3}}>📋</div>
+            <div style={{fontSize:12,color:'#ccc'}}>No proofs submitted yet</div>
           </div>
         )}
+
+        {/* Note */}
+        <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginTop:12,fontSize:10,color:'#999',lineHeight:1.6}}>
+          <div style={{fontWeight:600,color:'#666',marginBottom:4}}>Important</div>
+          • Each invite requires a separate verification screenshot<br />
+          • Approved submissions cannot be deleted<br />
+          • Submitting false proofs will result in account penalties
+        </div>
       </div>
     </div>
   );
