@@ -36,6 +36,7 @@ router.get('/code', async (req, res) => {
 
 // GET /api/referral/stats - detailed stats
 router.get('/stats', async (req, res) => {
+  const user = await userModel.findById(req.user.id);
   const rawStats = await invitationModel.getStats(req.user.id);
   const effective = await invitationModel.getEffectiveCount(req.user.id);
 
