@@ -293,6 +293,12 @@ async function migrate() {
   try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS admin_notes TEXT DEFAULT ''`); } catch (e) { console.log('admin_notes skipped:', e.message); }
   // Transaction PIN
   try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS tx_pin TEXT DEFAULT NULL`); } catch (e) { console.log('tx_pin skipped:', e.message); }
+  // Task system tables
+  try {
+    await exec(`CREATE TABLE IF NOT EXISTS task_definitions (id SERIAL PRIMARY KEY,task_type TEXT NOT NULL,category TEXT DEFAULT 'trading',title TEXT NOT NULL,description TEXT DEFAULT '',icon TEXT DEFAULT '📦',icon_bg TEXT DEFAULT '#FFF5F0',target_count INTEGER DEFAULT 0,target_value NUMERIC DEFAULT 0,reward NUMERIC NOT NULL DEFAULT 0,reward_color TEXT DEFAULT '#FF5000',reset_period TEXT DEFAULT 'daily',sort_order INTEGER DEFAULT 0,active BOOLEAN DEFAULT TRUE)`);
+    await exec(`CREATE TABLE IF NOT EXISTS task_progress (id SERIAL PRIMARY KEY,user_id INTEGER NOT NULL,task_def_id INTEGER,task_type TEXT NOT NULL,current_count INTEGER DEFAULT 0,current_value NUMERIC DEFAULT 0,completed BOOLEAN DEFAULT FALSE,claimed BOOLEAN DEFAULT FALSE,claimed_at TIMESTAMP DEFAULT NULL,period_key TEXT NOT NULL DEFAULT '',FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)`);
+    await exec(`CREATE TABLE IF NOT EXISTS task_reward_log (id SERIAL PRIMARY KEY,user_id INTEGER NOT NULL,task_type TEXT,task_title TEXT,amount NUMERIC NOT NULL,created_at TIMESTAMP DEFAULT (datetime('now')),FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)`);
+  } catch (e) { console.log('Task tables migration skipped:', e.message); }
   // Admin audit log
   try {
     await exec(`CREATE TABLE IF NOT EXISTS admin_audit_log (
