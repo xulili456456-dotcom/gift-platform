@@ -113,7 +113,7 @@ export default function MinePage() {
 
       {/* Support Group */}
       <div style={{margin:'0 16px 8px',background:'#fff',borderRadius:14,overflow:'hidden'}}>
-        <MenuRow icon={<MessageCircle size={17} color="#00A86B"/>} iconBg="#E8F5E9" label={t('support.title')} desc={t('support.online')} onClick={()=>document.dispatchEvent(new CustomEvent('showContactSupport'))} right={<><span style={{fontSize:10,color:'#00A86B',fontWeight:600,marginRight:4}}>ONLINE</span><ChevronRight size={16} color="#ccc"/></>}/>
+        <MenuRow icon={<MessageCircle size={17} color="#00A86B"/>} iconBg="#E8F5E9" label={t('support.title')} desc={t('support.online')} onClick={()=>navigate('/mine/support')} right={<><span style={{fontSize:10,color:'#00A86B',fontWeight:600,marginRight:4}}>ONLINE</span><ChevronRight size={16} color="#ccc"/></>}/>
         <MenuRow icon={<Info size={17} color="#999"/>} iconBg="#f5f5f5" label={t('legal.title')} desc={`${t('legal.terms')} · ${t('legal.privacy')} · ${t('legal.about')}`} onClick={()=>navigate('/mine/legal')}/>
       </div>
 
