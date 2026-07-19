@@ -62,7 +62,7 @@ async function start() {
   app.use('/api/users', userRoutes);
   app.use('/api/gifts', giftRoutes);
   app.use('/api/claims', claimRoutes);
-  app.use('/api/tasks', require('./routes/tasks'));
+  app.use('/api/tasks', require('./routes/tasks').router);
   app.use('/api/wallet', require('./routes/wallet'));
   app.use('/api/kyc', require('./routes/kyc'));
   app.use('/api/proofs', require('./routes/proofs'));
