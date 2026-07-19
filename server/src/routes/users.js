@@ -71,7 +71,7 @@ router.put('/me/password', async (req, res) => {
 
     const newHash = await hashPassword(newPassword);
     const { run } = require('../db/database');
-    await run("UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?", [newHash, req.user.id]);
+    await run("UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?", [newHash, new Date().toISOString(), req.user.id]);
     res.json({ message: 'Password changed successfully' });
   } catch (err) {
     console.error('Password change error:', err);
@@ -102,8 +102,8 @@ router.put('/me/contact', async (req, res) => {
 
     const { run } = require('../db/database');
     const sets = Object.keys(updates).map(k => `${k} = ?`).join(', ');
-    await run(`UPDATE users SET ${sets}, updated_at = datetime('now') WHERE id = ?`,
-      [...Object.values(updates), req.user.id]);
+    await run(`UPDATE users SET ${sets}, updated_at = ? WHERE id = ?`,
+      [...Object.values(updates), new Date().toISOString(), req.user.id]);
     res.json({ message: 'Updated successfully', ...updates });
   } catch (err) {
     res.status(500).json({ error: 'Update failed' });
