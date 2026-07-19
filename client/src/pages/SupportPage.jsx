@@ -1,19 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Send, Bot, User, Sparkles } from 'lucide-react';
+import { Send } from 'lucide-react';
 
 const FAQ_DB = [
-  { q: ['如何邀请','怎么邀请','邀请方式','邀请链接','分享链接','复制链接','二维码','invite','share','referral','link','copy','qr','invitar','compartir','招待','共有','リンク'], aKey: 'messages.faq1a' },
-  { q: ['有效邀请','怎么算','计算方式','权重','有效人数','effective','calculate','formula','weight','calcular','efectivo','有効','計算'], aKey: 'messages.faq2a' },
-  { q: ['领取','怎么领','提现','怎么提','到账','奖励发放','拿钱','怎么拿','claim','withdraw','receive','reward','recibir','reclamar','受取','受け取り','出金'], aKey: 'messages.faq3a' },
-  { q: ['钱包','绑定钱包','加密钱包','USDT','地址','网络','TRC20','ERC20','BEP20','wallet','crypto','address','network','bind','billetera','vincular','ウォレット','アドレス'], aKey: 'messages.faq4a' },
-  { q: ['审核','审核多久','review','approve','how long','pendiente','revisión','審査','時間'], aKey: 'messages.faq1a' },
-  { q: ['密码','改密码','修改密码','忘记密码','安全','password','security','change','reset','contraseña','seguridad','パスワード','セキュリティ'], aKey: 'messages.faq2a' },
-  { q: ['实名','认证','KYC','identity','verification','document','verificación','identidad','本人確認','認証'], aKey: 'messages.faq3a' },
-  { q: ['会员','等级','VIP','member','tier','level','gold','diamond','silver','platinum','miembro','nivel','メンバー','ランク'], aKey: 'messages.faq1a' },
-  { q: ['保证金','锁仓','staking','质押','stake','deposit','lock','plan','bloquear','ステーキング','ロック'], aKey: 'messages.faq2a' },
-  { q: ['违规','封号','作弊','ban','cheat','script','violation','fraud','trampa','不正','禁止','違反'], aKey: 'messages.faq3a' },
+  { q: ['invite','邀请','invitar','招待','共有'], aKey: 'messages.faq1a' },
+  { q: ['withdraw','提现','retirar','出金','提取','effective','有效'], aKey: 'messages.faq2a' },
+  { q: ['kyc','identity','verification','认证','实名','本人確認'], aKey: 'messages.faq3a' },
+  { q: ['commission','earn','佣金','comisión','報酬','收益'], aKey: 'messages.faq1a' },
+  { q: ['review','how long','审核','pendiente','審査','時間'], aKey: 'messages.faq1a' },
+  { q: ['wallet','bind','钱包','billetera','ウォレット','アドレス'], aKey: 'messages.faq4a' },
+  { q: ['password','pass','contraseña','パスワード','セキュリティ','security'], aKey: 'messages.faq2a' },
+  { q: ['stake','staking','质押','bloquear','ステーキング'], aKey: 'messages.faq2a' },
+  { q: ['task','任务','tarea','タスク','trade','购物'], aKey: 'messages.faq1a' },
+  { q: ['vip','member','会员','miembro','メンバー','ランク','等级'], aKey: 'messages.faq1a' },
+  { q: ['claim','领取','怎么领','拿钱','reward','recibir','reclamar','受取'], aKey: 'messages.faq3a' },
+  { q: ['ban','cheat','违规','作弊','封号','fraud','trampa','不正','禁止'], aKey: 'messages.faq3a' },
 ];
 
 const QUICK_QUESTIONS = [
@@ -24,8 +26,6 @@ const QUICK_QUESTIONS = [
 export default function SupportPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [ready, setReady] = useState(false);
-  useEffect(() => { setTimeout(() => setReady(true), 200); }, []);
   const [messages, setMessages] = useState(() => {
     try { const saved = sessionStorage.getItem('chat_messages'); return saved ? JSON.parse(saved) : [{ from: 'bot', text: t('support.welcome'), time: new Date() }]; }
     catch { return [{ from: 'bot', text: t('support.welcome'), time: new Date() }]; }
@@ -39,13 +39,11 @@ export default function SupportPage() {
 
   const findAnswer = (query) => {
     const q = query.toLowerCase();
-    let best = null;
-    let bestScore = 0;
+    let best = null, bestScore = 0;
     for (const faq of FAQ_DB) {
       for (const keyword of faq.q) {
         if (q.includes(keyword.toLowerCase())) {
-          const score = keyword.length;
-          if (score > bestScore) { bestScore = score; best = faq; }
+          if (keyword.length > bestScore) { bestScore = keyword.length; best = faq; }
         }
       }
     }
@@ -60,60 +58,49 @@ export default function SupportPage() {
     setTyping(true);
 
     setTimeout(() => {
-      const answer = findAnswer(q) || t('support.notFound');
-      setMessages(m => m.slice(-50).concat({ from: 'bot', text: answer, time: new Date() }));
+      const answer = findAnswer(q) || ('I\'m not sure about that. Please try rephrasing your question, or contact our support team on Telegram: @Shopping_Operations for direct assistance.');
+      setMessages(m => m.slice(-40).concat({ from: 'bot', text: answer, time: new Date() }));
       setTyping(false);
     }, 600 + Math.random() * 800);
   };
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col animate-fade-in" style={{ paddingBottom: '100px' }}>
-      <div className="bg-white px-4 py-3 flex items-center gap-3 border-b border-separator">
-        <button onClick={() => navigate('/mine')} className="flex items-center gap-1 text-primary font-medium text-sm pr-2 py-1">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6" /></svg>
-          {t('common.back')}
-        </button>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <Bot size={18} className="text-primary" />
-          </div>
+    <div style={{background:'#f2f2f7',height:'100vh',maxWidth:430,margin:'0 auto',display:'flex',flexDirection:'column'}}>
+      {/* Header */}
+      <div style={{background:'#0f0f0f',padding:'10px 16px 12px',display:'flex',alignItems:'center',gap:12,color:'#fff',flexShrink:0}}>
+        <button onClick={() => navigate('/mine')} style={{background:'none',border:'none',fontSize:20,cursor:'pointer',color:'#fff'}}>←</button>
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <div style={{width:36,height:36,borderRadius:18,background:'#FF5000',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18}}>🤖</div>
           <div>
-            <h2 className="text-[14px] font-bold text-text">{t('support.title')}</h2>
-            <p className="text-[10px] text-text-muted">{t('support.online')}</p>
+            <div style={{fontSize:14,fontWeight:700}}>{t('support.title')}</div>
+            <div style={{fontSize:10,color:'#aaa'}}>{t('support.online')}</div>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div style={{flex:1,overflowY:'auto',padding:16,display:'flex',flexDirection:'column',gap:14}}>
         {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-2 ${msg.from === 'user' ? 'flex-row-reverse' : ''}`}>
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-              msg.from === 'bot' ? 'bg-primary/10' : 'bg-primary'
-            }`}>
-              {msg.from === 'bot'
-                ? <Bot size={14} className="text-primary" />
-                : <User size={14} className="text-white" />
-              }
+          <div key={i} style={{display:'flex',gap:8,alignItems:'flex-end',flexDirection: msg.from === 'bot' ? 'row' : 'row-reverse'}}>
+            <div style={msg.from === 'bot'
+              ? {width:28,height:28,borderRadius:14,background:'#f0f0f0',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:14}
+              : {width:28,height:28,borderRadius:14,background:'#FF5000',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:12,color:'#fff'}}>
+              {msg.from === 'bot' ? '🤖' : '👤'}
             </div>
-            <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-[13px] leading-relaxed ${
-              msg.from === 'bot'
-                ? 'bg-white border border-separator text-text'
-                : 'bg-primary text-white'
-            }`}>
+            <div style={msg.from === 'bot'
+              ? {maxWidth:'75%',background:'#fff',borderRadius:'16px 16px 16px 4px',padding:'12px 14px',fontSize:12,color:'#333',lineHeight:1.5,boxShadow:'0 1px 3px rgba(0,0,0,.04)'}
+              : {maxWidth:'75%',background:'#FF5000',borderRadius:'16px 16px 4px 16px',padding:'12px 14px',fontSize:12,color:'#fff',lineHeight:1.5}}>
               {msg.text}
             </div>
           </div>
         ))}
         {typing && (
-          <div className="flex gap-2">
-            <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <Bot size={14} className="text-primary" />
-            </div>
-            <div className="bg-white border border-separator rounded-2xl px-4 py-3 flex gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-text-muted animate-bounce" style={{ animationDelay: '0s' }} />
-              <span className="w-2 h-2 rounded-full bg-text-muted animate-bounce" style={{ animationDelay: '0.2s' }} />
-              <span className="w-2 h-2 rounded-full bg-text-muted animate-bounce" style={{ animationDelay: '0.4s' }} />
+          <div style={{display:'flex',gap:8,alignItems:'flex-end'}}>
+            <div style={{width:28,height:28,borderRadius:14,background:'#f0f0f0',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:14}}>🤖</div>
+            <div style={{background:'#fff',borderRadius:'16px 16px 16px 4px',padding:'12px 16px',display:'flex',gap:4,boxShadow:'0 1px 3px rgba(0,0,0,.04)'}}>
+              <div className="typing-dot" style={{width:7,height:7,borderRadius:'50%',background:'#ccc',animation:'bounce 1.4s infinite ease-in-out',animationDelay:'0s'}} />
+              <div className="typing-dot" style={{width:7,height:7,borderRadius:'50%',background:'#ccc',animation:'bounce 1.4s infinite ease-in-out',animationDelay:'0.2s'}} />
+              <div className="typing-dot" style={{width:7,height:7,borderRadius:'50%',background:'#ccc',animation:'bounce 1.4s infinite ease-in-out',animationDelay:'0.4s'}} />
             </div>
           </div>
         )}
@@ -121,26 +108,27 @@ export default function SupportPage() {
       </div>
 
       {/* Quick Questions */}
-      <div className="px-4 py-2 flex gap-2 overflow-x-auto scrollbar-none">
+      <div style={{padding:'8px 16px',display:'flex',gap:6,overflowX:'auto',flexShrink:0}}>
         {QUICK_QUESTIONS.map((q, i) => (
-          <button key={i} onClick={() => send(t(q))}
-            className="shrink-0 px-3 py-1.5 bg-white border border-separator rounded-full text-[11px] text-text-secondary active:bg-bg transition-colors whitespace-nowrap">
-            {t(q)}
-          </button>
+          <button key={i} onClick={() => send(t(q))} style={{
+            padding:'8px 14px',background:'#fff',border:'1px solid #eee',borderRadius:20,fontSize:11,color:'#666',
+            whiteSpace:'nowrap',cursor:'pointer',flexShrink:0
+          }}>{t(q)}</button>
         ))}
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 bg-white border-t border-separator flex gap-2">
-        <input value={input} onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && send()}
+      <div style={{padding:'10px 16px 14px',background:'#fff',borderTop:'1px solid #f0f0f0',display:'flex',gap:8,flexShrink:0}}>
+        <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()}
           placeholder={t('support.placeholder')}
-          className="flex-1 px-4 py-2.5 rounded-xl border border-separator bg-bg text-[13px] focus:outline-none focus:border-primary" />
-        <button onClick={() => send()}
-          className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center active:scale-95 transition-transform">
-          <Send size={16} />
+          style={{flex:1,padding:'10px 14px',background:'#f5f5f5',border:'none',borderRadius:24,fontSize:13,outline:'none',color:'#333'}} />
+        <button onClick={() => send()} style={{width:40,height:40,borderRadius:20,background:'#FF5000',border:'none',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',flexShrink:0}}>
+          <Send size={16} color="#fff" />
         </button>
       </div>
+
+      {/* Keyframes for dot animation */}
+      <style>{`@keyframes bounce{0%,80%,100%{transform:scale(.6)}40%{transform:scale(1)}}`}</style>
     </div>
   );
 }
