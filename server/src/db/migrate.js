@@ -299,6 +299,34 @@ async function migrate() {
     await exec(`CREATE TABLE IF NOT EXISTS task_progress (id SERIAL PRIMARY KEY,user_id INTEGER NOT NULL,task_def_id INTEGER,task_type TEXT NOT NULL,current_count INTEGER DEFAULT 0,current_value NUMERIC DEFAULT 0,completed BOOLEAN DEFAULT FALSE,claimed BOOLEAN DEFAULT FALSE,claimed_at TIMESTAMP DEFAULT NULL,period_key TEXT NOT NULL DEFAULT '',FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)`);
     await exec(`CREATE TABLE IF NOT EXISTS task_reward_log (id SERIAL PRIMARY KEY,user_id INTEGER NOT NULL,task_type TEXT,task_title TEXT,amount NUMERIC NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)`);
   } catch (e) { console.log('Task tables migration skipped:', e.message); }
+  // Seed default tasks
+  try {
+    const hasTasks = await get('SELECT id FROM task_definitions LIMIT 1');
+    if (!hasTasks) {
+      const taskList = [
+        ['daily_order_5','trading','Complete 5 Orders Today','Finish any 5 product purchases before midnight','📦','#FFF5F0',5,0,2.50,'#FF5000','daily',1],
+        ['high_value_order','trading','Place a High-Value Order','Complete a single order worth $100 or more','💎','#FCE4EC',1,100,5.00,'#E04500','daily',2],
+        ['speed_trade','trading','Speed Trade Challenge','Complete an order within 2 hours of purchase','⚡','#FFF8E1',1,0,3.00,'#F59E0B','daily',3],
+        ['category_explorer','trading','Try All Categories','Trade at least 1 product from each category','🌈','#E3F2FD',5,0,4.00,'#2196F3','weekly',4],
+        ['profit_streak','trading','Profit Streak','5 consecutive orders all with positive profit','📈','#E8F5E9',5,0,4.00,'#00A86B','daily',5],
+        ['bargain_hunter','trading','Bargain Hunter','Complete an order under $20 with 15%+ profit','🔍','#FFF0F0',1,0,2.00,'#E04500','daily',6],
+        ['weekend_warrior','trading','Weekend Warrior','Complete 5 orders on Saturday or Sunday','🎯','#FFF8E1',5,0,6.00,'#F59E0B','weekly',7],
+        ['product_review','trading','Write Product Reviews','Review 3 products you have purchased','✍️','#E8F5E9',3,0,0.80,'#FF5000','daily',8],
+        ['social_share','trading','Share Your Best Deal','Share a completed order profit on social media','🔄','#F3E5F5',2,0,0.30,'#FF5000','daily',9],
+        ['first_deposit','deposit','First Deposit Bonus','Make your first deposit of $50+','🎉','#E8F5E9',1,0,5.00,'#00A86B','one_time',10],
+        ['deposit_500','deposit','Deposit Milestone: $500','Reach $500 total deposits','🏦','#FFF5F0',0,500,3.00,'#FF5000','milestone',11],
+        ['first_withdrawal','deposit','First Withdrawal','Complete KYC and make your first withdrawal','💸','#FFF0F0',1,0,2.00,'#E04500','one_time',12],
+        ['invite_3_weekly','referral','Invite 3 Friends This Week','Get 3 new people to register with your code','👥','#FFF5F0',3,0,3.00,'#FF5000','weekly',13],
+        ['referral_trade','referral','Referral Makes First Trade','Have a referred friend complete their first order','💰','#E8F5E9',1,0,2.00,'#00A86B','milestone',14],
+        ['first_order','trading','Complete First Trade','Finish your very first trading order','🎓','#FFF0F0',1,0,3.00,'#00A86B','one_time',15],
+        ['kyc_complete','trading','Complete KYC Verification','Verify your identity to unlock full features','🛡️','#E8F5E9',1,0,2.00,'#FF5000','one_time',16]
+      ];
+      for (const t of taskList) {
+        await run('INSERT INTO task_definitions (task_type,category,title,description,icon,icon_bg,target_count,target_value,reward,reward_color,reset_period,sort_order) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)', t);
+      }
+      console.log('Seeded '+taskList.length+' default tasks.');
+    }
+  } catch (e) { console.log('Task seed skipped:', e.message); }
   // Admin audit log
   try {
     await exec(`CREATE TABLE IF NOT EXISTS admin_audit_log (
