@@ -118,6 +118,13 @@ export default function App() {
 
           <Route path="/gift/:id" element={<Lazy Comp={GiftDetailPage} />} />
           <Route path="/admin" element={<AdminRedirect />} />
+          <Route path="/admin/dashboard" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminDashboardPage'))} />} />
+          <Route path="/admin/orders" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminOrdersPage'))} />} />
+          <Route path="/admin/kyc" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminKYCPage'))} />} />
+          <Route path="/admin/deposits" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminDepositsPage'))} />} />
+          <Route path="/admin/tasks" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminTasksPage'))} />} />
+          <Route path="/admin/notifications" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminNotificationsPage'))} />} />
+          <Route path="/admin/audit" element={<Lazy Comp={lazy(() => import('./pages/admin/AdminAuditLogPage'))} />} />
 
           <Route path="/gifts" element={<Navigate to="/home" replace />} />
           <Route path="/invite" element={<Navigate to="/tasks" replace />} />

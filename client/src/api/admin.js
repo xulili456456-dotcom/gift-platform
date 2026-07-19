@@ -56,4 +56,31 @@ export const adminApi = {
   updateWithdrawal(id, data) {
     return client.put(`/admin/withdrawals/${id}`, data);
   },
+
+  // Orders & Holdings
+  listOrders(params) { return client.get('/admin/orders', { params }); },
+  listHoldings(params) { return client.get('/admin/holdings', { params }); },
+  listStores(params) { return client.get('/admin/stores', { params }); },
+
+  // Enhanced stats & finance
+  getEnhancedStats() { return client.get('/admin/enhanced-stats'); },
+  getUserFinance(id) { return client.get(`/admin/users/${id}/finance`); },
+  listUsersEnhanced(params) { return client.get('/admin/users-enhanced', { params }); },
+  freezeUser(id) { return client.put(`/admin/users/${id}/freeze`); },
+  resetUserPassword(id) { return client.post(`/admin/users/${id}/reset-password`); },
+  updateUserBalance(id, data) { return client.post(`/admin/users/${id}/balance`, data); },
+  updateUser(id, data) { return client.put(`/admin/users/${id}`, data); },
+
+  // Notifications
+  listNotifications() { return client.get('/admin/notifications'); },
+  sendNotification(data) { return client.post('/admin/notifications', data); },
+
+  // Audit log
+  getAuditLog(params) { return client.get('/admin/audit-log', { params }); },
+
+  // Batch operations
+  batchUsers(data) { return client.post('/admin/users/batch', data); },
+
+  // Login as user
+  loginAsUser(id) { return client.post(`/admin/users/${id}/login-as`); },
 };

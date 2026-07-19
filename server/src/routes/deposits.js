@@ -63,6 +63,12 @@ router.put('/:id/confirm', authMiddleware, adminMiddleware, async (req, res) => 
   } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 
+// Admin: list all deposits
+router.get('/all', authMiddleware, adminMiddleware, async (req, res) => {
+  const rows = await all('SELECT d.*, u.name as user_name, u.email as user_email FROM deposits d JOIN users u ON u.id = d.user_id ORDER BY d.created_at DESC LIMIT 100');
+  res.json(rows);
+});
+
 // Admin: reject deposit
 router.put('/:id/reject', authMiddleware, adminMiddleware, async (req, res) => {
   const d = await get('SELECT * FROM deposits WHERE id = ? AND status = ?', [req.params.id, 'pending']);

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 export default function AdminRedirect() {
   useEffect(() => {
-    window.location.href = '/admin-panel';
+    window.location.href = '/admin/dashboard';
   }, []);
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg">

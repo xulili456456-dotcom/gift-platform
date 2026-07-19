@@ -191,4 +191,46 @@ router.post('/checkin', async (req, res) => {
   }
 });
 
+// Admin: GET /api/tasks/definitions
+router.get('/definitions', async (req, res) => {
+  try {
+    const tasks = await all('SELECT * FROM task_definitions ORDER BY sort_order');
+    res.json(tasks);
+  } catch (e) { res.status(500).json({ error: 'Failed' }); }
+});
+
+// Admin: PUT /api/tasks/definitions/:id
+router.put('/definitions/:id', async (req, res) => {
+  try {
+    const { active, reward } = req.body;
+    if (typeof active !== 'undefined') await run('UPDATE task_definitions SET active = ? WHERE id = ?', [active ? 1 : 0, req.params.id]);
+    if (typeof reward !== 'undefined') await run('UPDATE task_definitions SET reward = ? WHERE id = ?', [Number(reward), req.params.id]);
+    const updated = await get('SELECT * FROM task_definitions WHERE id = ?', [req.params.id]);
+    res.json(updated);
+  } catch (e) { res.status(500).json({ error: 'Update failed' }); }
+});
+
+// Admin: POST /api/admin/notifications/send
+router.post('/send-notification', async (req, res) => {
+  try {
+    const { target, user_email, title, body, type } = req.body;
+    if (!title || !body) return res.status(400).json({ error: 'Title and body required' });
+    const notify = require('./notifications').notify;
+    if (target === 'all') {
+      const users = await all('SELECT id FROM users WHERE is_active = 1');
+      for (const u of users) {
+        try { await notify(u.id, title, body, type || 'info'); } catch {}
+      }
+      res.json({ message: `Sent to ${users.length} users` });
+    } else if (target === 'specific' && user_email) {
+      const u = await get('SELECT id FROM users WHERE email = ?', [user_email]);
+      if (!u) return res.status(404).json({ error: 'User not found' });
+      await notify(u.id, title, body, type || 'info');
+      res.json({ message: 'Notification sent' });
+    } else {
+      res.status(400).json({ error: 'Invalid target' });
+    }
+  } catch (e) { res.status(500).json({ error: 'Send failed' }); }
+});
+
 module.exports = { router, updateTaskProgress };
