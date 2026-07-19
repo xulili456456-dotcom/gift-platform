@@ -119,21 +119,30 @@ export default function NotificationsPage() {
             {items.map(n => {
               const icon = getIcon(n.type);
               return (
-                <div key={n.id} onClick={() => { setSelected(n); markRead(n); }} style={{
-                  background:'#fff',borderRadius:16,padding:14,marginBottom:8,cursor:'pointer',
+                <div key={n.id} style={{
+                  background:'#fff',borderRadius:16,padding:14,marginBottom:8,
                   borderLeft: n.is_read ? '3px solid transparent' : '3px solid #FF5000',
                   opacity: n.is_read ? .55 : 1, transition:'opacity .2s'
                 }}>
                   <div style={{display:'flex',alignItems:'flex-start',gap:10}}>
-                    <div style={{width:36,height:36,borderRadius:18,background:icon.bg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:16}}>{icon.emoji}</div>
-                    <div style={{flex:1,minWidth:0}}>
-                      <div style={{display:'flex',alignItems:'center',gap:6}}>
-                        <span style={{fontSize:13,fontWeight:n.is_read?600:700,color:n.is_read?'#999':'#0f0f0f'}}>{n.title}</span>
-                        {!n.is_read && <span style={{width:7,height:7,borderRadius:'50%',background:'#FF5000',flexShrink:0}} />}
+                    <div onClick={() => { setSelected(n); markRead(n); }} style={{display:'flex',alignItems:'flex-start',gap:10,flex:1,minWidth:0,cursor:'pointer'}}>
+                      <div style={{width:36,height:36,borderRadius:18,background:icon.bg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,fontSize:16}}>{icon.emoji}</div>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{display:'flex',alignItems:'center',gap:6}}>
+                          <span style={{fontSize:13,fontWeight:n.is_read?600:700,color:n.is_read?'#999':'#0f0f0f'}}>{n.title}</span>
+                          {!n.is_read && <span style={{width:7,height:7,borderRadius:'50%',background:'#FF5000',flexShrink:0}} />}
+                        </div>
+                        {n.body && <div style={{fontSize:11,color:n.is_read?'#bbb':'#999',marginTop:2,lineHeight:1.4,display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{n.body}</div>}
+                        <div style={{fontSize:10,color:n.is_read?'#ddd':'#ccc',marginTop:4}}>{n.created_at ? new Date(n.created_at).toLocaleString() : ''}</div>
                       </div>
-                      {n.body && <div style={{fontSize:11,color:n.is_read?'#bbb':'#999',marginTop:2,lineHeight:1.4,display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{n.body}</div>}
-                      <div style={{fontSize:10,color:n.is_read?'#ddd':'#ccc',marginTop:4}}>{n.created_at ? new Date(n.created_at).toLocaleString() : ''}</div>
                     </div>
+                    {!n.is_read && (
+                      <button onClick={(e) => { e.stopPropagation(); markRead(n); }} title="Mark as read" style={{
+                        width:28,height:28,borderRadius:14,border:'1.5px solid #ddd',background:'#fff',
+                        display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',
+                        flexShrink:0,color:'#aaa',fontSize:14,padding:0,outline:'none'
+                      }}>✓</button>
+                    )}
                   </div>
                 </div>
               );
