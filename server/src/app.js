@@ -13,7 +13,7 @@ const errorHandler = require('./middleware/errorHandler');
 const apiLimiter = rateLimit({ windowMs: 60 * 1000, max: 500, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many requests, please try again later' } });
 
 // Import routes
-// adminPanelRoute removed — redirect to new React admin
+const adminPanelRoute = require('./routes/adminPanel');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const giftRoutes = require('./routes/gifts');
@@ -54,8 +54,8 @@ async function start() {
   // Global rate limit
   app.use('/api', apiLimiter);
 
-  // Redirect old admin-panel to new React admin
-  app.use('/admin-panel', (req, res) => res.redirect('/admin/dashboard'));
+  // Admin Panel (original backend standalone)
+  app.use('/admin-panel', adminPanelRoute);
 
   // API Routes
   app.use('/api/auth', authRoutes);
