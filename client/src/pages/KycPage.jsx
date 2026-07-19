@@ -234,7 +234,7 @@ export default function KycPage() {
             <div style={{textAlign:'center',flex:1}}>
               <div style={{width:24,height:24,borderRadius:12,background:'#FF5000',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 4px',fontSize:12}}>✓</div>
               <div style={{color:'#333',fontWeight:600}}>Submitted</div>
-              <div style={{color:'#bbb'}}>{kyc?.submittedAt ? new Date(kyc.submittedAt).toLocaleDateString() : '---'}</div>
+              <div style={{color:'#bbb'}}>{kyc?.submitted_at ? new Date(kyc.submitted_at).toLocaleDateString() : '---'}</div>
             </div>
             <div style={{width:40,height:2,background:'#f0f0f0',marginTop:-16}} />
             <div style={{textAlign:'center',flex:1}}>
@@ -269,7 +269,7 @@ export default function KycPage() {
             <div><div style={{color:'#999',marginBottom:2}}>{t('kyc.realName')}</div><div style={{fontWeight:600,color:'#333'}}>{kyc?.real_name || '---'}</div></div>
             <div><div style={{color:'#999',marginBottom:2}}>Document Type</div><div style={{fontWeight:600,color:'#333'}}>{kyc?.doc_type === 'passport' ? 'Passport' : "Driver's License"}</div></div>
             <div><div style={{color:'#999',marginBottom:2}}>ID Number</div><div style={{fontWeight:600,color:'#333'}}>{maskId(kyc?.id_number)}</div></div>
-            <div><div style={{color:'#999',marginBottom:2}}>Verified On</div><div style={{fontWeight:600,color:'#00A86B'}}>{kyc?.reviewedAt ? new Date(kyc.reviewedAt).toLocaleDateString() : '---'}</div></div>
+            <div><div style={{color:'#999',marginBottom:2}}>Verified On</div><div style={{fontWeight:600,color:'#00A86B'}}>{kyc?.reviewed_at ? new Date(kyc.reviewed_at).toLocaleDateString() : '---'}</div></div>
           </div>
         </div>
 
@@ -323,7 +323,7 @@ export default function KycPage() {
           <div style={{background:'#fff',borderRadius:20,padding:18,marginBottom:12}}>
             <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:8}}>Rejection Reason</div>
             <div style={{background:'#FFF0F0',borderRadius:12,padding:12,fontSize:11,color:'#C0392B',lineHeight:1.6,marginBottom:12}}>
-              {kyc?.reject_reason || 'Your submission did not pass review. Please check the requirements and try again.'}
+              {kyc?.admin_note || 'Your submission did not pass review. Please check the requirements and try again.'}
             </div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
               <div>
