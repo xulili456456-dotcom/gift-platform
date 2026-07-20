@@ -265,8 +265,13 @@ router.get('/users/:id/finance', async (req, res) => {
 // ========== User Notes ==========
 router.put('/users/:id/notes', async (req, res) => {
   const id = parseInt(req.params.id);
-  await run('UPDATE users SET admin_notes = ? WHERE id = ?', [req.body.notes || '', id]);
-  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, 'notes', id, '']); } catch {}
+  const user = await userModel.findById(id);
+  const old = (user.admin_notes || '').trim();
+  const now = new Date().toLocaleString();
+  const entry = `[${now}] ${req.body.notes || ''}`;
+  const newNotes = old ? old + '\n' + entry : entry;
+  await run('UPDATE users SET admin_notes = ? WHERE id = ?', [newNotes, id]);
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, 'notes', id, req.body.notes || '']); } catch {}
   res.json({ ok: true });
 });
 
@@ -532,6 +537,59 @@ router.get('/enhanced-stats', async (req, res) => {
     todayVolume: Number(todayVolume?.total || 0),
     newUsersMonth: Number(newUsersMonth?.c || 0),
     ordersToday: Number(ordersToday?.c || 0),
+
+// ========== Daily Cash Flow ==========
+router.get('/daily-flow', async (req, res) => {
+  try {
+    const today = new Date().toISOString().slice(0,10);
+    const deposits = await get("SELECT COALESCE(SUM(amount),0) as t FROM deposits WHERE created_at::date = CURRENT_DATE AND status = 'confirmed'");
+    const withdrawals = await get("SELECT COALESCE(SUM(amount),0) as t FROM withdrawals WHERE created_at::date = CURRENT_DATE");
+    const checkins = await get("SELECT COALESCE(SUM(amount),0) as t FROM task_earnings WHERE created_at::date = CURRENT_DATE AND type = 'checkin'");
+    const bonuses = await get("SELECT COALESCE(SUM(amount),0) as t FROM task_earnings WHERE created_at::date = CURRENT_DATE AND type = 'bonus'");
+    const orders = await get("SELECT COUNT(*) as c, COALESCE(SUM(amount),0) as t FROM store_orders WHERE created_at::date = CURRENT_DATE");
+    const settled = await get("SELECT COUNT(*) as c FROM store_orders WHERE created_at::date = CURRENT_DATE AND status = 'done'");
+    res.json({
+      date: today,
+      deposits: Number(deposits?.t||0),
+      withdrawals: Number(withdrawals?.t||0),
+      checkins: Number(checkins?.t||0),
+      bonuses: Number(bonuses?.t||0),
+      orders_count: Number(orders?.c||0),
+      orders_volume: Number(orders?.t||0),
+      settled: Number(settled?.c||0),
+    });
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
+// ========== Top Inviters ==========
+router.get('/top-inviters', async (req, res) => {
+  try {
+    const rows = await all(
+      'SELECT u.id, u.email, u.name, u.referral_code, COUNT(i.id) as invite_count FROM users u LEFT JOIN invitations i ON i.inviter_id = u.id GROUP BY u.id ORDER BY invite_count DESC LIMIT 20'
+    );
+    res.json(rows.map(r => ({...r, invite_count: Number(r.invite_count)})));
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
+// ========== IP Duplicates Detection ==========
+router.get('/ip-duplicates', async (req, res) => {
+  try {
+    const rows = await all(
+      "SELECT ip_address, COUNT(*) as user_count, ARRAY_AGG(email) as emails, ARRAY_AGG(id) as ids FROM users WHERE ip_address IS NOT NULL AND ip_address != '' GROUP BY ip_address HAVING COUNT(*) > 1 ORDER BY user_count DESC LIMIT 30"
+    );
+    res.json(rows);
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
+// ========== Rapid Orders Detection ==========
+router.get('/rapid-orders', async (req, res) => {
+  try {
+    const rows = await all(
+      "SELECT u.id, u.email, u.name, COUNT(*) as order_count, MAX(o.created_at) as last_order FROM store_orders o JOIN users u ON u.id = o.user_id WHERE o.created_at > NOW() - INTERVAL '1 hour' GROUP BY u.id, u.email, u.name HAVING COUNT(*) >= 3 ORDER BY order_count DESC LIMIT 20"
+    );
+    res.json(rows.map(r => ({...r, order_count: Number(r.order_count)})));
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
     pendingDeposits: Number(pendingDeposits?.c || 0),
     pendingWithdrawals: Number(pendingWithdrawals?.c || 0),
     pendingKyc: Number(pendingKyc?.c || 0),
