@@ -28,7 +28,7 @@ export default function StoreFundsPage() {
     try { const { data } = await client.get('/store/holdings'); setHoldings(data); } catch {}
   }, []);
 
-  useEffect(() => { loadStatus(); loadEarnings(); loadHoldings(); client.get('/store/orders-history?period=today').then(({data}) => setOrderHistory(data)).catch(()=>{}); }, []);
+  useEffect(() => { loadStatus(); loadEarnings(); loadHoldings(); client.get('/store/orders-history?period=all').then(({data}) => setOrderHistory(data)).catch(()=>{}); }, []);
 
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
@@ -41,7 +41,7 @@ export default function StoreFundsPage() {
     catch (err) { toast.error(err.response?.data?.detail || err.response?.data?.error || 'Failed'); }
   };
 
-  if (!status?.hasStore) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><p className="text-gray-400">No store opened</p></div>;
+  if (!status?.hasStore && (!orderHistory?.orders || orderHistory.orders.length === 0)) return <div className="min-h-screen bg-gray-50 flex items-center justify-center flex-col gap-3"><p className="text-gray-400">No store opened</p><button onClick={() => navigate('/store')} style={{padding:'10px 24px',background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:13,fontWeight:600,cursor:'pointer'}}>Open Store</button></div>;
 
   const s = status.store;
 

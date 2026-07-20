@@ -373,6 +373,7 @@ router.get('/orders-history', async (req, res) => {
   if (period === 'today') dateFilter = "AND created_at::date = CURRENT_DATE";
   else if (period === 'week') dateFilter = "AND created_at >= CURRENT_DATE - INTERVAL '7 days'";
   else if (period === 'month') dateFilter = "AND created_at >= CURRENT_DATE - INTERVAL '30 days'";
+  else dateFilter = ''; // 'all' or any other value = no date filter
 
   const orders = await all(
     `SELECT id, amount as profit, created_at, status, product_name FROM store_orders WHERE store_id = ? AND status = 'done' ${dateFilter} ORDER BY created_at DESC LIMIT 50`,
