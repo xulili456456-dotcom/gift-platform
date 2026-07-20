@@ -271,13 +271,25 @@ const PRODUCTS = [
 
 
 function genProducts(tier, cat, search, catalog) {
-  let filtered = cat === 'All' ? [...catalog] : catalog.filter(p => p.cat === cat);
+  // Normalize products — add defaults for missing fields
+  const normalized = catalog.map((p, i) => ({
+    ...p, id: i,
+    cat: p.cat || 'Digital',
+    sold: p.sold || Math.floor(Math.random() * 500 + 50),
+    rating: p.rating || 4.3,
+    reviews: p.reviews || Math.floor(Math.random() * 200 + 50),
+    specs: p.specs || {},
+    desc: p.desc || '',
+    img: p.img || `/products/${(i % 60) + 1}.jpg`,
+    price: Number(p.price) || 25,
+  }));
+  let filtered = cat === 'All' ? [...normalized] : normalized.filter(p => p.cat === cat);
   if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.cat.toLowerCase().includes(search.toLowerCase()));
   filtered.sort((a,b) => b.sold - a.sold);
-  return filtered.map((p, i) => {
+  return filtered.map(p => {
     const cost = Math.round(p.price * COST_RATE * 100) / 100;
     const profit = Math.round(p.price * PROFIT_RATE * 100) / 100;
-    return { ...p, id: i, costPrice: cost, profit };
+    return { ...p, costPrice: cost, profit };
   });
 }
 
