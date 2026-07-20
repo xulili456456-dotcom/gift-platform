@@ -34,7 +34,7 @@ export default function MinePage() {
   const loadData = async () => {
     try {
       const [c, g, s, b] = await Promise.all([claimsApi.list(), giftsApi.eligible(), referralApi.getStats(), client.get('/tasks/balance').catch(() => ({ data: { total: 0 } }))]);
-      setClaims(c.data); setEligibleGifts(g.data?.eligible || []); setEffectiveInvites(g.data?.effective_invites || 0); setStats(s.data); setTaskBalance(b.data?.total || 0);
+      setClaims(c.data); setEligibleGifts(g.data?.eligible || []); setEffectiveInvites(g.data?.effective_invites || 0); setStats(s.data); setTaskBalance(b.data?.available || b.data?.total || 0);
     } catch { toast.error(t('common.loadingFailed')); }
     finally { setLoading(false); }
   };
@@ -45,7 +45,7 @@ export default function MinePage() {
 
   if (loading) return (<div className="p-4 space-y-3"><div className="skeleton h-32 rounded-3xl" /><div className="skeleton h-48 rounded-2xl" /></div>);
 
-  const totalEarned = claims.filter(c => c.status !== 'rejected').reduce((s, c) => s + (c.value || 0), 0) + taskBalance;
+  const totalEarned = taskBalance;
   const pendingClaims = claims.filter(c => c.status === 'pending');
   const deliveredClaims = claims.filter(c => c.status === 'delivered');
   const current = langs.find(l => l.code === i18n.language) || langs[0];
