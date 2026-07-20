@@ -62,7 +62,7 @@ export default function KycPage() {
     if (!form.frontImg || !form.backImg) { toast.error(t('kyc.uploadBoth')); return; }
     setSubmitting(true);
     client.post('/kyc', { doc_type: form.docType, real_name: form.name, id_number: form.idNumber, front_image: form.frontImg, back_image: form.backImg })
-      .then(({ data }) => { setKyc({ ...form, status: 'pending', id: data.id }); setSubmitting(false); toast.success(t('common.submit')); })
+      .then(({ data }) => { setKyc({ real_name: form.name, id_number: form.idNumber, doc_type: form.docType, front_image: form.frontImg, back_image: form.backImg, status: 'pending', id: data.id }); setSubmitting(false); toast.success(t('common.submit')); })
       .catch(err => { setSubmitting(false); toast.error(err.response?.data?.error || t('common.operationFailed')); });
   };
 

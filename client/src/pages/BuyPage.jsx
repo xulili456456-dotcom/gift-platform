@@ -56,7 +56,7 @@ export default function BuyPage() {
       <div className="max-w-lg mx-auto">
         {/* Product Image */}
         <div className="bg-[#f8f8f8] aspect-square flex items-center justify-center">
-          <img src={product.productImg || `/products/${pId || 1}.jpg`} alt={product.productName}
+          <img src={product.productImg || `/products/${pid || 1}.jpg`} alt={product.productName}
             className="w-full h-full object-contain p-6" />
         </div>
 

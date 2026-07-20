@@ -674,7 +674,7 @@ export default function StorePage() {
       <div className="shrink-0 bg-white border-t border-gray-100 safe-bottom px-4 py-2.5 flex items-center justify-between text-xs">
         <div>
           <span className="text-[#565959]">{t('store.todayProfit')} </span>
-          <span className="text-[#0F1111] font-bold">${s.todayEarnings.toFixed(2)}</span>
+          <span className="text-[#0F1111] font-bold">${earnings.todayProfit.toFixed(2)}</span>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={handleClose} className="text-[10px] text-[#565959] hover:text-[#CC0C39] transition-colors">{t('store.closeStore')}</button>

@@ -47,9 +47,9 @@ router.post('/', async (req, res) => {
       const rest = Number(task.amount) - deduct;
       await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
       if (rest > 0.001) {
-        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+        const frag = await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
           [req.user.id, rest, task.type, 'delivered']);
-        // Fragment is already 'delivered' — don't track for cancel
+        deductedIds.push(frag.id); // Track fragment for cancellation
       }
       remaining -= deduct;
     }

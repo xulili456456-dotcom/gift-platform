@@ -57,7 +57,7 @@ router.get('/public-product/:pid', async (req, res) => {
 });
 
 // POST /api/commissions/buy/:pid — someone buys through the share link
-router.post('/buy/:pid', async (req, res) => {
+router.post('/buy/:pid', authMiddleware, async (req, res) => {
   const record = await get('SELECT * FROM share_commissions WHERE id = ? AND status = ?', [req.params.pid, 'pending']);
   if (!record) return res.status(404).json({ error: 'Product not available or already sold' });
 

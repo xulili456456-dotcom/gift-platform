@@ -397,35 +397,52 @@ router.get('/stores', async (req, res) => {
 router.get('/users-enhanced', async (req, res) => {
   const { page = 1, limit = 20, search = '' } = req.query;
   const offset = (page - 1) * limit;
-  const searchClause = search ? `WHERE u.email ILIKE $1 OR u.name ILIKE $1 OR u.phone ILIKE $1` : '';
-  const countParams = search ? [`%${search}%`] : [];
+  const hasSearch = !!search;
 
-  const total = await get(
-    `SELECT COUNT(*) as c FROM users u ${searchClause.replace('$1','?')}`,
-    countParams
-  );
-
-  const params = search ? [`%${search}%`, limit, offset] : [limit, offset];
-  const rows = await all(
-    `SELECT u.id, u.email, u.phone, u.name, u.referral_code, u.is_admin, u.is_active, u.frozen,
-            u.created_at, u.ip_address,
-            COALESCE(s.id, 0) as store_id, s.tier, s.deposit as store_deposit, s.status as store_status,
-            COALESCE((SELECT SUM(amount) FROM task_earnings WHERE user_id = u.id AND status = 'delivered'), 0) as balance,
-            COALESCE(k.status, '') as kyc_status
-     FROM users u
-     LEFT JOIN stores s ON s.user_id = u.id
-     LEFT JOIN kyc_submissions k ON k.user_id = u.id
-     ${searchClause}
-     ORDER BY u.id DESC
-     LIMIT $${search ? 2 : 1} OFFSET $${search ? 3 : 2}`,
-    params
-  );
-
-  res.json({
-    users: rows.map(r => ({ ...r, balance: Number(r.balance), store_deposit: Number(r.store_deposit || 0) })),
-    total: Number(total?.c || 0),
-    page, limit,
-  });
+  if (hasSearch) {
+    const searchTerm = `%${search}%`;
+    const total = await get(
+      `SELECT COUNT(*) as c FROM users u WHERE u.email ILIKE $1 OR u.name ILIKE $1 OR u.phone ILIKE $1`,
+      [searchTerm]
+    );
+    const rows = await all(
+      `SELECT u.id, u.email, u.phone, u.name, u.referral_code, u.is_admin, u.is_active, u.frozen,
+              u.created_at, u.ip_address,
+              COALESCE(s.id, 0) as store_id, s.tier, s.deposit as store_deposit, s.status as store_status,
+              COALESCE((SELECT SUM(amount) FROM task_earnings WHERE user_id = u.id AND status = 'delivered'), 0) as balance,
+              COALESCE(k.status, '') as kyc_status
+       FROM users u
+       LEFT JOIN stores s ON s.user_id = u.id
+       LEFT JOIN kyc_submissions k ON k.user_id = u.id
+       WHERE u.email ILIKE $1 OR u.name ILIKE $1 OR u.phone ILIKE $1
+       ORDER BY u.id DESC
+       LIMIT $2 OFFSET $3`,
+      [searchTerm, limit, offset]
+    );
+    res.json({
+      users: rows.map(r => ({ ...r, balance: Number(r.balance), store_deposit: Number(r.store_deposit || 0) })),
+      total: Number(total?.c || 0), page, limit,
+    });
+  } else {
+    const total = await get('SELECT COUNT(*) as c FROM users u');
+    const rows = await all(
+      `SELECT u.id, u.email, u.phone, u.name, u.referral_code, u.is_admin, u.is_active, u.frozen,
+              u.created_at, u.ip_address,
+              COALESCE(s.id, 0) as store_id, s.tier, s.deposit as store_deposit, s.status as store_status,
+              COALESCE((SELECT SUM(amount) FROM task_earnings WHERE user_id = u.id AND status = 'delivered'), 0) as balance,
+              COALESCE(k.status, '') as kyc_status
+       FROM users u
+       LEFT JOIN stores s ON s.user_id = u.id
+       LEFT JOIN kyc_submissions k ON k.user_id = u.id
+       ORDER BY u.id DESC
+       LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+    res.json({
+      users: rows.map(r => ({ ...r, balance: Number(r.balance), store_deposit: Number(r.store_deposit || 0) })),
+      total: Number(total?.c || 0), page, limit,
+    });
+  }
 });
 
 // ========== Edit User ==========
