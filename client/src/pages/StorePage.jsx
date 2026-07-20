@@ -272,9 +272,10 @@ const PRODUCTS = [
 
 function genProducts(tier, cat, search, catalog) {
   // Normalize products — add defaults for missing fields
+  const allCats = ['Digital','Women','Men','Beauty','Shoes','Home','Accessories','Food','Toys','Sports','Auto'];
   const normalized = catalog.map((p, i) => ({
     ...p, id: i,
-    cat: p.cat || 'Digital',
+    cat: p.cat || allCats[i % allCats.length],
     sold: p.sold || Math.floor(Math.random() * 500 + 50),
     rating: p.rating || 4.3,
     reviews: p.reviews || Math.floor(Math.random() * 200 + 50),
