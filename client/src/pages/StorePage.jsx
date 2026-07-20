@@ -348,7 +348,8 @@ export default function StorePage() {
     if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0)));
     else if (affordableOnly) list = list.filter(p => p.costPrice <= (status.store.balance || 0));
     if (sortMode === 'profit') list.sort((a, b) => b.profit - a.profit);
-    else if (sortMode === 'price') list.sort((a, b) => b.price - a.price);
+    else if (sortMode === 'price') list.sort((a, b) => a.price - b.price);
+    else if (sortMode === 'price-desc') list.sort((a, b) => b.price - a.price);
     else if (sortMode === 'free') list.sort((a, b) => a.price - b.price);
     else list.sort((a, b) => b.sold - a.sold);
     return list;
@@ -624,9 +625,10 @@ export default function StorePage() {
 
       {/* Sort + Trade Mode Toggle */}
       <div style={{display:'flex',alignItems:'center',padding:'6px 16px 8px',gap:0,borderBottom:'1px solid #f0f0f0',background:'#fff'}}>
-        <button onClick={() => { setSortMode('profit'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='profit'?700:400,color:sortMode==='profit'?'#0f0f0f':'#999',marginRight:14,background:'none',border:'none',cursor:'pointer'}}>Hot</button>
-        <button onClick={() => { setSortMode('price'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='price'?700:400,color:sortMode==='price'?'#0f0f0f':'#999',marginRight:14,background:'none',border:'none',cursor:'pointer'}}>Price</button>
-        <button onClick={() => { setSortMode('free'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='free'?700:400,color:sortMode==='free'?'#0f0f0f':'#999',background:'none',border:'none',cursor:'pointer'}}>Free</button>
+        <button onClick={() => { setSortMode('profit'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='profit'?700:400,color:sortMode==='profit'?'#0f0f0f':'#999',marginRight:10,background:'none',border:'none',cursor:'pointer'}}>🔥 Hot</button>
+        <button onClick={() => { setSortMode('price'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='price'?700:400,color:sortMode==='price'?'#0f0f0f':'#999',marginRight:10,background:'none',border:'none',cursor:'pointer'}}>💰 Cheap</button>
+        <button onClick={() => { setSortMode('price-desc'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='price-desc'?700:400,color:sortMode==='price-desc'?'#0f0f0f':'#999',marginRight:10,background:'none',border:'none',cursor:'pointer'}}>💎 Expensive</button>
+        <button onClick={() => { setSortMode('free'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='free'?700:400,color:sortMode==='free'?'#0f0f0f':'#999',background:'none',border:'none',cursor:'pointer'}}>🎁 Free</button>
         <span style={{flex:1}} />
         <div style={{display:'flex',background:'#f5f5f5',borderRadius:10,padding:2}}>
           <button onClick={() => setTradeMode('holding')} style={{padding:'5px 12px',borderRadius:8,fontSize:10,fontWeight:600,background:tradeMode==='holding'?'#0f0f0f':'transparent',color:tradeMode==='holding'?'#fff':'#999',border:'none',cursor:'pointer'}}>Trade</button>
