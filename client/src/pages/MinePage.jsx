@@ -95,6 +95,7 @@ export default function MinePage() {
       <div style={{margin:'0 16px 8px',background:'#fff',borderRadius:14,overflow:'hidden'}}>
         <MenuRow icon={<Users size={17} color="#4C6EF5"/>} iconBg="#EEF2FF" label={t('mine.myTeam')} desc={t('mine.myTeamDesc')} onClick={()=>navigate('/mine/team')}/>
         <MenuRow icon={<Store size={17} color="#FF5000"/>} iconBg="#FFF5F0" label={t('mine.myStore')} desc={t('mine.myStoreDesc')} onClick={()=>navigate('/store')}/>
+        <MenuRow icon={<ArrowUpRight size={17} color="#00A86B"/>} iconBg="#E8F5E9" label="Trading History" desc="View your orders & holdings" onClick={()=>navigate('/store/funds')}/>
       </div>
 
       {/* Account Group */}
