@@ -417,3 +417,4 @@ body.dark .text-red-500 { color: #ff6568; }
 body.dark .border-amber-200 { border-color: #a07840; }
 body.dark .bg-green-100 { background: #0d2418 !important; }
 body.dark .bg-success\/5 { background: #0d2418 !important; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }

@@ -539,21 +539,42 @@ export default function StorePage() {
         )}
 
         {showInsufficient && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowInsufficient(null)}>
-            <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
-              <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {showInsufficient?.isDeposit ? (t('store.depositRequired')||'Security Security Deposit Required') : (t('store.insufficient')||'Insufficient Balance')}</p>
-              <div className="space-y-1.5 mb-4 text-sm">
-                <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#FFB84D]">${showInsufficient.need?.toFixed(2)}</b></p>
-                <p className="text-[#565959]">{t('store.have') || 'Available'}: <b className="text-[#0F1111]">${showInsufficient.have?.toFixed(2)}</b></p>
-                <p className="text-[#565959]">{t('store.shortage') || 'Shortage'}: <b className="text-[#FFB84D]">${showInsufficient.shortage?.toFixed(2)}</b></p>
-                {showInsufficient.balance != null && <p className="text-[10px] text-[#999]">💰 Balance: ${showInsufficient.balance?.toFixed(2)} · 🔒 Deposit: ${(showInsufficient.deposit||0).toFixed(2)}</p>}
+          <div style={{position:'fixed',inset:0,zIndex:200,background:'rgba(0,0,0,.4)',backdropFilter:'blur(2px)',display:'flex',alignItems:'flex-end',justifyContent:'center'}} onClick={() => setShowInsufficient(null)}>
+            <div style={{background:'#fff',borderRadius:'20px 20px 0 0',padding:'24px 20px 32px',width:'100%',maxWidth:430,boxShadow:'0 -8px 40px rgba(0,0,0,.15)',animation:'slideUp .3s ease-out'}} onClick={e => e.stopPropagation()}>
+              <div style={{width:36,height:4,borderRadius:2,background:'#e0e0e0',margin:'0 auto 20px'}} />
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:16}}>
+                <div style={{width:40,height:40,borderRadius:12,background:'#FFF0F0',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20}}>💰</div>
+                <div>
+                  <div style={{fontSize:15,fontWeight:700,color:'#0f0f0f'}}>{showInsufficient?.isDeposit ? (t('store.depositRequired')||'Deposit Required') : 'Insufficient Balance'}</div>
+                  <div style={{fontSize:11,color:'#E04500'}}>You need more funds to complete this order</div>
+                </div>
               </div>
-              <div className="bg-gray-50 rounded-xl p-3 mb-4 text-xs text-[#565959] space-y-1">
-                <p className="font-bold text-[#0F1111]">💡 {t('store.howToEarn') || 'How to get funds'}:</p>
-                <p>• {t('store.tipCheckin') || 'Daily check-in: $0.10-$0.70'}</p>
-                <p>• {t('store.tipHolding') || 'Holdings auto-sell and return funds'}</p>
+              <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:0,alignItems:'center',marginBottom:16,background:'#f8f8f8',borderRadius:14,padding:16,textAlign:'center'}}>
+                <div><div style={{fontSize:10,color:'#999',marginBottom:4}}>Need</div><div style={{fontSize:20,fontWeight:800,color:'#0f0f0f'}}>${showInsufficient.need?.toFixed(2)}</div></div>
+                <div style={{fontSize:18,color:'#ccc',padding:'0 8px',fontWeight:700}}>vs</div>
+                <div><div style={{fontSize:10,color:'#999',marginBottom:4}}>Available</div><div style={{fontSize:20,fontWeight:800,color:'#E04500'}}>${showInsufficient.have?.toFixed(2)}</div></div>
               </div>
-              <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-xl text-sm font-bold bg-[#FF5000] text-[#0F1111]">{t('common.ok') || 'OK'}</button>
+              <div style={{marginBottom:16}}>
+                <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'#999',marginBottom:4}}><span>Shortage</span><span style={{color:'#E04500',fontWeight:700}}>${showInsufficient.shortage?.toFixed(2)}</span></div>
+                <div style={{background:'#eee',borderRadius:3,height:8,overflow:'hidden'}}><div style={{width:Math.round((showInsufficient.have||0)/(showInsufficient.need||1)*100)+'%',height:'100%',background:'linear-gradient(90deg,#FF5000,#E04500)',borderRadius:3}} /></div>
+                <div style={{fontSize:9,color:'#bbb',marginTop:2}}>You have {Math.round((showInsufficient.have||0)/(showInsufficient.need||1)*100)}% of the required amount</div>
+              </div>
+              <div style={{display:'flex',gap:8,marginBottom:16}}>
+                <div style={{flex:1,background:'#f8f8f8',borderRadius:10,padding:10,textAlign:'center'}}><div style={{fontSize:10,color:'#999'}}>Balance</div><div style={{fontSize:14,fontWeight:700,color:'#333'}}>${(showInsufficient.balance||0).toFixed(2)}</div></div>
+                <div style={{flex:1,background:'#FFF5F0',borderRadius:10,padding:10,textAlign:'center'}}><div style={{fontSize:10,color:'#999'}}>Deposit</div><div style={{fontSize:14,fontWeight:700,color:'#FF5000'}}>${(showInsufficient.deposit||0).toFixed(2)}</div></div>
+              </div>
+              <div style={{background:'#FFFAF5',borderRadius:12,padding:12,marginBottom:16}}>
+                <div style={{fontSize:11,fontWeight:700,color:'#CC6600',marginBottom:8}}>💡 How to get more funds</div>
+                <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                  <div style={{display:'flex',alignItems:'center',gap:8,fontSize:11,color:'#996633'}}><span style={{width:20,height:20,borderRadius:10,background:'#FF5000',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,flexShrink:0}}>1</span><span>Add funds via <b style={{color:'#FF5000',cursor:'pointer'}} onClick={()=>{setShowInsufficient(null);navigate('/mine/deposit')}}>Deposit</b> page</span></div>
+                  <div style={{display:'flex',alignItems:'center',gap:8,fontSize:11,color:'#996633'}}><span style={{width:20,height:20,borderRadius:10,background:'#F59E0B',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,flexShrink:0}}>2</span><span>Daily check-in for <b style={{color:'#F59E0B'}}>$0.10-$0.70</b></span></div>
+                  <div style={{display:'flex',alignItems:'center',gap:8,fontSize:11,color:'#996633'}}><span style={{width:20,height:20,borderRadius:10,background:'#00A86B',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,flexShrink:0}}>3</span><span>Wait for <b style={{color:'#00A86B'}}>active holdings</b> to auto-settle</span></div>
+                </div>
+              </div>
+              <div style={{display:'flex',gap:8}}>
+                <button onClick={() => setShowInsufficient(null)} style={{flex:1,padding:12,background:'#f5f5f5',color:'#666',border:'none',borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer'}}>Cancel</button>
+                <button onClick={()=>{setShowInsufficient(null);navigate('/mine/deposit')}} style={{flex:1,padding:12,background:'#FF5000',color:'#fff',border:'none',borderRadius:12,fontSize:13,fontWeight:700,cursor:'pointer'}}>Go Deposit</button>
+              </div>
             </div>
           </div>
         )}
@@ -696,21 +717,42 @@ export default function StorePage() {
       </div>
 
       {showInsufficient && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={() => setShowInsufficient(null)}>
-          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
-            <p className="text-lg font-bold text-[#0F1111] mb-3">💰 {showInsufficient?.isDeposit ? (t('store.depositRequired')||'Security Security Deposit Required') : (t('store.insufficient')||'Insufficient Balance')}</p>
-            <div className="space-y-1.5 mb-4 text-sm">
-              <p className="text-[#565959]">{t('store.need') || 'Need'}: <b className="text-[#FFB84D]">${showInsufficient.need?.toFixed(2)}</b></p>
-              <p className="text-[#565959]">{t('store.have') || 'Available'}: <b className="text-[#0F1111]">${showInsufficient.have?.toFixed(2)}</b></p>
-              <p className="text-[#565959]">{t('store.shortage') || 'Shortage'}: <b className="text-[#FFB84D]">${showInsufficient.shortage?.toFixed(2)}</b></p>
-              {showInsufficient.balance != null && <p className="text-[10px] text-[#999]">💰 Balance: ${showInsufficient.balance?.toFixed(2)} · 🔒 Deposit: ${(showInsufficient.deposit||0).toFixed(2)}</p>}
+        <div style={{position:'fixed',inset:0,zIndex:200,background:'rgba(0,0,0,.4)',backdropFilter:'blur(2px)',display:'flex',alignItems:'flex-end',justifyContent:'center'}} onClick={() => setShowInsufficient(null)}>
+          <div style={{background:'#fff',borderRadius:'20px 20px 0 0',padding:'24px 20px 32px',width:'100%',maxWidth:430,boxShadow:'0 -8px 40px rgba(0,0,0,.15)',animation:'slideUp .3s ease-out'}} onClick={e => e.stopPropagation()}>
+            <div style={{width:36,height:4,borderRadius:2,background:'#e0e0e0',margin:'0 auto 20px'}} />
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:16}}>
+              <div style={{width:40,height:40,borderRadius:12,background:'#FFF0F0',display:'flex',alignItems:'center',justifyContent:'center',fontSize:20}}>💰</div>
+              <div>
+                <div style={{fontSize:15,fontWeight:700,color:'#0f0f0f'}}>{showInsufficient?.isDeposit ? (t('store.depositRequired')||'Deposit Required') : 'Insufficient Balance'}</div>
+                <div style={{fontSize:11,color:'#E04500'}}>You need more funds to complete this order</div>
+              </div>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3 mb-4 text-xs text-[#565959] space-y-1">
-              <p className="font-bold text-[#0F1111]">💡 {t('store.howToEarn') || 'How to get funds'}:</p>
-              <p>• {t('store.tipCheckin') || 'Daily check-in: $0.10-$0.70'}</p>
-              <p>• {t('store.tipHolding') || 'Holdings auto-sell and return funds'}</p>
+            <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',alignItems:'center',marginBottom:16,background:'#f8f8f8',borderRadius:14,padding:16,textAlign:'center'}}>
+              <div><div style={{fontSize:10,color:'#999',marginBottom:4}}>Need</div><div style={{fontSize:20,fontWeight:800,color:'#0f0f0f'}}>${(showInsufficient.need||0).toFixed(2)}</div></div>
+              <div style={{fontSize:18,color:'#ccc',padding:'0 8px',fontWeight:700}}>vs</div>
+              <div><div style={{fontSize:10,color:'#999',marginBottom:4}}>Available</div><div style={{fontSize:20,fontWeight:800,color:'#E04500'}}>${(showInsufficient.have||0).toFixed(2)}</div></div>
             </div>
-            <button onClick={() => setShowInsufficient(null)} className="w-full py-2.5 rounded-xl text-sm font-bold bg-[#FF5000] text-[#0F1111]">{t('common.ok') || 'OK'}</button>
+            <div style={{marginBottom:16}}>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'#999',marginBottom:4}}><span>Shortage</span><span style={{color:'#E04500',fontWeight:700}}>${(showInsufficient.shortage||0).toFixed(2)}</span></div>
+              <div style={{background:'#eee',borderRadius:3,height:8,overflow:'hidden'}}><div style={{width:Math.round(((showInsufficient.have||0)/(showInsufficient.need||1))*100)+'%',height:'100%',background:'linear-gradient(90deg,#FF5000,#E04500)',borderRadius:3}} /></div>
+              <div style={{fontSize:9,color:'#bbb',marginTop:2}}>You have {Math.round(((showInsufficient.have||0)/(showInsufficient.need||1))*100)}% of the required amount</div>
+            </div>
+            <div style={{display:'flex',gap:8,marginBottom:16}}>
+              <div style={{flex:1,background:'#f8f8f8',borderRadius:10,padding:10,textAlign:'center'}}><div style={{fontSize:10,color:'#999'}}>Balance</div><div style={{fontSize:14,fontWeight:700,color:'#333'}}>${(showInsufficient.balance||0).toFixed(2)}</div></div>
+              <div style={{flex:1,background:'#FFF5F0',borderRadius:10,padding:10,textAlign:'center'}}><div style={{fontSize:10,color:'#999'}}>Deposit</div><div style={{fontSize:14,fontWeight:700,color:'#FF5000'}}>${(showInsufficient.deposit||0).toFixed(2)}</div></div>
+            </div>
+            <div style={{background:'#FFFAF5',borderRadius:12,padding:12,marginBottom:16}}>
+              <div style={{fontSize:11,fontWeight:700,color:'#CC6600',marginBottom:8}}>💡 How to get more funds</div>
+              <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                <div style={{display:'flex',alignItems:'center',gap:8,fontSize:11,color:'#996633'}}><span style={{width:20,height:20,borderRadius:10,background:'#FF5000',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,flexShrink:0}}>1</span><span>Add funds via <b style={{color:'#FF5000',cursor:'pointer'}} onClick={()=>{setShowInsufficient(null);navigate('/mine/deposit')}}>Deposit</b> page</span></div>
+                <div style={{display:'flex',alignItems:'center',gap:8,fontSize:11,color:'#996633'}}><span style={{width:20,height:20,borderRadius:10,background:'#F59E0B',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,flexShrink:0}}>2</span><span>Daily check-in for <b style={{color:'#F59E0B'}}>$0.10-$0.70</b></span></div>
+                <div style={{display:'flex',alignItems:'center',gap:8,fontSize:11,color:'#996633'}}><span style={{width:20,height:20,borderRadius:10,background:'#00A86B',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,flexShrink:0}}>3</span><span>Wait for <b style={{color:'#00A86B'}}>active holdings</b> to auto-settle</span></div>
+              </div>
+            </div>
+            <div style={{display:'flex',gap:8}}>
+              <button onClick={() => setShowInsufficient(null)} style={{flex:1,padding:12,background:'#f5f5f5',color:'#666',border:'none',borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer'}}>Cancel</button>
+              <button onClick={()=>{setShowInsufficient(null);navigate('/mine/deposit')}} style={{flex:1,padding:12,background:'#FF5000',color:'#fff',border:'none',borderRadius:12,fontSize:13,fontWeight:700,cursor:'pointer'}}>Go Deposit</button>
+            </div>
           </div>
         </div>
       )}
