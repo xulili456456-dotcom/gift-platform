@@ -31,8 +31,7 @@ export default function HomePage() {
 
   const copyCode = () => {
     if (!referralCode || referralCode === '------') { toast.error('No invite code'); return; }
-    navigator.clipboard.writeText(referralCode);
-    toast.success('Code copied');
+    navigator.clipboard.writeText(referralCode).then(() => toast.success('Code copied')).catch(() => toast.error('Failed to copy'));
   };
 
   if (loading) return (

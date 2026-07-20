@@ -30,9 +30,10 @@ router.get('/', async (req, res) => {
         [userId, task.task_type, key]
       );
       if (!progress) {
-        await run('INSERT INTO task_progress (user_id, task_type, current_count, current_value, period_key) VALUES (?,?,0,0,?)',
+        const { insert } = require('../db/database');
+        const newP = await insert('INSERT INTO task_progress (user_id, task_type, current_count, current_value, period_key) VALUES (?,?,0,0,?)',
           [userId, task.task_type, key]);
-        progress = { current_count: 0, current_value: 0, completed: false, claimed: false };
+        progress = { id: newP.id, current_count: 0, current_value: 0, completed: false, claimed: false };
       }
       const pct = task.target_count > 0
         ? Math.min(100, Math.round(progress.current_count / task.target_count * 100))
@@ -109,9 +110,10 @@ async function updateTaskProgress(userId, taskType, increment, valueIncrement = 
       [userId, taskType, key]
     );
     if (!progress) {
-      await run('INSERT INTO task_progress (user_id, task_type, current_count, current_value, period_key) VALUES (?,?,?,?,?)',
+      const { insert } = require('../db/database');
+      const result = await insert('INSERT INTO task_progress (user_id, task_type, current_count, current_value, period_key) VALUES (?,?,?,?,?)',
         [userId, taskType, increment, valueIncrement, key]);
-      progress = { id: null, current_count: increment, current_value: valueIncrement };
+      progress = { id: result.id, current_count: increment, current_value: valueIncrement };
     } else {
       const nc = (progress.current_count || 0) + increment;
       const nv = Number(progress.current_value || 0) + valueIncrement;
@@ -121,7 +123,7 @@ async function updateTaskProgress(userId, taskType, increment, valueIncrement = 
     }
     const countMet = task.target_count > 0 && progress.current_count >= task.target_count;
     const valueMet = task.target_value > 0 && Number(progress.current_value) >= task.target_value;
-    if ((countMet || valueMet) && !progress.completed) {
+    if ((countMet || valueMet) && !progress.completed && progress.id) {
       await run('UPDATE task_progress SET completed = TRUE WHERE id = ?', [progress.id]);
     }
   } catch (err) {

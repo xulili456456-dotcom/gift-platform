@@ -39,12 +39,21 @@ export default function NotificationsPage() {
 
   const markRead = (n) => {
     if (n.is_read) return;
-    setData(prev => ({
-      ...prev,
-      notifications: prev.notifications.map(x => x.id === n.id ? { ...x, is_read: true } : x),
-      unread: Math.max(0, prev.unread - 1),
-    }));
-    client.put('/notifications/' + n.id + '/read').catch(() => {});
+    setData(prev => {
+      const wasRead = n.is_read;
+      return {
+        ...prev,
+        notifications: prev.notifications.map(x => x.id === n.id ? { ...x, is_read: true } : x),
+        unread: Math.max(0, prev.unread - 1),
+      };
+    });
+    client.put('/notifications/' + n.id + '/read').catch(() => {
+      setData(prev => ({
+        ...prev,
+        notifications: prev.notifications.map(x => x.id === n.id ? { ...x, is_read: false } : x),
+        unread: prev.unread + 1,
+      }));
+    });
     window.dispatchEvent(new Event('notifUpdate'));
   };
 

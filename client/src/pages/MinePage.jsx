@@ -41,7 +41,7 @@ export default function MinePage() {
 
   const tgName = (name) => { const gd = i18n.getResource(i18n.language, 'translation', 'giftData'); return (gd && gd[name]) ? gd[name].name : name; };
   const handleClaim = async (gift) => { setClaimingGift(gift.id); try { await claimsApi.create(gift.id); toast.success(t('claim.submitOk')); setShowClaimConfirm(null); loadData(); } catch (err) { toast.error(err.response?.data?.error || t('claim.submitFail')); } finally { setClaimingGift(null); } };
-  const handleLogout = () => { if (confirm(t('mine.logoutConfirm'))) { logout(); window.location.replace('/login'); } };
+  const handleLogout = () => { if (confirm(t('mine.logoutConfirm'))) { logout(); navigate('/login', { replace: true }); } };
 
   if (loading) return (<div className="p-4 space-y-3"><div className="skeleton h-32 rounded-3xl" /><div className="skeleton h-48 rounded-2xl" /></div>);
 

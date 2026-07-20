@@ -42,8 +42,7 @@ export default function TeamPage() {
       toast.error('No invite code available. Please try again later.');
       return;
     }
-    navigator.clipboard.writeText(referralCode);
-    toast.success('Code copied');
+    navigator.clipboard.writeText(referralCode).then(() => toast.success('Code copied')).catch(() => toast.error('Failed to copy'));
   };
 
   return (

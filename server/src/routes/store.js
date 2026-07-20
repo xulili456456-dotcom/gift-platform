@@ -200,15 +200,15 @@ router.post('/orders/process', async (req, res) => {
     const sellHours = 6 + Math.random() * 24;
     const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
 
-    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name) VALUES (?, ?, ?, 'holding', ?, ?)", [store.id, req.user.id, cost, sellBy, productName || '']);
-    await t.commit();
-
-    // Increment free order counter if applicable
+    // Increment free order counter INSIDE transaction
     let freeUsedCount = Number(freeUsed?.value || 0);
     if (isFreeOrder) {
       freeUsedCount += 1;
-      await run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [freeKey, String(freeUsedCount), String(freeUsedCount)]);
+      await t.run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [freeKey, String(freeUsedCount), String(freeUsedCount)]);
     }
+
+    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name) VALUES (?, ?, ?, 'holding', ?, ?)", [store.id, req.user.id, cost, sellBy, productName || '']);
+    await t.commit();
 
     res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: FREE_SLOTS - freeUsedCount });
 
