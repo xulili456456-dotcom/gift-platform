@@ -101,7 +101,7 @@ export default function GiftHallPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-primary">¥{gift.value}</p>
+                  <p className="text-lg font-bold text-primary">${gift.value}</p>
                   <p className="text-[11px] text-text-muted">{gift.gift_type === 'cash' ? t('gifts.cash') : gift.gift_type === 'physical' ? t('gifts.physical') : t('gifts.virtual')}</p>
                 </div>
               </div>
@@ -126,7 +126,7 @@ export default function GiftHallPage() {
             <div className="text-center mb-6">
               <div className={`w-20 h-20 rounded-2xl flex items-center justify-center text-5xl mx-auto mb-3 ${effective >= detailGift.required_invites ? 'bg-primary/10' : 'bg-gray-100'}`}>{detailGift.gift_type === 'cash' ? '🧧' : '🎁'}</div>
               <h2 className="text-xl font-bold text-text-primary">{tg(detailGift).name}</h2>
-              <p className="text-3xl font-bold text-primary mt-1">¥{detailGift.value}</p>
+              <p className="text-3xl font-bold text-primary mt-1">${detailGift.value}</p>
               <p className="text-sm text-text-muted mt-1">{tg(detailGift).desc}</p>
             </div>
             <div className="bg-warm-bg rounded-xl p-4 mb-4">

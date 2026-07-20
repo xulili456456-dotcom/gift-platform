@@ -29,7 +29,7 @@ export default function BuyPage() {
   };
 
   if (loading) return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#FF9900] border-t-transparent rounded-full animate-spin" /></div>;
-  if (error) return <div className="min-h-screen bg-white flex items-center justify-center px-4"><div className="text-center max-w-sm"><p className="text-5xl mb-4">😔</p><p className="text-[#565959] text-sm">{error}</p></div></div>;
+  if (error || !product) return <div className="min-h-screen bg-white flex items-center justify-center px-4"><div className="text-center max-w-sm"><p className="text-5xl mb-4">😔</p><p className="text-[#565959] text-sm">{error || 'This product is no longer available'}</p></div></div>;
   if (bought) return (
     <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="text-center max-w-sm">

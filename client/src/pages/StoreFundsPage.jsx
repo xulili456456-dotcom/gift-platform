@@ -63,7 +63,7 @@ export default function StoreFundsPage() {
           <div style={{display:'flex',justifyContent:'center',gap:24,marginTop:10}}>
             <div><span style={{fontSize:10,color:'#999'}}>Security </span><span style={{fontSize:14,fontWeight:700}}>${(s.deposit||0).toFixed(0)}</span></div>
             <div><span style={{fontSize:10,color:'#999'}}>Free </span><span style={{fontSize:14,fontWeight:700,color:'#FF5000'}}>{s.freeRemaining||0}/5</span></div>
-            <div><span style={{fontSize:10,color:'#999'}}>Total Profit </span><span style={{fontSize:14,fontWeight:700,color:'#00A86B'}}>+${earnings.totalProfit.toFixed(0)}</span></div>
+            <div><span style={{fontSize:10,color:'#999'}}>Total Profit </span><span style={{fontSize:14,fontWeight:700,color:'#00A86B'}}>+${(earnings.totalProfit || 0).toFixed(0)}</span></div>
           </div>
         </div>
 

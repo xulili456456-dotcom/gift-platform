@@ -68,7 +68,7 @@ export default function LoginPage() {
           </button>
         </form>
         <div className="text-center mt-5">
-          <Link to="/reset-password" className="text-sm text-gray-400">Forgot password?</Link>
+          <Link to="/reset" className="text-sm text-gray-400">Forgot password?</Link>
         </div>
       </div>
 

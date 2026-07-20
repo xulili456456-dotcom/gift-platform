@@ -40,7 +40,7 @@ export default function RewardsPage() {
     <div className="p-4 space-y-4 animate-fade-in">
       <div className="bg-gradient-to-br from-gold to-gold/80 rounded-2xl p-5 text-white shadow-lg shadow-gold/20 text-center">
         <p className="text-white/80 text-xs mb-1">{t('rewards.totalEarned')}</p>
-        <p className="text-4xl font-bold">¥{totalEarned}</p>
+        <p className="text-4xl font-bold">${totalEarned}</p>
         <p className="text-white/70 text-xs mt-1">{claims.length} {t('rewards.claimRecords')}</p>
       </div>
 
@@ -59,7 +59,7 @@ export default function RewardsPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-bold text-primary">¥{claim.value}</p>
+                  <p className="text-lg font-bold text-primary">${claim.value}</p>
                   <span className={`inline-block text-[11px] px-2 py-0.5 rounded-full font-medium ${config.color}`}>{config.icon} {config.label}</span>
                 </div>
               </div>
