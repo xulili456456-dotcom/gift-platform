@@ -270,21 +270,8 @@ const PRODUCTS = [
 ];
 
 
-function genProducts(tier, cat, search, catalog) {
-  // Normalize products — add defaults for missing fields
-  const allCats = ['Digital','Women','Men','Beauty','Shoes','Home','Accessories','Food','Toys','Sports','Auto'];
-  const normalized = catalog.map((p, i) => ({
-    ...p, id: i,
-    cat: p.cat || allCats[i % allCats.length],
-    sold: p.sold || Math.floor(Math.random() * 500 + 50),
-    rating: p.rating || 4.3,
-    reviews: p.reviews || Math.floor(Math.random() * 200 + 50),
-    specs: p.specs || {},
-    desc: p.desc || '',
-    img: p.img || `/products/${(i % 60) + 1}.jpg`,
-    price: Number(p.price) || 25,
-  }));
-  let filtered = cat === 'All' ? [...normalized] : normalized.filter(p => p.cat === cat);
+function genProducts(tier, cat, search) {
+  let filtered = cat === 'All' ? [...PRODUCTS] : PRODUCTS.filter(p => p.cat === cat);
   if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.cat.toLowerCase().includes(search.toLowerCase()));
   filtered.sort((a,b) => b.sold - a.sold);
   return filtered.map(p => {
@@ -331,8 +318,6 @@ export default function StorePage() {
   const [search, setSearch] = useState('');
   const [detail, setDetail] = useState(null);
   const [notifCount, setNotifCount] = useState(0);
-  const [catalog, setCatalog] = useState(PRODUCTS);
-  useEffect(() => { client.get('/store/products-catalog').then(({data}) => { if (data?.length) setCatalog(data); }).catch(()=>{}); }, []);
   const [earnings, setEarnings] = useState({ todayProfit: 0, totalProfit: 0, totalOrders: 0, balance: 0, tomorrowEstimate: 0, dailyGoal: 20 });
   const [sortMode, setSortMode] = useState('profit'); // 'profit' | 'price' | 'sales'
   const [affordableOnly, setAffordableOnly] = useState(false);
@@ -359,7 +344,7 @@ export default function StorePage() {
 
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
-    let list = genProducts(status.store.tier, CAT_VALUES[catIdx], search, catalog);
+    let list = genProducts(status.store.tier, CAT_VALUES[catIdx], search);
     if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0)));
     else if (affordableOnly) list = list.filter(p => p.costPrice <= (status.store.balance || 0));
     if (sortMode === 'profit') list.sort((a, b) => b.profit - a.profit);
