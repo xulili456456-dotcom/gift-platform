@@ -114,10 +114,12 @@ export default function HomePage() {
         <div style={{marginBottom:16}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
             <div style={{fontSize:13,fontWeight:700,color:'#0f0f0f'}}>📊 Active Holdings</div>
-            <span onClick={() => navigate('/store/funds')} style={{fontSize:11,color:'#FF5000',fontWeight:600,cursor:'pointer'}}>View All (7) ›</span>
+            <span onClick={() => navigate('/store')} style={{fontSize:11,color:'#FF5000',fontWeight:600,cursor:'pointer'}}>Browse Store ›</span>
           </div>
-          <div style={{textAlign:'center',padding:30,background:'#fff',borderRadius:14,fontSize:12,color:'#bbb'}}>
-            Visit <span onClick={() => navigate('/store/funds')} style={{color:'#FF5000',cursor:'pointer',fontWeight:600}}>Store Funds</span> to view your active holdings
+          <div style={{textAlign:'center',padding:24,background:'#fff',borderRadius:14}}>
+            <div style={{fontSize:28,marginBottom:8}}>🛒</div>
+            <div style={{fontSize:12,color:'#999',marginBottom:8}}>No active holdings yet</div>
+            <button onClick={() => navigate('/store')} style={{padding:'8px 20px',background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:12,fontWeight:600,cursor:'pointer'}}>Start Trading</button>
           </div>
         </div>
 

@@ -461,7 +461,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   // Check balance
   const taskBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
   const available = Number(taskBal?.total || 0);
-  if (available < cost) return res.status(400).json({ error: `Insufficient balance. Need $${cost}, have $${available.toFixed(2)}` });
+  if (available < cost) return res.status(400).json({ error: `Insufficient balance. Need $${cost}, have $${available.toFixed(2)}`, need: cost, have: available, shortage: Math.round((cost - available) * 100) / 100 });
 
   // Transaction: deduct + create holding + increment per-user counter
   const t = await tx();
@@ -500,7 +500,7 @@ router.post('/deposit', authMiddleware, async (req, res) => {
 
   const bal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
   const available = Number(bal?.total || 0);
-  if (amount > available) return res.status(400).json({ error: `Insufficient balance. Available: $${available.toFixed(2)}` });
+  if (amount > available) return res.status(400).json({ error: `Insufficient balance. Available: $${available.toFixed(2)}`, need: amount, have: available, shortage: Math.round((amount - available) * 100) / 100 });
 
   const t = await tx();
   try {
