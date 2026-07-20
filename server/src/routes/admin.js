@@ -512,7 +512,7 @@ router.get('/holdings', async (req, res) => {
      ${where} ORDER BY o.created_at DESC LIMIT 200`,
     params
   );
-  res.json(rows);
+  res.json({ holdings: rows });
 });
 
 // ========== Enhanced Stats ==========

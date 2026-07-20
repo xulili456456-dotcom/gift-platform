@@ -236,7 +236,7 @@ router.post('/send-notification', async (req, res) => {
     } else {
       res.status(400).json({ error: 'Invalid target' });
     }
-  } catch (e) { res.status(500).json({ error: 'Send failed' }); }
+  } catch (e) { console.error('Notification send error:', e.message); res.status(500).json({ error: 'Send failed: ' + e.message }); }
 });
 
 module.exports = { router, updateTaskProgress };
