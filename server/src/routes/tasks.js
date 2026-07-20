@@ -197,6 +197,39 @@ router.post('/checkin', async (req, res) => {
   }
 });
 
+// Admin: GET /api/tasks/user/:userId — view any user's task progress
+router.get('/user/:userId', require('../middleware/admin'), async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const tasks = await all('SELECT * FROM task_definitions WHERE active = TRUE ORDER BY sort_order');
+    const result = [];
+    for (const task of tasks) {
+      const key = periodKey(task.reset_period);
+      let progress = await get(
+        'SELECT * FROM task_progress WHERE user_id = ? AND task_type = ? AND period_key = ?',
+        [userId, task.task_type, key]
+      );
+      if (!progress) {
+        progress = { current_count: 0, current_value: 0, completed: false, claimed: false };
+      }
+      const pct = task.target_count > 0
+        ? Math.min(100, Math.round((progress.current_count||0) / task.target_count * 100))
+        : task.target_value > 0
+          ? Math.min(100, Math.round(Number(progress.current_value||0) / task.target_value * 100))
+          : 0;
+      result.push({
+        id: task.id, task_type: task.task_type, title: task.title,
+        target_count: task.target_count, target_value: task.target_value,
+        reward: Number(task.reward), reset_period: task.reset_period,
+        current_count: progress.current_count||0, current_value: Number(progress.current_value||0),
+        completed: !!progress.completed, claimed: !!progress.claimed, pct,
+      });
+    }
+    const rewards = await all('SELECT * FROM task_reward_log WHERE user_id = ? ORDER BY created_at DESC LIMIT 20', [userId]);
+    res.json({ tasks: result, rewards: rewards.map(r => ({ ...r, amount: Number(r.amount) })) });
+  } catch (e) { console.error('Task user error:', e); res.status(500).json({ error: 'Failed' }); }
+});
+
 // Admin: GET /api/tasks/definitions
 router.get('/definitions', require('../middleware/admin'), async (req, res) => {
   try {
