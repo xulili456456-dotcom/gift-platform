@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { useEffect, lazy, Suspense, useState } from 'react';
+import { useEffect, lazy, Suspense, useState, Component } from 'react';
 import useAuthStore from './store/authStore';
 import AppLayout from './components/Layout/AppLayout';
 import ProtectedRoute from './components/shared/ProtectedRoute';
@@ -40,10 +40,27 @@ const PageLoader = () => (
   </div>
 );
 
+class ErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) return (
+      <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:12,background:'#f2f2f7'}}>
+        <div style={{fontSize:40}}>😵</div>
+        <div style={{fontSize:14,fontWeight:600,color:'#333'}}>Something went wrong</div>
+        <button onClick={() => { this.setState({ hasError: false }); window.location.reload(); }} style={{padding:'10px 20px',background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:13,fontWeight:600,cursor:'pointer'}}>Retry</button>
+      </div>
+    );
+    return this.props.children;
+  }
+}
+
 const Lazy = ({ Comp }) => (
-  <Suspense fallback={<PageLoader />}>
-    <Comp />
-  </Suspense>
+  <ErrorBoundary>
+    <Suspense fallback={<PageLoader />}>
+      <Comp />
+    </Suspense>
+  </ErrorBoundary>
 );
 
 export default function App() {
