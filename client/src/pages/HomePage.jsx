@@ -83,19 +83,19 @@ export default function HomePage() {
         </div>
         <div style={{display:'flex',gap:12}}>
           <div style={{flex:1}}>
-            <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>P&L</div>
-            <div style={{fontSize:20,fontWeight:800,color:'#00A86B'}}>+$18.45</div>
-            <div style={{fontSize:9,color:'#00A86B'}}>↑ 2.4%</div>
+            <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>Total Earned</div>
+            <div style={{fontSize:20,fontWeight:800,color:'#00A86B'}}>${totalEarned.toFixed(2)}</div>
+            <div style={{fontSize:9,color:'#999'}}>all time</div>
           </div>
           <div style={{flex:1,textAlign:'center'}}>
-            <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>Orders Closed</div>
-            <div style={{fontSize:20,fontWeight:800,color:'#0f0f0f'}}>3</div>
-            <div style={{fontSize:9,color:'#999'}}>of 7 active</div>
+            <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>Effective Invites</div>
+            <div style={{fontSize:20,fontWeight:800,color:'#0f0f0f'}}>{effective}</div>
+            <div style={{fontSize:9,color:'#999'}}>{totalInvites} total</div>
           </div>
           <div style={{flex:1,textAlign:'right'}}>
-            <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>Avg Return</div>
-            <div style={{fontSize:20,fontWeight:800,color:'#00A86B'}}>14.2%</div>
-            <div style={{fontSize:9,color:'#999'}}>per order</div>
+            <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>Gifts Available</div>
+            <div style={{fontSize:20,fontWeight:800,color:'#FF5000'}}>{gifts.length}</div>
+            <div style={{fontSize:9,color:'#999'}}>to claim</div>
           </div>
         </div>
       </div>
@@ -117,8 +117,8 @@ export default function HomePage() {
             <div style={{fontSize:13,fontWeight:700,color:'#0f0f0f'}}>📊 Active Holdings</div>
             <span onClick={() => navigate('/store/funds')} style={{fontSize:11,color:'#FF5000',fontWeight:600,cursor:'pointer'}}>View All (7) ›</span>
           </div>
-          <div style={{textAlign:'center',padding:30,background:'#fff',borderRadius:14,fontSize:12,color:'#ccc'}}>
-            Loading active holdings...
+          <div style={{textAlign:'center',padding:30,background:'#fff',borderRadius:14,fontSize:12,color:'#bbb'}}>
+            Visit <span onClick={() => navigate('/store/funds')} style={{color:'#FF5000',cursor:'pointer',fontWeight:600}}>Store Funds</span> to view your active holdings
           </div>
         </div>
 

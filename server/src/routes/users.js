@@ -60,8 +60,8 @@ router.put('/me/password', async (req, res) => {
     if (!oldPassword || !newPassword) {
       return res.status(400).json({ error: 'Please enter your old and new passwords' });
     }
-    if (newPassword.length < 6) {
-      return res.status(400).json({ error: 'New password must be at least 6 characters' });
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: 'New password must be at least 8 characters' });
     }
     const user = await userModel.findById(req.user.id);
     if (!user) return res.status(404).json({ error: 'User not found' });

@@ -26,9 +26,13 @@ export default function TasksPage() {
       ]);
       setData(tRes.data);
       setBalance(bRes.data);
-    } catch {} finally { setLoading(false); }
+    } catch { setData({ tasks: [], rewards: [], summary: { completed: 0, total: 0 } }); toast.error('Failed to load tasks'); } finally { setLoading(false); }
   };
   useEffect(() => { loadAll(); }, []);
+
+  const tasks = data?.tasks || [];
+  const rewards = data?.rewards || [];
+  const summary = data?.summary || { completed: 0, total: 0 };
 
   const doCheckin = async () => {
     setSubmitting(true);
@@ -63,10 +67,6 @@ export default function TasksPage() {
       <div style={{padding:16}}><div style={{background:'#fff',borderRadius:14,height:200}} /></div>
     </div>
   );
-
-  const tasks = data?.tasks || [];
-  const rewards = data?.rewards || [];
-  const summary = data?.summary || { completed: 0, total: 0 };
 
   const filtered = tab === 'All' ? tasks : tasks.filter(t => t.category === tab.toLowerCase());
 

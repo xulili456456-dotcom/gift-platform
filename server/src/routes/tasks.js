@@ -196,7 +196,7 @@ router.post('/checkin', async (req, res) => {
 });
 
 // Admin: GET /api/tasks/definitions
-router.get('/definitions', async (req, res) => {
+router.get('/definitions', require('../middleware/admin'), async (req, res) => {
   try {
     const tasks = await all('SELECT * FROM task_definitions ORDER BY sort_order');
     res.json(tasks);
