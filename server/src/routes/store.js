@@ -389,14 +389,6 @@ router.get('/orders-history', async (req, res) => {
 });
 
 // GET /api/store/free-products — daily random free products (≤$100, no deposit)
-// Get all products catalog
-router.get('/products-catalog', async (req, res) => {
-  try {
-    const catalog = require('../data/products.json');
-    res.json(catalog);
-  } catch { res.json([]); }
-});
-
 router.get('/free-products', authMiddleware, async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
   const key = 'free_products_v4_' + today;

@@ -57,6 +57,11 @@ async function start() {
   // Admin Panel (original backend standalone)
   app.use('/admin-panel', adminPanelRoute);
 
+  // Public product catalog (no auth needed)
+  app.get('/api/store/products-catalog', (req, res) => {
+    try { res.json(require('./data/products.json')); } catch { res.json([]); }
+  });
+
   // API Routes
   app.use('/api/auth', authRoutes);
   app.use('/api/users', userRoutes);
