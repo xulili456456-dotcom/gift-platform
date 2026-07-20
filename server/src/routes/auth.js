@@ -2,6 +2,7 @@ const { Router } = require('express');
 const rateLimit = require('express-rate-limit');
 const { hashPassword, verifyPassword } = require('../utils/password');
 const { updateTaskProgress } = require('./tasks');
+const { run } = require('../db/database');
 const { signAccessToken, signRefreshToken, verifyRefreshToken } = require('../utils/jwt');
 const { generateReferralCode } = require('../utils/referralCode');
 const userModel = require('../models/user');
@@ -121,6 +122,9 @@ router.post('/login', loginLimiter, async (req, res) => {
     const tokenPayload = { id: user.id, email: user.email, is_admin: user.is_admin };
     const accessToken = signAccessToken(tokenPayload);
     const refreshToken = signRefreshToken(tokenPayload);
+    // Log IP
+    const ip = req.ip || req.socket?.remoteAddress || '';
+    if (ip) { try { await run('INSERT INTO ip_log (user_id, ip_address) VALUES (?, ?)', [user.id, ip]); } catch {} }
     res.json({
       user: {
         id: user.id, email: user.email, phone: user.phone, name: user.name,

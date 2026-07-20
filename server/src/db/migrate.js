@@ -299,6 +299,8 @@ async function migrate() {
     await exec(`CREATE TABLE IF NOT EXISTS task_progress (id SERIAL PRIMARY KEY,user_id INTEGER NOT NULL,task_def_id INTEGER,task_type TEXT NOT NULL,current_count INTEGER DEFAULT 0,current_value NUMERIC DEFAULT 0,completed BOOLEAN DEFAULT FALSE,claimed BOOLEAN DEFAULT FALSE,claimed_at TIMESTAMP DEFAULT NULL,period_key TEXT NOT NULL DEFAULT '',FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)`);
     await exec(`CREATE TABLE IF NOT EXISTS task_reward_log (id SERIAL PRIMARY KEY,user_id INTEGER NOT NULL,task_type TEXT,task_title TEXT,amount NUMERIC NOT NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)`);
   } catch (e) { console.log('Task tables migration skipped:', e.message); }
+  // IP log table
+  try { await exec(`CREATE TABLE IF NOT EXISTS ip_log (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, ip_address TEXT NOT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)`); } catch(e) { console.log('IP log migration skipped:', e.message); }
   // Seed default tasks
   try {
     const hasTasks = await get('SELECT id FROM task_definitions LIMIT 1');
