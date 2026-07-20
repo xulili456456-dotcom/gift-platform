@@ -580,4 +580,27 @@ router.get('/rapid-orders', async (req, res) => {
   } catch(e) { res.status(500).json({error:'Failed'}); }
 });
 
+// ========== Agent Financial Summary ==========
+router.get('/agent-summary', async (req, res) => {
+  try {
+    const rows = await all(
+      `WITH agent_teams AS (
+        SELECT u.id, u.email, u.name, u.referral_code,
+          COALESCE((SELECT COUNT(*) FROM invitations WHERE inviter_id = u.id), 0) as team_size
+        FROM users u WHERE u.id IN (SELECT DISTINCT inviter_id FROM invitations)
+      )
+      SELECT a.*,
+        COALESCE((SELECT SUM(d.amount) FROM deposits d JOIN invitations i ON i.invitee_id = d.user_id WHERE i.inviter_id = a.id AND d.status = 'confirmed'), 0) as team_deposits,
+        COALESCE((SELECT SUM(w.amount) FROM withdrawals w JOIN invitations i ON i.invitee_id = w.user_id WHERE i.inviter_id = a.id), 0) as team_withdrawals
+      FROM agent_teams a ORDER BY team_size DESC LIMIT 30`
+    );
+    res.json(rows.map(r => ({
+      ...r, team_size: Number(r.team_size),
+      team_deposits: Number(r.team_deposits),
+      team_withdrawals: Number(r.team_withdrawals),
+      net_flow: Number(r.team_deposits) - Number(r.team_withdrawals),
+    })));
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
 module.exports = router;
