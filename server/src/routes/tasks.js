@@ -223,7 +223,7 @@ router.post('/send-notification', async (req, res) => {
     if (!title || !body) return res.status(400).json({ error: 'Title and body required' });
     const notify = require('./notifications').notify;
     if (target === 'all') {
-      const users = await all('SELECT id FROM users WHERE is_active = 1');
+      const users = await all('SELECT id FROM users WHERE is_active IS TRUE');
       for (const u of users) {
         try { await notify(u.id, title, body, type || 'info'); } catch {}
       }
