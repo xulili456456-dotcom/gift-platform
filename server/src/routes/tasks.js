@@ -145,17 +145,18 @@ function calcStreak(rows, skipToday = false) {
 // GET /api/tasks/balance
 router.get('/balance', async (req, res) => {
   try {
-    const [earningsRow, checkinRows, totalRow] = await Promise.all([
+    const [earningsRow, checkinRows, totalRow, availableRow] = await Promise.all([
       get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ?", [req.user.id]),
       all("SELECT created_at FROM task_earnings WHERE user_id = ? AND type = 'checkin' ORDER BY id DESC LIMIT 7", [req.user.id]),
       get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND type = 'checkin'", [req.user.id]),
+      get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND status = 'delivered'", [req.user.id]),
     ]);
     const today = new Date().toISOString().slice(0, 10);
     const checkedToday = checkinRows.length > 0 && new Date(checkinRows[0].created_at).toISOString().slice(0, 10) === today;
     const streak = calcStreak(checkinRows, false);
     const nextReward = streak < 7 ? CHECKIN_REWARDS[streak] : 0.7;
     res.json({
-      available: 0, total: Number(totalRow.total),
+      available: Number(availableRow.total), total: Number(totalRow.total),
       checkedToday, streak,
       nextCheckinReward: nextReward,
       allTimeEarnings: Number(earningsRow.total),
