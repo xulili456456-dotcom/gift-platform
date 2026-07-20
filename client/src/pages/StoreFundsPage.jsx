@@ -41,7 +41,8 @@ export default function StoreFundsPage() {
     catch (err) { toast.error(err.response?.data?.detail || err.response?.data?.error || 'Failed'); }
   };
 
-  if (!status?.hasStore && (!orderHistory?.orders || orderHistory.orders.length === 0)) return <div className="min-h-screen bg-gray-50 flex items-center justify-center flex-col gap-3"><p className="text-gray-400">No store opened</p><button onClick={() => navigate('/store')} style={{padding:'10px 24px',background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:13,fontWeight:600,cursor:'pointer'}}>Open Store</button></div>;
+  if (!status) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="w-8 h-8 border-3 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>;
+  if (!status.hasStore && (!orderHistory?.orders || orderHistory.orders.length === 0)) return <div className="min-h-screen bg-gray-50 flex items-center justify-center flex-col gap-3"><p className="text-gray-400">No store opened</p><button onClick={() => navigate('/store')} style={{padding:'10px 24px',background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:13,fontWeight:600,cursor:'pointer'}}>Open Store</button></div>;
 
   const s = status.store;
 
