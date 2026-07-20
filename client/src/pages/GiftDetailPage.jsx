@@ -40,13 +40,13 @@ export default function GiftDetailPage() {
   };
 
   if (loading) return (
+    <div className="min-h-screen bg-bg p-4 space-y-4">
+      <div className="skeleton h-8 w-32" /><div className="skeleton h-56 rounded-2xl" /><div className="skeleton h-48 rounded-2xl" />
+    </div>
+  );
   if (!gift) return (
     <div style={{minHeight:'100vh',background:'#f2f2f7',display:'flex',alignItems:'center',justifyContent:'center'}}>
       <p style={{fontSize:13,color:'#999'}}>Gift not found</p>
-    </div>
-  );
-    <div className="min-h-screen bg-bg p-4 space-y-4">
-      <div className="skeleton h-8 w-32" /><div className="skeleton h-56 rounded-2xl" /><div className="skeleton h-48 rounded-2xl" />
     </div>
   );
 
