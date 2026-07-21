@@ -347,7 +347,7 @@ router.get('/users-filtered', async (req, res) => {
             COALESCE(s.id, 0) as store_id, s.tier, s.deposit as store_deposit, s.status as store_status,
             COALESCE((SELECT SUM(amount) FROM task_earnings WHERE user_id = u.id AND status = 'delivered'), 0) as balance,
             COALESCE(k.status, '') as kyc_status,
-            p.name as parent_name, p.email as parent_email, p.id as parent_id
+            p.name as parent_name, p.email as parent_email, p.referral_code as parent_code, p.id as parent_id
      FROM users u
      LEFT JOIN stores s ON s.user_id = u.id
      LEFT JOIN kyc_submissions k ON k.user_id = u.id
