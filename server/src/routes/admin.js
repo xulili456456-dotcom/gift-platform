@@ -334,7 +334,7 @@ router.get('/users-filtered', async (req, res) => {
   const offset = (page - 1) * limit;
   let where = 'WHERE 1=1';
   const params = [];
-  if (search) { where += ' AND (u.email ILIKE ? OR u.name ILIKE ? OR u.phone ILIKE ?)'; params.push('%'+search+'%', '%'+search+'%', '%'+search+'%'); }
+  if (search) { where += ' AND (u.email ILIKE ? OR u.name ILIKE ? OR u.phone ILIKE ? OR u.referral_code ILIKE ?)'; params.push('%'+search+'%', '%'+search+'%', '%'+search+'%', '%'+search+'%'); }
   if (kyc) { where += kyc==='none' ? ' AND (k.status IS NULL OR k.status = ?)' : ' AND k.status = ?'; params.push(kyc==='none'?'rejected':kyc); }
   if (frozen === 'yes') { where += ' AND u.frozen = TRUE'; }
   else if (frozen === 'no') { where += ' AND u.frozen = FALSE'; }
