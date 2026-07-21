@@ -754,10 +754,11 @@ router.get('/agent-team/:id', async (req, res) => {
 // ========== All Transaction Ledger ==========
 router.get('/ledger', async (req, res) => {
   try {
-    const { page = 1, limit = 50, type = '' } = req.query;
+    const { page = 1, limit = 50, type = '', user_id = '' } = req.query;
     const offset = (page - 1) * limit;
-    let where = '', params = [];
-    if (type) { where = 'WHERE te.type = ?'; params.push(type); }
+    let where = user_id ? 'WHERE te.user_id = ?' : 'WHERE 1=1';
+    let params = user_id ? [user_id] : [];
+    if (type) { where += ' AND te.type = ?'; params.push(type); }
     const total = await get(`SELECT COUNT(*) as c FROM task_earnings te ${where}`, params);
     const rows = await all(
       `SELECT te.*, u.email, u.name FROM task_earnings te
