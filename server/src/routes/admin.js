@@ -611,6 +611,22 @@ router.put('/agents/:id', async (req, res) => {
   } catch(e) { res.status(500).json({error:'Failed'}); }
 });
 
+// Agent operations list & record
+router.get('/agent-ops', async (req, res) => {
+  try {
+    const rows = await all('SELECT * FROM agent_operations ORDER BY created_at DESC LIMIT 200');
+    res.json(rows);
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+router.post('/agent-ops', async (req, res) => {
+  try {
+    const { agent_id, target_user_id, action, amount, detail } = req.body;
+    await insert('INSERT INTO agent_operations (agent_id, target_user_id, action, amount, detail) VALUES (?,?,?,?,?)',
+      [agent_id, target_user_id, action||'adjust', amount||0, detail||'']);
+    res.json({ ok: true });
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
 router.post('/agents/:id/quota', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
