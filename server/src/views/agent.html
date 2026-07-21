@@ -98,7 +98,7 @@ function loadTeam(c){
 function showMember(id){
   var c=document.getElementById('ct');
   c.innerHTML='<div class="em">加载中...</div>';
-  api('GET','/admin/agent-member/'+id).then(function(d){
+  api('GET','/agent/member/'+id).then(function(d){
     memData=d;var m=d.member;
     c.innerHTML='<button class="btn" style="background:#f0f0f0;color:var(--t);margin-bottom:12px" onclick="switchTab(\'team\')">← 返回团队</button>'+
     '<div class="cd"><div class="ch">'+(m.name||m.email)+' #'+m.id+'</div><div class="cb">'+
@@ -132,7 +132,7 @@ function showAdjust(id,name){
 function doAdjust(id){
   var amt=parseFloat(document.getElementById('adjAmt').value),note=document.getElementById('adjNote').value;
   if(!amt||isNaN(amt)){toast('请输入有效金额',1);return}
-  api('POST','/admin/agent-balance',{target_user_id:id,amount:amt,note:note||''}).then(function(d){
+  api('POST','/agent/balance',{target_user_id:id,amount:amt,note:note||''}).then(function(d){
     toast(amt>0?'上分 $'+amt+' 成功':'下分 $'+Math.abs(amt)+' 成功');
     document.querySelector('div[style*=fixed]').remove();switchTab('team')
   }).catch(function(e){toast(e.message,1)})
@@ -140,7 +140,7 @@ function doAdjust(id){
 
 function loadOrders(c){
   c.innerHTML='<div class="em">加载中...</div>';
-  api('GET','/admin/agent-orders').then(function(d){
+  api('GET','/agent/orders').then(function(d){
     var orders=d.orders||[];
     c.innerHTML='<div class="cd"><div class="ch">团队订单 ('+orders.length+')</div><div class="cb"><table><thead><tr><th>用户</th><th>产品</th><th>金额</th><th>状态</th><th>时间</th></tr></thead><tbody>'+
     (orders.length===0?'<tr><td colspan="5" class="em">暂无订单</td></tr>':orders.map(function(o){return'<tr><td>'+o.user_name+'</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(o.product_name||'-')+'</td><td>$'+Number(o.amount||0).toFixed(2)+'</td><td><span class="bg '+(o.status==='done'?'bgn':'bgy')+'">'+(o.status==='done'?'已完成':'持仓中')+'</span></td><td style="font-size:10px">'+new Date(o.created_at).toLocaleString()+'</td></tr>'}).join(''))+
@@ -150,7 +150,7 @@ function loadOrders(c){
 
 function loadOps(c){
   c.innerHTML='<div class="cd"><div class="ch">上下分记录</div><div class="cb"><div class="em">加载中...</div></div></div>';
-  api('GET','/admin/agent-ops').then(function(rows){
+  api('GET','/agent/ops').then(function(rows){
     rows=(rows||[]).filter(function(o){return o.agent_id===uid});
     c.innerHTML='<div class="cd"><div class="ch">上下分记录 ('+rows.length+')</div><div class="cb"><table><thead><tr><th>时间</th><th>目标用户</th><th>金额</th><th>备注</th></tr></thead><tbody>'+
     (rows.length===0?'<tr><td colspan="4" class="em">暂无记录</td></tr>':rows.map(function(o){return'<tr><td style="font-size:10px">'+new Date(o.created_at).toLocaleString()+'</td><td>#'+(o.target_user_id||'-')+'</td><td style="font-weight:700;color:'+(Number(o.amount)>=0?'var(--s)':'var(--d)')+'">'+(Number(o.amount)>=0?'+':'')+'$'+Math.abs(Number(o.amount)).toFixed(2)+'</td><td style="font-size:10px">'+(o.detail||'')+'</td></tr>'}).join(''))+

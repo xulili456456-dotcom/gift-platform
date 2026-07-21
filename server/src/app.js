@@ -58,6 +58,8 @@ async function start() {
   app.use('/admin-panel', adminPanelRoute);
   // Agent Panel
   app.use('/agent-panel', require('./routes/agentPanel'));
+  // Agent API routes (auth only, no admin required)
+  app.use('/api/agent', require('./routes/agent'));
 
   // Public product catalog (no auth needed)
   app.get('/api/store/products-catalog', (req, res) => {
