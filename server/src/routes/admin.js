@@ -751,6 +751,24 @@ router.get('/agent-team/:id', async (req, res) => {
   } catch(e) { res.status(500).json({error:'Failed'}); }
 });
 
+// ========== All Transaction Ledger ==========
+router.get('/ledger', async (req, res) => {
+  try {
+    const { page = 1, limit = 50, type = '' } = req.query;
+    const offset = (page - 1) * limit;
+    let where = '', params = [];
+    if (type) { where = 'WHERE te.type = ?'; params.push(type); }
+    const total = await get(`SELECT COUNT(*) as c FROM task_earnings te ${where}`, params);
+    const rows = await all(
+      `SELECT te.*, u.email, u.name FROM task_earnings te
+       JOIN users u ON u.id = te.user_id ${where}
+       ORDER BY te.created_at DESC LIMIT ? OFFSET ?`,
+      [...params, limit, offset]
+    );
+    res.json({ rows: rows.map(r => ({...r, amount: Number(r.amount)})), total: Number(total?.c||0), page, limit });
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
 // ========== Agent Financial Summary ==========
 router.get('/agent-summary', async (req, res) => {
   try {
