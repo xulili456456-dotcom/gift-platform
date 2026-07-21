@@ -87,7 +87,7 @@ router.post('/register', registerLimiter, async (req, res) => {
       user: {
         id: user.id, email: user.email, phone: user.phone, name: user.name,
         nameHex: Buffer.from(user.name||'','utf8').toString('hex'),
-        referral_code: user.referral_code, is_admin: user.is_admin, has_tx_pin: !!user.tx_pin,
+        referral_code: user.referral_code, is_admin: user.is_admin, is_agent: !!user.is_agent, has_tx_pin: !!user.tx_pin,
       },
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -128,7 +128,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     res.json({
       user: {
         id: user.id, email: user.email, phone: user.phone, name: user.name,
-        referral_code: user.referral_code, is_admin: user.is_admin, has_tx_pin: !!user.tx_pin,
+        referral_code: user.referral_code, is_admin: user.is_admin, is_agent: !!user.is_agent, has_tx_pin: !!user.tx_pin,
       },
       access_token: accessToken,
       refresh_token: refreshToken,
