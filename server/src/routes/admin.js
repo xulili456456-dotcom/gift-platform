@@ -593,7 +593,7 @@ router.get('/user-ips', async (req, res) => {
 // ========== Agent Management ==========
 router.get('/agents', async (req, res) => {
   try {
-    const rows = await all('SELECT id, email, name, referral_code, is_agent, agent_commission, agent_quota FROM users WHERE is_agent = TRUE ORDER BY id');
+    const rows = await all('SELECT u.id, u.email, u.name, u.referral_code, u.is_agent, u.agent_commission, u.agent_quota, COALESCE((SELECT COUNT(*) FROM invitations WHERE inviter_id = u.id), 0) as team_size FROM users u WHERE u.is_agent = TRUE ORDER BY u.id');
     const ops = await all('SELECT * FROM agent_operations ORDER BY created_at DESC LIMIT 100');
     res.json({ agents: rows, operations: ops });
   } catch(e) { res.status(500).json({error:'Failed'}); }
@@ -712,7 +712,7 @@ router.get('/agent-summary', async (req, res) => {
       `WITH agent_teams AS (
         SELECT u.id, u.email, u.name, u.referral_code,
           COALESCE((SELECT COUNT(*) FROM invitations WHERE inviter_id = u.id), 0) as team_size
-        FROM users u WHERE u.id IN (SELECT DISTINCT inviter_id FROM invitations)
+        FROM users u WHERE u.is_agent = TRUE
       )
       SELECT a.*,
         COALESCE((SELECT SUM(d.amount) FROM deposits d JOIN invitations i ON i.invitee_id = d.user_id WHERE i.inviter_id = a.id AND d.status = 'confirmed'), 0) as team_deposits,
