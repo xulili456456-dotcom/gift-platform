@@ -158,6 +158,13 @@ router.put('/claims/:id', async (req, res) => {
   }
 
   const updated = await userGiftModel.updateStatus(id, status, admin_note || '');
+  // Credit user balance when gift is delivered
+  if (status === 'delivered') {
+    const giftValue = claim.value || 0;
+    if (giftValue > 0) {
+      await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [claim.user_id, giftValue, 'bonus', 'delivered']);
+    }
+  }
   res.json(updated);
 });
 
