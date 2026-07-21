@@ -1,111 +1,161 @@
 <!DOCTYPE html>
-<html lang="zh-CN"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>代理后台</title>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>代理后台</title>
 <style>
-:root{--red:#FF5000;--bg:#FFF8F0;--white:#FFF;--text:#2D2D2D;--muted:#8B7355;--success:#2E7D32;--danger:#DC2626;--blue:#2563EB;--border:#e5e7eb}
+:root{--r:#FF5000;--bg:#FFF8F0;--w:#FFF;--t:#2D2D2D;--m:#8B7355;--s:#2E7D32;--d:#DC2626;--b:#2563EB;--br:#e5e7eb}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-body.login-body{display:flex;align-items:center;justify-content:center}
-.login-box{background:var(--white);border-radius:20px;padding:40px 32px;width:380px;max-width:90vw;box-shadow:0 8px 40px rgba(0,0,0,.08);text-align:center}
-.login-box h1{font-size:24px;margin-bottom:4px}.login-box .sub{color:var(--muted);font-size:13px;margin-bottom:24px}
-.login-box input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;margin-bottom:12px;outline:none}
-.login-box input:focus{border-color:var(--red)}
-.login-box button{width:100%;padding:13px;background:linear-gradient(135deg,var(--red),#E04500);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer}
-.login-box .err{color:var(--danger);font-size:13px;margin-bottom:12px;min-height:20px}
-header{background:linear-gradient(135deg,var(--red),#E04500);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-header h1{font-size:18px}header .logout{background:rgba(255,255,255,.2);color:#fff;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:13px}
-nav{background:var(--white);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;padding:0 8px;position:sticky;top:56px;z-index:99}
-nav button{padding:12px 16px;border:none;background:none;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent}
-nav button.active{color:var(--red);border-bottom-color:var(--red);font-weight:600}
+body{font-family:'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+body.lb{display:flex;align-items:center;justify-content:center}
+.lbox{background:var(--w);border-radius:20px;padding:40px 32px;width:380px;max-width:90vw;box-shadow:0 8px 40px rgba(0,0,0,.08);text-align:center}
+.lbox h1{font-size:24px;margin-bottom:4px}.lbox .sub{color:var(--m);font-size:13px;margin-bottom:24px}
+.lbox input{width:100%;padding:12px 16px;border:1.5px solid var(--br);border-radius:12px;font-size:14px;margin-bottom:12px;outline:none}
+.lbox input:focus{border-color:var(--r)}
+.lbox button{width:100%;padding:13px;background:linear-gradient(135deg,var(--r),#E04500);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer}
+.lbox .err{color:var(--d);font-size:13px;margin-bottom:12px;min-height:20px}
+header{background:linear-gradient(135deg,var(--r),#E04500);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+header h1{font-size:18px}header .lo{background:rgba(255,255,255,.2);color:#fff;border:none;padding:8px 16px;border-radius:20px;cursor:pointer;font-size:13px}
+nav{background:var(--w);border-bottom:1px solid var(--br);display:flex;overflow-x:auto;padding:0 8px;position:sticky;top:56px;z-index:99}
+nav button{padding:12px 16px;border:none;background:none;font-size:13px;font-weight:500;cursor:pointer;color:var(--m);white-space:nowrap;border-bottom:2px solid transparent}
+nav button.ac{color:var(--r);border-bottom-color:var(--r);font-weight:600}
 main{padding:20px;max-width:1400px;margin:0 auto}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
-.stat-card{background:var(--white);border-radius:12px;padding:16px;border:1px solid var(--border)}
-.stat-card .label{font-size:11px;color:var(--muted);margin-bottom:4px}.stat-card .value{font-size:22px;font-weight:700}
-.card{background:var(--white);border-radius:12px;border:1px solid var(--border);margin-bottom:16px;overflow:hidden}
-.card-header{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:space-between}
-.card-body{padding:18px}table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:10px 12px;background:#fafafa;color:var(--muted);font-weight:500;font-size:11px;border-bottom:1px solid var(--border)}
-td{padding:10px 12px;border-bottom:1px solid var(--border)}tr:hover{background:#fdf5f5}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.badge-green{background:#e8f5e9;color:var(--success)}.badge-red{background:#fce4ec;color:var(--danger)}.badge-yellow{background:#fff8e1;color:#f57c00}.badge-blue{background:#e3f2fd;color:var(--blue)}.badge-gray{background:#f5f5f5;color:#9e9e9e}
-.btn{padding:8px 16px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer}.btn-green{background:var(--success);color:#fff}.btn-red{background:var(--danger);color:#fff}.btn-blue{background:var(--blue);color:#fff}.btn-gray{background:#f0f0f0;color:var(--text)}.btn-sm{padding:5px 12px;font-size:11px}
-.toast{position:fixed;top:20px;right:20px;z-index:999;background:var(--success);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.2);display:none}
-.toast.error{background:var(--danger)}.empty{text-align:center;padding:40px;color:var(--muted);font-size:14px}
-.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:16px}
-.tabs button{padding:8px 16px;border:none;background:none;font-size:12px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;font-weight:500}
-.tabs button.active{color:var(--red);border-bottom-color:var(--red)}
-.kv{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:12px;margin:8px 0}
-.kv .k{color:var(--muted)}.kv .v{font-weight:500}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.sc{background:var(--w);border-radius:12px;padding:16px;border:1px solid var(--br)}
+.sc .lb{font-size:11px;color:var(--m)}.sc .vl{font-size:22px;font-weight:700}
+.cd{background:var(--w);border-radius:12px;border:1px solid var(--br);margin-bottom:16px;overflow:hidden}
+.ch{padding:14px 18px;border-bottom:1px solid var(--br);font-weight:600;font-size:14px;display:flex;align-items:center;justify-content:space-between}
+.cb{padding:18px}table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 12px;background:#fafafa;color:var(--m);font-weight:500;font-size:11px;border-bottom:1px solid var(--br)}
+td{padding:10px 12px;border-bottom:1px solid var(--br)}tr:hover{background:#fdf5f5}
+.bg{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.bgn{background:#e8f5e9;color:var(--s)}.bgr{background:#fce4ec;color:var(--d)}.bgy{background:#fff8e1;color:#f57c00}.bgb{background:#e3f2fd;color:var(--b)}.bgg{background:#f5f5f5;color:#9e9e9e}
+.btn{padding:8px 16px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer}.btnsm{padding:5px 12px;font-size:11px}
+.toast{position:fixed;top:20px;right:20px;z-index:999;background:var(--s);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.2);display:none}
+.toast.er{background:var(--d)}.em{text-align:center;padding:40px;color:var(--m);font-size:14px}
+.tabs{display:flex;border-bottom:2px solid var(--br);margin-bottom:16px}
+.tabs button{padding:8px 16px;border:none;background:none;font-size:12px;cursor:pointer;color:var(--m);border-bottom:2px solid transparent;margin-bottom:-2px;font-weight:500}
+.tabs button.ac{color:var(--r);border-bottom-color:var(--r)}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:12px;margin:8px 0}.kv .k{color:var(--m)}.kv .v{font-weight:500}
 </style></head>
-<body class="login-body">
-<div id="loginPage"><div class="login-box"><h1>代理后台</h1><p class="sub">代理账号登录</p>
-<input id="loginEmail" placeholder="代理邮箱"><input id="loginPass" type="password" placeholder="密码">
-<div class="err" id="loginErr"></div><button onclick="doLogin()">登 录</button></div></div>
-
-<div id="mainApp" style="display:none;width:100%">
-<header><h1>代理后台</h1><div><span id="agentInfo" style="font-size:12px;opacity:.8;margin-right:12px"></span><button class="logout" onclick="logout()">退出</button></div></header>
-<nav id="nav"></nav><main id="content"></main></div>
+<body class="lb">
+<div id="lp"><div class="lbox"><h1>代理后台</h1><p class="sub">代理账号登录</p>
+<input id="le" placeholder="代理邮箱"><input id="lpw" type="password" placeholder="密码">
+<div class="err" id="lerr"></div><button onclick="doLogin()">登 录</button></div></div>
+<div id="ma" style="display:none;width:100%">
+<header><h1>代理后台</h1><div><span id="ai" style="font-size:12px;opacity:.8;margin-right:12px"></span><button class="lo" onclick="logout()">退出</button></div></header>
+<nav id="nav"></nav><main id="ct"></main></div>
 <div class="toast" id="toast"></div>
-
 <script>
-var API='/api',token='',currentTab='team',uId=null;
-function doLogin(){var e=document.getElementById('loginEmail').value.trim(),p=document.getElementById('loginPass').value;
-if(!e||!p){document.getElementById('loginErr').textContent='请输入邮箱和密码';return}
-document.getElementById('loginErr').textContent='登录中...';
-fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})})
-.then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
-.then(function(x){if(!x.ok){document.getElementById('loginErr').textContent=x.data.error||'登录失败';return}
-if(!x.data.user||!x.data.user.is_agent){document.getElementById('loginErr').textContent='需要代理账号,请先联系管理员添加';return}
-token=x.data.access_token;uId=x.data.user.id;localStorage.setItem('agent_token',token);
-document.getElementById('agentInfo').textContent=x.data.user.email;
-document.getElementById('loginPage').style.display='none';document.getElementById('mainApp').style.display='block';
-document.body.classList.remove('login-body');initApp()}).catch(function(e){document.getElementById('loginErr').textContent='登录失败: '+e.message})}
+var API='/api',token='',ctab='team',uid=null,memData=null;
+function doLogin(){
+  var e=document.getElementById('le').value.trim(),p=document.getElementById('lpw').value;
+  if(!e||!p){document.getElementById('lerr').textContent='请输入邮箱和密码';return}
+  document.getElementById('lerr').textContent='登录中...';
+  fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})})
+  .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
+  .then(function(x){
+    if(!x.ok){document.getElementById('lerr').textContent=x.data.error||'登录失败';return}
+    if(!x.data.user||!x.data.user.is_agent){document.getElementById('lerr').textContent='需要代理账号';return}
+    token=x.data.access_token;uid=x.data.user.id;localStorage.setItem('agent_token',token);
+    document.getElementById('ai').textContent=x.data.user.email;
+    document.getElementById('lp').style.display='none';document.getElementById('ma').style.display='block';
+    document.body.classList.remove('lb');initApp()
+  }).catch(function(e){document.getElementById('lerr').textContent='登录失败: '+e.message})
+}
 function logout(){localStorage.removeItem('agent_token');location.reload()}
-function apiCall(method,path,body){return fetch(API+path,{method:method,headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:body?JSON.stringify(body):undefined}).then(function(r){return r.json().then(function(d){if(!r.ok)throw new Error(d.error||'请求失败');return d})})}
-function toast(msg,err){var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' error':'');t.style.display='block';setTimeout(function(){t.style.display='none'},3000)}
-function initApp(){var saved=localStorage.getItem('agent_token');if(saved){token=saved;apiCall('GET','/auth/me').then(function(u){uId=u.id;document.getElementById('agentInfo').textContent=u.email;document.getElementById('loginPage').style.display='none';document.getElementById('mainApp').style.display='block';document.body.classList.remove('login-body');if(!u.is_agent){logout();return};renderNav();switchTab('team')}).catch(function(){logout()});return}renderNav();switchTab('team')}
-function renderNav(){var tabs=[['team','我的团队'],['orders','团队订单'],['ops','上下分记录']];document.getElementById('nav').innerHTML=tabs.map(function(x){return'<button class="'+(x[0]===currentTab?'active':'')+'" onclick="switchTab(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')}
-function switchTab(tab){currentTab=tab;renderNav();var c=document.getElementById('content');if(tab==='team')loadTeam(c);else if(tab==='orders')loadTeamOrders(c);else if(tab==='ops')loadOps(c)}
+function api(m,p,d){return fetch(API+p,{method:m,headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:d?JSON.stringify(d):undefined}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||'failed');return j})})}
+function toast(msg,err){var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' er':'');t.style.display='block';setTimeout(function(){t.style.display='none'},3000)}
+function initApp(){
+  var saved=localStorage.getItem('agent_token');
+  if(!saved){renderNav();switchTab('team');return}
+  token=saved;
+  api('GET','/auth/me').then(function(u){
+    uid=u.id;document.getElementById('ai').textContent=u.email;
+    document.getElementById('lp').style.display='none';document.getElementById('ma').style.display='block';
+    document.body.classList.remove('lb');
+    if(!u.is_agent){logout();return}
+    renderNav();switchTab('team')
+  }).catch(function(){logout()})
+}
+function renderNav(){
+  var tabs=[['team','我的团队'],['orders','团队订单'],['ops','上下分记录']];
+  document.getElementById('nav').innerHTML=tabs.map(function(x){return'<button class="'+(x[0]===ctab?'ac':'')+'" onclick="switchTab(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')
+}
+function switchTab(tab){ctab=tab;renderNav();var c=document.getElementById('ct');if(tab==='team')loadTeam(c);else if(tab==='orders')loadOrders(c);else if(tab==='ops')loadOps(c)}
 
-function loadTeam(c){c.innerHTML='<div class="empty">加载中...</div>';
-  apiCall('GET','/referral/stats').then(function(s){
-  apiCall('GET','/users/me/invitees?limit=500').then(function(d){var invitees=d.invitees||[];
-  c.innerHTML='<div class="stats-grid"><div class="stat-card"><div class="label">团队总人数</div><div class="value">'+s.total_invites+'</div></div><div class="stat-card"><div class="label">直接邀请</div><div class="value">'+s.direct_count+'</div></div><div class="stat-card"><div class="label">有效邀请</div><div class="value blue">'+s.effective_invites+'</div></div></div>'+
-  '<div class="card"><div class="card-header">团队成员 ('+invitees.length+')</div><div class="card-body"><table><thead><tr><th>用户</th><th>邮箱</th><th>等级</th><th>加入时间</th><th>操作</th></tr></thead><tbody>'+
-  (invitees.length===0?'<tr><td colspan="5" class="empty">暂无团队成员</td></tr>':invitees.map(function(u){return'<tr><td><b>'+(u.name||u.email||'-')+'</b></td><td>'+u.email+'</td><td>Lv.'+u.level+'</td><td style="font-size:10px">'+new Date(u.invited_at).toLocaleString()+'</td><td><button class="btn btn-sm btn-blue" onclick="showMember('+u.id+')">详情</button> <button class="btn btn-sm btn-green" onclick="showAdjust('+u.id+',\''+(u.name||u.email||'').replace(/'/g,"")+'\')">上下分</button></td></tr>'}).join(""))+'</tbody></table></div></div>'})}).catch(function(e){c.innerHTML='<div class="empty">'+e.message+'</div>'})}
+function loadTeam(c){
+  c.innerHTML='<div class="em">加载中...</div>';
+  api('GET','/referral/stats').then(function(s){
+    api('GET','/users/me/invitees?limit=500').then(function(d){
+      var inv=d.invitees||[];
+      c.innerHTML=
+        '<div class="sg"><div class="sc"><div class="lb">团队总人数</div><div class="vl">'+s.total_invites+'</div></div><div class="sc"><div class="lb">直接邀请</div><div class="vl">'+s.direct_count+'</div></div><div class="sc"><div class="lb">有效邀请</div><div class="vl" style="color:var(--b)">'+s.effective_invites+'</div></div></div>'+
+        '<div class="cd"><div class="ch">团队成员 ('+inv.length+')</div><div class="cb"><table><thead><tr><th>用户</th><th>邮箱</th><th>等级</th><th>加入时间</th><th>操作</th></tr></thead><tbody>'+
+        (inv.length===0?'<tr><td colspan="5" class="em">暂无团队成员</td></tr>':inv.map(function(u){return'<tr><td><b>'+(u.name||u.email||'-')+'</b></td><td>'+u.email+'</td><td>Lv.'+u.level+'</td><td style="font-size:10px">'+new Date(u.invited_at).toLocaleString()+'</td><td><button class="btn btnsm" style="background:var(--b);color:#fff" onclick="showMember('+u.id+')">详情</button> <button class="btn btnsm" style="background:var(--s);color:#fff" onclick="showAdjust('+u.id+','+JSON.stringify(u.name||u.email||'User')+')">上下分</button></td></tr>'}).join(''))+
+        '</tbody></table></div></div>'
+    }).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})
+  }).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})
+}
 
-function showMember(id){var c=document.getElementById('content');c.innerHTML='<div class="empty">加载中...</div>';
-  apiCall('GET','/admin/agent-member/'+id).then(function(d){var m=d.member;
-  c.innerHTML='<button class="btn btn-gray" style="margin-bottom:12px" onclick="switchTab(\'team\')">← 返回团队</button>'+
-  '<div class="card"><div class="card-header">'+(m.name||m.email)+' #'+m.id+'</div><div class="card-body">'+
-  '<div class="tabs"><button class="active" onclick="showMemberTab(\'info\','+id+')">信息</button><button onclick="showMemberTab(\'finance\','+id+')">财务</button><button onclick="showMemberTab(\'orders\','+id+')">订单</button></div><div id="memberTab"></div></div></div>';
-  showMemberTab('info',id);window._memberData=d})</div>').catch(function(e){c.innerHTML='<div class="empty">'+e.message+'</div>'})}
-function showMemberTab(tab,id){var d=window._memberData,dc=document.getElementById('memberTab');
-  if(tab==='info'){var m=d.member;dc.innerHTML='<div class="kv"><div class="k">邮箱</div><div class="v">'+m.email+'</div><div class="k">手机</div><div class="v">'+(m.phone||'-')+'</div><div class="k">邀请码</div><div class="v">'+m.referral_code+'</div><div class="k">注册时间</div><div class="v">'+new Date(m.created_at).toLocaleString()+'</div></div>';var btns=document.querySelectorAll('.card-body .tabs button');for(var i=0;i<btns.length;i++)btns[i].classList.remove('active');btns[0].classList.add('active')}
-  else if(tab==='finance'){var e=d.earnings||[],dep=d.deposits||[],wd=d.withdrawals||[];
-    dc.innerHTML='<p style="font-weight:700;margin-bottom:8px">收入流水 ('+e.length+')</p><table><tr><th>金额</th><th>类型</th><th>时间</th></tr>'+e.slice(0,20).map(function(x){return'<tr><td style="color:var(--success);font-weight:600">+$'+Number(x.amount).toFixed(2)+'</td><td>'+x.type+'</td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>'+
-    '<p style="font-weight:700;margin:16px 0 8px">充值记录 ('+dep.length+')</p><table><tr><th>金额</th><th>网络</th><th>状态</th><th>时间</th></tr>'+dep.map(function(x){return'<tr><td>$'+Number(x.amount).toFixed(2)+'</td><td>'+x.network+'</td><td><span class="badge '+(x.status==='confirmed'?'badge-green':'badge-yellow')+'">'+x.status+'</span></td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>'+
-    '<p style="font-weight:700;margin:16px 0 8px">提现记录 ('+wd.length+')</p><table><tr><th>金额</th><th>状态</th><th>时间</th></tr>'+wd.map(function(x){return'<tr><td>$'+Number(x.amount).toFixed(2)+'</td><td><span class="badge '+(x.status==='completed'?'badge-green':'badge-yellow')+'">'+x.status+'</span></td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>';var btns=document.querySelectorAll('.card-body .tabs button');for(var i=0;i<btns.length;i++)btns[i].classList.remove('active');btns[1].classList.add('active')}
-  else if(tab==='orders'){var o=d.orders||[];dc.innerHTML='<table><tr><th>产品</th><th>金额</th><th>状态</th><th>时间</th></tr>'+o.map(function(x){return'<tr><td>'+(x.product_name||'-')+'</td><td>$'+Number(x.amount||0).toFixed(2)+'</td><td><span class="badge '+(x.status==='done'?'badge-green':'badge-yellow')+'">'+x.status+'</span></td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>';var btns=document.querySelectorAll('.card-body .tabs button');for(var i=0;i<btns.length;i++)btns[i].classList.remove('active');btns[2].classList.add('active')}}
+function showMember(id){
+  var c=document.getElementById('ct');
+  c.innerHTML='<div class="em">加载中...</div>';
+  api('GET','/admin/agent-member/'+id).then(function(d){
+    memData=d;var m=d.member;
+    c.innerHTML='<button class="btn" style="background:#f0f0f0;color:var(--t);margin-bottom:12px" onclick="switchTab(\'team\')">← 返回团队</button>'+
+    '<div class="cd"><div class="ch">'+(m.name||m.email)+' #'+m.id+'</div><div class="cb">'+
+    '<div class="tabs"><button class="ac" onclick="memTab(\'info\')">信息</button><button onclick="memTab(\'finance\')">财务</button><button onclick="memTab(\'orders\')">订单</button></div><div id="mtab"></div></div></div>';
+    memTab('info')
+  }).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})
+}
+function memTab(tab){
+  var d=memData,dc=document.getElementById('mtab'),m=d.member;
+  var btns=document.querySelectorAll('.tabs button');for(var i=0;i<btns.length;i++)btns[i].classList.remove('ac');
+  if(tab==='info'){
+    btns[0].classList.add('ac');
+    dc.innerHTML='<div class="kv"><div class="k">邮箱</div><div class="v">'+m.email+'</div><div class="k">手机</div><div class="v">'+(m.phone||'-')+'</div><div class="k">邀请码</div><div class="v">'+m.referral_code+'</div><div class="k">注册</div><div class="v">'+new Date(m.created_at).toLocaleString()+'</div></div>'
+  }else if(tab==='finance'){
+    btns[1].classList.add('ac');var e=d.earnings||[],dep=d.deposits||[],wd=d.withdrawals||[],h='';
+    h+='<p style="font-weight:700;margin-bottom:8px">收入流水 ('+e.length+')</p><table><tr><th>金额</th><th>类型</th><th>时间</th></tr>'+e.slice(0,20).map(function(x){return'<tr><td style="color:var(--s);font-weight:600">+$'+Number(x.amount).toFixed(2)+'</td><td>'+x.type+'</td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>';
+    h+='<p style="font-weight:700;margin:16px 0 8px">充值记录 ('+dep.length+')</p><table><tr><th>金额</th><th>网络</th><th>状态</th><th>时间</th></tr>'+dep.map(function(x){return'<tr><td>$'+Number(x.amount).toFixed(2)+'</td><td>'+x.network+'</td><td><span class="bg '+(x.status==='confirmed'?'bgn':'bgy')+'">'+x.status+'</span></td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>';
+    h+='<p style="font-weight:700;margin:16px 0 8px">提现记录 ('+wd.length+')</p><table><tr><th>金额</th><th>状态</th><th>时间</th></tr>'+wd.map(function(x){return'<tr><td>$'+Number(x.amount).toFixed(2)+'</td><td><span class="bg '+(x.status==='completed'?'bgn':'bgy')+'">'+x.status+'</span></td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>';
+    dc.innerHTML=h
+  }else if(tab==='orders'){
+    btns[2].classList.add('ac');var o=d.orders||[];
+    dc.innerHTML='<table><tr><th>产品</th><th>金额</th><th>状态</th><th>时间</th></tr>'+o.map(function(x){return'<tr><td>'+(x.product_name||'-')+'</td><td>$'+Number(x.amount||0).toFixed(2)+'</td><td><span class="bg '+(x.status==='done'?'bgn':'bgy')+'">'+x.status+'</span></td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>'
+  }
+}
 
-function showAdjust(uid,name){var d=document.createElement("div");d.className="modal-overlay";d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px';
-d.innerHTML='<div class="modal" style="background:var(--white);border-radius:16px;width:100%;max-width:380px;padding:24px" onclick="event.stopPropagation()"><h2 style="margin-bottom:12px">'+name+'</h2>'+
-'<div style="margin-bottom:10px"><label style="font-size:12px;color:var(--muted)">金额 ($) — 正数上分 / 负数下分</label><input id="adjAmt" type="number" step="0.01" placeholder="例如: 10 或 -5"></div>'+
-'<div style="margin-bottom:10px"><label style="font-size:12px;color:var(--muted)">备注</label><input id="adjNote" placeholder="备注"></div>'+
-'<div style="display:flex;gap:8px"><button class="btn btn-blue" onclick="doAdjust('+uid+')">确认</button><button class="btn btn-gray" onclick="this.closest(\'.modal-overlay\').remove()">取消</button></div></div>';
-d.addEventListener("click",function(e){if(e.target===d)d.remove()});document.body.appendChild(d)}
-function doAdjust(uid){var amt=parseFloat(document.getElementById("adjAmt").value),note=document.getElementById("adjNote").value;
-if(!amt||isNaN(amt)){toast("请输入有效金额",1);return}
-apiCall('POST','/admin/agent-balance',{target_user_id:uid,amount:amt,note:note||''}).then(function(d){toast(amt>0?'上分 $'+amt+' 成功':'下分 $'+Math.abs(amt)+' 成功');document.querySelector('.modal-overlay').remove();switchTab('team')}).catch(function(e){toast(e.message,1)})}
+function showAdjust(id,name){
+  var d=document.createElement('div');d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px';
+  d.innerHTML='<div style="background:#fff;border-radius:16px;width:100%;max-width:380px;padding:24px" onclick="event.stopPropagation()"><h2 style="margin-bottom:12px">'+name+'</h2><div style="margin-bottom:10px"><label style="font-size:12px;color:var(--m)">金额 ($) — 正数上分 / 负数下分</label><input id="adjAmt" type="number" step="0.01" placeholder="例如: 10 或 -5"></div><div style="margin-bottom:10px"><label style="font-size:12px;color:var(--m)">备注</label><input id="adjNote" placeholder="备注"></div><div style="display:flex;gap:8px"><button class="btn" style="background:var(--b);color:#fff" onclick="doAdjust('+id+')">确认</button><button class="btn" style="background:#f0f0f0;color:var(--t)" onclick="this.closest(\'div[style*=fixed]\').remove()">取消</button></div></div>';
+  d.addEventListener('click',function(e){if(e.target===d)d.remove()});document.body.appendChild(d)
+}
+function doAdjust(id){
+  var amt=parseFloat(document.getElementById('adjAmt').value),note=document.getElementById('adjNote').value;
+  if(!amt||isNaN(amt)){toast('请输入有效金额',1);return}
+  api('POST','/admin/agent-balance',{target_user_id:id,amount:amt,note:note||''}).then(function(d){
+    toast(amt>0?'上分 $'+amt+' 成功':'下分 $'+Math.abs(amt)+' 成功');
+    document.querySelector('div[style*=fixed]').remove();switchTab('team')
+  }).catch(function(e){toast(e.message,1)})
+}
 
-function loadTeamOrders(c){c.innerHTML='<div class="empty">加载中...</div>';
-  apiCall('GET','/admin/agent-orders').then(function(d){var orders=d.orders||[];
-  c.innerHTML='<div class="card"><div class="card-header">团队订单 ('+orders.length+')</div><div class="card-body"><table><thead><tr><th>用户</th><th>产品</th><th>金额</th><th>状态</th><th>时间</th></tr></thead><tbody>'+
-  (orders.length===0?'<tr><td colspan="5" class="empty">暂无订单</td></tr>':orders.map(function(o){return'<tr><td>'+o.user_name+'</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(o.product_name||'-')+'</td><td>$'+Number(o.amount||0).toFixed(2)+'</td><td><span class="badge '+(o.status==='done'?'badge-green':'badge-yellow')+'">'+(o.status==='done'?'已完成':'持仓中')+'</span></td><td style="font-size:10px">'+new Date(o.created_at).toLocaleString()+'</td></tr>'}).join(""))+'</tbody></table></div></div>'}).catch(function(e){c.innerHTML='<div class="empty">'+e.message+'</div>'})}
+function loadOrders(c){
+  c.innerHTML='<div class="em">加载中...</div>';
+  api('GET','/admin/agent-orders').then(function(d){
+    var orders=d.orders||[];
+    c.innerHTML='<div class="cd"><div class="ch">团队订单 ('+orders.length+')</div><div class="cb"><table><thead><tr><th>用户</th><th>产品</th><th>金额</th><th>状态</th><th>时间</th></tr></thead><tbody>'+
+    (orders.length===0?'<tr><td colspan="5" class="em">暂无订单</td></tr>':orders.map(function(o){return'<tr><td>'+o.user_name+'</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(o.product_name||'-')+'</td><td>$'+Number(o.amount||0).toFixed(2)+'</td><td><span class="bg '+(o.status==='done'?'bgn':'bgy')+'">'+(o.status==='done'?'已完成':'持仓中')+'</span></td><td style="font-size:10px">'+new Date(o.created_at).toLocaleString()+'</td></tr>'}).join(''))+
+    '</tbody></table></div></div>'
+  }).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})
+}
 
-function loadOps(c){c.innerHTML='<div class="card"><div class="card-header">上下分记录</div><div class="card-body"><div class="empty">加载中...</div></div></div>';
-  apiCall('GET','/admin/agent-ops').then(function(rows){
-  rows=(rows||[]).filter(function(o){return o.agent_id===uId});
-  c.innerHTML='<div class="card"><div class="card-header">上下分记录 ('+rows.length+')</div><div class="card-body"><table><thead><tr><th>时间</th><th>目标用户</th><th>金额</th><th>备注</th></tr></thead><tbody>'+
-  (rows.length===0?'<tr><td colspan="4" class="empty">暂无记录</td></tr>':rows.map(function(o){return'<tr><td style="font-size:10px">'+new Date(o.created_at).toLocaleString()+'</td><td>#'+(o.target_user_id||'-')+'</td><td style="font-weight:700;color:'+(Number(o.amount)>=0?'var(--success)':'var(--danger)')+'">'+(Number(o.amount)>=0?'+':'')+'$'+Math.abs(Number(o.amount)).toFixed(2)+'</td><td style="font-size:10px">'+(o.detail||'')+'</td></tr>'}).join(""))+'</tbody></table></div></div>'}).catch(function(e){c.innerHTML='<div class="card"><div class="card-header">上下分记录</div><div class="card-body"><div class="empty">'+e.message+'</div></div></div>'})}
+function loadOps(c){
+  c.innerHTML='<div class="cd"><div class="ch">上下分记录</div><div class="cb"><div class="em">加载中...</div></div></div>';
+  api('GET','/admin/agent-ops').then(function(rows){
+    rows=(rows||[]).filter(function(o){return o.agent_id===uid});
+    c.innerHTML='<div class="cd"><div class="ch">上下分记录 ('+rows.length+')</div><div class="cb"><table><thead><tr><th>时间</th><th>目标用户</th><th>金额</th><th>备注</th></tr></thead><tbody>'+
+    (rows.length===0?'<tr><td colspan="4" class="em">暂无记录</td></tr>':rows.map(function(o){return'<tr><td style="font-size:10px">'+new Date(o.created_at).toLocaleString()+'</td><td>#'+(o.target_user_id||'-')+'</td><td style="font-weight:700;color:'+(Number(o.amount)>=0?'var(--s)':'var(--d)')+'">'+(Number(o.amount)>=0?'+':'')+'$'+Math.abs(Number(o.amount)).toFixed(2)+'</td><td style="font-size:10px">'+(o.detail||'')+'</td></tr>'}).join(''))+
+    '</tbody></table></div></div>'
+  }).catch(function(e){c.innerHTML='<div class="cd"><div class="ch">上下分记录</div><div class="cb"><div class="em">'+e.message+'</div></div></div>'})
+}
+initApp();
 </script></body></html>
