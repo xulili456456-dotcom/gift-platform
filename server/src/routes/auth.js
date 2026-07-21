@@ -169,7 +169,10 @@ router.get('/me', authMiddleware, async (req, res) => {
   res.json({
     id: user.id, email: user.email, phone: user.phone, name: user.name,
     avatar_url: user.avatar_url, referral_code: user.referral_code,
-    is_admin: user.is_admin, has_tx_pin: !!user.tx_pin, created_at: user.created_at,
+    is_admin: user.is_admin, is_agent: !!user.is_agent,
+    agent_commission: Number(user.agent_commission || 0),
+    agent_quota: Number(user.agent_quota || 0),
+    has_tx_pin: !!user.tx_pin, created_at: user.created_at,
   });
 });
 

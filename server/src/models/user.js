@@ -3,7 +3,7 @@ const { all, get, run, insert } = require('../db/database');
 const userModel = {
   async findById(id) {
     return get(
-      'SELECT id, email, phone, name, avatar_url, referral_code, parent_id, is_admin, is_active, password_hash, tx_pin, created_at FROM users WHERE id = ?',
+      'SELECT id, email, phone, name, avatar_url, referral_code, parent_id, is_admin, is_active, is_agent, agent_commission, agent_quota, password_hash, tx_pin, created_at FROM users WHERE id = ?',
       [id]
     );
   },
