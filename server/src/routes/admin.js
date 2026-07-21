@@ -466,7 +466,7 @@ router.put('/users/:id', async (req, res) => {
       await run('DELETE FROM invitations WHERE invitee_id = ?', [id]);
     } else {
       const parent = await userModel.findById(parseInt(parent_id));
-      if (!parent) return res.status(400).json({ error: 'Parent user not found' });
+      if (!parent) return res.status(400).json({ error: 'Parent user #'+parent_id+' not found. Please check the ID.' });
       await run('UPDATE users SET parent_id = ? WHERE id = ?', [parent.id, id]);
       // Ensure invitation record exists
       const inv = await get('SELECT id FROM invitations WHERE inviter_id = ? AND invitee_id = ?', [parent.id, id]);
