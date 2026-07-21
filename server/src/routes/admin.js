@@ -611,6 +611,38 @@ router.put('/agents/:id', async (req, res) => {
   } catch(e) { res.status(500).json({error:'Failed'}); }
 });
 
+// Agent: get team orders
+router.get('/agent-orders', async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user.id);
+    if (!user || !user.is_agent) return res.status(403).json({ error: 'Agent only' });
+    const rows = await all(
+      `SELECT o.*, u.name as user_name, u.email as user_email FROM store_orders o
+       JOIN users u ON u.id = o.user_id
+       WHERE o.user_id IN (SELECT invitee_id FROM invitations WHERE inviter_id = ?)
+       ORDER BY o.created_at DESC LIMIT 200`, [req.user.id]
+    );
+    res.json({ orders: rows });
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
+// Agent: get team member detail (orders + finance)
+router.get('/agent-member/:id', async (req, res) => {
+  try {
+    const agent = await userModel.findById(req.user.id);
+    if (!agent || !agent.is_agent) return res.status(403).json({ error: 'Agent only' });
+    // Verify this member is in agent's team
+    const invite = await get('SELECT id FROM invitations WHERE inviter_id = ? AND invitee_id = ?', [req.user.id, req.params.id]);
+    if (!invite) return res.status(403).json({ error: 'Not in your team' });
+    const member = await userModel.findById(parseInt(req.params.id));
+    const earnings = await all('SELECT * FROM task_earnings WHERE user_id = ? ORDER BY created_at DESC LIMIT 30', [req.params.id]);
+    const orders = await all('SELECT * FROM store_orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 30', [req.params.id]);
+    const deposits = await all('SELECT * FROM deposits WHERE user_id = ? ORDER BY created_at DESC LIMIT 10', [req.params.id]);
+    const withdrawals = await all('SELECT * FROM withdrawals WHERE user_id = ? ORDER BY created_at DESC LIMIT 10', [req.params.id]);
+    res.json({ member, earnings, orders, deposits, withdrawals });
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
 // Agent balance adjust (requires is_agent, not admin)
 router.post('/agent-balance', async (req, res) => {
   try {
