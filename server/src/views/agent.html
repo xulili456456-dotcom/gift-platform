@@ -69,10 +69,10 @@ function initApp(){var saved=localStorage.getItem('agent_token');if(!saved){rend
 token=saved;api('GET','/auth/me').then(function(u){uid=u.id;document.getElementById('ai').textContent=u.email;
 document.getElementById('lp').style.display='none';document.getElementById('ma').style.display='block';document.body.classList.remove('lb');
 if(!u.is_agent){logout();return};renderNav();switchTab('dashboard')}).catch(function(){logout()})}
-function renderNav(){var tabs=[['dashboard','仪表盘'],['users','用户管理'],['orders','团队订单'],['ops','上下分记录']];
+function renderNav(){var tabs=[['dashboard','仪表盘'],['users','用户管理'],['orders','团队订单'],['kyc','实名认证'],['withdrawals','提现记录'],['ops','上下分记录']];
 document.getElementById('nav').innerHTML=tabs.map(function(x){return'<button class="'+(x[0]===ctab?'ac':'')+'" onclick="switchTab(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')}
 function switchTab(tab){ctab=tab;renderNav();var c=document.getElementById('ct');
-if(tab==='dashboard')loadDash(c);else if(tab==='users')loadUsers(c);else if(tab==='orders')loadOrders(c);else if(tab==='ops')loadOps(c)}
+if(tab==='dashboard')loadDash(c);else if(tab==='users')loadUsers(c);else if(tab==='orders')loadOrders(c);else if(tab==='kyc')loadKyc(c);else if(tab==='withdrawals')loadWd(c);else if(tab==='ops')loadOps(c)}
 
 // ===== DASHBOARD =====
 function loadDash(c){c.innerHTML='<div class="em">加载中...</div>';
@@ -129,6 +129,20 @@ api('GET','/agent/orders').then(function(d){var orders=d.orders||[];
 c.innerHTML='<div class="cd"><div class="ch">团队订单 ('+orders.length+')</div><div class="cb"><table><thead><tr><th>用户</th><th>产品</th><th>金额</th><th>状态</th><th>时间</th></tr></thead><tbody>'+
 (orders.length===0?'<tr><td colspan="5" class="em">暂无订单</td></tr>':orders.map(function(o){return'<tr><td>'+o.user_name+'</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(o.product_name||'-')+'</td><td>$'+Number(o.amount||0).toFixed(2)+'</td><td><span class="bg '+(o.status==='done'?'bgn':'bgy')+'">'+(o.status==='done'?'已完成':'持仓中')+'</span></td><td style="font-size:10px">'+new Date(o.created_at).toLocaleString()+'</td></tr>'}).join(''))+
 '</tbody></table></div></div>'}).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})}
+
+// ===== KYC =====
+function loadKyc(c){c.innerHTML='<div class="em">加载中...</div>';
+api('GET','/agent/kyc').then(function(rows){rows=rows||[];
+c.innerHTML='<div class="cd"><div class="ch">实名认证 ('+rows.length+')</div><div class="cb"><table><thead><tr><th>用户</th><th>姓名</th><th>证件号</th><th>照片</th><th>状态</th><th>时间</th></tr></thead><tbody>'+
+(rows.length===0?'<tr><td colspan="6" class="em">暂无</td></tr>':rows.map(function(k){return'<tr><td>'+k.user_name+'</td><td>'+k.real_name+'</td><td style="font-size:11px">'+k.id_number+'</td><td style="display:flex;gap:8px">'+(k.front_image?'<img src="'+k.front_image+'" onclick="viewImg(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;cursor:pointer">':'无')+(k.back_image?'<img src="'+k.back_image+'" onclick="viewImg(this)" style="width:60px;height:40px;object-fit:cover;border-radius:4px;cursor:pointer">':'')+'</td><td><span class="bg '+(k.status==='approved'?'bgn':k.status==='pending'?'bgy':'bgr')+'">'+(k.status==='approved'?'已通过':k.status==='pending'?'待审核':'已拒绝')+'</span></td><td style="font-size:10px">'+new Date(k.submitted_at).toLocaleString()+'</td></tr>'}).join(''))+
+'</tbody></table></div></div>'}).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})}
+// ===== WITHDRAWALS =====
+function loadWd(c){c.innerHTML='<div class="em">加载中...</div>';
+api('GET','/agent/withdrawals').then(function(rows){rows=rows||[];
+c.innerHTML='<div class="cd"><div class="ch">提现记录 ('+rows.length+')</div><div class="cb"><table><thead><tr><th>用户</th><th>金额</th><th>网络</th><th>地址</th><th>状态</th><th>时间</th></tr></thead><tbody>'+
+(rows.length===0?'<tr><td colspan="6" class="em">暂无</td></tr>':rows.map(function(w){var big=Number(w.amount)>=500;return'<tr'+(big?' style="background:#fff0f0"':'')+'><td>'+w.user_name+'</td><td style="font-weight:700;color:'+(big?'var(--d)':'inherit')+'">$'+Number(w.amount).toFixed(2)+(big?' ⚠️':'')+'</td><td>'+w.network+'</td><td style="font-size:10px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(w.wallet_address||'-')+'</td><td><span class="bg '+(w.status==='completed'?'bgn':w.status==='pending'?'bgy':'bgr')+'">'+(w.status==='completed'?'已完成':w.status==='pending'?'待审批':'已拒绝')+'</span></td><td style="font-size:10px">'+new Date(w.created_at).toLocaleString()+'</td></tr>'}).join(''))+
+'</tbody></table></div></div>'}).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})}
+function viewImg(el){var s=el.getAttribute('src');var d=document.createElement('div');d.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:99999;display:flex;align-items:center;justify-content:center;cursor:pointer';d.onclick=function(){d.remove()};var i=document.createElement('img');i.src=s;i.style.cssText='max-width:95vw;max-height:95vh;object-fit:contain;pointer-events:none';d.appendChild(i);document.body.appendChild(d)}
 
 // ===== OPS =====
 function loadOps(c){c.innerHTML='<div class="cd"><div class="ch">上下分记录</div><div class="cb"><div class="em">加载中...</div></div></div>';

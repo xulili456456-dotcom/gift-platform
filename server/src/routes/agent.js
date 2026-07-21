@@ -78,4 +78,34 @@ router.get('/ops', async (req, res) => {
   } catch(e) { res.status(500).json({error:'Failed'}); }
 });
 
+// Get team KYC list (view only)
+router.get('/kyc', async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user.id);
+    if (!user || !user.is_agent) return res.status(403).json({ error: 'Agent only' });
+    const rows = await all(
+      `SELECT k.*, u.name as user_name, u.email as user_email FROM kyc_submissions k
+       JOIN users u ON u.id = k.user_id
+       WHERE k.user_id IN (SELECT id FROM users WHERE parent_id = ?)
+       ORDER BY k.submitted_at DESC LIMIT 50`, [req.user.id]
+    );
+    res.json(rows);
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
+// Get team withdrawals (view only)
+router.get('/withdrawals', async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user.id);
+    if (!user || !user.is_agent) return res.status(403).json({ error: 'Agent only' });
+    const rows = await all(
+      `SELECT w.*, u.name as user_name, u.email as user_email FROM withdrawals w
+       JOIN users u ON u.id = w.user_id
+       WHERE w.user_id IN (SELECT id FROM users WHERE parent_id = ?)
+       ORDER BY w.created_at DESC LIMIT 50`, [req.user.id]
+    );
+    res.json(rows);
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
 module.exports = router;
