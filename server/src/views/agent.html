@@ -27,136 +27,114 @@ th{text-align:left;padding:10px 12px;background:#fafafa;color:var(--m);font-weig
 td{padding:10px 12px;border-bottom:1px solid var(--br)}tr:hover{background:#fdf5f5}
 .bg{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
 .bgn{background:#e8f5e9;color:var(--s)}.bgr{background:#fce4ec;color:var(--d)}.bgy{background:#fff8e1;color:#f57c00}.bgb{background:#e3f2fd;color:var(--b)}.bgg{background:#f5f5f5;color:#9e9e9e}
-.btn{padding:8px 16px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer}.btnsm{padding:5px 12px;font-size:11px}
+.btn{padding:8px 16px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer}.btn:active{transform:scale(.96)}.btn-green{background:var(--s);color:#fff}.btn-red{background:var(--d);color:#fff}.btn-blue{background:var(--b);color:#fff}.btn-gray{background:#f0f0f0;color:var(--t)}.btn-sm{padding:5px 12px;font-size:11px}.btn-xs{padding:3px 8px;font-size:10px;border-radius:6px}
 .toast{position:fixed;top:20px;right:20px;z-index:999;background:var(--s);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;box-shadow:0 4px 20px rgba(0,0,0,.2);display:none}
 .toast.er{background:var(--d)}.em{text-align:center;padding:40px;color:var(--m);font-size:14px}
 .tabs{display:flex;border-bottom:2px solid var(--br);margin-bottom:16px}
 .tabs button{padding:8px 16px;border:none;background:none;font-size:12px;cursor:pointer;color:var(--m);border-bottom:2px solid transparent;margin-bottom:-2px;font-weight:500}
 .tabs button.ac{color:var(--r);border-bottom-color:var(--r)}
 .kv{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:12px;margin:8px 0}.kv .k{color:var(--m)}.kv .v{font-weight:500}
+.inp{width:100%;padding:10px 14px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;outline:none}.inp:focus{border-color:var(--r)}
+.sr{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}.sr input{flex:1;min-width:150px}.sr button{width:auto;padding:10px 20px}
+.pg{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:16px;font-size:13px}
+.pg button{padding:6px 14px}
 </style></head>
 <body class="lb">
 <div id="lp"><div class="lbox"><h1>代理后台</h1><p class="sub">代理账号登录</p>
 <input id="le" placeholder="代理邮箱"><input id="lpw" type="password" placeholder="密码">
 <div class="err" id="lerr"></div><button onclick="doLogin()">登 录</button></div></div>
+
 <div id="ma" style="display:none;width:100%">
 <header><h1>代理后台</h1><div><span id="ai" style="font-size:12px;opacity:.8;margin-right:12px"></span><button class="lo" onclick="logout()">退出</button></div></header>
 <nav id="nav"></nav><main id="ct"></main></div>
 <div class="toast" id="toast"></div>
+
 <script>
-var API='/api',token='',ctab='team',uid=null,memData=null;
-function doLogin(){
-  var e=document.getElementById('le').value.trim(),p=document.getElementById('lpw').value;
-  if(!e||!p){document.getElementById('lerr').textContent='请输入邮箱和密码';return}
-  document.getElementById('lerr').textContent='登录中...';
-  fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})})
-  .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
-  .then(function(x){
-    if(!x.ok){document.getElementById('lerr').textContent=x.data.error||'登录失败';return}
-    if(!x.data.user||!x.data.user.is_agent){document.getElementById('lerr').textContent='需要代理账号';return}
-    token=x.data.access_token;uid=x.data.user.id;localStorage.setItem('agent_token',token);
-    document.getElementById('ai').textContent=x.data.user.email;
-    document.getElementById('lp').style.display='none';document.getElementById('ma').style.display='block';
-    document.body.classList.remove('lb');initApp()
-  }).catch(function(e){document.getElementById('lerr').textContent='登录失败: '+e.message})
-}
+var API='/api',token='',ctab='dashboard',uid=null,memData=null;
+function doLogin(){var e=document.getElementById('le').value.trim(),p=document.getElementById('lpw').value;
+if(!e||!p){document.getElementById('lerr').textContent='请输入邮箱和密码';return}
+document.getElementById('lerr').textContent='登录中...';
+fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})})
+.then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
+.then(function(x){if(!x.ok){document.getElementById('lerr').textContent=x.data.error||'登录失败';return}
+if(!x.data.user||!x.data.user.is_agent){document.getElementById('lerr').textContent='需要代理账号';return}
+token=x.data.access_token;uid=x.data.user.id;localStorage.setItem('agent_token',token);
+document.getElementById('ai').textContent=x.data.user.email;
+document.getElementById('lp').style.display='none';document.getElementById('ma').style.display='block';
+document.body.classList.remove('lb');initApp()}).catch(function(e){document.getElementById('lerr').textContent='登录失败: '+e.message})}
 function logout(){localStorage.removeItem('agent_token');location.reload()}
 function api(m,p,d){return fetch(API+p,{method:m,headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:d?JSON.stringify(d):undefined}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||'failed');return j})})}
 function toast(msg,err){var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(err?' er':'');t.style.display='block';setTimeout(function(){t.style.display='none'},3000)}
-function initApp(){
-  var saved=localStorage.getItem('agent_token');
-  if(!saved){renderNav();switchTab('team');return}
-  token=saved;
-  api('GET','/auth/me').then(function(u){
-    uid=u.id;document.getElementById('ai').textContent=u.email;
-    document.getElementById('lp').style.display='none';document.getElementById('ma').style.display='block';
-    document.body.classList.remove('lb');
-    if(!u.is_agent){logout();return}
-    renderNav();switchTab('team')
-  }).catch(function(){logout()})
-}
-function renderNav(){
-  var tabs=[['team','我的团队'],['orders','团队订单'],['ops','上下分记录']];
-  document.getElementById('nav').innerHTML=tabs.map(function(x){return'<button class="'+(x[0]===ctab?'ac':'')+'" onclick="switchTab(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')
-}
-function switchTab(tab){ctab=tab;renderNav();var c=document.getElementById('ct');if(tab==='team')loadTeam(c);else if(tab==='orders')loadOrders(c);else if(tab==='ops')loadOps(c)}
+function initApp(){var saved=localStorage.getItem('agent_token');if(!saved){renderNav();switchTab('dashboard');return}
+token=saved;api('GET','/auth/me').then(function(u){uid=u.id;document.getElementById('ai').textContent=u.email;
+document.getElementById('lp').style.display='none';document.getElementById('ma').style.display='block';document.body.classList.remove('lb');
+if(!u.is_agent){logout();return};renderNav();switchTab('dashboard')}).catch(function(){logout()})}
+function renderNav(){var tabs=[['dashboard','仪表盘'],['users','用户管理'],['orders','团队订单'],['ops','上下分记录']];
+document.getElementById('nav').innerHTML=tabs.map(function(x){return'<button class="'+(x[0]===ctab?'ac':'')+'" onclick="switchTab(\''+x[0]+'\')">'+x[1]+'</button>'}).join('')}
+function switchTab(tab){ctab=tab;renderNav();var c=document.getElementById('ct');
+if(tab==='dashboard')loadDash(c);else if(tab==='users')loadUsers(c);else if(tab==='orders')loadOrders(c);else if(tab==='ops')loadOps(c)}
 
-function loadTeam(c){
-  c.innerHTML='<div class="em">加载中...</div>';
-  api('GET','/referral/stats').then(function(s){
-    api('GET','/users/me/invitees?limit=500').then(function(d){
-      var inv=d.invitees||[];
-      c.innerHTML=
-        '<div class="sg"><div class="sc"><div class="lb">团队总人数</div><div class="vl">'+s.total_invites+'</div></div><div class="sc"><div class="lb">直接邀请</div><div class="vl">'+s.direct_count+'</div></div><div class="sc"><div class="lb">有效邀请</div><div class="vl" style="color:var(--b)">'+s.effective_invites+'</div></div></div>'+
-        '<div class="cd"><div class="ch">团队成员 ('+inv.length+')</div><div class="cb"><table><thead><tr><th>用户</th><th>邮箱</th><th>等级</th><th>加入时间</th><th>操作</th></tr></thead><tbody>'+
-        (inv.length===0?'<tr><td colspan="5" class="em">暂无团队成员</td></tr>':inv.map(function(u){return'<tr><td><b>'+(u.name||u.email||'-')+'</b></td><td>'+u.email+'</td><td>Lv.'+u.level+'</td><td style="font-size:10px">'+new Date(u.invited_at).toLocaleString()+'</td><td><button class="btn btnsm" style="background:var(--b);color:#fff" onclick="showMember('+u.id+')">详情</button> <button class="btn btnsm" style="background:var(--s);color:#fff" onclick="showAdjust('+u.id+',\''+(u.name||u.email||'User').replace(/'/g,'')+'\')">上下分</button></td></tr>'}).join(''))+
-        '</tbody></table></div></div>'
-    }).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})
-  }).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})
-}
+// ===== DASHBOARD =====
+function loadDash(c){c.innerHTML='<div class="em">加载中...</div>';
+api('GET','/referral/stats').then(function(s){
+c.innerHTML='<div class="sg"><div class="sc"><div class="lb">团队总人数</div><div class="vl">'+s.total_invites+'</div></div><div class="sc"><div class="lb">直接邀请(Lv1)</div><div class="vl">'+s.direct_count+'</div></div><div class="sc"><div class="lb">有效邀请</div><div class="vl" style="color:var(--b)">'+s.effective_invites+'</div></div><div class="sc"><div class="lb">二级邀请</div><div class="vl">'+s.level2_count+'</div></div><div class="sc"><div class="lb">三级邀请</div><div class="vl">'+s.level3_count+'</div></div></div>'+
+'<div class="cd"><div class="ch">最近团队成员</div><div class="cb"><div id="recentMembers">加载中...</div></div></div>'
+}).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'});
+api('GET','/users/me/invitees?limit=5').then(function(d){var inv=d.invitees||[];
+var h=inv.length===0?'<div class="em">暂无</div>':'<table><tr><th>用户</th><th>等级</th><th>加入时间</th></tr>'+inv.map(function(u){return'<tr><td><b>'+(u.name||u.email)+'</b></td><td>Lv.'+u.level+'</td><td style="font-size:10px">'+new Date(u.invited_at).toLocaleString()+'</td></tr>'}).join('')+'</table>';
+document.getElementById('recentMembers').innerHTML=h}).catch(function(){})}
 
-function showMember(id){
-  var c=document.getElementById('ct');
-  c.innerHTML='<div class="em">加载中...</div>';
-  api('GET','/agent/member/'+id).then(function(d){
-    memData=d;var m=d.member;
-    c.innerHTML='<button class="btn" style="background:#f0f0f0;color:var(--t);margin-bottom:12px" onclick="switchTab(\'team\')">← 返回团队</button>'+
-    '<div class="cd"><div class="ch">'+(m.name||m.email)+' #'+m.id+'</div><div class="cb">'+
-    '<div class="tabs"><button class="ac" onclick="memTab(\'info\')">信息</button><button onclick="memTab(\'finance\')">财务</button><button onclick="memTab(\'orders\')">订单</button></div><div id="mtab"></div></div></div>';
-    memTab('info')
-  }).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})
-}
-function memTab(tab){
-  var d=memData,dc=document.getElementById('mtab'),m=d.member;
-  var btns=document.querySelectorAll('.tabs button');for(var i=0;i<btns.length;i++)btns[i].classList.remove('ac');
-  if(tab==='info'){
-    btns[0].classList.add('ac');
-    dc.innerHTML='<div class="kv"><div class="k">邮箱</div><div class="v">'+m.email+'</div><div class="k">手机</div><div class="v">'+(m.phone||'-')+'</div><div class="k">邀请码</div><div class="v">'+m.referral_code+'</div><div class="k">注册</div><div class="v">'+new Date(m.created_at).toLocaleString()+'</div></div>'
-  }else if(tab==='finance'){
-    btns[1].classList.add('ac');var e=d.earnings||[],dep=d.deposits||[],wd=d.withdrawals||[],h='';
-    h+='<p style="font-weight:700;margin-bottom:8px">收入流水 ('+e.length+')</p><table><tr><th>金额</th><th>类型</th><th>时间</th></tr>'+e.slice(0,20).map(function(x){return'<tr><td style="color:var(--s);font-weight:600">+$'+Number(x.amount).toFixed(2)+'</td><td>'+x.type+'</td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>';
-    h+='<p style="font-weight:700;margin:16px 0 8px">充值记录 ('+dep.length+')</p><table><tr><th>金额</th><th>网络</th><th>状态</th><th>时间</th></tr>'+dep.map(function(x){return'<tr><td>$'+Number(x.amount).toFixed(2)+'</td><td>'+x.network+'</td><td><span class="bg '+(x.status==='confirmed'?'bgn':'bgy')+'">'+x.status+'</span></td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>';
-    h+='<p style="font-weight:700;margin:16px 0 8px">提现记录 ('+wd.length+')</p><table><tr><th>金额</th><th>状态</th><th>时间</th></tr>'+wd.map(function(x){return'<tr><td>$'+Number(x.amount).toFixed(2)+'</td><td><span class="bg '+(x.status==='completed'?'bgn':'bgy')+'">'+x.status+'</span></td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>';
-    dc.innerHTML=h
-  }else if(tab==='orders'){
-    btns[2].classList.add('ac');var o=d.orders||[];
-    dc.innerHTML='<table><tr><th>产品</th><th>金额</th><th>状态</th><th>时间</th></tr>'+o.map(function(x){return'<tr><td>'+(x.product_name||'-')+'</td><td>$'+Number(x.amount||0).toFixed(2)+'</td><td><span class="bg '+(x.status==='done'?'bgn':'bgy')+'">'+x.status+'</span></td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>'
-  }
-}
+// ===== USERS =====
+var uPage=1,uSearch='';
+function loadUsers(c){c.innerHTML='<div class="cd"><div class="ch">团队成员</div><div class="cb"><div class="sr"><input class="inp" id="us" placeholder="搜索邮箱/姓名..." value="'+uSearch+'"><button class="btn btn-blue" onclick="uSearch=document.getElementById(\'us\').value;uPage=1;loadUsers(document.getElementById(\'ct\'))">搜索</button></div><div id="ut"></div><div id="up" class="pg"></div></div></div>';loadUserData()}
+function loadUserData(){
+api('GET','/users/me/invitees?limit=100&page='+uPage).then(function(d){var users=d.invitees||[];
+var total=users.length;
+var h='<table><thead><tr><th>用户</th><th>邮箱</th><th>等级</th><th>加入时间</th><th>操作</th></tr></thead><tbody>'+
+(users.length===0?'<tr><td colspan="5" class="em">暂无团队成员</td></tr>':users.map(function(u){return'<tr><td><b>'+(u.name||u.email||'-')+'</b></td><td>'+u.email+'</td><td>Lv.'+u.level+'</td><td style="font-size:10px">'+new Date(u.invited_at).toLocaleString()+'</td><td><button class="btn btn-sm btn-blue" onclick="showMember('+u.id+')">详情</button> <button class="btn btn-sm btn-green" onclick="showAdjust('+u.id+','+(u.name||u.email||'User').replace(/'/g,'')+')">上下分</button></td></tr>'}).join(''))+'</tbody></table>';
+document.getElementById('ut').innerHTML=h;
+document.getElementById('up').innerHTML='<span>共 '+total+' 人</span>'}).catch(function(e){document.getElementById('ut').innerHTML='<div class="em">'+e.message+'</div>'})}
 
-function showAdjust(id,name){
-  var d=document.createElement('div');d.className='modal-overlay';d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px';
-  d.innerHTML='<div class="modal" style="background:var(--w);border-radius:16px;width:100%;max-width:380px;padding:24px" onclick="event.stopPropagation()"><h2 style="margin-bottom:16px">'+name+'</h2><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input id="adjAmt" type="number" placeholder="金额" style="flex:1;padding:10px 14px;border:1.5px solid var(--br);border-radius:8px;font-size:14px;outline:none" min="1"><input id="adjNote" type="text" placeholder="备注" style="width:100px;padding:10px 14px;border:1.5px solid var(--br);border-radius:8px;font-size:14px;outline:none"></div><div style="display:flex;gap:8px"><button class="btn btn-green" onclick="doAdjust('+id+',1)" style="flex:1">上分</button><button class="btn btn-red" onclick="doAdjust('+id+',-1)" style="flex:1">下分</button><button class="btn btn-gray" onclick="this.closest(\'.modal-overlay\').remove()" style="flex:1">取消</button></div></div>';
-  d.addEventListener('click',function(e){if(e.target===d)d.remove()});document.body.appendChild(d)
-}
-function doAdjust(id,sign){
-  var amt=parseFloat(document.getElementById('adjAmt').value),note=document.getElementById('adjNote').value;
-  if(!amt||amt<0){toast('请输入有效金额',1);return}
-  var total=sign>0?amt:-amt,label=sign>0?'上分 $'+amt:'下分 $'+amt;
-  if(!confirm('确认'+label+'？'))return;
-  api('POST','/agent/balance',{target_user_id:id,amount:total,note:note||''}).then(function(d){
-    toast(label+' 成功');document.querySelector('.modal-overlay').remove();switchTab('team')
-  }).catch(function(e){toast(e.message,1)})
-}
+// ===== MEMBER DETAIL =====
+function showMember(id){var c=document.getElementById('ct');c.innerHTML='<div class="em">加载中...</div>';
+api('GET','/agent/member/'+id).then(function(d){memData=d;var m=d.member;
+c.innerHTML='<button class="btn btn-gray" style="margin-bottom:12px" onclick="switchTab(\'users\')">← 返回</button>'+
+'<div class="cd"><div class="ch">'+(m.name||m.email)+' #'+m.id+'</div><div class="cb">'+
+'<div class="tabs"><button class="ac" onclick="memTab(\'info\')">信息</button><button onclick="memTab(\'finance\')">财务</button><button onclick="memTab(\'orders\')">订单</button></div><div id="mtab"></div></div></div>';
+memTab('info')}).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})}
+function memTab(tab){var d=memData,dc=document.getElementById('mtab'),m=d.member;
+var btns=document.querySelectorAll('.tabs button');for(var i=0;i<btns.length;i++)btns[i].classList.remove('ac');
+if(tab==='info'){btns[0].classList.add('ac');
+dc.innerHTML='<div class="kv"><div class="k">邮箱</div><div class="v">'+m.email+'</div><div class="k">手机</div><div class="v">'+(m.phone||'-')+'</div><div class="k">邀请码</div><div class="v">'+m.referral_code+'</div><div class="k">注册</div><div class="v">'+new Date(m.created_at).toLocaleString()+'</div><div class="k">状态</div><div class="v">'+(m.frozen?'<span class="bg bgr">已冻结</span>':'<span class="bg bgn">正常</span>')+'</div></div>'}
+else if(tab==='finance'){btns[1].classList.add('ac');var e=d.earnings||[],dep=d.deposits||[],wd=d.withdrawals||[],h='';
+h+='<p style="font-weight:700;margin-bottom:8px">余额流水 ('+e.length+')</p><table><tr><th>金额</th><th>类型</th><th>时间</th></tr>'+e.slice(0,20).map(function(x){return'<tr><td style="color:var(--s);font-weight:600">+$'+Number(x.amount).toFixed(2)+'</td><td>'+x.type+'</td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>';
+h+='<p style="font-weight:700;margin:16px 0 8px">充值 ('+dep.length+')</p><table><tr><th>金额</th><th>网络</th><th>状态</th></tr>'+dep.map(function(x){return'<tr><td>$'+Number(x.amount).toFixed(2)+'</td><td>'+x.network+'</td><td><span class="bg '+(x.status==='confirmed'?'bgn':'bgy')+'">'+x.status+'</span></td></tr>'}).join('')+'</table>';
+h+='<p style="font-weight:700;margin:16px 0 8px">提现 ('+wd.length+')</p><table><tr><th>金额</th><th>状态</th></tr>'+wd.map(function(x){return'<tr><td>$'+Number(x.amount).toFixed(2)+'</td><td><span class="bg '+(x.status==='completed'?'bgn':'bgy')+'">'+x.status+'</span></td></tr>'}).join('')+'</table>';
+dc.innerHTML=h}
+else if(tab==='orders'){btns[2].classList.add('ac');var o=d.orders||[];
+dc.innerHTML='<table><tr><th>产品</th><th>金额</th><th>状态</th><th>时间</th></tr>'+o.map(function(x){return'<tr><td>'+(x.product_name||'-')+'</td><td>$'+Number(x.amount||0).toFixed(2)+'</td><td><span class="bg '+(x.status==='done'?'bgn':'bgy')+'">'+x.status+'</span></td><td style="font-size:10px">'+new Date(x.created_at).toLocaleString()+'</td></tr>'}).join('')+'</table>'}}
 
-function loadOrders(c){
-  c.innerHTML='<div class="em">加载中...</div>';
-  api('GET','/agent/orders').then(function(d){
-    var orders=d.orders||[];
-    c.innerHTML='<div class="cd"><div class="ch">团队订单 ('+orders.length+')</div><div class="cb"><table><thead><tr><th>用户</th><th>产品</th><th>金额</th><th>状态</th><th>时间</th></tr></thead><tbody>'+
-    (orders.length===0?'<tr><td colspan="5" class="em">暂无订单</td></tr>':orders.map(function(o){return'<tr><td>'+o.user_name+'</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(o.product_name||'-')+'</td><td>$'+Number(o.amount||0).toFixed(2)+'</td><td><span class="bg '+(o.status==='done'?'bgn':'bgy')+'">'+(o.status==='done'?'已完成':'持仓中')+'</span></td><td style="font-size:10px">'+new Date(o.created_at).toLocaleString()+'</td></tr>'}).join(''))+
-    '</tbody></table></div></div>'
-  }).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})
-}
+// ===== ADJUST =====
+function showAdjust(id,name){var d=document.createElement('div');d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px';
+d.innerHTML='<div style="background:var(--w);border-radius:16px;width:100%;max-width:380px;padding:24px" onclick="event.stopPropagation()"><h2 style="margin-bottom:16px">'+name+'</h2><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input id="adjAmt" type="number" placeholder="金额" style="flex:1;padding:10px 14px;border:1.5px solid var(--br);border-radius:8px;font-size:14px;outline:none" min="1"><input id="adjNote" type="text" placeholder="备注" style="width:100px;padding:10px 14px;border:1.5px solid var(--br);border-radius:8px;font-size:14px;outline:none"></div><div style="display:flex;gap:8px"><button class="btn btn-green" onclick="doAdjust('+id+',1)" style="flex:1">上分</button><button class="btn btn-red" onclick="doAdjust('+id+',-1)" style="flex:1">下分</button><button class="btn btn-gray" onclick="this.closest(\'div[style*=fixed]\').remove()" style="flex:1">取消</button></div></div>';
+d.addEventListener('click',function(e){if(e.target===d)d.remove()});document.body.appendChild(d)}
+function doAdjust(id,sign){var amt=parseFloat(document.getElementById('adjAmt').value),note=document.getElementById('adjNote').value;
+if(!amt||amt<0){toast('请输入有效金额',1);return}var total=sign>0?amt:-amt,label=sign>0?'上分 $'+amt:'下分 $'+amt;
+if(!confirm('确认'+label+'？'))return;
+api('POST','/agent/balance',{target_user_id:id,amount:total,note:note||''}).then(function(d){toast(label+' 成功');document.querySelector('div[style*=fixed]').remove();switchTab('users')}).catch(function(e){toast(e.message,1)})}
 
-function loadOps(c){
-  c.innerHTML='<div class="cd"><div class="ch">上下分记录</div><div class="cb"><div class="em">加载中...</div></div></div>';
-  api('GET','/agent/ops').then(function(rows){
-    rows=(rows||[]).filter(function(o){return o.agent_id===uid});
-    c.innerHTML='<div class="cd"><div class="ch">上下分记录 ('+rows.length+')</div><div class="cb"><table><thead><tr><th>时间</th><th>目标用户</th><th>金额</th><th>备注</th></tr></thead><tbody>'+
-    (rows.length===0?'<tr><td colspan="4" class="em">暂无记录</td></tr>':rows.map(function(o){return'<tr><td style="font-size:10px">'+new Date(o.created_at).toLocaleString()+'</td><td>#'+(o.target_user_id||'-')+'</td><td style="font-weight:700;color:'+(Number(o.amount)>=0?'var(--s)':'var(--d)')+'">'+(Number(o.amount)>=0?'+':'')+'$'+Math.abs(Number(o.amount)).toFixed(2)+'</td><td style="font-size:10px">'+(o.detail||'')+'</td></tr>'}).join(''))+
-    '</tbody></table></div></div>'
-  }).catch(function(e){c.innerHTML='<div class="cd"><div class="ch">上下分记录</div><div class="cb"><div class="em">'+e.message+'</div></div></div>'})
-}
+// ===== ORDERS =====
+function loadOrders(c){c.innerHTML='<div class="em">加载中...</div>';
+api('GET','/agent/orders').then(function(d){var orders=d.orders||[];
+c.innerHTML='<div class="cd"><div class="ch">团队订单 ('+orders.length+')</div><div class="cb"><table><thead><tr><th>用户</th><th>产品</th><th>金额</th><th>状态</th><th>时间</th></tr></thead><tbody>'+
+(orders.length===0?'<tr><td colspan="5" class="em">暂无订单</td></tr>':orders.map(function(o){return'<tr><td>'+o.user_name+'</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(o.product_name||'-')+'</td><td>$'+Number(o.amount||0).toFixed(2)+'</td><td><span class="bg '+(o.status==='done'?'bgn':'bgy')+'">'+(o.status==='done'?'已完成':'持仓中')+'</span></td><td style="font-size:10px">'+new Date(o.created_at).toLocaleString()+'</td></tr>'}).join(''))+
+'</tbody></table></div></div>'}).catch(function(e){c.innerHTML='<div class="em">'+e.message+'</div>'})}
+
+// ===== OPS =====
+function loadOps(c){c.innerHTML='<div class="cd"><div class="ch">上下分记录</div><div class="cb"><div class="em">加载中...</div></div></div>';
+api('GET','/agent/ops').then(function(rows){rows=rows||[];
+c.innerHTML='<div class="cd"><div class="ch">上下分记录 ('+rows.length+')</div><div class="cb"><table><thead><tr><th>时间</th><th>目标用户</th><th>金额</th><th>备注</th></tr></thead><tbody>'+
+(rows.length===0?'<tr><td colspan="4" class="em">暂无记录</td></tr>':rows.map(function(o){return'<tr><td style="font-size:10px">'+new Date(o.created_at).toLocaleString()+'</td><td>#'+(o.target_user_id||'-')+'</td><td style="font-weight:700;color:'+(Number(o.amount)>=0?'var(--s)':'var(--d)')+'">'+(Number(o.amount)>=0?'+':'')+'$'+Math.abs(Number(o.amount)).toFixed(2)+'</td><td style="font-size:10px">'+(o.detail||'')+'</td></tr>'}).join(''))+
+'</tbody></table></div></div>'}).catch(function(e){c.innerHTML='<div class="cd"><div class="ch">上下分记录</div><div class="cb"><div class="em">'+e.message+'</div></div></div>'})}
 initApp();
 </script></body></html>
