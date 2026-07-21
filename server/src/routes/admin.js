@@ -705,6 +705,24 @@ router.post('/agents/:id/quota', async (req, res) => {
   } catch(e) { res.status(500).json({error:'Failed'}); }
 });
 
+// ========== Agent Team Detail ==========
+router.get('/agent-team/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const agent = await get('SELECT id, email, name FROM users WHERE id = ? AND is_agent = TRUE', [id]);
+    if (!agent) return res.status(404).json({ error: 'Not an agent' });
+    const members = await all(
+      `SELECT u.id, u.email, u.phone, u.name, u.referral_code, u.created_at, u.frozen,
+        COALESCE(k.status, '') as kyc_status,
+        COALESCE((SELECT SUM(amount) FROM task_earnings WHERE user_id = u.id AND status = 'delivered'), 0) as balance
+      FROM invitations i JOIN users u ON u.id = i.invitee_id
+      LEFT JOIN kyc_submissions k ON k.user_id = u.id
+      WHERE i.inviter_id = ? ORDER BY i.created_at DESC LIMIT 200`, [id]
+    );
+    res.json({ agent, members: members.map(m => ({...m, balance: Number(m.balance)})) });
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
 // ========== Agent Financial Summary ==========
 router.get('/agent-summary', async (req, res) => {
   try {
