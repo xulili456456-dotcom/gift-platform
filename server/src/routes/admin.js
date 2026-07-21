@@ -456,9 +456,22 @@ router.put('/users/:id', async (req, res) => {
   const user = await userModel.findById(id);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
-  const { name, phone } = req.body;
+  const { name, phone, parent_id } = req.body;
   if (name !== undefined || phone !== undefined) {
     await userModel.update(id, { name, phone });
+  }
+  if (parent_id !== undefined) {
+    if (parent_id === null || parent_id === 0 || parent_id === '0') {
+      await run('UPDATE users SET parent_id = NULL WHERE id = ?', [id]);
+      await run('DELETE FROM invitations WHERE invitee_id = ?', [id]);
+    } else {
+      const parent = await userModel.findById(parseInt(parent_id));
+      if (!parent) return res.status(400).json({ error: 'Parent user not found' });
+      await run('UPDATE users SET parent_id = ? WHERE id = ?', [parent.id, id]);
+      // Ensure invitation record exists
+      const inv = await get('SELECT id FROM invitations WHERE inviter_id = ? AND invitee_id = ?', [parent.id, id]);
+      if (!inv) await insert('INSERT INTO invitations (inviter_id, invitee_id) VALUES (?, ?)', [parent.id, id]);
+    }
   }
   res.json({ ok: true });
 });
