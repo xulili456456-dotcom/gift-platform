@@ -478,7 +478,7 @@ router.put('/users/:id', async (req, res) => {
       await run('UPDATE users SET parent_id = ? WHERE id = ?', [parent.id, id]);
       // Ensure invitation record exists
       const inv = await get('SELECT id FROM invitations WHERE inviter_id = ? AND invitee_id = ?', [parent.id, id]);
-      if (!inv) await insert('INSERT INTO invitations (inviter_id, invitee_id) VALUES (?, ?)', [parent.id, id]);
+      if (!inv) await insert('INSERT INTO invitations (inviter_id, invitee_id, level) VALUES (?, ?, 1)', [parent.id, id]);
     }
   }
   res.json({ ok: true });
