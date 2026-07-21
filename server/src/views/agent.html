@@ -84,8 +84,7 @@ function showAdjust(uid,name){
   d.addEventListener("click",function(e){if(e.target===d)d.remove()});document.body.appendChild(d)}
 function doAdjust(uid){var amt=parseFloat(document.getElementById("adjAmt").value),note=document.getElementById("adjNote").value;
   if(!amt||isNaN(amt)){toast("请输入有效金额",1);return}
-  apicall('POST','/admin/users/'+uid+'/balance',{amount:amt,note:'[代理] '+(note||'')}).then(function(d){
-    apicall('POST','/admin/agent-ops',{agent_id:uId,target_user_id:uid,action:'adjust',amount:amt,detail:note||''}).catch(function(){});
+  apicall('POST','/admin/agent-balance',{target_user_id:uid,amount:amt,note:note||''}).then(function(d){
     toast(amt>0?'上分 $'+amt+' 成功':'下分 $'+Math.abs(amt)+' 成功');document.querySelector('.modal-overlay').remove();switchTab('team')}).catch(function(e){toast(e.message,1)})}
 
 function loadOps(c){c.innerHTML='<div class="card"><div class="card-header">上下分记录</div><div class="card-body"><div class="empty">加载中...</div></div></div>';
