@@ -301,6 +301,11 @@ async function migrate() {
   } catch (e) { console.log('Task tables migration skipped:', e.message); }
   // IP log table
   try { await exec(`CREATE TABLE IF NOT EXISTS ip_log (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, ip_address TEXT NOT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)`); } catch(e) { console.log('IP log migration skipped:', e.message); }
+  // Agent system
+  try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_agent BOOLEAN DEFAULT FALSE`); } catch(e) { console.log('is_agent skipped:', e.message); }
+  try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS agent_commission NUMERIC DEFAULT 0.5`); } catch(e) { console.log('agent_commission skipped:', e.message); }
+  try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS agent_quota NUMERIC DEFAULT 0`); } catch(e) { console.log('agent_quota skipped:', e.message); }
+  try { await exec(`CREATE TABLE IF NOT EXISTS agent_operations (id SERIAL PRIMARY KEY, agent_id INTEGER NOT NULL, target_user_id INTEGER, action TEXT NOT NULL, amount NUMERIC DEFAULT 0, detail TEXT DEFAULT '', created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY (agent_id) REFERENCES users(id) ON DELETE CASCADE)`); } catch(e) { console.log('agent_operations skipped:', e.message); }
   // Seed default tasks
   try {
     const hasTasks = await get('SELECT id FROM task_definitions LIMIT 1');

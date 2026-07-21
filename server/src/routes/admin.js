@@ -590,6 +590,39 @@ router.get('/user-ips', async (req, res) => {
   } catch(e) { res.status(500).json({error:'Failed'}); }
 });
 
+// ========== Agent Management ==========
+router.get('/agents', async (req, res) => {
+  try {
+    const rows = await all('SELECT id, email, name, referral_code, is_agent, agent_commission, agent_quota FROM users WHERE is_agent = TRUE ORDER BY id');
+    const ops = await all('SELECT * FROM agent_operations ORDER BY created_at DESC LIMIT 100');
+    res.json({ agents: rows, operations: ops });
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
+router.put('/agents/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { is_agent, agent_commission, agent_quota } = req.body;
+    if (typeof is_agent !== 'undefined') await run('UPDATE users SET is_agent = ? WHERE id = ?', [!!is_agent, id]);
+    if (typeof agent_commission !== 'undefined') await run('UPDATE users SET agent_commission = ? WHERE id = ?', [Number(agent_commission), id]);
+    if (typeof agent_quota !== 'undefined') await run('UPDATE users SET agent_quota = ? WHERE id = ?', [Number(agent_quota), id]);
+    const user = await get('SELECT id, email, name, referral_code, is_agent, agent_commission, agent_quota FROM users WHERE id = ?', [id]);
+    res.json(user);
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
+router.post('/agents/:id/quota', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const amount = parseFloat(req.body.amount);
+    if (!amount || amount <= 0) return res.status(400).json({ error: 'Invalid amount' });
+    await run('UPDATE users SET agent_quota = agent_quota + ? WHERE id = ?', [amount, id]);
+    const user = await get('SELECT id, agent_quota FROM users WHERE id = ?', [id]);
+    await insert('INSERT INTO agent_operations (agent_id, action, amount, detail) VALUES (?,?,?,?)', [id, 'quota_add', amount, 'Admin added quota']);
+    res.json({ agent_quota: Number(user.agent_quota) });
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
 // ========== Agent Financial Summary ==========
 router.get('/agent-summary', async (req, res) => {
   try {
