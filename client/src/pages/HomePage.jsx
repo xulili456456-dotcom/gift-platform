@@ -4,7 +4,6 @@ import useAuthStore from '../store/authStore';
 import { giftsApi } from '../api/gifts';
 import { referralApi } from '../api/referral';
 import { claimsApi } from '../api/claims';
-import PullToRefresh from '../components/shared/PullToRefresh';
 import toast from 'react-hot-toast';
 
 export default function HomePage() {
@@ -43,7 +42,6 @@ export default function HomePage() {
   );
 
   return (
-    <PullToRefresh onRefresh={loadAll}>
     <div style={{background:'#f2f2f7',minHeight:'100vh',maxWidth:430,margin:'0 auto',paddingBottom:80}}>
 
       {/* ===== HEADER ===== */}
@@ -159,6 +157,5 @@ export default function HomePage() {
         </div>
       </div>
     </div>
-    </PullToRefresh>
   );
 }
