@@ -47,15 +47,15 @@ export default function HomePage() {
 
       {/* ===== HEADER ===== */}
       <div style={{background:'#0f0f0f',padding:'12px 16px 16px',color:'#fff'}}>
-        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12}}>
-          <div style={{width:36,height:36,borderRadius:18,background:'#FF5000',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:14}}>
+        <div style={{display:'flex',alignItems:'center',marginBottom:12}}>
+          <div style={{width:36,height:36,borderRadius:18,background:'#FF5000',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:700,fontSize:14,flexShrink:0,marginRight:10}}>
             {(user?.name || user?.email || '?')[0].toUpperCase()}
           </div>
-          <div style={{flex:1}}>
+          <div style={{flex:1,minWidth:0}}>
             <div style={{fontSize:11,color:'#aaa'}}>Total Balance</div>
             <div style={{fontSize:22,fontWeight:800}}>${totalEarned.toFixed(2)}</div>
           </div>
-          <button onClick={goDeposit} style={{padding:'10px 20px',background:'#00A86B',color:'#fff',border:'none',borderRadius:10,fontSize:12,fontWeight:700,cursor:'pointer',flexShrink:0}}>+ Deposit</button>
+          <a href="/mine/deposit" style={{flexShrink:0,padding:'10px 20px',background:'#00A86B',color:'#fff',border:'none',borderRadius:10,fontSize:12,fontWeight:700,cursor:'pointer',textDecoration:'none',display:'inline-block',WebkitTapHighlightColor:'transparent',touchAction:'manipulation'}}>+ Deposit</a>
         </div>
         <div style={{display:'flex',gap:8}}>
           <div onClick={() => navigate('/mine/wallet')} style={{flex:1,background:'#1a1a1a',borderRadius:10,padding:8,textAlign:'center',cursor:'pointer'}}>
