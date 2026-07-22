@@ -82,22 +82,18 @@ export default function App() {
 
       {/* Contact Support Modal */}
       {showContact && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={() => setShowContact(false)}>
-          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-sm animate-scale-in border border-[#e7e7e7]" onClick={e => e.stopPropagation()}>
-            <div className="text-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-[#FF9900]/20 flex items-center justify-center mx-auto mb-3">
-                <span className="text-3xl">💬</span>
-              </div>
-              <h3 className="text-lg font-bold text-[#0F1111]">Contact Support</h3>
-              <p className="text-xs text-[#565959] mt-1">Reach our team for deposit assistance</p>
+        <div style={{position:'fixed',inset:0,zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,.6)',backdropFilter:'blur(2px)',padding:16}} onClick={() => setShowContact(false)}>
+          <div onClick={e => e.stopPropagation()} style={{background:'#fff',borderRadius:24,width:'100%',maxWidth:330,padding:'32px 24px 24px',boxShadow:'0 20px 60px rgba(0,0,0,.2)',textAlign:'center',animation:'scaleIn .25s ease-out'}}>
+            <div style={{position:'relative',display:'inline-block',marginBottom:16}}>
+              <div style={{width:64,height:64,borderRadius:32,background:'linear-gradient(135deg,#0088CC,#00B2FF)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:30}}>✈️</div>
+              <div style={{position:'absolute',bottom:2,right:2,width:16,height:16,borderRadius:8,background:'#00A86B',border:'2px solid #fff'}}></div>
             </div>
-            <div className="space-y-3 mb-5">
-              <a href="https://t.me/Shopping_Operations" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-[#f0f2f2] border border-[#e7e7e7] hover:border-[#FF9900] transition-colors">
-                <span className="text-2xl">📱</span>
-                <div><p className="text-[13px] font-bold text-[#0F1111]">Telegram</p><p className="text-[10px] text-[#999]">@Shopping_Operations</p></div>
-              </a>
-            </div>
-            <button onClick={() => setShowContact(false)} className="w-full py-3 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">Close</button>
+            <div style={{fontSize:18,fontWeight:800,color:'#0f0f0f',marginBottom:2}}>Contact Support</div>
+            <div style={{fontSize:12,color:'#00A86B',fontWeight:500,marginBottom:8}}>● Online — respond within minutes</div>
+            <div style={{fontSize:12,color:'#999',marginBottom:20}}>Reach us on Telegram for any questions</div>
+            <a href="https://t.me/Shopping_Operations" target="_blank" rel="noopener noreferrer" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,padding:14,background:'linear-gradient(135deg,#0088CC,#00B2FF)',borderRadius:14,textDecoration:'none',marginBottom:10,color:'#fff',fontSize:14,fontWeight:700}}>✈️ Open Telegram</a>
+            <div style={{fontSize:12,color:'#0088CC',marginBottom:18}}>@Shopping_Operations</div>
+            <button onClick={() => setShowContact(false)} style={{width:'100%',padding:12,background:'#f5f5f5',color:'#666',border:'none',borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer'}}>Close</button>
           </div>
         </div>
       )}
