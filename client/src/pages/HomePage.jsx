@@ -54,7 +54,7 @@ export default function HomePage() {
             <div style={{fontSize:11,color:'#aaa'}}>Total Balance</div>
             <div style={{fontSize:22,fontWeight:800}}>${totalEarned.toFixed(2)}</div>
           </div>
-          <button onClick={() => navigate('/mine/deposit')} style={{padding:'10px 20px',background:'#00A86B',color:'#fff',border:'none',borderRadius:10,fontSize:12,fontWeight:700,cursor:'pointer',minWidth:80,minHeight:40,zIndex:10,position:'relative'}}>+ Deposit</button>
+          <button onClick={() => { try { navigate('/mine/deposit'); } catch(e) { window.location.href = '/mine/deposit'; } }} style={{padding:'10px 20px',background:'#00A86B',color:'#fff',border:'none',borderRadius:10,fontSize:12,fontWeight:700,cursor:'pointer',minWidth:80,minHeight:40}}>+ Deposit</button>
         </div>
         <div style={{display:'flex',gap:8}}>
           <div onClick={() => navigate('/mine/wallet')} style={{flex:1,background:'#1a1a1a',borderRadius:10,padding:8,textAlign:'center',cursor:'pointer'}}>
