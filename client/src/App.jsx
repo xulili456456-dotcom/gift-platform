@@ -96,10 +96,6 @@ export default function App() {
                 <span className="text-2xl">📱</span>
                 <div><p className="text-[13px] font-bold text-[#0F1111]">Telegram</p><p className="text-[10px] text-[#999]">@Shopping_Operations</p></div>
               </a>
-              <a href="mailto:support@shopee-ops.com" className="flex items-center gap-3 p-3 rounded-xl bg-[#f0f2f2] border border-[#e7e7e7] hover:border-[#FF9900] transition-colors">
-                <span className="text-2xl">📧</span>
-                <div><p className="text-[13px] font-bold text-[#0F1111]">Email</p><p className="text-[10px] text-[#999]">support@shopee-ops.com</p></div>
-              </a>
             </div>
             <button onClick={() => setShowContact(false)} className="w-full py-3 bg-[#f0f2f2] text-[#0F1111] font-medium rounded-xl text-sm">Close</button>
           </div>
