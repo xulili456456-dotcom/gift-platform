@@ -55,7 +55,6 @@ export default function HomePage() {
             <div style={{fontSize:11,color:'#aaa'}}>Total Balance</div>
             <div style={{fontSize:22,fontWeight:800}}>${totalEarned.toFixed(2)}</div>
           </div>
-          <a href="/mine/deposit" style={{flexShrink:0,padding:'10px 20px',background:'#00A86B',color:'#fff',border:'none',borderRadius:10,fontSize:12,fontWeight:700,cursor:'pointer',textDecoration:'none',display:'inline-block',WebkitTapHighlightColor:'transparent',touchAction:'manipulation'}}>+ Deposit</a>
         </div>
         <div style={{display:'flex',gap:8}}>
           <div onClick={() => navigate('/mine/wallet')} style={{flex:1,background:'#1a1a1a',borderRadius:10,padding:8,textAlign:'center',cursor:'pointer'}}>
@@ -103,6 +102,9 @@ export default function HomePage() {
         <div style={{display:'flex',gap:8,margin:'16px 0'}}>
           <button onClick={() => navigate('/store')} style={{flex:1,padding:12,background:'#FF5000',color:'#fff',border:'none',borderRadius:14,fontSize:13,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
             <span>🛒</span> Browse Store
+          </button>
+          <button onClick={() => navigate('/mine/deposit')} style={{flex:1,padding:12,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:13,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
+            <span>💰</span> Deposit
           </button>
           <button onClick={() => navigate('/mine/withdraw')} style={{flex:1,padding:12,background:'#0f0f0f',color:'#fff',border:'none',borderRadius:14,fontSize:13,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:6}}>
             <span>💸</span> Withdraw
