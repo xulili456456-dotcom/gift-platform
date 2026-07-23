@@ -291,7 +291,10 @@ function genProducts(tier, cat, search, daySeed) {
     var cost = Math.round(price * costRate * 100) / 100;
     var profit = Math.round(price * profitRate * 100) / 100;
     var roi = Math.round(profitRate * 100);
-    return { ...p, costPrice: cost, profit, roi };
+    // Dynamic sales: daily variation ±25% based on product index + day seed
+    var soldVariation = 0.75 + ((daySeed * (idx + 7) * 13 + idx * 19) % 500) / 1000;
+    var sold = Math.max(1, Math.round((p.sold || 50) * soldVariation));
+    return { ...p, costPrice: cost, profit, roi, sold };
   });
 }
 
