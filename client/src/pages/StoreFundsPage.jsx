@@ -4,8 +4,18 @@ import client from '../api/client';
 import { ChevronLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const COST_RATE = 0.85;
-const PROFIT_RATE = 0.15;
+function getRates(price){
+  var today = new Date().toISOString().slice(0,10);
+  var seed = today.split('-').reduce(function(s,x){return s+parseInt(x)},0);
+  var shift = ((seed * 7 + 13) % 100 - 50) / 500;
+  var base;
+  if (price < 20) base = 0.06 + Math.random() * 0.04;
+  else if (price < 100) base = 0.08 + Math.random() * 0.07;
+  else if (price < 500) base = 0.10 + Math.random() * 0.08;
+  else base = 0.15 + Math.random() * 0.10;
+  var pr = Math.max(0.05, Math.min(0.25, base + shift));
+  return { profitRate: pr, costRate: 1 - pr };
+}
 
 export default function StoreFundsPage() {
   const navigate = useNavigate();
@@ -91,7 +101,7 @@ export default function StoreFundsPage() {
           </div>
           {holdings.length === 0 && <p style={{fontSize:11,color:'#999',textAlign:'center',padding:20}}>No active holdings</p>}
           {holdings.map(h => {
-            const profit = Math.round((Number(h.cost) / COST_RATE * PROFIT_RATE) * 100) / 100;
+            var r = getRates(Number(h.amount) / 0.85); const profit = Math.round(Number(h.amount) * r.profitRate * 100) / 100;
             const isOpen = expandedHolding === h.id;
             const totalReturn = Number(h.cost) + profit;
             return (
@@ -127,7 +137,7 @@ export default function StoreFundsPage() {
           {(!orderHistory?.orders || orderHistory.orders.length === 0) && <p style={{fontSize:11,color:'#999',textAlign:'center',padding:20}}>No orders today</p>}
           {orderHistory?.orders?.slice(0,20).map(o => {
             const profit = Number(o.profit) || 0;
-            const cost = profit > 0 ? Math.round((profit / PROFIT_RATE * COST_RATE) * 100) / 100 : 0;
+            var r2 = getRates(Number(o.amount) || 30); const cost = Number(o.amount) * r2.costRate;
             const isOpen = expandedOrder === o.id;
             return (
             <div key={o.id} style={{borderBottom:'1px solid #f5f5f5'}}>

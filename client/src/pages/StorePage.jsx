@@ -271,12 +271,26 @@ const PRODUCTS = [
 
 
 function genProducts(tier, cat, search) {
+  // Daily seed for variation — changes each day
+  var today = new Date().toISOString().slice(0,10);
+  var seed = today.split('-').reduce(function(s,x){return s+parseInt(x)},0);
+  var dailyShift = ((seed * 7 + 13) % 100 - 50) / 500; // -0.05 to +0.05 shift per day
+
   let filtered = cat === 'All' ? [...PRODUCTS] : PRODUCTS.filter(p => p.cat === cat);
   if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.cat.toLowerCase().includes(search.toLowerCase()));
   filtered.sort((a,b) => b.sold - a.sold);
   return filtered.map(p => {
-    const cost = Math.round(p.price * COST_RATE * 100) / 100;
-    const profit = Math.round(p.price * PROFIT_RATE * 100) / 100;
+    var price = p.price;
+    // Profit rate based on price tier + daily random jitter
+    var baseRate;
+    if (price < 20) baseRate = 0.06 + Math.random() * 0.04;       // 6-10%
+    else if (price < 100) baseRate = 0.08 + Math.random() * 0.07;   // 8-15%
+    else if (price < 500) baseRate = 0.10 + Math.random() * 0.08;   // 10-18%
+    else baseRate = 0.15 + Math.random() * 0.10;                    // 15-25%
+    var profitRate = Math.max(0.05, Math.min(0.25, baseRate + dailyShift));
+    var costRate = 1 - profitRate;
+    var cost = Math.round(price * costRate * 100) / 100;
+    var profit = Math.round(price * profitRate * 100) / 100;
     return { ...p, costPrice: cost, profit };
   });
 }
