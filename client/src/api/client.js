@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const client = axios.create({
-  baseURL: '/api',
+  baseURL: window.location.hostname === 'www.shopeetrade.com' ? 'https://gift-platform-h6um.onrender.com/api' : '/api',
   timeout: 15000,
   headers: { 'Content-Type': 'application/json' },
 });
