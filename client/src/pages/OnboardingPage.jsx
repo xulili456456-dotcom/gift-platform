@@ -1,54 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../components/shared/LanguageSwitcher';
 
 const slides = [
-  { emoji: '👋', titleKey: 'onboard.slide1Title', bodyKey: 'onboard.slide1Body' },
-  { emoji: '📨', titleKey: 'onboard.slide2Title', bodyKey: 'onboard.slide2Body' },
-  { emoji: '🎁', titleKey: 'onboard.slide3Title', bodyKey: 'onboard.slide3Body' },
-  { emoji: '💰', titleKey: 'onboard.slide4Title', bodyKey: 'onboard.slide4Body' },
+  { emoji:'🛒', bg:'linear-gradient(135deg,#FF5000,#E04500)', titleKey:'onboard.slide1Title', bodyKey:'onboard.slide1Body' },
+  { emoji:'👥', bg:'#FFF5F0', titleKey:'onboard.slide2Title', bodyKey:'onboard.slide2Body' },
+  { emoji:'🎁', bg:'#FFF5F0', titleKey:'onboard.slide3Title', bodyKey:'onboard.slide3Body' },
+  { emoji:'🚀', bg:'#E8F5E9', titleKey:'onboard.slide4Title', bodyKey:'onboard.slide4Body' },
 ];
-
-// Confetti particles for last slide
-function Confetti() {
-  const particles = Array.from({ length: 30 }, (_, i) => ({
-    id: i,
-    left: Math.random() * 100,
-    delay: Math.random() * 1.5,
-    duration: 1.5 + Math.random() * 2,
-    color: ['#e0c78e','#c8a06e','#a07840','#FF6B00','#FFD54F'][i % 5],
-    size: 6 + Math.random() * 8,
-  }));
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-50">
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="absolute rounded-sm animate-float-up"
-          style={{
-            left: `${p.left}%`,
-            top: '-20px',
-            width: p.size,
-            height: p.size * 0.6,
-            background: p.color,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
-            opacity: 0.9,
-            transform: `rotate(${Math.random() * 360}deg)`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
 
 export default function OnboardingPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [direction, setDirection] = useState(1); // 1=forward, -1=back
   const touchStart = useRef(0);
 
   const finish = () => {
@@ -57,119 +22,51 @@ export default function OnboardingPage() {
   };
 
   const next = () => {
-    setDirection(1);
     if (step < slides.length - 1) setStep(step + 1);
     else finish();
   };
 
-  const prev = () => {
-    if (step > 0) {
-      setDirection(-1);
-      setStep(step - 1);
-    }
-  };
+  const prev = () => { if (step > 0) setStep(step - 1); };
 
-  // Touch swipe
   const onTouchStart = (e) => { touchStart.current = e.touches[0].clientX; };
   const onTouchEnd = (e) => {
     const diff = touchStart.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) next();
-      else prev();
-    }
+    if (Math.abs(diff) > 50) { if (diff > 0) next(); else prev(); }
   };
 
   const current = slides[step];
   const isLast = step === slides.length - 1;
 
   return (
-    <div className="min-h-dvh flex flex-col bg-gradient-to-b from-[#c8a06e] via-[#b8905e] to-[#a07840] relative overflow-hidden"
+    <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',background:'#fff',maxWidth:430,margin:'0 auto'}}
       onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-      {/* ═══ Animated Background ═══ */}
-      <div className="absolute -top-32 -right-32 w-80 h-80 rounded-full bg-white/5 animate-pulse" style={{ animationDuration: '8s' }} />
-      <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-white/5 animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
-      <div className="absolute top-1/3 left-1/4 w-48 h-48 rounded-full bg-white/3 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
 
-      {/* ═══ Confetti on last slide ═══ */}
-      {isLast && <Confetti />}
-
-      {/* ═══ Header ═══ */}
-      <div className="px-4 pt-12 flex justify-end relative z-10">
-        <button onClick={finish} className="text-white/60 text-sm font-medium px-3 py-1.5 hover:text-white transition-colors">
-          {t('common.skip')}
-        </button>
+      <div style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',padding:'40px 28px'}}>
+        <div style={{width:72,height:72,borderRadius:20,background:current.bg,display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,marginBottom:28}}>{current.emoji}</div>
+        <div style={{fontSize:24,fontWeight:800,color:'#0f0f0f',marginBottom:8}}>{t(current.titleKey)}</div>
+        <div style={{fontSize:14,color:'#999',lineHeight:1.6,maxWidth:260}}>{t(current.bodyKey)}</div>
+        <div style={{marginTop:24}}><LanguageSwitcher /></div>
       </div>
 
-      {/* ═══ Slide ═══ */}
-      <div className="flex-1 flex flex-col items-center justify-center px-8 text-center relative z-10">
-        <div
-          className="transition-all duration-500"
-          style={{
-            opacity: 0,
-            transform: `translateX(${direction * 30}px)`,
-            animation: 'slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-          }}
-          key={step}
-        >
-          {/* Floating emoji */}
-          <div className="text-7xl mb-6" style={{ animation: 'float 3s ease-in-out infinite' }}>
-            {current.emoji}
-          </div>
-          <h1 className="text-[22px] font-black text-white mb-3 tracking-tight">{t(current.titleKey)}</h1>
-          <p className="text-base text-white/70 leading-relaxed max-w-xs mx-auto">{t(current.bodyKey)}</p>
-
-          {/* Language Switcher */}
-          <div className="mt-8 flex flex-col items-center gap-2">
-            <span className="text-sm text-white/50 font-medium">{t('common.language')}</span>
-            <LanguageSwitcher />
-          </div>
-        </div>
-      </div>
-
-      {/* ═══ Bottom ═══ */}
-      <div className="px-6 pb-10 space-y-4 relative z-10">
-        {/* Dots */}
-        <div className="flex justify-center gap-2">
+      <div style={{padding:'0 28px 40px'}}>
+        <div style={{display:'flex',justifyContent:'center',gap:6,marginBottom:20}}>
           {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { setDirection(i > step ? 1 : -1); setStep(i); }}
-              className={`rounded-full transition-all duration-300 ${
-                i === step ? 'bg-white w-6 h-2' : 'bg-white/30 w-2 h-2 hover:bg-white/50'
-              }`}
-            />
+            <button key={i} onClick={() => setStep(i)} style={{
+              width: i===step?28:5, height:5, border:'none', borderRadius:3,
+              background: i===step?(isLast?'#00A86B':'#FF5000':'#e0e0e0'),
+              cursor:'pointer', padding:0, transition:'all .2s'
+            }} />
           ))}
         </div>
-
-        {/* Button */}
-        <button onClick={next}
-          className="w-full py-4 bg-white text-[#c8a06e] font-bold rounded-2xl text-base active:scale-95 transition-all shadow-lg shadow-black/10 hover:shadow-xl hover:shadow-black/20 hover:-translate-y-0.5">
-          {isLast ? t('common.start') : t('common.next')}
-        </button>
-
-        {/* Back hint */}
-        {step > 0 && (
-          <button onClick={prev} className="w-full text-center text-white/30 text-xs py-1 hover:text-white/50 transition-colors">
-            {t('common.back')}
-          </button>
+        {isLast ? (
+          <button onClick={finish} style={{width:'100%',padding:16,background:'#FF5000',color:'#fff',border:'none',borderRadius:16,fontSize:16,fontWeight:700,cursor:'pointer',boxShadow:'0 4px 16px rgba(255,80,0,.3)'}}>Get Started</button>
+        ) : (
+          <div style={{display:'flex',gap:12}}>
+            <button onClick={step===0?finish:prev} style={{flex:1,padding:14,background:'#f5f5f5',color:'#999',border:'none',borderRadius:14,fontSize:14,fontWeight:600,cursor:'pointer'}}>{step===0?'Skip':'Back'}</button>
+            <button onClick={next} style={{flex:1,padding:14,background:'#FF5000',color:'#fff',border:'none',borderRadius:14,fontSize:14,fontWeight:700,cursor:'pointer'}}>Next</button>
+          </div>
         )}
       </div>
-
-      {/* ═══ Inline CSS Animations ═══ */}
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-12px); }
-        }
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateX(var(--slide-x, 0)); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes floatUp {
-          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-          100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
-        }
-      `}</style>
     </div>
   );
 }
