@@ -290,7 +290,8 @@ function genProducts(tier, cat, search, daySeed) {
     var costRate = 1 - profitRate;
     var cost = Math.round(price * costRate * 100) / 100;
     var profit = Math.round(price * profitRate * 100) / 100;
-    return { ...p, costPrice: cost, profit };
+    var roi = Math.round(profitRate * 100);
+    return { ...p, costPrice: cost, profit, roi };
   });
 }
 
@@ -483,7 +484,7 @@ export default function StorePage() {
                 </div>
                 <div style={{flex:1,background:'#fff',borderRadius:10,padding:8,textAlign:'center'}}>
                   <div style={{fontSize:9,color:'#999'}}>ROI</div>
-                  <div style={{fontSize:14,fontWeight:700,color:'#00A86B'}}>15%</div>
+                  <div style={{fontSize:14,fontWeight:700,color:'#00A86B'}}>{p.roi || Math.round(p.profit/p.price*100)}%</div>
                 </div>
               </div>
             </div>
@@ -678,7 +679,7 @@ export default function StorePage() {
                 <div style={{flex:1,display:'flex',flexDirection:'column',gap:4}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
                     <span style={{fontSize:20,fontWeight:800,color:'#00A86B'}}>+${p.profit.toFixed(2)}</span>
-                    <span style={{fontSize:10,padding:'2px 8px',borderRadius:10,background:'#E8F5E9',color:'#00A86B',fontWeight:600}}>15% ROI</span>
+                    <span style={{fontSize:10,padding:'2px 8px',borderRadius:10,background:'#E8F5E9',color:'#00A86B',fontWeight:600}}>{p.roi || Math.round(p.profit/p.price*100)}% ROI</span>
                   </div>
                   <p style={{fontSize:11,color:'#666',lineHeight:1.4,display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden',margin:0}}>{p.name}</p>
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'#999'}}>
@@ -864,7 +865,7 @@ export default function StorePage() {
                   <div className="pb-2 text-[10px] space-y-1 text-[#565959] px-1 border-t border-[#f0f2f2] pt-1">
                     <div className="flex justify-between"><span>Product</span><span className="text-[#0F1111] font-medium truncate max-w-[70%]">{h.product_name || '-'}</span></div>
                     <div className="flex justify-between"><span>Cost</span><span className="text-[#0F1111] font-medium">${Number(h.cost).toFixed(2)}</span></div>
-                    <div className="flex justify-between"><span>Profit (15%)</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>Profit ({p.roi || Math.round(p.profit/p.price*100)}%)</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
                     <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${(Number(h.cost) + profit).toFixed(2)}</span></div>
                     <div className="flex justify-between"><span>Created</span><span className="text-[#0F1111]">{new Date(h.created_at).toLocaleString()}</span></div>
                     <div className="flex justify-between"><span>Sell By</span><span className="text-[#0F1111]">{new Date(h.sell_by).toLocaleString()}</span></div>
@@ -896,7 +897,7 @@ export default function StorePage() {
                 <div className="pb-2 text-[10px] space-y-1 text-[#565959] px-1">
                   <div className="flex justify-between"><span>Product</span><span className="text-[#0F1111] font-medium truncate max-w-[70%]">{o.product_name || `#${o.id}`}</span></div>
                   <div className="flex justify-between"><span>Cost</span><span className="text-[#0F1111] font-medium">${cost.toFixed(2)}</span></div>
-                  <div className="flex justify-between"><span>Profit (15%)</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Profit ({p.roi || Math.round(p.profit/p.price*100)}%)</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${(cost + profit).toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>Time</span><span className="text-[#0F1111]">{new Date(o.created_at).toLocaleString()}</span></div>
                 </div>
