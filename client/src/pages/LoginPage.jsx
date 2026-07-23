@@ -26,57 +26,35 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-white flex flex-col" style={{ maxWidth: 430, margin: '0 auto' }}>
-      {/* Status Bar */}
-      <div className="h-11 bg-black flex items-center justify-between px-6 text-white text-[11px] font-medium">
-        <span>9:41</span>
-        <span>●●●●○</span>
-      </div>
-
-      {/* Spacer */}
-      <div className="h-12" />
-
-      {/* Brand Hero */}
-      <div className="px-6 pt-2 pb-8">
-        <div className="w-14 h-14 bg-black rounded-2xl flex items-center justify-center mb-5">
-          <span className="text-white text-xl font-bold">S</span>
-        </div>
-        <h1 className="text-[26px] font-extrabold text-gray-900 leading-tight mb-2">
-          Welcome back
-        </h1>
-        <p className="text-[15px] text-gray-400">
-          Sign in to continue earning
-        </p>
+    <div style={{minHeight:'100vh',background:'#fff',display:'flex',flexDirection:'column',maxWidth:430,margin:'0 auto'}}>
+      {/* Header */}
+      <div style={{background:'#0f0f0f',padding:'50px 28px 36px',textAlign:'center'}}>
+        <img src="/logo.jpg" alt="Logo" style={{width:48,height:48,borderRadius:12,objectFit:'cover',marginBottom:10}} />
+        <div style={{fontSize:14,fontWeight:700,color:'#fff'}}>Shopee Shopping Operations</div>
       </div>
 
       {/* Form */}
-      <div className="flex-1 px-6">
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Email</div>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="name@email.com" autoFocus
-              className="w-full px-0 py-3 text-[17px] text-gray-900 placeholder-gray-300 bg-transparent border-b-2 border-gray-200 focus:border-black outline-none transition-colors" />
-          </div>
-          <div>
-            <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Password</div>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password"
-              className="w-full px-0 py-3 text-[17px] text-gray-900 placeholder-gray-300 bg-transparent border-b-2 border-gray-200 focus:border-black outline-none transition-colors" />
+      <div style={{flex:1,padding:'36px 28px'}}>
+        <div style={{fontSize:22,fontWeight:800,color:'#0f0f0f',marginBottom:4}}>Sign In</div>
+        <div style={{fontSize:13,color:'#999',marginBottom:32}}>Welcome back</div>
+
+        <form onSubmit={handleSubmit}>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" autoFocus
+            style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:12,outline:'none'}} />
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password"
+            style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:8,outline:'none'}} />
+          <div style={{textAlign:'right',marginBottom:28}}>
+            <Link to="/reset" style={{color:'#FF5000',fontSize:12,textDecoration:'none'}}>Forgot password?</Link>
           </div>
           <button type="submit" disabled={loading}
-            className="w-full h-14 bg-black text-white rounded-2xl text-[17px] font-semibold disabled:opacity-50 active:scale-[0.98] transition-all mt-6">
+            style={{width:'100%',padding:15,background:'#FF5000',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:20,opacity:loading?.5:1}}>
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        <div className="text-center mt-5">
-          <Link to="/reset" className="text-sm text-gray-400">Forgot password?</Link>
-        </div>
-      </div>
 
-      {/* Bottom */}
-      <div className="px-6 py-4 safe-bottom text-center">
-        <p className="text-sm text-gray-400">
-          Don't have an account? <Link to="/register" className="text-black font-semibold">Sign Up</Link>
-        </p>
+        <div style={{textAlign:'center',fontSize:13,color:'#bbb'}}>
+          No account? <Link to="/register" style={{color:'#FF5000',fontWeight:700,textDecoration:'none'}}>Register →</Link>
+        </div>
       </div>
     </div>
   );

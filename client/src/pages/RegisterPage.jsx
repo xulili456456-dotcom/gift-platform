@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
-import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 
 export default function RegisterPage() {
   const { t } = useTranslation();
@@ -33,88 +33,57 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-white flex flex-col" style={{ maxWidth: 430, margin: '0 auto' }}>
-      {/* Status Bar */}
-      <div className="h-11 bg-black flex items-center justify-between px-6 text-white text-[11px] font-medium">
-        <span>9:41</span>
-        <span>●●●●○</span>
+    <div style={{minHeight:'100vh',background:'#fff',display:'flex',flexDirection:'column',maxWidth:430,margin:'0 auto'}}>
+      {/* Header */}
+      <div style={{background:'#0f0f0f',padding:'50px 28px 36px',textAlign:'center',position:'relative'}}>
+        {step === 2 && <button onClick={() => setStep(1)} style={{position:'absolute',left:16,top:50,background:'none',border:'none',cursor:'pointer',color:'#fff'}}><ChevronLeft size={22} /></button>}
+        <img src="/logo.jpg" alt="Logo" style={{width:48,height:48,borderRadius:12,objectFit:'cover',marginBottom:10}} />
+        <div style={{fontSize:14,fontWeight:700,color:'#fff'}}>Shopee Shopping Operations</div>
       </div>
 
-      {/* Nav */}
-      <div className="h-12 flex items-center px-2">
-        {step === 2 && <button onClick={() => setStep(1)} className="p-2"><ChevronLeft size={22} className="text-gray-800" /></button>}
-      </div>
-
-      {/* Brand Hero */}
-      <div className="px-6 pt-2 pb-8">
-        <div className="w-14 h-14 bg-black rounded-2xl flex items-center justify-center mb-5">
-          <span className="text-white text-xl font-bold">S</span>
+      {/* Form */}
+      <div style={{flex:1,padding: step===1?'36px 28px':'30px 28px'}}>
+        <div style={{fontSize:22,fontWeight:800,color:'#0f0f0f',marginBottom:4}}>
+          {step === 1 ? 'Create Account' : 'Complete Profile'}
         </div>
-        <h1 className="text-[26px] font-extrabold text-gray-900 leading-tight mb-2">
-          {step === 1 ? 'Create your\naccount' : 'Complete your\nprofile'}
-        </h1>
-        <p className="text-[15px] text-gray-400">
-          {step === 1 ? 'Start earning with e-commerce tasks' : 'Just a few more details'}
-        </p>
-      </div>
+        <div style={{fontSize:13,color:'#999',marginBottom: step===1?32:24}}>
+          {step === 1 ? 'Start earning today' : 'Just a few more details'}
+        </div>
 
-      {/* Form Card */}
-      <div className="flex-1 px-6">
         {step === 1 ? (
-          <div className="space-y-5">
-            <div>
-              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Email</div>
-              <input type="email" value={form.email} onChange={update('email')} placeholder="name@email.com"
-                className="w-full px-0 py-3 text-[17px] text-gray-900 placeholder-gray-300 bg-transparent border-b-2 border-gray-200 focus:border-black outline-none transition-colors" />
-              {form.email && !emailValid && <p className="text-red-400 text-xs mt-1">Enter a valid email</p>}
+          <div>
+            <input type="email" value={form.email} onChange={update('email')} placeholder="Email"
+              style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:10,outline:'none'}} />
+            {form.email && !emailValid && <div style={{fontSize:11,color:'#E04500',marginBottom:8,marginTop:-6}}>Enter a valid email</div>}
+            <input type="password" value={form.password} onChange={update('password')} placeholder="Password (8+ characters)"
+              style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:12,outline:'none'}} />
+            <div style={{display:'flex',gap:4,marginBottom:28}}>
+              <div style={{flex:1,height:3,borderRadius:2,background: form.password.length>=4?'#00A86B':'#eee'}} />
+              <div style={{flex:1,height:3,borderRadius:2,background: pwValid?'#00A86B':'#eee'}} />
             </div>
-            <div>
-              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Password</div>
-              <input type="password" value={form.password} onChange={update('password')} placeholder="Min. 8 characters"
-                className="w-full px-0 py-3 text-[17px] text-gray-900 placeholder-gray-300 bg-transparent border-b-2 border-gray-200 focus:border-black outline-none transition-colors" />
-              <div className="flex gap-2 mt-2">
-                <div className={`flex-1 h-1 rounded-full ${form.password.length >= 4 ? 'bg-green-400' : 'bg-gray-200'}`} />
-                <div className={`flex-1 h-1 rounded-full ${form.password.length >= 8 ? 'bg-green-400' : 'bg-gray-200'}`} />
-              </div>
-            </div>
+            <button onClick={() => { if (canNext) setStep(2); else toast.error('Please fill in valid email and password'); }}
+              style={{width:'100%',padding:15,background:'#FF5000',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:20,opacity: canNext?1:.5}}>
+              Continue
+            </button>
           </div>
         ) : (
-          <div className="space-y-5">
-            <div>
-              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Full Name</div>
-              <input type="text" value={form.name} onChange={update('name')} placeholder="Your name"
-                className="w-full px-0 py-3 text-[17px] text-gray-900 placeholder-gray-300 bg-transparent border-b-2 border-gray-200 focus:border-black outline-none transition-colors" />
-            </div>
-            <div>
-              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Phone Number</div>
-              <input type="tel" value={form.phone} onChange={update('phone')} placeholder="10-15 digits"
-                className="w-full px-0 py-3 text-[17px] text-gray-900 placeholder-gray-300 bg-transparent border-b-2 border-gray-200 focus:border-black outline-none transition-colors" />
-            </div>
-            <div>
-              <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Referral Code <span className="font-normal normal-case tracking-normal">(optional)</span></div>
-              <input type="text" value={form.referral_code} onChange={update('referral_code')} placeholder="Enter code"
-                className="w-full px-0 py-3 text-[17px] text-gray-900 placeholder-gray-300 bg-transparent border-b-2 border-gray-200 focus:border-black outline-none transition-colors" />
-            </div>
+          <div>
+            <input type="text" value={form.name} onChange={update('name')} placeholder="Full Name"
+              style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:10,outline:'none'}} />
+            <input type="tel" value={form.phone} onChange={update('phone')} placeholder="Phone"
+              style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:10,outline:'none'}} />
+            <input value={form.referral_code} onChange={update('referral_code')} placeholder="Referral Code (optional)"
+              style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:24,outline:'none'}} />
+            <button onClick={handleSubmit} disabled={loading}
+              style={{width:'100%',padding:15,background:'#FF5000',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:16,opacity:loading?.5:1}}>
+              {loading ? 'Creating Account...' : 'Create Account'}
+            </button>
           </div>
         )}
-      </div>
 
-      {/* Bottom */}
-      <div className="px-6 py-4 safe-bottom">
-        {step === 1 ? (
-          <button onClick={() => setStep(2)} disabled={!canNext}
-            className="w-full h-14 bg-black text-white rounded-2xl text-[17px] font-semibold flex items-center justify-center gap-2 disabled:opacity-20 active:scale-[0.98] transition-all">
-            Continue <ChevronRight size={20} />
-          </button>
-        ) : (
-          <button onClick={handleSubmit} disabled={loading}
-            className="w-full h-14 bg-black text-white rounded-2xl text-[17px] font-semibold disabled:opacity-50 active:scale-[0.98] transition-all">
-            {loading ? 'Creating Account...' : 'Create Account'}
-          </button>
-        )}
-        <p className="text-center text-sm text-gray-400 mt-4 mb-2">
-          Already have an account? <Link to="/login" className="text-black font-semibold">Sign In</Link>
-        </p>
+        <div style={{textAlign:'center',fontSize:13,color:'#bbb'}}>
+          Already have an account? <Link to="/login" style={{color:'#FF5000',fontWeight:700,textDecoration:'none'}}>Sign In →</Link>
+        </div>
       </div>
     </div>
   );
