@@ -270,24 +270,23 @@ const PRODUCTS = [
 ];
 
 
-function genProducts(tier, cat, search) {
-  // Daily seed for variation — changes each day
-  var today = new Date().toISOString().slice(0,10);
-  var seed = today.split('-').reduce(function(s,x){return s+parseInt(x)},0);
-  var dailyShift = ((seed * 7 + 13) % 100 - 50) / 500; // -0.05 to +0.05 shift per day
-
+function genProducts(tier, cat, search, daySeed) {
+  // Profit rate based on price tier + deterministic daily seed + per-product jitter
   let filtered = cat === 'All' ? [...PRODUCTS] : PRODUCTS.filter(p => p.cat === cat);
   if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.cat.toLowerCase().includes(search.toLowerCase()));
   filtered.sort((a,b) => b.sold - a.sold);
-  return filtered.map(p => {
+  return filtered.map((p, idx) => {
     var price = p.price;
-    // Profit rate based on price tier + daily random jitter
+    // Use product index + day seed for deterministic per-product randomness
+    var rng = ((daySeed * (idx + 1) * 31 + idx * 17) % 1000) / 1000;
     var baseRate;
-    if (price < 20) baseRate = 0.06 + Math.random() * 0.04;       // 6-10%
-    else if (price < 100) baseRate = 0.08 + Math.random() * 0.07;   // 8-15%
-    else if (price < 500) baseRate = 0.10 + Math.random() * 0.08;   // 10-18%
-    else baseRate = 0.15 + Math.random() * 0.10;                    // 15-25%
-    var profitRate = Math.max(0.05, Math.min(0.25, baseRate + dailyShift));
+    if (price < 20) baseRate = 0.05 + 0.03 * rng;        // 5-8%
+    else if (price < 50) baseRate = 0.06 + 0.04 * rng;    // 6-10%
+    else if (price < 100) baseRate = 0.07 + 0.05 * rng;   // 7-12%
+    else if (price < 300) baseRate = 0.08 + 0.06 * rng;    // 8-14%
+    else if (price < 800) baseRate = 0.10 + 0.07 * rng;    // 10-17%
+    else baseRate = 0.13 + 0.09 * rng;                     // 13-22%
+    var profitRate = Math.round(baseRate * 100) / 100;
     var costRate = 1 - profitRate;
     var cost = Math.round(price * costRate * 100) / 100;
     var profit = Math.round(price * profitRate * 100) / 100;
@@ -356,9 +355,10 @@ export default function StorePage() {
   const [freeRemaining, setFreeRemaining] = useState(0);
   useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); }).catch(()=>{}); }, [status?.store?.doneToday]);
 
+  var daySeed = parseInt(new Date().toISOString().slice(0,10).replace(/-/g,''),10);
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
-    let list = genProducts(status.store.tier, CAT_VALUES[catIdx], search);
+    let list = genProducts(status.store.tier, CAT_VALUES[catIdx], search, daySeed);
     if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0)));
     else if (affordableOnly) list = list.filter(p => p.costPrice <= (status.store.balance || 0));
     if (sortMode === 'profit') list.sort((a, b) => b.profit - a.profit);
@@ -367,7 +367,7 @@ export default function StorePage() {
     else if (sortMode === 'free') list.sort((a, b) => a.price - b.price);
     else list.sort((a, b) => b.sold - a.sold);
     return list;
-  }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, catIdx, search, sortMode, affordableOnly, status?.store?.balance, freeProducts]);
+  }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, catIdx, search, sortMode, affordableOnly, status?.store?.balance, freeProducts, daySeed]);
 
   const [tradeMode, setTradeMode] = useState('holding'); // 'holding' | 'share'
   const [shareProduct, setShareProduct] = useState(null);
