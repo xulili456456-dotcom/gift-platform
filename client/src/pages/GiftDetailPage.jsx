@@ -76,6 +76,31 @@ export default function GiftDetailPage() {
           <p className="text-[13px] text-text-secondary mt-2">{tg(gift.name).desc}</p>
         </div>
 
+        {/* KYC Notice */}
+        <div className="bg-[#FFF3E0] rounded-xl border border-[#FFB74D] border-l-4 border-l-[#FF9800] p-4 flex gap-3">
+          <span className="text-xl flex-shrink-0">⚠️</span>
+          <div className="flex-1">
+            <p className="text-[13px] font-bold text-[#E65100] mb-1">{t('gifts.kycNotice')}</p>
+            <p className="text-[12px] text-[#8D6E63] leading-relaxed">{t('gifts.kycNoticeDesc')}</p>
+          </div>
+        </div>
+
+        {/* KYC Steps */}
+        <div className="bg-[#F5F7FA] rounded-xl p-4">
+          <p className="text-[12px] font-bold text-[#546E7A] mb-3 uppercase tracking-wide">📋 {t('gifts.kycStepsTitle')}</p>
+          {[
+            { key: 'kycStep1', done: true },
+            { key: 'kycStep2', done: true },
+            { key: 'kycStep3', done: false },
+            { key: 'kycStep4', done: false },
+          ].map((step, i) => (
+            <div key={step.key} className="flex items-center gap-2.5 py-2">
+              <span className={`w-[22px] h-[22px] rounded-full flex items-center justify-center text-[11px] font-bold flex-shrink-0 ${step.done ? 'bg-[#4CAF50] text-white' : 'bg-[#FF9800] text-white'}`}>{i + 1}</span>
+              <span className={`text-[12px] ${step.done ? 'text-[#388E3C] font-semibold' : 'text-[#607D8B]'}`}>{t(`gifts.${step.key}`)}</span>
+            </div>
+          ))}
+        </div>
+
         {/* Progress */}
         <div className="bg-white rounded-2xl border border-separator p-5 shadow-sm">
           <h3 className="text-[14px] font-bold text-text mb-4 flex items-center gap-2">
@@ -87,7 +112,7 @@ export default function GiftDetailPage() {
             <span className="font-bold text-text">{gift.required_invites} {t('common.people')}</span>
           </div>
           <div className="flex items-center justify-between text-[13px] mb-3">
-            <span className="text-text-secondary">{t('gifts.detail.currentInvites')}</span>
+            <span className="text-text-secondary">{t('gifts.kycEffectiveInvites')}</span>
             <span className="font-bold text-text">{effective} {t('common.people')}</span>
           </div>
           <div className="w-full h-3 bg-bg rounded-full overflow-hidden">
