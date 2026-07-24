@@ -57,8 +57,8 @@ const userGiftModel = {
     }
     const rows = await all(
       `SELECT ug.*, g.name as gift_name, g.gift_type, g.value,
-              u.name as user_name, u.email as user_email, u.phone as user_phone, u.id as uid,
-              u.parent_id,
+              u.name as user_name, u.email as user_email, u.phone as user_phone,
+              u.id as uid, u.referral_code as user_code, u.parent_id,
               parent.referral_code as parent_code,
               parent.name as inviter_name, parent.id as inviter_id
        FROM user_gifts ug
