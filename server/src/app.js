@@ -102,7 +102,7 @@ app.use('/api/commissions', require('./routes/commissions'));
   }
 
   // Landing page routes (served from landing-dist)
-  const landingRoutes = ['/', '/download', '/about', '/faq', '/legal'];
+  const landingRoutes = ['/download', '/about', '/faq', '/legal'];
   landingRoutes.forEach(route => {
     app.get(route, (req, res) => {
       if (hasLanding) {

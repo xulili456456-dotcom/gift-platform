@@ -1,4 +1,4 @@
-const { getDb, exec, get, run, all } = require('./database');
+const { getDb, exec, get, run, all, closeDb } = require('./database');
 
 const schema = `
 -- Users table
