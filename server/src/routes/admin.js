@@ -158,6 +158,25 @@ router.put('/claims/:id', async (req, res) => {
     return res.status(404).json({ error: 'Claim record not found' });
   }
 
+  // Before approval, verify KYC of downline users
+  if (status === 'delivered') {
+    const gift = await giftModel.findById(claim.gift_id);
+    if (gift && gift.required_invites > 0) {
+      const kycCount = await get(
+        `SELECT COUNT(*) as cnt FROM invitations i
+         JOIN kyc_submissions k ON k.user_id = i.invitee_id AND k.status = 'approved'
+         WHERE i.inviter_id = $1 AND i.level = 1`,
+        [claim.user_id]
+      );
+      const validKyc = Number(kycCount?.cnt) || 0;
+      if (validKyc < gift.required_invites) {
+        return res.status(400).json({
+          error: `下级实名不足：需要${gift.required_invites}人完成KYC，当前仅${validKyc}人`
+        });
+      }
+    }
+  }
+
   const updated = await userGiftModel.updateStatus(id, status, admin_note || '');
 
   // Send notification
