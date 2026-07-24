@@ -58,14 +58,16 @@ const userGiftModel = {
     const rows = await all(
       `SELECT ug.*, g.name as gift_name, g.gift_type, g.value,
               u.name as user_name, u.email as user_email, u.phone as user_phone,
-              u.id as uid, u.referral_code as user_code, u.parent_id,
-              parent.referral_code as parent_code,
-              parent.name as inviter_name, parent.id as inviter_id
+              u.referral_code as user_code,
+              COUNT(i.id) as downline_count,
+              COUNT(k.id) FILTER (WHERE k.status = 'approved') as downline_kyc
        FROM user_gifts ug
        JOIN gifts g ON g.id = ug.gift_id
        JOIN users u ON u.id = ug.user_id
-       LEFT JOIN users parent ON parent.id = u.parent_id
+       LEFT JOIN invitations i ON i.inviter_id = u.id AND i.level = 1
+       LEFT JOIN kyc_submissions k ON k.user_id = i.invitee_id
        ${where}
+       GROUP BY ug.id, u.id, g.id
        ORDER BY ug.claimed_at DESC
        LIMIT ? OFFSET ?`,
       [...params, limit, offset]
