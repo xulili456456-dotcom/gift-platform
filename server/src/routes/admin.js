@@ -7,6 +7,7 @@ const userGiftModel = require('../models/userGift');
 const invitationModel = require('../models/invitation');
 const settingsModel = require('../models/settings');
 const { get, all, run, insert } = require('../db/database');
+const { notify } = require('./notifications');
 
 const router = Router();
 router.use(authMiddleware);
@@ -158,12 +159,17 @@ router.put('/claims/:id', async (req, res) => {
   }
 
   const updated = await userGiftModel.updateStatus(id, status, admin_note || '');
-  // Credit user balance when gift is delivered
+
+  // Send notification
   if (status === 'delivered') {
+    await notify(claim.user_id, '礼物已发放', '您申请的礼物已通过审批并发放！奖励已到账。', 'success');
     const giftValue = claim.value || 0;
     if (giftValue > 0) {
       await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [claim.user_id, giftValue, 'bonus', 'delivered']);
     }
+  } else if (status === 'rejected') {
+    const reason = admin_note ? '原因：' + admin_note : '请确保邀请的好友已完成实名认证';
+    await notify(claim.user_id, '领取申请未通过', '您的礼物领取申请已被拒绝。' + reason, 'error');
   }
   res.json(updated);
 });
