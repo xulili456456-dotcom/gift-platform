@@ -57,10 +57,12 @@ const userGiftModel = {
     }
     const rows = await all(
       `SELECT ug.*, g.name as gift_name, g.gift_type, g.value,
-              u.name as user_name, u.email as user_email, u.phone as user_phone
+              u.name as user_name, u.email as user_email, u.phone as user_phone,
+              inv.name as inviter_name, inv.id as inviter_id
        FROM user_gifts ug
        JOIN gifts g ON g.id = ug.gift_id
        JOIN users u ON u.id = ug.user_id
+       LEFT JOIN users inv ON inv.id = u.parent_id
        ${where}
        ORDER BY ug.claimed_at DESC
        LIMIT ? OFFSET ?`,
