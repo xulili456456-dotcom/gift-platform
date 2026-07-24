@@ -58,14 +58,12 @@ const userGiftModel = {
     const rows = await all(
       `SELECT ug.*, g.name as gift_name, g.gift_type, g.value,
               u.name as user_name, u.email as user_email, u.phone as user_phone,
-              COALESCE(parent.name, inviter.name) as inviter_name,
-              COALESCE(parent.id, inviter.id) as inviter_id
+              COALESCE(inv.name, (SELECT us.name FROM users us JOIN invitations iv ON iv.inviter_id = us.id WHERE iv.invitee_id = u.id AND iv.level = 1 LIMIT 1)) as inviter_name,
+              COALESCE(inv.id, (SELECT us.id FROM users us JOIN invitations iv ON iv.inviter_id = us.id WHERE iv.invitee_id = u.id AND iv.level = 1 LIMIT 1)) as inviter_id
        FROM user_gifts ug
        JOIN gifts g ON g.id = ug.gift_id
        JOIN users u ON u.id = ug.user_id
-       LEFT JOIN users parent ON parent.id = u.parent_id
-       LEFT JOIN invitations i ON i.invitee_id = u.id AND i.level = 1 AND i.inviter_id != u.id
-       LEFT JOIN users inviter ON inviter.id = i.inviter_id
+       LEFT JOIN users inv ON inv.id = u.parent_id
        ${where}
        ORDER BY ug.claimed_at DESC
        LIMIT ? OFFSET ?`,
