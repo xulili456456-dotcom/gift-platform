@@ -3,6 +3,7 @@ const authMiddleware = require('../middleware/auth');
 const adminMiddleware = require('../middleware/admin');
 const { get, insert, run, all } = require('../db/database');
 const { updateTaskProgress } = require('./tasks');
+const { notify } = require('./notifications');
 
 const router = Router();
 
@@ -43,11 +44,21 @@ router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res) => {
   if (!status) return res.status(400).json({ error: 'status required' });
   await run("UPDATE kyc_submissions SET status = ?, admin_note = ?, reviewed_at = NOW() WHERE id = ?",
     [status, admin_note || '', req.params.id]);
+
+  // Send notification to user
+  const kyc = await get('SELECT user_id, real_name FROM kyc_submissions WHERE id = ?', [req.params.id]);
+  if (kyc) {
+    if (status === 'approved') {
+      await notify(kyc.user_id, '实名认证已通过', '恭喜，您的实名认证审核已通过！（姓名：' + (kyc.real_name || '') + '）', 'success');
+    } else if (status === 'rejected') {
+      const reason = admin_note ? '原因：' + admin_note : '请重新提交真实有效的身份信息';
+      await notify(kyc.user_id, '实名认证未通过', '您的实名认证审核未通过。' + reason, 'error');
+    }
+  }
+
   res.json({ ok: true });
   if (status === 'approved') {
-    get('SELECT user_id FROM kyc_submissions WHERE id = ?', [req.params.id]).then(k => {
-      if (k) updateTaskProgress(k.user_id, 'kyc_complete', 1).catch(()=>{});
-    }).catch(()=>{});
+    updateTaskProgress(kyc.user_id, 'kyc_complete', 1).catch(()=>{});
   }
 });
 
