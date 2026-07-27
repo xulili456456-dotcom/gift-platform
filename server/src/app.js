@@ -41,9 +41,14 @@ async function start() {
     contentSecurityPolicy: false,
   }));
 
-  // CORS
+  // CORS — allow specific origins + same-origin / non-browser requests
   app.use(cors({
-    origin: config.CORS_ORIGIN,
+    origin: (requestOrigin, cb) => {
+      // Non-browser requests (curl, Postman, same-origin proxy) — allow
+      if (!requestOrigin) return cb(null, true);
+      if (config.CORS_ORIGIN.includes(requestOrigin)) return cb(null, true);
+      cb(null, false);
+    },
     credentials: true,
   }));
 
