@@ -232,11 +232,16 @@ router.get('/holdings', async (req, res) => {
   const holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at, product_name FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
   const now = Date.now();
   res.json(holdings.map(h => {
+    const cost = Number(h.cost);
     const sellBy = new Date(h.sell_by).getTime();
     const total = sellBy - new Date(h.created_at).getTime();
     const elapsed = now - new Date(h.created_at).getTime();
     const progress = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
-    return { ...h, cost: Number(h.cost), progress, sellBy: h.sell_by };
+    // Reconstruct product price from cost, then calculate profit
+    const productPrice = cost > 0 ? Math.round((cost / COST_RATE) * 100) / 100 : 0;
+    const profit = Math.round(productPrice * PROFIT_RATE * 100) / 100;
+    const roi = productPrice > 0 ? Math.round((profit / productPrice) * 100) : 0;
+    return { ...h, cost, profit, roi, progress, sellBy: h.sell_by };
   }));
 });
 

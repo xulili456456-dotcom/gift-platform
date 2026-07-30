@@ -847,7 +847,10 @@ export default function StorePage() {
             <h3 className="text-sm font-bold text-[#0F1111] mb-2">📦 Active Holdings ({holdings.length})</h3>
             {holdings.length === 0 && <p className="text-[11px] text-[#999] text-center py-4">No active holdings</p>}
             {holdings.map(h => {
-              const profit = Math.round((Number(h.cost) / COST_RATE * PROFIT_RATE) * 100) / 100;
+              const profit = Number(h.profit) || 0;
+              const cost = Number(h.cost) || 0;
+              const roi = Number(h.roi) || (cost > 0 ? Math.round(profit / cost * 100) : 0);
+              const totalReturn = cost + profit;
               const isOpen = expandedHolding === h.id;
               return (
                 <div key={h.id} className="border-b border-gray-100 last:border-0">
@@ -857,7 +860,7 @@ export default function StorePage() {
                       <span className="text-[#067D62] font-bold shrink-0">+${profit.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center justify-between text-[9px] text-[#565959] mt-0.5">
-                      <span>Cost ${Number(h.cost).toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</span>
+                      <span>Cost ${cost.toFixed(2)} · Sell by {new Date(h.sell_by).toLocaleDateString()}</span>
                       <span>{h.progress}%</span>
                     </div>
                     <div className="w-full h-1 bg-gray-50 rounded-full mt-1 overflow-hidden">
@@ -867,9 +870,9 @@ export default function StorePage() {
                   {isOpen && (
                   <div className="pb-2 text-[10px] space-y-1 text-[#565959] px-1 border-t border-[#f0f2f2] pt-1">
                     <div className="flex justify-between"><span>Product</span><span className="text-[#0F1111] font-medium truncate max-w-[70%]">{h.product_name || '-'}</span></div>
-                    <div className="flex justify-between"><span>Cost</span><span className="text-[#0F1111] font-medium">${Number(h.cost).toFixed(2)}</span></div>
-                    <div className="flex justify-between"><span>Profit ({p.roi || Math.round(p.profit/p.price*100)}%)</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
-                    <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${(Number(h.cost) + profit).toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>Cost</span><span className="text-[#0F1111] font-medium">${cost.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>Profit ({roi}%)</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${totalReturn.toFixed(2)}</span></div>
                     <div className="flex justify-between"><span>Created</span><span className="text-[#0F1111]">{new Date(h.created_at).toLocaleString()}</span></div>
                     <div className="flex justify-between"><span>Sell By</span><span className="text-[#0F1111]">{new Date(h.sell_by).toLocaleString()}</span></div>
                   </div>
