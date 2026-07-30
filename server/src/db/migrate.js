@@ -389,6 +389,21 @@ async function migrate() {
       console.log('All referral codes already numeric.');
     }
   } catch (e) { console.log('Referral code conversion error:', e.message); }
+  // One-time cleanup: clear bogus IPs captured before trust-proxy was enabled
+  // These are internal/Render proxy IPs, not real client IPs
+  try {
+    const bogusPattern = `ip_address IN ('127.0.0.1','::1','::ffff:127.0.0.1','0.0.0.0','undefined') OR ip_address LIKE '10.%' OR ip_address LIKE '::ffff:10.%' OR ip_address LIKE '172.16.%' OR ip_address LIKE '172.17.%' OR ip_address LIKE '172.18.%' OR ip_address LIKE '172.19.%' OR ip_address LIKE '172.20.%' OR ip_address LIKE '172.21.%' OR ip_address LIKE '172.22.%' OR ip_address LIKE '172.23.%' OR ip_address LIKE '172.24.%' OR ip_address LIKE '172.25.%' OR ip_address LIKE '172.26.%' OR ip_address LIKE '172.27.%' OR ip_address LIKE '172.28.%' OR ip_address LIKE '172.29.%' OR ip_address LIKE '172.30.%' OR ip_address LIKE '172.31.%' OR ip_address LIKE '192.168.%' OR ip_address LIKE '::ffff:172.%' OR ip_address LIKE '::ffff:192.168.%'`;
+    const userResult = await all(`SELECT id, ip_address FROM users WHERE ${bogusPattern}`);
+    if (userResult.length > 0) {
+      await exec(`UPDATE users SET ip_address = '' WHERE ${bogusPattern}`);
+      console.log('Cleared ' + userResult.length + ' bogus user IPs (proxy/localhost -> empty)');
+    }
+    const logResult = await all(`SELECT id FROM ip_log WHERE ${bogusPattern}`);
+    if (logResult.length > 0) {
+      await exec(`DELETE FROM ip_log WHERE ${bogusPattern}`);
+      console.log('Deleted ' + logResult.length + ' bogus login IP log entries');
+    }
+  } catch (e) { console.log('IP cleanup skipped:', e.message); }
   console.log('Migrations complete.');
 }
 
