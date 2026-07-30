@@ -35,6 +35,9 @@ async function start() {
 
   const app = express();
 
+  // Trust the first proxy (Render's load balancer) so req.ip returns real client IP
+  app.set('trust proxy', 1);
+
   // Security
   app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },

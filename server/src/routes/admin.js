@@ -636,9 +636,16 @@ router.get('/rapid-orders', async (req, res) => {
 // ========== All User IPs ==========
 router.get('/user-ips', async (req, res) => {
   try {
-    const rows = await all(
-      "SELECT u.id, u.email, u.name, u.ip_address as reg_ip, (SELECT ARRAY_AGG(DISTINCT ip_address) FROM ip_log WHERE user_id = u.id) as login_ips FROM users u ORDER BY u.id DESC LIMIT 100"
-    );
+    const { user_id } = req.query;
+    let query, params;
+    if (user_id) {
+      query = "SELECT u.id, u.email, u.name, u.ip_address as reg_ip, (SELECT ARRAY_AGG(DISTINCT ip_address) FROM ip_log WHERE user_id = u.id) as login_ips FROM users u WHERE u.id = $1";
+      params = [parseInt(user_id)];
+    } else {
+      query = "SELECT u.id, u.email, u.name, u.ip_address as reg_ip, (SELECT ARRAY_AGG(DISTINCT ip_address) FROM ip_log WHERE user_id = u.id) as login_ips FROM users u ORDER BY u.id DESC LIMIT 100";
+      params = [];
+    }
+    const rows = await all(query, params);
     res.json(rows);
   } catch(e) { res.status(500).json({error:'Failed'}); }
 });

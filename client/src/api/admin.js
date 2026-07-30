@@ -83,4 +83,8 @@ export const adminApi = {
 
   // Login as user
   loginAsUser(id) { return client.post(`/admin/users/${id}/login-as`); },
+
+  // IP tracking
+  getUserIps(params) { return client.get('/admin/user-ips', { params }); },
+  getIpDuplicates() { return client.get('/admin/ip-duplicates'); },
 };

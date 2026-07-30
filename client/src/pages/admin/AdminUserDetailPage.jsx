@@ -89,6 +89,7 @@ export default function AdminUserDetailPage() {
   const [balanceNote, setBalanceNote] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [loginToken, setLoginToken] = useState('');
+  const [ipHistory, setIpHistory] = useState(null);
 
   useEffect(() => {
     loadAll();
@@ -97,16 +98,19 @@ export default function AdminUserDetailPage() {
   const loadAll = async () => {
     setLoading(true);
     try {
-      const [userRes, financeRes, ordersRes, teamRes] = await Promise.all([
+      const [userRes, financeRes, ordersRes, teamRes, ipRes] = await Promise.all([
         adminApi.getUserDetail(id),
         adminApi.getUserFinance(id),
         adminApi.listOrders({ userId: id }),
         adminApi.getUserTree(id),
+        adminApi.getUserIps({ user_id: id }),
       ]);
       setUser(userRes.data);
       setFinance(financeRes.data);
       setOrders(ordersRes.data?.orders || ordersRes.data || []);
       setTeam(teamRes.data?.tree || teamRes.data || []);
+      const userIpRow = (ipRes.data || [])[0] || null;
+      setIpHistory(userIpRow || null);
     } catch {
       toast.error('Failed to load user data');
     } finally {
@@ -295,13 +299,21 @@ export default function AdminUserDetailPage() {
             <InfoRow label="Referral Code" value={user.referral_code || '-'} mono />
             <InfoRow label="User ID" value={user.id} mono />
             <InfoRow label="Joined" value={user.created_at ? user.created_at.slice(0, 10) : '-'} />
+            <InfoRow label="Registration IP" value={ipHistory?.reg_ip || user.ip_address || '-'} mono />
+            {ipHistory?.login_ips && ipHistory.login_ips.filter(Boolean).length > 0 && (
+              <InfoRow
+                label={`Login IPs (${ipHistory.login_ips.filter(Boolean).length})`}
+                value={ipHistory.login_ips.filter(Boolean).slice(0, 8).join(', ')}
+                mono
+              />
+            )}
           </div>
         </div>
 
         {/* Tabs */}
         <div style={styles.card} style={{ ...styles.card, padding: '0 18px' }}>
           <div style={{ display: 'flex' }}>
-            {['finance', 'orders', 'team', 'actions'].map((tab) => (
+            {['finance', 'orders', 'team', 'ip', 'actions'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -325,6 +337,10 @@ export default function AdminUserDetailPage() {
 
           {activeTab === 'team' && (
             <TeamTab team={team} />
+          )}
+
+          {activeTab === 'ip' && (
+            <IpTab ipHistory={ipHistory} />
           )}
 
           {activeTab === 'actions' && (
@@ -498,6 +514,115 @@ function TeamTab({ team }) {
         Referral Tree ({team.length} direct)
       </h3>
       {team.map((node) => renderNode(node, 0))}
+    </div>
+  );
+}
+
+function IpTab({ ipHistory }) {
+  if (!ipHistory) return <Empty label="No IP data available" />;
+
+  const regIp = ipHistory.reg_ip || '';
+  const loginIps = (ipHistory.login_ips || []).filter(Boolean);
+
+  return (
+    <div>
+      <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 700, color: '#0f0f0f' }}>IP Address History</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+        {/* Registration IP */}
+        <div style={{
+          padding: '14px',
+          borderRadius: 12,
+          background: '#f5f5f5',
+          border: '1px solid #e0e0e0',
+        }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Registration IP</span>
+          <p style={{ margin: '4px 0 0', fontSize: 18, fontWeight: 700, fontFamily: 'monospace', color: regIp ? '#0f0f0f' : '#ccc' }}>
+            {regIp || 'Not Available'}
+          </p>
+        </div>
+
+        {/* Login IPs */}
+        <div style={{
+          padding: '14px',
+          borderRadius: 12,
+          background: '#fff',
+          border: '1px solid #e0e0e0',
+        }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            Login IPs ({loginIps.length} unique)
+          </span>
+          {loginIps.length === 0 ? (
+            <p style={{ margin: '8px 0 0', fontSize: 13, color: '#ccc' }}>No login records yet</p>
+          ) : (
+            <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {loginIps.slice(0, 20).map((ip, i) => (
+                <div key={i} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '8px 12px',
+                  borderRadius: 8,
+                  background: ip === regIp ? '#FFF8E1' : '#fafafa',
+                  border: ip === regIp ? '1px solid #FFE082' : '1px solid #f0f0f0',
+                }}>
+                  <code style={{
+                    fontSize: 12,
+                    fontFamily: 'monospace',
+                    color: ip === regIp ? '#B76E00' : '#0f0f0f',
+                    fontWeight: ip === regIp ? 600 : 400,
+                  }}>
+                    {ip}
+                  </code>
+                  {ip === regIp && (
+                    <span style={{
+                      fontSize: 10,
+                      fontWeight: 600,
+                      color: '#B76E00',
+                      background: '#FFF3CD',
+                      padding: '2px 6px',
+                      borderRadius: 4,
+                    }}>
+                      MATCHES REG
+                    </span>
+                  )}
+                </div>
+              ))}
+              {loginIps.length > 20 && (
+                <p style={{ fontSize: 11, color: '#999', textAlign: 'center', marginTop: 4 }}>
+                  +{loginIps.length - 20} more
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Risk Assessment */}
+        <div style={{
+          padding: '14px',
+          borderRadius: 12,
+          background: '#fafafa',
+          border: '1px solid #e0e0e0',
+        }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Quick Assessment</span>
+          <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: '#666' }}>IP captured</span>
+              <span style={{ fontWeight: 600, color: regIp ? '#4CAF50' : '#F44336' }}>{regIp ? '✓ Yes' : '✗ No'}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: '#666' }}>Unique login IPs</span>
+              <span style={{ fontWeight: 600, color: loginIps.length > 3 ? '#FF9800' : '#4CAF50' }}>{loginIps.length}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: '#666' }}>Proxy / VPN risk</span>
+              <span style={{ fontWeight: 600, color: loginIps.length > 5 ? '#F44336' : '#4CAF50' }}>
+                {loginIps.length > 5 ? 'High (many IPs)' : loginIps.length === 0 ? 'Unknown' : 'Low'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

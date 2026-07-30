@@ -8,6 +8,7 @@ const { generateReferralCode } = require('../utils/referralCode');
 const userModel = require('../models/user');
 const invitationModel = require('../models/invitation');
 const authMiddleware = require('../middleware/auth');
+const { getClientIp } = require('../utils/ip');
 
 const router = Router();
 
@@ -72,7 +73,7 @@ router.post('/register', registerLimiter, async (req, res) => {
       name: name || '',
       referralCode: code,
       parentId,
-      ipAddress: req.ip || req.connection?.remoteAddress || '',
+      ipAddress: getClientIp(req),
     });
 
     if (parentId && inviter) {
@@ -123,7 +124,7 @@ router.post('/login', loginLimiter, async (req, res) => {
     const accessToken = signAccessToken(tokenPayload);
     const refreshToken = signRefreshToken(tokenPayload);
     // Log IP
-    const ip = req.ip || req.socket?.remoteAddress || '';
+    const ip = getClientIp(req);
     if (ip) { try { await run('INSERT INTO ip_log (user_id, ip_address) VALUES (?, ?)', [user.id, ip]); } catch {} }
     res.json({
       user: {

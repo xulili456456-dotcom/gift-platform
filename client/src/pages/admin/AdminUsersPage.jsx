@@ -12,22 +12,55 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [detailUser, setDetailUser] = useState(null);
+  const [dupCount, setDupCount] = useState(0);
+  const [dupIPs, setDupIPs] = useState(new Set());
   const navigate = useNavigate();
 
-  useEffect(() => { loadUsers(); }, [page]);
+  useEffect(() => { loadUsers(); loadIpDuplicates(); }, [page]);
 
   const loadUsers = async () => {
     setLoading(true);
-    try { const { data } = await adminApi.listUsers({ page, limit: 20, search }); setUsers(data.users); setTotal(data.total); }
-    catch { toast.error(t('common.loadingFailed')); }
-    finally { setLoading(false); }
+    try {
+      const { data } = await adminApi.listUsersEnhanced({ page, limit: 20, search });
+      setUsers(data.users);
+      setTotal(data.total);
+    } catch {
+      toast.error(t('common.loadingFailed'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadIpDuplicates = async () => {
+    try {
+      const { data } = await adminApi.getIpDuplicates();
+      setDupCount(data.length);
+      const ips = new Set();
+      for (const d of data) {
+        if (d.ids) d.ids.forEach(id => ips.add(String(id)));
+      }
+      setDupIPs(ips);
+    } catch { /* silent */ }
   };
 
   const handleSearch = (e) => { e.preventDefault(); setPage(1); loadUsers(); };
 
   const viewDetail = async (userId) => {
-    try { const { data } = await adminApi.getUserDetail(userId); setDetailUser(data); }
-    catch { toast.error(t('common.loadingFailed')); }
+    try {
+      const [detailRes, ipRes] = await Promise.all([
+        adminApi.getUserDetail(userId),
+        adminApi.getUserIps({ user_id: userId }),
+      ]);
+      const detail = detailRes.data;
+      const ipRow = (ipRes.data || [])[0] || null;
+      setDetailUser({
+        ...detail,
+        reg_ip: ipRow?.reg_ip || detail.ip_address || '',
+        login_ips: ipRow?.login_ips || [],
+      });
+    } catch {
+      toast.error(t('common.loadingFailed'));
+    }
   };
 
   const totalPages = Math.ceil(total / 20);
@@ -40,6 +73,11 @@ export default function AdminUsersPage() {
         </button>
         <h1 className="text-lg font-bold text-text-primary">{t('admin.userMgmt')}</h1>
         <span className="text-xs text-text-muted bg-gray-100 px-2 py-0.5 rounded-full">{total} {t('common.people')}</span>
+        {dupCount > 0 && (
+          <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+            {dupCount} IP dup{dupCount > 1 ? 's' : ''}
+          </span>
+        )}
       </div>
 
       <form onSubmit={handleSearch} className="flex gap-2">
@@ -50,19 +88,47 @@ export default function AdminUsersPage() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {loading ? <div className="p-4 space-y-2">{[1,2,3].map(i => <div key={i} className="skeleton h-14 rounded-xl" />)}</div> : (
           <>
-            <table className="w-full text-sm">
-              <thead><tr className="border-b border-gray-100 bg-warm-bg"><th className="text-left px-4 py-3 text-xs font-medium text-text-muted">ID</th><th className="text-left px-4 py-3 text-xs font-medium text-text-muted">{t('auth.email')}</th><th className="text-left px-4 py-3 text-xs font-medium text-text-muted">{t('auth.phone')}</th><th className="text-left px-4 py-3 text-xs font-medium text-text-muted">{t('auth.name')}</th></tr></thead>
-              <tbody>
-                {users.map((u) => (
-                  <tr key={u.id} onClick={() => viewDetail(u.id)} className="border-b border-gray-50 hover:bg-warm-bg/50 cursor-pointer transition-colors">
-                    <td className="px-4 py-3 text-text-muted">{u.id}</td>
-                    <td className="px-4 py-3"><p className="font-medium text-text-primary">{u.name || '-'}</p><p className="text-xs text-text-muted">{u.email}</p></td>
-                    <td className="px-4 py-3 text-text-secondary">{u.phone}</td>
-                    <td className="px-4 py-3 text-xs text-text-muted">{u.created_at?.slice(0, 10)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead><tr className="border-b border-gray-100 bg-warm-bg">
+                  <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">ID</th>
+                  <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">{t('auth.email')}/{t('auth.name')}</th>
+                  <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">{t('auth.phone')}</th>
+                  <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">IP</th>
+                  <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">{t('admin.createdAt') || 'Joined'}</th>
+                </tr></thead>
+                <tbody>
+                  {users.map((u) => {
+                    const hasDupIP = u.ip_address && dupIPs.has(String(u.id));
+                    return (
+                      <tr key={u.id} onClick={() => viewDetail(u.id)} className="border-b border-gray-50 hover:bg-warm-bg/50 cursor-pointer transition-colors">
+                        <td className="px-3 py-3 text-text-muted text-xs">{u.id}</td>
+                        <td className="px-3 py-3">
+                          <p className="font-medium text-text-primary text-sm">{u.name || '-'}</p>
+                          <p className="text-xs text-text-muted">{u.email}</p>
+                        </td>
+                        <td className="px-3 py-3 text-text-secondary text-xs">{u.phone}</td>
+                        <td className="px-3 py-3">
+                          {u.ip_address ? (
+                            <div className="flex items-center gap-1.5">
+                              <code className={`text-xs font-mono ${hasDupIP ? 'text-amber-600 bg-amber-50 border border-amber-200' : 'text-text-muted bg-gray-100'} px-1.5 py-0.5 rounded`}>
+                                {u.ip_address}
+                              </code>
+                              {hasDupIP && (
+                                <span className="text-[10px] text-amber-600" title="This IP is shared with other users">⚠️</span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-text-muted italic">N/A</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3 text-xs text-text-muted">{u.created_at?.slice(0, 10)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
             {totalPages > 1 && (
               <div className="flex justify-center gap-2 p-4 border-t border-gray-100">
                 <button disabled={page <= 1} onClick={() => setPage(p => p - 1)} className="px-3 py-1.5 rounded-lg text-xs font-medium disabled:opacity-30 bg-gray-100">{t('admin.prevPage')}</button>
@@ -84,6 +150,23 @@ export default function AdminUsersPage() {
               <div className="flex justify-between"><span className="text-text-muted">{t('auth.email')}</span><span className="font-medium">{detailUser.email}</span></div>
               <div className="flex justify-between"><span className="text-text-muted">{t('auth.phone')}</span><span className="font-medium">{detailUser.phone}</span></div>
               <div className="flex justify-between"><span className="text-text-muted">{t('auth.referralCode')}</span><span className="font-medium font-mono">{detailUser.referral_code}</span></div>
+              <div className="flex justify-between items-center">
+                <span className="text-text-muted">Registration IP</span>
+                <code className="text-xs font-mono font-medium bg-white px-2 py-0.5 rounded border border-gray-200">{detailUser.reg_ip || detailUser.ip_address || 'N/A'}</code>
+              </div>
+              {detailUser.login_ips && detailUser.login_ips.length > 0 && (
+                <div className="flex justify-between items-start">
+                  <span className="text-text-muted">Login IPs</span>
+                  <div className="flex flex-wrap gap-1 justify-end max-w-[60%]">
+                    {detailUser.login_ips.filter(Boolean).slice(0, 5).map((ip, i) => (
+                      <code key={i} className="text-[10px] font-mono bg-white px-1.5 py-0.5 rounded border border-gray-200 text-text-secondary">{ip}</code>
+                    ))}
+                    {detailUser.login_ips.filter(Boolean).length > 5 && (
+                      <span className="text-[10px] text-text-muted">+{detailUser.login_ips.filter(Boolean).length - 5} more</span>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-3 gap-2 mb-4">
               {[1,2,3].map(level => (
