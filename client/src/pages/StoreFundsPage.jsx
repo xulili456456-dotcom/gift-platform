@@ -101,7 +101,7 @@ export default function StoreFundsPage() {
           </div>
           {holdings.length === 0 && <p style={{fontSize:11,color:'#999',textAlign:'center',padding:20}}>No active holdings</p>}
           {holdings.map(h => {
-            var r = getRates(Number(h.amount) / 0.85); const profit = Math.round(Number(h.amount) * r.profitRate * 100) / 100;
+            const profit = Number(h.profit) || (Number(h.cost) / 0.85 * 0.15);
             const isOpen = expandedHolding === h.id;
             const totalReturn = Number(h.cost) + profit;
             return (
@@ -137,7 +137,7 @@ export default function StoreFundsPage() {
           {(!orderHistory?.orders || orderHistory.orders.length === 0) && <p style={{fontSize:11,color:'#999',textAlign:'center',padding:20}}>No orders today</p>}
           {orderHistory?.orders?.slice(0,20).map(o => {
             const profit = Number(o.profit) || 0;
-            var r2 = getRates(Number(o.amount) || 30); const cost = Number(o.amount) * r2.costRate;
+            const cost = profit > 0 ? Math.round(profit / 0.15 * 0.85 * 100) / 100 : 0;
             const isOpen = expandedOrder === o.id;
             return (
             <div key={o.id} style={{borderBottom:'1px solid #f5f5f5'}}>
