@@ -4,6 +4,30 @@ import { useTranslation } from 'react-i18next';
 import { adminApi } from '../../api/admin';
 import toast from 'react-hot-toast';
 
+const isIpTrusted = (ip, createdAt, fixDate) => {
+  if (!ip) return null; // no IP
+  if (!createdAt) return false; // no date, assume legacy
+  if (!fixDate) return true; // no fix date, assume trusted
+  return new Date(createdAt) >= new Date(fixDate);
+};
+
+function IpBadge({ ip, createdAt, fixDate }) {
+  const status = isIpTrusted(ip, createdAt, fixDate);
+  if (status === null) return <span className="text-xs text-text-muted italic">N/A</span>;
+  return (
+    <div className="flex items-center gap-1.5">
+      <code className={`text-xs font-mono px-1.5 py-0.5 rounded ${status ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
+        {ip}
+      </code>
+      {status ? (
+        <span className="text-[10px] text-green-600" title="IP captured after trust-proxy fix">✓</span>
+      ) : (
+        <span className="text-[10px] text-amber-500" title="Captured before fix — may be proxy IP">?</span>
+      )}
+    </div>
+  );
+}
+
 export default function AdminUsersPage() {
   const { t } = useTranslation();
   const [users, setUsers] = useState([]);
@@ -14,6 +38,7 @@ export default function AdminUsersPage() {
   const [detailUser, setDetailUser] = useState(null);
   const [dupCount, setDupCount] = useState(0);
   const [dupIPs, setDupIPs] = useState(new Set());
+  const [ipFixDate, setIpFixDate] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => { loadUsers(); loadIpDuplicates(); }, [page]);
@@ -52,10 +77,13 @@ export default function AdminUsersPage() {
         adminApi.getUserIps({ user_id: userId }),
       ]);
       const detail = detailRes.data;
-      const ipRow = (ipRes.data || [])[0] || null;
+      const ipData = ipRes.data;
+      const ipRow = (ipData.users || ipData)[0] || null;
+      if (ipData.ip_fix_deployed_at) setIpFixDate(ipData.ip_fix_deployed_at);
       setDetailUser({
         ...detail,
         reg_ip: ipRow?.reg_ip || detail.ip_address || '',
+        created_at: ipRow?.created_at || detail.created_at || '',
         login_ips: ipRow?.login_ips || [],
       });
     } catch {
@@ -94,8 +122,8 @@ export default function AdminUsersPage() {
                   <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">ID</th>
                   <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">{t('auth.email')}/{t('auth.name')}</th>
                   <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">{t('auth.phone')}</th>
-                  <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">IP</th>
-                  <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">{t('admin.createdAt') || 'Joined'}</th>
+                  <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">IP · <span className="text-green-600">✓trusted</span>/<span className="text-amber-500">?legacy</span></th>
+                  <th className="text-left px-3 py-3 text-xs font-medium text-text-muted">Joined</th>
                 </tr></thead>
                 <tbody>
                   {users.map((u) => {
@@ -109,18 +137,8 @@ export default function AdminUsersPage() {
                         </td>
                         <td className="px-3 py-3 text-text-secondary text-xs">{u.phone}</td>
                         <td className="px-3 py-3">
-                          {u.ip_address ? (
-                            <div className="flex items-center gap-1.5">
-                              <code className={`text-xs font-mono ${hasDupIP ? 'text-amber-600 bg-amber-50 border border-amber-200' : 'text-text-muted bg-gray-100'} px-1.5 py-0.5 rounded`}>
-                                {u.ip_address}
-                              </code>
-                              {hasDupIP && (
-                                <span className="text-[10px] text-amber-600" title="This IP is shared with other users">⚠️</span>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-xs text-text-muted italic">N/A</span>
-                          )}
+                          <IpBadge ip={u.ip_address} createdAt={u.created_at} fixDate={ipFixDate} />
+                          {hasDupIP && <span className="text-[10px] text-amber-600 ml-1" title="Shared IP">⚠️</span>}
                         </td>
                         <td className="px-3 py-3 text-xs text-text-muted">{u.created_at?.slice(0, 10)}</td>
                       </tr>
@@ -152,14 +170,14 @@ export default function AdminUsersPage() {
               <div className="flex justify-between"><span className="text-text-muted">{t('auth.referralCode')}</span><span className="font-medium font-mono">{detailUser.referral_code}</span></div>
               <div className="flex justify-between items-center">
                 <span className="text-text-muted">Registration IP</span>
-                <code className="text-xs font-mono font-medium bg-white px-2 py-0.5 rounded border border-gray-200">{detailUser.reg_ip || detailUser.ip_address || 'N/A'}</code>
+                <IpBadge ip={detailUser.reg_ip || detailUser.ip_address} createdAt={detailUser.created_at} fixDate={ipFixDate} />
               </div>
-              {detailUser.login_ips && detailUser.login_ips.length > 0 && (
+              {detailUser.login_ips && detailUser.login_ips.filter(Boolean).length > 0 && (
                 <div className="flex justify-between items-start">
                   <span className="text-text-muted">Login IPs</span>
                   <div className="flex flex-wrap gap-1 justify-end max-w-[60%]">
                     {detailUser.login_ips.filter(Boolean).slice(0, 5).map((ip, i) => (
-                      <code key={i} className="text-[10px] font-mono bg-white px-1.5 py-0.5 rounded border border-gray-200 text-text-secondary">{ip}</code>
+                      <code key={i} className="text-[10px] font-mono bg-green-50 text-green-700 px-1.5 py-0.5 rounded border border-green-200">{ip}</code>
                     ))}
                     {detailUser.login_ips.filter(Boolean).length > 5 && (
                       <span className="text-[10px] text-text-muted">+{detailUser.login_ips.filter(Boolean).length - 5} more</span>

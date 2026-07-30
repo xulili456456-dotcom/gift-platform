@@ -90,6 +90,7 @@ export default function AdminUserDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [loginToken, setLoginToken] = useState('');
   const [ipHistory, setIpHistory] = useState(null);
+  const [ipFixDate, setIpFixDate] = useState(null);
 
   useEffect(() => {
     loadAll();
@@ -109,8 +110,10 @@ export default function AdminUserDetailPage() {
       setFinance(financeRes.data);
       setOrders(ordersRes.data?.orders || ordersRes.data || []);
       setTeam(teamRes.data?.tree || teamRes.data || []);
-      const userIpRow = (ipRes.data || [])[0] || null;
+      const ipData = ipRes.data;
+      const userIpRow = (ipData.users || ipData)[0] || null;
       setIpHistory(userIpRow || null);
+      if (ipData.ip_fix_deployed_at) setIpFixDate(ipData.ip_fix_deployed_at);
     } catch {
       toast.error('Failed to load user data');
     } finally {
@@ -307,6 +310,11 @@ export default function AdminUserDetailPage() {
                 mono
               />
             )}
+            {ipFixDate && (
+              <div style={{ marginTop: 4, fontSize: 10, color: '#999', textAlign: 'right' }}>
+                Fix deployed: {new Date(ipFixDate).toLocaleDateString()}
+              </div>
+            )}
           </div>
         </div>
 
@@ -340,7 +348,7 @@ export default function AdminUserDetailPage() {
           )}
 
           {activeTab === 'ip' && (
-            <IpTab ipHistory={ipHistory} />
+            <IpTab ipHistory={ipHistory} ipFixDate={ipFixDate} userCreatedAt={user?.created_at} />
           )}
 
           {activeTab === 'actions' && (
@@ -518,42 +526,89 @@ function TeamTab({ team }) {
   );
 }
 
-function IpTab({ ipHistory }) {
+function IpTab({ ipHistory, ipFixDate, userCreatedAt }) {
   if (!ipHistory) return <Empty label="No IP data available" />;
 
   const regIp = ipHistory.reg_ip || '';
   const loginIps = (ipHistory.login_ips || []).filter(Boolean);
+  const regTrusted = regIp && userCreatedAt && ipFixDate && new Date(userCreatedAt) >= new Date(ipFixDate);
+  // Login IPs after cleanup are all post-fix (bogus ones were deleted)
+  const loginTrusted = loginIps.length > 0;
 
   return (
     <div>
       <h3 style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 700, color: '#0f0f0f' }}>IP Address History</h3>
+      {ipFixDate && (
+        <div style={{
+          margin: '-8px 0 16px',
+          fontSize: 11,
+          color: '#666',
+          background: '#f0f0f0',
+          padding: '6px 10px',
+          borderRadius: 6,
+          display: 'inline-block',
+        }}>
+          Trust-proxy fix deployed: {new Date(ipFixDate).toLocaleString()}
+        </div>
+      )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
 
         {/* Registration IP */}
         <div style={{
           padding: '14px',
           borderRadius: 12,
-          background: '#f5f5f5',
-          border: '1px solid #e0e0e0',
+          background: regTrusted ? '#f0fdf4' : '#f5f5f5',
+          border: regTrusted ? '1px solid #bbf7d0' : '1px solid #e0e0e0',
         }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Registration IP</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Registration IP</span>
+            {regIp && (
+              <span style={{
+                fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 10,
+                background: regTrusted ? '#dcfce7' : '#fef3c7',
+                color: regTrusted ? '#16a34a' : '#b45309',
+              }}>
+                {regTrusted ? '✓ TRUSTED' : '? LEGACY'}
+              </span>
+            )}
+          </div>
           <p style={{ margin: '4px 0 0', fontSize: 18, fontWeight: 700, fontFamily: 'monospace', color: regIp ? '#0f0f0f' : '#ccc' }}>
             {regIp || 'Not Available'}
           </p>
+          {!regTrusted && regIp && (
+            <p style={{ margin: '4px 0 0', fontSize: 10, color: '#b45309' }}>
+              Captured before trust-proxy fix — may be Render proxy IP, not real client IP
+            </p>
+          )}
         </div>
 
         {/* Login IPs */}
         <div style={{
           padding: '14px',
           borderRadius: 12,
-          background: '#fff',
-          border: '1px solid #e0e0e0',
+          background: loginTrusted ? '#f0fdf4' : '#fff',
+          border: loginTrusted ? '1px solid #bbf7d0' : '1px solid #e0e0e0',
         }}>
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            Login IPs ({loginIps.length} unique)
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+            <span style={{ fontSize: 11, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Login IPs ({loginIps.length} unique)
+            </span>
+            {loginTrusted && (
+              <span style={{
+                fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 10,
+                background: '#dcfce7', color: '#16a34a',
+              }}>
+                ✓ TRUSTED
+              </span>
+            )}
+          </div>
           {loginIps.length === 0 ? (
-            <p style={{ margin: '8px 0 0', fontSize: 13, color: '#ccc' }}>No login records yet</p>
+            <div>
+              <p style={{ margin: '8px 0 0', fontSize: 13, color: '#ccc' }}>No login records yet</p>
+              <p style={{ margin: '4px 0 0', fontSize: 10, color: '#999' }}>
+                All pre-fix bogus records were deleted. Users need to log in again to populate.
+              </p>
+            </div>
           ) : (
             <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {loginIps.slice(0, 20).map((ip, i) => (
@@ -563,13 +618,13 @@ function IpTab({ ipHistory }) {
                   gap: 10,
                   padding: '8px 12px',
                   borderRadius: 8,
-                  background: ip === regIp ? '#FFF8E1' : '#fafafa',
-                  border: ip === regIp ? '1px solid #FFE082' : '1px solid #f0f0f0',
+                  background: ip === regIp ? '#FFF8E1' : '#f0fdf4',
+                  border: ip === regIp ? '1px solid #FFE082' : '1px solid #bbf7d0',
                 }}>
                   <code style={{
                     fontSize: 12,
                     fontFamily: 'monospace',
-                    color: ip === regIp ? '#B76E00' : '#0f0f0f',
+                    color: ip === regIp ? '#B76E00' : '#166534',
                     fontWeight: ip === regIp ? 600 : 400,
                   }}>
                     {ip}
@@ -607,17 +662,25 @@ function IpTab({ ipHistory }) {
           <span style={{ fontSize: 11, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Quick Assessment</span>
           <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-              <span style={{ color: '#666' }}>IP captured</span>
-              <span style={{ fontWeight: 600, color: regIp ? '#4CAF50' : '#F44336' }}>{regIp ? '✓ Yes' : '✗ No'}</span>
+              <span style={{ color: '#666' }}>Registration IP quality</span>
+              <span style={{ fontWeight: 600, color: regTrusted ? '#16a34a' : !regIp ? '#F44336' : '#b45309' }}>
+                {regTrusted ? '✓ Verified' : !regIp ? '✗ Missing' : '? Legacy'}
+              </span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ color: '#666' }}>Login IP quality</span>
+              <span style={{ fontWeight: 600, color: loginTrusted ? '#16a34a' : '#999' }}>
+                {loginTrusted ? '✓ Verified (post-fix)' : 'No data yet'}
+              </span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
               <span style={{ color: '#666' }}>Unique login IPs</span>
-              <span style={{ fontWeight: 600, color: loginIps.length > 3 ? '#FF9800' : '#4CAF50' }}>{loginIps.length}</span>
+              <span style={{ fontWeight: 600, color: loginIps.length > 3 ? '#FF9800' : '#16a34a' }}>{loginIps.length}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-              <span style={{ color: '#666' }}>Proxy / VPN risk</span>
-              <span style={{ fontWeight: 600, color: loginIps.length > 5 ? '#F44336' : '#4CAF50' }}>
-                {loginIps.length > 5 ? 'High (many IPs)' : loginIps.length === 0 ? 'Unknown' : 'Low'}
+              <span style={{ color: '#666' }}>User registered</span>
+              <span style={{ fontWeight: 600, color: '#333' }}>
+                {userCreatedAt ? new Date(userCreatedAt).toLocaleDateString() : 'Unknown'}
               </span>
             </div>
           </div>

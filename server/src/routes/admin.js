@@ -638,15 +638,18 @@ router.get('/user-ips', async (req, res) => {
   try {
     const { user_id } = req.query;
     let query, params;
+    const baseSelect = "SELECT u.id, u.email, u.name, u.created_at, u.ip_address as reg_ip, (SELECT ARRAY_AGG(DISTINCT ip_address) FROM ip_log WHERE user_id = u.id) as login_ips FROM users u";
     if (user_id) {
-      query = "SELECT u.id, u.email, u.name, u.ip_address as reg_ip, (SELECT ARRAY_AGG(DISTINCT ip_address) FROM ip_log WHERE user_id = u.id) as login_ips FROM users u WHERE u.id = $1";
+      query = baseSelect + " WHERE u.id = $1";
       params = [parseInt(user_id)];
     } else {
-      query = "SELECT u.id, u.email, u.name, u.ip_address as reg_ip, (SELECT ARRAY_AGG(DISTINCT ip_address) FROM ip_log WHERE user_id = u.id) as login_ips FROM users u ORDER BY u.id DESC LIMIT 100";
+      query = baseSelect + " ORDER BY u.id DESC LIMIT 100";
       params = [];
     }
     const rows = await all(query, params);
-    res.json(rows);
+    // Include the IP fix timestamp so the frontend can show trust status
+    const fixRow = await get("SELECT value FROM admin_settings WHERE key = 'ip_fix_deployed_at'");
+    res.json({ users: rows, ip_fix_deployed_at: fixRow?.value || null });
   } catch(e) { res.status(500).json({error:'Failed'}); }
 });
 

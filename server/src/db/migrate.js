@@ -404,6 +404,10 @@ async function migrate() {
       console.log('Deleted ' + logResult.length + ' bogus login IP log entries');
     }
   } catch (e) { console.log('IP cleanup skipped:', e.message); }
+  // Record the trust-proxy fix timestamp so frontend can distinguish trusted vs legacy IPs
+  try {
+    await exec(`INSERT INTO admin_settings (key, value) VALUES ('ip_fix_deployed_at', '2026-07-30T12:20:00Z') ON CONFLICT (key) DO NOTHING`);
+  } catch (e) { console.log('IP fix timestamp skipped:', e.message); }
   console.log('Migrations complete.');
 }
 
