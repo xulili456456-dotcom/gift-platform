@@ -900,7 +900,7 @@ export default function StorePage() {
             {(!orderHistory?.orders || orderHistory.orders.length === 0) && <p className="text-[11px] text-[#999] text-center py-4">No orders today</p>}
             {orderHistory?.orders?.slice(0, 20).map(o => {
               const profit = Number(o.profit) || 0;
-              const cost = profit > 0 ? Math.round((profit / 0.15 * 0.85) * 100) / 100 : 0;
+              const cost = profit > 0 ? Math.round(profit / 0.14 * 0.86 * 100) / 100 : 0;
               const isOpen = expandedOrder === o.id;
               return (
               <div key={o.id} className="border-b border-gray-100 last:border-0">

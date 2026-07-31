@@ -246,7 +246,7 @@ router.post('/orders/process', async (req, res) => {
 router.get('/holdings', async (req, res) => {
   const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
   if (!store) return res.json([]);
-  const holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at, product_name FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
+  const holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at, product_name, product_price FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
   const now = Date.now();
   res.json(holdings.map(h => {
     const cost = Number(h.cost);
@@ -254,11 +254,10 @@ router.get('/holdings', async (req, res) => {
     const total = sellBy - new Date(h.created_at).getTime();
     const elapsed = now - new Date(h.created_at).getTime();
     const progress = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
-    // Reconstruct product price from cost, then calculate profit
-    const productPrice = cost > 0 ? Math.round((cost / 0.85) * 100) / 100 : 0;
-    const profit = Math.round(productPrice * 0.15 * 100) / 100;
-    const roi = productPrice > 0 ? Math.round((profit / productPrice) * 100) : 0;
-    return { ...h, cost, profit, roi, progress, sellBy: h.sell_by };
+    const price = Number(h.product_price) || (cost > 0 ? Math.round(cost / 0.85 * 100) / 100 : 0);
+    const { profit: p, rate } = calcProduct(price);
+    const roi = rate;
+    return { ...h, cost, profit: p, roi, progress, sellBy: h.sell_by };
   }));
 });
 
@@ -477,7 +476,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!store) return res.status(400).json({ error: 'Please open a store first' });
 
-  const cost = Math.round(product.price * 0.85 * 100) / 100;
+  const cost = Math.round(product.price * (1 - FREE_PROFIT_RATE) * 100) / 100;
   const profit = Math.round(product.price * 0.05 * 100) / 100;
   const totalReturn = Math.round((cost + profit) * 100) / 100;
 
