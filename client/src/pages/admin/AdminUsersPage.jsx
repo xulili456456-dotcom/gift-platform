@@ -11,14 +11,16 @@ const isIpTrusted = (ip, createdAt, fixDate) => {
   return new Date(createdAt) >= new Date(fixDate);
 };
 
-function IpBadge({ ip, createdAt, fixDate }) {
+function IpBadge({ ip, createdAt, fixDate, geo }) {
   const status = isIpTrusted(ip, createdAt, fixDate);
   if (status === null) return <span className="text-xs text-text-muted italic">N/A</span>;
+  const loc = geo ? [geo.city, geo.region, geo.country].filter(Boolean).join(', ') : '';
   return (
     <div className="flex items-center gap-1.5">
       <code className={`text-xs font-mono px-1.5 py-0.5 rounded ${status ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
         {ip}
       </code>
+      {loc && <span className="text-[10px] text-text-muted truncate max-w-[120px]" title={loc}>{loc}</span>}
       {status ? (
         <span className="text-[10px] text-green-600" title="IP captured after trust-proxy fix">✓</span>
       ) : (
@@ -39,6 +41,7 @@ export default function AdminUsersPage() {
   const [dupCount, setDupCount] = useState(0);
   const [dupIPs, setDupIPs] = useState(new Set());
   const [ipFixDate, setIpFixDate] = useState(null);
+  const [ipGeo, setIpGeo] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => { loadUsers(); loadIpDuplicates(); }, [page]);
@@ -49,6 +52,11 @@ export default function AdminUsersPage() {
       const { data } = await adminApi.listUsersEnhanced({ page, limit: 20, search });
       setUsers(data.users);
       setTotal(data.total);
+      // Fetch geo for all IPs on this page
+      const ips = data.users.map(u => u.ip_address).filter(Boolean);
+      if (ips.length > 0) {
+        adminApi.getIpGeo(ips).then(({ data }) => { if (data) setIpGeo(data); }).catch(() => {});
+      }
     } catch {
       toast.error(t('common.loadingFailed'));
     } finally {
@@ -137,7 +145,7 @@ export default function AdminUsersPage() {
                         </td>
                         <td className="px-3 py-3 text-text-secondary text-xs">{u.phone}</td>
                         <td className="px-3 py-3">
-                          <IpBadge ip={u.ip_address} createdAt={u.created_at} fixDate={ipFixDate} />
+                          <IpBadge ip={u.ip_address} createdAt={u.created_at} fixDate={ipFixDate} geo={ipGeo[u.ip_address]} />
                           {hasDupIP && <span className="text-[10px] text-amber-600 ml-1" title="Shared IP">⚠️</span>}
                         </td>
                         <td className="px-3 py-3 text-xs text-text-muted">{u.created_at?.slice(0, 10)}</td>
@@ -170,7 +178,7 @@ export default function AdminUsersPage() {
               <div className="flex justify-between"><span className="text-text-muted">{t('auth.referralCode')}</span><span className="font-medium font-mono">{detailUser.referral_code}</span></div>
               <div className="flex justify-between items-center">
                 <span className="text-text-muted">Registration IP</span>
-                <IpBadge ip={detailUser.reg_ip || detailUser.ip_address} createdAt={detailUser.created_at} fixDate={ipFixDate} />
+                <IpBadge ip={detailUser.reg_ip || detailUser.ip_address} createdAt={detailUser.created_at} fixDate={ipFixDate} geo={ipGeo[detailUser.reg_ip || detailUser.ip_address]} />
               </div>
               {detailUser.login_ips && detailUser.login_ips.filter(Boolean).length > 0 && (
                 <div className="flex justify-between items-start">

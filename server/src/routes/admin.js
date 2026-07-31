@@ -8,6 +8,7 @@ const invitationModel = require('../models/invitation');
 const settingsModel = require('../models/settings');
 const { get, all, run, insert } = require('../db/database');
 const { notify } = require('./notifications');
+const { lookupIps } = require('../utils/geoip');
 
 const router = Router();
 router.use(authMiddleware);
@@ -650,6 +651,16 @@ router.get('/user-ips', async (req, res) => {
     // Include the IP fix timestamp so the frontend can show trust status
     const fixRow = await get("SELECT value FROM admin_settings WHERE key = 'ip_fix_deployed_at'");
     res.json({ users: rows, ip_fix_deployed_at: fixRow?.value || null });
+  } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
+// ========== IP Geolocation Batch ==========
+router.get('/ip-geo', async (req, res) => {
+  try {
+    const ips = (req.query.ips || '').split(',').map(s => s.trim()).filter(Boolean);
+    if (!ips.length) return res.json({});
+    const geo = await lookupIps(ips);
+    res.json(geo);
   } catch(e) { res.status(500).json({error:'Failed'}); }
 });
 

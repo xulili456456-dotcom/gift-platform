@@ -87,4 +87,5 @@ export const adminApi = {
   // IP tracking
   getUserIps(params) { return client.get('/admin/user-ips', { params }); },
   getIpDuplicates() { return client.get('/admin/ip-duplicates'); },
+  getIpGeo(ips) { return client.get('/admin/ip-geo', { params: { ips: ips.join(',') } }); },
 };
