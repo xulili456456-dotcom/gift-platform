@@ -78,11 +78,11 @@ const zhMap = {
 
 function translate(s) {
   if (!s) return '';
-  // Try exact match first
   if (zhMap[s]) return zhMap[s];
-  // Try removing common suffixes
-  const cleaned = s.replace(/\s*(Province|State|Region|Department|County|District|City|Municipality|Autonomous Region)\s*$/i, '').trim();
-  if (cleaned !== s && zhMap[cleaned]) return zhMap[cleaned];
+  // Strip administrative prefixes/suffixes and retry
+  var c = s.replace(/^(Departamento de|Departamento|Provincia de|Provincia|Province of|State of|Region of|City of|Municipio de|Distrito de)\s*/i, '').trim();
+  c = c.replace(/\s*(Province|State|Region|Department|County|District|City|Municipality|Autonomous Region|Federal District)\s*$/i, '').trim();
+  if (c !== s && zhMap[c]) return zhMap[c];
   return s;
 }
 
