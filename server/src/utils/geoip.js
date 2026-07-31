@@ -2,18 +2,28 @@
  * IP Geolocation — calls ip-api.com (free, no key, 45 req/min).
  * Results cached in-memory to avoid repeated lookups.
  */
-const https = require('https');
+const http = require('http');
 
 const cache = new Map();
 
+// Only filter truly private/local IPs, not public 172.x.x.x ranges
+function isPrivateIp(ip) {
+  if (!ip || ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('0.')) return true;
+  if (ip.startsWith('::ffff:')) return isPrivateIp(ip.replace('::ffff:', ''));
+  // 172.16.0.0 - 172.31.255.255 are private
+  if (ip.startsWith('172.')) {
+    const second = parseInt(ip.split('.')[1]);
+    if (second >= 16 && second <= 31) return true;
+  }
+  return false;
+}
+
 function lookupIp(ip) {
   return new Promise((resolve) => {
-    if (!ip || ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('172.')) {
-      return resolve(null);
-    }
+    if (isPrivateIp(ip)) return resolve(null);
     if (cache.has(ip)) return resolve(cache.get(ip));
 
-    const req = https.get(`https://ip-api.com/json/${ip}?fields=country,regionName,city,isp,query`, (res) => {
+    const req = http.get(`http://ip-api.com/json/${ip}?fields=country,regionName,city,isp,query`, (res) => {
       let d = '';
       res.on('data', c => d += c);
       res.on('end', () => {
