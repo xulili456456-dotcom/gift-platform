@@ -258,7 +258,7 @@ router.post('/check-sell', async (req, res) => {
       const t = await tx();
       try {
         await t.run("UPDATE store_orders SET status = 'done', amount = ?, processed_at = NOW() WHERE id = ?", [profit, order.id]);
-        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, totalReturn, 'bonus', 'delivered']);
+        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, totalReturn, 'order_profit', 'delivered']);
         await t.commit();
         settled.push({ id: order.id, cost: Number(order.cost), profit, totalReturn });
       } catch (err) {

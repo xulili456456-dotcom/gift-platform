@@ -185,7 +185,7 @@ router.put('/claims/:id', async (req, res) => {
     await notify(claim.user_id, '礼物已发放', '您申请的礼物已通过审批并发放！奖励已到账。', 'success');
     const giftValue = claim.value || 0;
     if (giftValue > 0) {
-      await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [claim.user_id, giftValue, 'bonus', 'delivered']);
+      await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [claim.user_id, giftValue, 'task_reward', 'delivered']);
     }
   } else if (status === 'rejected') {
     const reason = admin_note ? '原因：' + admin_note : '请确保邀请的好友已完成实名认证';
@@ -258,7 +258,7 @@ router.post('/users/:id/balance', async (req, res) => {
   if (amount > 0) {
     await insert(
       'INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
-      [id, amount, 'bonus', 'delivered']
+      [id, amount, 'admin_adjust', 'delivered']
     );
     try { require('./notifications').notify(id, '💰 余额到账', `管理员已为您充值 $${amount.toFixed(2)}${note ? ' ('+note+')' : ''}`, 'success'); } catch {}
   } else {

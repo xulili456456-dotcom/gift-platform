@@ -65,7 +65,7 @@ router.post('/buy/:pid', authMiddleware, async (req, res) => {
   try {
     await t.run("UPDATE share_commissions SET status = 'credited' WHERE id = ?", [record.id]);
     await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
-      [record.sharer_id, Number(record.commission), 'bonus', 'delivered']);
+      [record.sharer_id, Number(record.commission), 'commission', 'delivered']);
     await t.commit();
 
     try { require('./notifications').notify(record.sharer_id, '💰 Commission Earned!', `$${Number(record.commission)} from ${record.product_name}`, 'success'); } catch {}

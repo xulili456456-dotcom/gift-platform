@@ -89,7 +89,7 @@ router.post('/:taskType/claim', async (req, res) => {
     await run('INSERT INTO task_reward_log (user_id, task_type, task_title, amount, created_at) VALUES (?,?,?,?,?)',
       [userId, taskType, task.title, task.reward, new Date().toISOString()]);
     // Credit the reward to user's spendable balance
-    await run("INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, 'bonus', 'delivered')",
+    await run("INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, 'task_reward', 'delivered')",
       [userId, task.reward]);
 
     res.json({ message: 'Reward claimed', amount: Number(task.reward) });
