@@ -721,6 +721,48 @@ router.get('/risk-assessment', async (req, res) => {
   } catch(e) { res.status(500).json({ error: 'Failed: ' + e.message }); }
 });
 
+// ========== User Geo Distribution ==========
+router.get('/user-geo-stats', async (req, res) => {
+  try {
+    // Collect all unique IPs from users (reg_ip + login_ips)
+    const regIps = await all("SELECT ip_address FROM users WHERE ip_address != '' AND ip_address IS NOT NULL");
+    const loginIps = await all("SELECT DISTINCT ip_address FROM ip_log");
+    const allIps = [...new Set([...regIps.map(r => r.ip_address), ...loginIps.map(r => r.ip_address)])];
+
+    // Look up geo for all IPs
+    const { lookupIps } = require('../utils/geoip');
+    const geoMap = await lookupIps(allIps);
+
+    // Count users by country
+    const byCountry = {};
+    for (const u of regIps) {
+      const g = geoMap[u.ip_address];
+      if (g && g.country) {
+        byCountry[g.country] = (byCountry[g.country] || 0) + 1;
+      }
+    }
+    // Also count users with login IPs in each country (but don't double count)
+    const regUsersWithIp = new Set(regIps.map(r => r.ip_address));
+    // Count unique user logins by country
+    const loginUsers = await all(
+      "SELECT DISTINCT user_id, ip_address FROM ip_log WHERE ip_address NOT LIKE '10.%' AND ip_address NOT LIKE '172.1%' AND ip_address NOT LIKE '192.168.%'"
+    );
+    for (const l of loginUsers) {
+      const g = geoMap[l.ip_address];
+      if (g && g.country && !regIps.some(r => r.ip_address === l.ip_address)) {
+        byCountry[g.country] = (byCountry[g.country] || 0) + 1;
+      }
+    }
+
+    // Convert to sorted array
+    const stats = Object.entries(byCountry)
+      .map(([country, count]) => ({ country, count }))
+      .sort((a, b) => b.count - a.count);
+
+    res.json({ total: regIps.length + (loginUsers.length > 0 ? 1 : 0), byCountry: stats, countries: stats.length });
+  } catch(e) { res.status(500).json({ error: 'Failed: ' + e.message }); }
+});
+
 // ========== IP Geolocation Batch ==========
 router.get('/ip-geo', async (req, res) => {
   try {
