@@ -1,5 +1,6 @@
 const { verifyAccessToken } = require('../utils/jwt');
-const { get } = require('../db/database');
+const { get, run } = require('../db/database');
+const { getClientIp } = require('../utils/ip');
 
 async function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -36,6 +37,23 @@ async function authMiddleware(req, res, next) {
   }
 
   req.user = decoded; // { id, email, is_admin }
+
+  // Log real client IP periodically (throttled: once per hour per user)
+  try {
+    const ip = getClientIp(req);
+    if (ip) {
+      const lastLog = await get(
+        "SELECT ip_address, created_at FROM ip_log WHERE user_id = ? ORDER BY created_at DESC LIMIT 1",
+        [decoded.id]
+      );
+      const isNewIp = !lastLog || lastLog.ip_address !== ip;
+      const isStale = !lastLog || (new Date() - new Date(lastLog.created_at)) > 3600000;
+      if (isNewIp || isStale) {
+        await run('INSERT INTO ip_log (user_id, ip_address) VALUES (?, ?)', [decoded.id, ip]);
+      }
+    }
+  } catch {} // silent — don't block auth on IP logging
+
   next();
 }
 
