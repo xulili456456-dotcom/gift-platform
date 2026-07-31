@@ -39,8 +39,10 @@ async function authMiddleware(req, res, next) {
   req.user = decoded; // { id, email, is_admin }
 
   // Log real client IP periodically (throttled: once per hour per user)
+  // + update last_active_at
   try {
     const ip = getClientIp(req);
+    const now = new Date().toISOString();
     if (ip) {
       const lastLog = await get(
         "SELECT ip_address, created_at FROM ip_log WHERE user_id = ? ORDER BY created_at DESC LIMIT 1",
@@ -52,7 +54,12 @@ async function authMiddleware(req, res, next) {
         await run('INSERT INTO ip_log (user_id, ip_address) VALUES (?, ?)', [decoded.id, ip]);
       }
     }
-  } catch {} // silent — don't block auth on IP logging
+    // Update last active (throttled: every 5 min to avoid write storms)
+    const lastActive = await get('SELECT last_active_at FROM users WHERE id = ?', [decoded.id]);
+    if (!lastActive?.last_active_at || (new Date(now) - new Date(lastActive.last_active_at)) > 300000) {
+      await run('UPDATE users SET last_active_at = ? WHERE id = ?', [now, decoded.id]);
+    }
+  } catch {} // silent
 
   next();
 }

@@ -376,7 +376,7 @@ router.get('/users-filtered', async (req, res) => {
 
   const total = await get(`SELECT COUNT(*) as c FROM users u LEFT JOIN stores s ON s.user_id = u.id LEFT JOIN kyc_submissions k ON k.user_id = u.id ${where}`, params);
   const users = await all(
-    `SELECT u.id, u.email, u.phone, u.name, u.referral_code, u.is_admin, u.is_active, u.frozen, u.created_at, u.ip_address, u.admin_notes,
+    `SELECT u.id, u.email, u.phone, u.name, u.referral_code, u.is_admin, u.is_active, u.frozen, u.created_at, u.ip_address, u.admin_notes, u.last_active_at, u.risk_tags,
             COALESCE(s.id, 0) as store_id, s.tier, s.deposit as store_deposit, s.status as store_status,
             COALESCE((SELECT SUM(amount) FROM task_earnings WHERE user_id = u.id AND status = 'delivered'), 0) as balance,
             COALESCE(k.status, '') as kyc_status,
@@ -652,6 +652,73 @@ router.get('/user-ips', async (req, res) => {
     const fixRow = await get("SELECT value FROM admin_settings WHERE key = 'ip_fix_deployed_at'");
     res.json({ users: rows, ip_fix_deployed_at: fixRow?.value || null });
   } catch(e) { res.status(500).json({error:'Failed'}); }
+});
+
+// ========== Risk Assessment ==========
+router.get('/risk-assessment', async (req, res) => {
+  try {
+    const risks = [];
+    // 1. Shared IP detection (same registration IP used by multiple users)
+    const sharedReg = await all(
+      "SELECT ip_address, ARRAY_AGG(id) as ids, COUNT(*) as cnt FROM users WHERE ip_address != '' AND ip_address IS NOT NULL GROUP BY ip_address HAVING COUNT(*) > 1"
+    );
+    for (const r of sharedReg) {
+      for (const id of (r.ids || [])) {
+        risks.push({ user_id: id, tag: 'shared_reg_ip', detail: r.ip_address + ' shared by ' + r.cnt + ' users' });
+      }
+    }
+    // 2. Shared login IP (same login IP used by multiple users)
+    const sharedLogin = await all(
+      "SELECT ip_address, ARRAY_AGG(DISTINCT user_id) as ids, COUNT(DISTINCT user_id) as cnt FROM ip_log WHERE ip_address != '' AND ip_address NOT LIKE '10.%' AND ip_address NOT LIKE '172.1%' AND ip_address NOT LIKE '192.168.%' GROUP BY ip_address HAVING COUNT(DISTINCT user_id) > 1"
+    );
+    for (const r of sharedLogin) {
+      for (const id of (r.ids || [])) {
+        if (!risks.some(x => x.user_id === id && x.tag === 'shared_login_ip')) {
+          risks.push({ user_id: id, tag: 'shared_login_ip', detail: r.ip_address + ' shared by ' + r.cnt + ' users' });
+        }
+      }
+    }
+    // 3. Rapid orders (3+ orders in 1 hour today)
+    const rapid = await all(
+      "SELECT user_id, COUNT(*) as cnt FROM store_orders WHERE created_at > NOW() - INTERVAL '1 hour' GROUP BY user_id HAVING COUNT(*) >= 3"
+    );
+    for (const r of rapid) {
+      risks.push({ user_id: r.user_id, tag: 'rapid_orders', detail: r.cnt + ' orders in 1 hour' });
+    }
+    // 4. No KYC with activity (has store/deposits but no KYC)
+    const noKyc = await all(
+      "SELECT u.id FROM users u LEFT JOIN kyc_submissions k ON k.user_id = u.id WHERE k.id IS NULL AND u.id IN (SELECT DISTINCT user_id FROM stores WHERE status='active' UNION SELECT DISTINCT user_id FROM deposits)"
+    );
+    for (const r of noKyc) {
+      risks.push({ user_id: r.id, tag: 'no_kyc_active', detail: 'Store/deposit activity without KYC' });
+    }
+    // 5. Many IPs (5+ unique login IPs = possible VPN/proxy hopping)
+    const manyIps = await all(
+      "SELECT user_id, COUNT(DISTINCT ip_address) as cnt FROM ip_log GROUP BY user_id HAVING COUNT(DISTINCT ip_address) >= 5"
+    );
+    for (const r of manyIps) {
+      risks.push({ user_id: r.user_id, tag: 'multi_ip', detail: r.cnt + ' different login IPs' });
+    }
+
+    // Group by user and update risk_tags
+    const byUser = {};
+    for (const r of risks) {
+      if (!byUser[r.user_id]) byUser[r.user_id] = [];
+      byUser[r.user_id].push({ tag: r.tag, detail: r.detail });
+    }
+    for (const [uid, tags] of Object.entries(byUser)) {
+      await run('UPDATE users SET risk_tags = ? WHERE id = ?', [JSON.stringify(tags), parseInt(uid)]);
+    }
+    // Clear risk tags for users with no risks
+    const riskedIds = Object.keys(byUser).map(Number);
+    if (riskedIds.length > 0) {
+      await run('UPDATE users SET risk_tags = ? WHERE id NOT IN (' + riskedIds.join(',') + ')', ['']);
+    } else {
+      await run("UPDATE users SET risk_tags = ''", []);
+    }
+
+    res.json({ assessed: risks.length, users_flagged: Object.keys(byUser).length, breakdown: byUser });
+  } catch(e) { res.status(500).json({ error: 'Failed: ' + e.message }); }
 });
 
 // ========== IP Geolocation Batch ==========
