@@ -52,10 +52,17 @@ export default function AdminUsersPage() {
       const { data } = await adminApi.listUsersEnhanced({ page, limit: 20, search });
       setUsers(data.users);
       setTotal(data.total);
-      // Fetch geo for all IPs on this page
+      // Fetch geo for all IPs on this page — call ipwhois.app directly from browser
       const ips = data.users.map(u => u.ip_address).filter(Boolean);
       if (ips.length > 0) {
-        adminApi.getIpGeo(ips).then(({ data }) => { if (data) setIpGeo(data); }).catch(() => {});
+        const uniqueIps = [...new Set(ips)];
+        const geoMap = {};
+        Promise.all(uniqueIps.map(ip =>
+          fetch('https://ipwhois.app/json/' + ip)
+            .then(r => r.json())
+            .then(j => { if (j.success) geoMap[j.ip] = { country: j.country, region: j.region, city: j.city, isp: j.isp }; })
+            .catch(() => {})
+        )).then(() => { if (Object.keys(geoMap).length > 0) setIpGeo(geoMap); });
       }
     } catch {
       toast.error(t('common.loadingFailed'));
