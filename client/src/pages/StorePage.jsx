@@ -5,8 +5,18 @@ import client from '../api/client';
 import { ShoppingCart, X, Store, Search, Star, ChevronLeft, Truck, Shield, RotateCcw, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const COST_RATE = 0.85;    // cost price = market price × 85%
-const PROFIT_RATE = 0.15; // profit = market price × 15%
+function getRates(price){
+  var today = new Date().toISOString().slice(0,10);
+  var seed = today.split('-').reduce(function(s,x){return s+parseInt(x)},0);
+  var shift = ((seed * 7 + 13) % 100 - 50) / 500;
+  var base;
+  if (price < 20) base = 0.06 + Math.random() * 0.04;
+  else if (price < 100) base = 0.08 + Math.random() * 0.07;
+  else if (price < 500) base = 0.10 + Math.random() * 0.08;
+  else base = 0.15 + Math.random() * 0.10;
+  var pr = Math.max(0.05, Math.min(0.25, base + shift));
+  return { profitRate: pr, costRate: 1 - pr };
+}
 
 const TIER_INFO = {
   small:  { nameKey: 'store.small',  daily: 10, color: '#F59E0B', tag: 'Lv.1' },
@@ -888,7 +898,7 @@ export default function StorePage() {
             {(!orderHistory?.orders || orderHistory.orders.length === 0) && <p className="text-[11px] text-[#999] text-center py-4">No orders today</p>}
             {orderHistory?.orders?.slice(0, 20).map(o => {
               const profit = Number(o.profit) || 0;
-              const cost = profit > 0 ? Math.round((profit / PROFIT_RATE * COST_RATE) * 100) / 100 : 0;
+              const cost = profit > 0 ? Math.round((profit / 0.15 * 0.85) * 100) / 100 : 0;
               const isOpen = expandedOrder === o.id;
               return (
               <div key={o.id} className="border-b border-gray-100 last:border-0">

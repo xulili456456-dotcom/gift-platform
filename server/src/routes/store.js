@@ -14,15 +14,26 @@ const TIERS = {
   large:  { name: 'Large Store', dailyOrders: 40, threshold: 200 },
 };
 
-// Product profit formula (shared with frontend)
-// cost + profit = price × 100% — no money vanishes
-const COST_RATE = 0.85;   // Cost price = market price × 85%
-const PROFIT_RATE = 0.15; // Profit = market price × 15%
+// Product profit formula — random per product, seeded by day + product price
+const FREE_PROFIT_RATE = 0.05;
+
+function getRateForProduct(productPrice) {
+  const today = new Date().toISOString().slice(0, 10);
+  const seed = today.split('-').reduce((s, x) => s + parseInt(x), 0);
+  const shift = ((seed * 7 + 13) % 100 - 50) / 500;
+  let base;
+  if (productPrice < 20) base = 0.06 + Math.random() * 0.04;
+  else if (productPrice < 100) base = 0.08 + Math.random() * 0.07;
+  else if (productPrice < 500) base = 0.10 + Math.random() * 0.08;
+  else base = 0.15 + Math.random() * 0.10;
+  return Math.max(0.05, Math.min(0.25, base + shift));
+}
 
 function calcProduct(productPrice) {
-  const cost = Math.round(productPrice * COST_RATE * 100) / 100;
-  const profit = Math.round(productPrice * PROFIT_RATE * 100) / 100;
-  return { cost, profit, totalReturn: Math.round((cost + profit) * 100) / 100 };
+  const rate = getRateForProduct(productPrice);
+  const profit = Math.round(productPrice * rate * 100) / 100;
+  const cost = Math.round(productPrice * (1 - rate) * 100) / 100;
+  return { cost, profit, totalReturn: Math.round((cost + profit) * 100) / 100, rate: Math.round(rate * 100) };
 }
 
 function getTier(totalOrders) {
@@ -84,8 +95,8 @@ router.get('/status', async (req, res) => {
       ...store,
       tierName: tier.name,
       dailyOrders: tier.dailyOrders,
-      costRate: COST_RATE,
-      profitRate: PROFIT_RATE,
+      costRate: 'dynamic',
+      profitRate: 'dynamic',
       doneToday: Number(doneToday?.c) || 0,
       todayEarnings: Number(earningsToday?.total) || 0,
       totalOrders,
@@ -146,7 +157,6 @@ router.post('/orders/process', async (req, res) => {
   // Free daily orders: 5 slots/day per user, cost ≤ $50, no deposit needed, 5% profit
   const FREE_SLOTS = 5;
   const FREE_MAX_COST = 50;
-  const FREE_PROFIT_RATE = 0.05;
   const freeKey = 'free_used_' + req.user.id + '_' + today;
   const freeUsed = await get("SELECT value FROM admin_settings WHERE key = ?", [freeKey]);
   const freeRemaining = FREE_SLOTS - Number(freeUsed?.value || 0);
@@ -238,8 +248,8 @@ router.get('/holdings', async (req, res) => {
     const elapsed = now - new Date(h.created_at).getTime();
     const progress = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
     // Reconstruct product price from cost, then calculate profit
-    const productPrice = cost > 0 ? Math.round((cost / COST_RATE) * 100) / 100 : 0;
-    const profit = Math.round(productPrice * PROFIT_RATE * 100) / 100;
+    const productPrice = cost > 0 ? Math.round((cost / 0.85) * 100) / 100 : 0;
+    const profit = Math.round(productPrice * 0.15 * 100) / 100;
     const roi = productPrice > 0 ? Math.round((profit / productPrice) * 100) : 0;
     return { ...h, cost, profit, roi, progress, sellBy: h.sell_by };
   }));
@@ -253,7 +263,7 @@ router.post('/check-sell', async (req, res) => {
     const due = await all("SELECT id, amount as cost, user_id FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
     const settled = [];
     for (const order of due) {
-      const price = Number(order.cost) / COST_RATE;
+      const price = Math.round((Number(order.cost) / 0.85) * 100) / 100;
       const { profit, totalReturn } = calcProduct(price);
       const t = await tx();
       try {
@@ -363,7 +373,7 @@ router.get('/analytics', async (req, res) => {
     totalOrders: Number(totalOrders?.c || 0),
     balance: Number(balance?.total || 0),
     tier: store?.tier || null,
-    profitRate: PROFIT_RATE * 100,
+    profitRate: 'dynamic',
     dailyGoal: 20,
   });
 });
@@ -460,7 +470,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!store) return res.status(400).json({ error: 'Please open a store first' });
 
-  const cost = Math.round(product.price * COST_RATE * 100) / 100;
+  const cost = Math.round(product.price * 0.85 * 100) / 100;
   const profit = Math.round(product.price * 0.05 * 100) / 100;
   const totalReturn = Math.round((cost + profit) * 100) / 100;
 
