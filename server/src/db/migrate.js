@@ -271,6 +271,7 @@ async function migrate() {
   try { await exec(`ALTER TABLE store_orders ADD CONSTRAINT store_orders_status_check CHECK(status IN ('pending', 'done', 'holding'))`); } catch (e) { console.log('Store orders constraint update skipped:', e.message); }
   // Add product_name column
   try { await exec(`ALTER TABLE store_orders ADD COLUMN IF NOT EXISTS product_name TEXT DEFAULT ''`); } catch (e) { console.log('product_name column skipped:', e.message); }
+  try { await exec(`ALTER TABLE store_orders ADD COLUMN IF NOT EXISTS product_price NUMERIC(10,2) DEFAULT 0`); } catch (e) { console.log('product_price column skipped:', e.message); }
   // Add IP tracking to users
   try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS ip_address VARCHAR(45) DEFAULT ''`); } catch (e) { console.log('ip_address column skipped:', e.message); }
   // Add frozen flag to users

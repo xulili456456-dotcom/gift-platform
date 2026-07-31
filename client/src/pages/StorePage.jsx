@@ -7,13 +7,15 @@ import toast from 'react-hot-toast';
 
 function getRates(price){
   var today = new Date().toISOString().slice(0,10);
-  var seed = today.split('-').reduce(function(s,x){return s+parseInt(x)},0);
-  var shift = ((seed * 7 + 13) % 100 - 50) / 500;
+  var daySeed = today.split('-').reduce(function(s,x){return s+parseInt(x)},0);
+  var shift = ((daySeed * 7 + 13) % 100 - 50) / 500;
+  // Deterministic — same price on same day = same rate (matches server)
+  var rng = (function(s){var x=Math.sin(s*9301+49297)*49297;return x-Math.floor(x)})(price*31+daySeed);
   var base;
-  if (price < 20) base = 0.06 + Math.random() * 0.04;
-  else if (price < 100) base = 0.08 + Math.random() * 0.07;
-  else if (price < 500) base = 0.10 + Math.random() * 0.08;
-  else base = 0.15 + Math.random() * 0.10;
+  if (price < 20) base = 0.05 + 0.04 * rng;
+  else if (price < 100) base = 0.06 + 0.09 * rng;
+  else if (price < 500) base = 0.08 + 0.10 * rng;
+  else base = 0.13 + 0.12 * rng;
   var pr = Math.max(0.05, Math.min(0.25, base + shift));
   return { profitRate: pr, costRate: 1 - pr };
 }

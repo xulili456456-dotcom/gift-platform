@@ -14,19 +14,26 @@ const TIERS = {
   large:  { name: 'Large Store', dailyOrders: 40, threshold: 200 },
 };
 
-// Product profit formula — random per product, seeded by day + product price
+// Product profit formula — deterministic per product per day (no Math.random)
 const FREE_PROFIT_RATE = 0.05;
+
+function seededRand(seed) {
+  var x = Math.sin(seed * 9301 + 49297) * 49297;
+  return x - Math.floor(x);
+}
 
 function getRateForProduct(productPrice) {
   const today = new Date().toISOString().slice(0, 10);
-  const seed = today.split('-').reduce((s, x) => s + parseInt(x), 0);
-  const shift = ((seed * 7 + 13) % 100 - 50) / 500;
+  const daySeed = today.split('-').reduce((s, x) => s + parseInt(x), 0);
+  const shift = ((daySeed * 7 + 13) % 100 - 50) / 500; // deterministic daily shift
+  // Use product price as seed for deterministic per-product randomness
+  const rng = seededRand(productPrice * 31 + daySeed);
   let base;
-  if (productPrice < 20) base = 0.06 + Math.random() * 0.04;
-  else if (productPrice < 100) base = 0.08 + Math.random() * 0.07;
-  else if (productPrice < 500) base = 0.10 + Math.random() * 0.08;
-  else base = 0.15 + Math.random() * 0.10;
-  return Math.max(0.05, Math.min(0.25, base + shift));
+  if (productPrice < 20) base = 0.05 + 0.04 * rng;
+  else if (productPrice < 100) base = 0.06 + 0.09 * rng;
+  else if (productPrice < 500) base = 0.08 + 0.10 * rng;
+  else base = 0.13 + 0.12 * rng;
+  return Math.round(Math.max(0.05, Math.min(0.25, base + shift)) * 100) / 100;
 }
 
 function calcProduct(productPrice) {
@@ -217,7 +224,7 @@ router.post('/orders/process', async (req, res) => {
       await t.run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [freeKey, String(freeUsedCount), String(freeUsedCount)]);
     }
 
-    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name) VALUES (?, ?, ?, 'holding', ?, ?)", [store.id, req.user.id, cost, sellBy, productName || '']);
+    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES (?, ?, ?, 'holding', ?, ?, ?)", [store.id, req.user.id, cost, sellBy, productName || '', productPrice]);
     await t.commit();
 
     res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: FREE_SLOTS - freeUsedCount });
@@ -260,10 +267,10 @@ router.post('/check-sell', async (req, res) => {
   try {
     const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
     if (!store) return res.json({ settled: [] });
-    const due = await all("SELECT id, amount as cost, user_id FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
+    const due = await all("SELECT id, amount as cost, user_id, product_price FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
     const settled = [];
     for (const order of due) {
-      const price = Math.round((Number(order.cost) / 0.85) * 100) / 100;
+      const price = Number(order.product_price) || Math.round((Number(order.cost) / 0.85) * 100) / 100;
       const { profit, totalReturn } = calcProduct(price);
       const t = await tx();
       try {
@@ -495,7 +502,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
 
     const sellHours = 6 + Math.random() * 24;
     const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
-    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name) VALUES (?, ?, ?, 'holding', ?, ?)", [store.id, req.user.id, cost, sellBy, product.name]);
+    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES (?, ?, ?, 'holding', ?, ?, ?)", [store.id, req.user.id, cost, sellBy, product.name, product.price]);
 
     // Increment per-user free counter
     await t.run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [countKey, String(used + 1), String(used + 1)]);
