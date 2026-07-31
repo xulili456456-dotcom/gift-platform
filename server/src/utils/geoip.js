@@ -1,16 +1,14 @@
 /**
- * IP Geolocation — calls ip-api.com (free, no key, 45 req/min).
+ * IP Geolocation — calls ipwhois.app (free HTTPS, no key, 10k req/month).
  * Results cached in-memory to avoid repeated lookups.
  */
-const http = require('http');
+const https = require('https');
 
 const cache = new Map();
 
-// Only filter truly private/local IPs, not public 172.x.x.x ranges
 function isPrivateIp(ip) {
   if (!ip || ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.') || ip.startsWith('10.') || ip.startsWith('0.')) return true;
   if (ip.startsWith('::ffff:')) return isPrivateIp(ip.replace('::ffff:', ''));
-  // 172.16.0.0 - 172.31.255.255 are private
   if (ip.startsWith('172.')) {
     const second = parseInt(ip.split('.')[1]);
     if (second >= 16 && second <= 31) return true;
@@ -23,14 +21,14 @@ function lookupIp(ip) {
     if (isPrivateIp(ip)) return resolve(null);
     if (cache.has(ip)) return resolve(cache.get(ip));
 
-    const req = http.get(`http://ip-api.com/json/${ip}?fields=country,regionName,city,isp,query`, (res) => {
+    const req = https.get(`https://ipwhois.app/json/${ip}`, (res) => {
       let d = '';
       res.on('data', c => d += c);
       res.on('end', () => {
         try {
           const j = JSON.parse(d);
-          if (j.status === 'success') {
-            const result = { country: j.country, region: j.regionName, city: j.city, isp: j.isp, ip: j.query };
+          if (j.success) {
+            const result = { country: j.country, region: j.region, city: j.city, isp: j.isp, ip: j.ip };
             cache.set(ip, result);
             resolve(result);
           } else {
@@ -48,7 +46,6 @@ function lookupIp(ip) {
 async function lookupIps(ips) {
   const unique = [...new Set(ips.filter(Boolean))];
   const results = {};
-  // Sequential to respect rate limits (45/min = ~1.3s apart, but burst is fine for small batches)
   for (const ip of unique) {
     const r = await lookupIp(ip);
     if (r) results[ip] = r;
