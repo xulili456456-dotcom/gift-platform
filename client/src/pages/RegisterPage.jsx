@@ -10,7 +10,7 @@ export default function RegisterPage() {
   const [searchParams] = useSearchParams();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
-    email: '', phone: '', password: '', name: '',
+    email: '', phone: '', phone_prefix: '+1', password: '', name: '',
     referral_code: searchParams.get('ref') || '',
   });
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ export default function RegisterPage() {
     if (!form.name.trim() || !form.phone) { toast.error('Please fill in all fields'); return; }
     setLoading(true);
     try {
-      await register({ email: form.email, phone: form.phone, password: form.password, name: form.name, referral_code: form.referral_code || undefined });
+      await register({ email: form.email, phone: form.phone, phone_prefix: form.phone_prefix, password: form.password, name: form.name, referral_code: form.referral_code || undefined });
       toast.success('Account created!');
       navigate('/home', { replace: true });
     } catch (err) { toast.error(err.response?.data?.error || 'Registration failed'); setLoading(false); }
@@ -70,8 +70,14 @@ export default function RegisterPage() {
           <div>
             <input type="text" value={form.name} onChange={update('name')} placeholder="Full Name"
               style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:10,outline:'none'}} />
-            <input type="tel" value={form.phone} onChange={update('phone')} placeholder="Phone"
-              style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:10,outline:'none'}} />
+            <div style={{display:'flex',gap:8,marginBottom:10}}>
+              <select value={form.phone_prefix} onChange={update('phone_prefix')}
+                style={{width:110,padding:'14px 8px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,outline:'none',background:'#fff'}}>
+                {['+1','+44','+86','+81','+82','+91','+52','+55','+62','+63','+54','+34','+33','+39','+49','+65','+60','+66','+84','+971'].map(c=><option key={c} value={c}>{c}</option>)}
+              </select>
+              <input type="tel" value={form.phone} onChange={update('phone')} placeholder="Phone number"
+                style={{flex:1,padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,outline:'none'}} />
+            </div>
             <input value={form.referral_code} onChange={update('referral_code')} placeholder="Referral Code (optional)"
               style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:24,outline:'none'}} />
             <button onClick={handleSubmit} disabled={loading}

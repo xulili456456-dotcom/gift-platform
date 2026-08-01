@@ -3,7 +3,7 @@ const { all, get, run, insert } = require('../db/database');
 const userModel = {
   async findById(id) {
     return get(
-      'SELECT id, email, phone, name, avatar_url, referral_code, parent_id, is_admin, is_active, is_agent, agent_commission, agent_quota, password_hash, tx_pin, ip_address, admin_notes, frozen, created_at FROM users WHERE id = ?',
+      'SELECT id, email, phone, phone_prefix, name, avatar_url, referral_code, parent_id, is_admin, is_active, is_agent, agent_commission, agent_quota, password_hash, tx_pin, ip_address, admin_notes, frozen, created_at FROM users WHERE id = ?',
       [id]
     );
   },
@@ -22,10 +22,10 @@ const userModel = {
     );
   },
 
-  async create({ email, phone, passwordHash, name, referralCode, parentId, ipAddress }) {
+  async create({ email, phone, phonePrefix, passwordHash, name, referralCode, parentId, ipAddress }) {
     const result = await insert(
-      'INSERT INTO users (email, phone, password_hash, name, referral_code, parent_id, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [email, phone, passwordHash, name, referralCode, parentId || null, ipAddress || '']
+      'INSERT INTO users (email, phone, phone_prefix, password_hash, name, referral_code, parent_id, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [email, phone, phonePrefix || '+1', passwordHash, name, referralCode, parentId || null, ipAddress || '']
     );
     return this.findById(result.id);
   },
@@ -58,7 +58,7 @@ const userModel = {
       params.push(`%${search}%`, `%${search}%`, `%${search}%`);
     }
     const rows = await all(
-      `SELECT u.id, u.email, u.phone, u.name, u.referral_code, u.parent_id, u.is_admin, u.is_active, u.created_at, u.ip_address,
+      `SELECT u.id, u.email, u.phone, u.phone_prefix, u.name, u.referral_code, u.parent_id, u.is_admin, u.is_active, u.created_at, u.ip_address,
         COALESCE((SELECT SUM(g.value) FROM user_gifts ug JOIN gifts g ON g.id = ug.gift_id WHERE ug.user_id = u.id AND ug.status != 'rejected'), 0) as balance,
         COALESCE((SELECT COUNT(*) FROM invitations WHERE inviter_id = u.id AND level = 1), 0) as invite_count
        FROM users u ${where} ORDER BY u.id DESC LIMIT ? OFFSET ?`,

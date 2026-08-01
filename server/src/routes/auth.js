@@ -21,6 +21,7 @@ router.post('/register', registerLimiter, async (req, res) => {
   try {
     const email = (req.body.email || '').trim().toLowerCase();
     const phone = (req.body.phone || '').trim();
+    const phonePrefix = (req.body.phone_prefix || '+1').trim();
     const password = req.body.password || '';
     const name = (req.body.name || '').trim();
     const referral_code = (req.body.referral_code || '').trim();
@@ -69,7 +70,7 @@ router.post('/register', registerLimiter, async (req, res) => {
 
     const passwordHash = await hashPassword(password);
     const user = await userModel.create({
-      email, phone, passwordHash,
+      email, phone, phonePrefix, passwordHash,
       name: name || '',
       referralCode: code,
       parentId,
