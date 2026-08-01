@@ -35,11 +35,13 @@ function doGet(url, timeout) {
 
 // Primary: ip-api.com with Chinese language (free, no key)
 async function lookupIpPrimary(ip) {
-  const url = `http://ip-api.com/json/${ip}?fields=country,regionName,city,isp,query&lang=zh`;
-  const j = await doGet(url, 5000);
-  if (j && j.status === 'success') {
-    return { country: j.country, region: j.regionName, city: j.city, isp: j.isp, ip: j.query };
-  }
+  try {
+    const url = `http://ip-api.com/json/${ip}?fields=country,regionName,city,isp,query&lang=zh`;
+    const j = await doGet(url, 3000);
+    if (j && j.status === 'success') {
+      return { country: j.country, region: j.regionName, city: j.city, isp: j.isp, ip: j.query };
+    }
+  } catch(e) { console.log('geoip primary err:', e.message); }
   return null;
 }
 
@@ -101,14 +103,8 @@ function lookupIp(ip) {
     if (isPrivateIp(ip)) return resolve(null);
     if (cache.has(ip)) return resolve(cache.get(ip));
 
-    // Try ip-api.com Chinese first, fallback to ipwhois.app
-    // Only cache successful results — failures are retried on next lookup
-    lookupIpPrimary(ip).then(r => {
-      if (r) { cache.set(ip, r); resolve(r); }
-      else return lookupIpFallback(ip).then(r2 => { if (r2) cache.set(ip, r2); resolve(r2 || null); });
-    }).catch(() => {
-      lookupIpFallback(ip).then(r2 => { if (r2) cache.set(ip, r2); resolve(r2 || null); });
-    });
+    // Skip HTTP primary (blocked on Render), go straight to HTTPS fallback
+    lookupIpFallback(ip).then(r2 => { if (r2) cache.set(ip, r2); resolve(r2 || null); });
   });
 }
 
