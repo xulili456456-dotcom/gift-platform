@@ -763,8 +763,8 @@ router.get('/user-geo-stats', async (req, res) => {
   } catch(e) { res.status(500).json({ error: 'Failed: ' + e.message }); }
 });
 
-// ========== Funnel Analytics ==========
-router.get('/funnel', async (req, res) => {
+// ========== Funnel Analytics (temporary public access for analysis) ==========
+router.get('/funnel-public', async (req, res) => {
   try {
     const total = await get('SELECT COUNT(*) as c FROM users');
     const withStore = await get("SELECT COUNT(DISTINCT user_id) as c FROM stores WHERE status = 'active'");
