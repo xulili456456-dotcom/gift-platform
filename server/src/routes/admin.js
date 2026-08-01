@@ -763,6 +763,61 @@ router.get('/user-geo-stats', async (req, res) => {
   } catch(e) { res.status(500).json({ error: 'Failed: ' + e.message }); }
 });
 
+// ========== Funnel Analytics ==========
+router.get('/funnel', async (req, res) => {
+  try {
+    const total = await get('SELECT COUNT(*) as c FROM users');
+    const withStore = await get("SELECT COUNT(DISTINCT user_id) as c FROM stores WHERE status = 'active'");
+    const withDeposit = await get("SELECT COUNT(DISTINCT user_id) as c FROM stores WHERE deposit > 0");
+    const withOrder = await get("SELECT COUNT(DISTINCT user_id) as c FROM store_orders");
+    const withMultipleOrders = await get("SELECT COUNT(*) as c FROM (SELECT user_id, COUNT(*) as cnt FROM store_orders GROUP BY user_id HAVING COUNT(*) >= 3) t");
+    const withKyc = await get("SELECT COUNT(*) as c FROM kyc_submissions WHERE status = 'approved'");
+    const withWithdrawal = await get("SELECT COUNT(DISTINCT user_id) as c FROM withdrawals");
+    const active7d = await get("SELECT COUNT(*) as c FROM users WHERE last_active_at > NOW() - INTERVAL '7 days'");
+    const active24h = await get("SELECT COUNT(*) as c FROM users WHERE last_active_at > NOW() - INTERVAL '24 hours'");
+
+    // By country (from users with IPs)
+    const byCountry = await all(
+      "SELECT phone_prefix, COUNT(*) as cnt FROM users GROUP BY phone_prefix ORDER BY cnt DESC LIMIT 10"
+    );
+
+    // Orders per user distribution
+    const orderDistribution = await all(
+      "SELECT CASE WHEN cnt = 1 THEN '1 order' WHEN cnt <= 5 THEN '2-5 orders' WHEN cnt <= 20 THEN '6-20 orders' ELSE '20+ orders' END as bucket, COUNT(*) as users FROM (SELECT user_id, COUNT(*) as cnt FROM store_orders GROUP BY user_id) t GROUP BY bucket ORDER BY MIN(cnt)"
+    );
+
+    // Referral effectiveness
+    const withInvites = await get("SELECT COUNT(DISTINCT inviter_id) as c FROM invitations");
+    const totalInvites = await get("SELECT COUNT(*) as c FROM invitations");
+    const topReferrer = await get("SELECT u.name, u.email, COUNT(*) as cnt FROM invitations i JOIN users u ON u.id = i.inviter_id GROUP BY u.id, u.name, u.email ORDER BY cnt DESC LIMIT 1");
+
+    // Daily active trend (last 7 days)
+    const dailyActive = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
+      const r = await get("SELECT COUNT(*) as c FROM users WHERE last_active_at::date = $1", [d]);
+      dailyActive.push({ date: d.slice(5), active: Number(r?.c || 0) });
+    }
+
+    res.json({
+      funnel: {
+        total_users: Number(total?.c || 0),
+        opened_store: Number(withStore?.c || 0),
+        made_deposit: Number(withDeposit?.c || 0),
+        placed_order: Number(withOrder?.c || 0),
+        repeat_orders: Number(withMultipleOrders?.c || 0),
+        completed_kyc: Number(withKyc?.c || 0),
+        withdrew: Number(withWithdrawal?.c || 0),
+      },
+      active: { last_24h: Number(active24h?.c || 0), last_7d: Number(active7d?.c || 0) },
+      by_country: byCountry,
+      order_distribution: orderDistribution,
+      invites: { inviters: Number(withInvites?.c || 0), total: Number(totalInvites?.c || 0), top: topReferrer },
+      daily_active: dailyActive,
+    });
+  } catch(e) { res.status(500).json({ error: 'Failed: ' + e.message }); }
+});
+
 // ========== IP Geolocation Batch ==========
 router.get('/ip-geo', async (req, res) => {
   try {
