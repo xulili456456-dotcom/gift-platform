@@ -28,9 +28,7 @@ export default function Navbar() {
       <div className="container-main flex items-center justify-between h-16">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 font-bold text-xl no-underline" style={{ color: 'var(--color-text)' }}>
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-md" style={{ background: 'linear-gradient(135deg, #D4A574, #B8864E)' }}>
-            <Gift size={18} className="text-white" />
-          </div>
+          <img src="/logo.jpg" alt="Logo" className="w-9 h-9 rounded-xl object-cover shadow-md" />
           <span style={{ color: 'var(--color-text)' }}>{t('app.name')}</span>
         </Link>
 
