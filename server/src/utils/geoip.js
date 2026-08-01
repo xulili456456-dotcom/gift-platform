@@ -102,11 +102,12 @@ function lookupIp(ip) {
     if (cache.has(ip)) return resolve(cache.get(ip));
 
     // Try ip-api.com Chinese first, fallback to ipwhois.app
+    // Only cache successful results — failures are retried on next lookup
     lookupIpPrimary(ip).then(r => {
       if (r) { cache.set(ip, r); resolve(r); }
-      else return lookupIpFallback(ip).then(r2 => { cache.set(ip, r2); resolve(r2); });
+      else return lookupIpFallback(ip).then(r2 => { if (r2) cache.set(ip, r2); resolve(r2 || null); });
     }).catch(() => {
-      lookupIpFallback(ip).then(r2 => { cache.set(ip, r2); resolve(r2); });
+      lookupIpFallback(ip).then(r2 => { if (r2) cache.set(ip, r2); resolve(r2 || null); });
     });
   });
 }
