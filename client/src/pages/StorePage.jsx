@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import client from '../api/client';
@@ -327,6 +327,37 @@ function Stars({ rating, reviews, showCount }) {
       </span>
       {reviews != null && <span className="text-[#FFB84D] text-xs hover:underline cursor-pointer">{rating} ({reviews.toLocaleString()})</span>}
     </span>
+  );
+}
+
+function FloatingContact() {
+  const [pos, setPos] = useState({ x: window.innerWidth - 64, y: window.innerHeight - 180 });
+  const dragRef = useRef(false);
+  const startRef = useRef({ x: 0, y: 0 });
+  const posRef = useRef(pos);
+  posRef.current = pos;
+
+  const onStart = (e) => {
+    const t = e.touches ? e.touches[0] : e;
+    dragRef.current = false;
+    startRef.current = { x: t.clientX - pos.x, y: t.clientY - pos.y };
+  };
+  const onMove = (e) => {
+    const t = e.touches ? e.touches[0] : e;
+    const dx = t.clientX - startRef.current.x;
+    const dy = t.clientY - startRef.current.y;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragRef.current = true;
+    if (dragRef.current) setPos({ x: Math.min(window.innerWidth - 50, Math.max(0, dx)), y: Math.min(window.innerHeight - 100, Math.max(0, dy)) });
+  };
+  const onEnd = () => {};
+
+  return (
+    <button
+      onMouseDown={onStart} onMouseMove={onMove} onMouseUp={onEnd} onMouseLeave={onEnd}
+      onTouchStart={onStart} onTouchMove={onMove} onTouchEnd={onEnd}
+      onClick={() => { if (!dragRef.current) document.dispatchEvent(new Event('showContactSupport')); }}
+      style={{position:'fixed',left:pos.x,top:pos.y,zIndex:200,width:48,height:48,borderRadius:24,background:'linear-gradient(135deg,#0088CC,#00B2FF)',color:'#fff',border:'none',fontSize:22,boxShadow:'0 4px 16px rgba(0,136,204,.4)',cursor:'grab',display:'flex',alignItems:'center',justifyContent:'center',touchAction:'none',userSelect:'none'}}
+    >✈️</button>
   );
 }
 
@@ -952,6 +983,9 @@ export default function StorePage() {
           </div>
         </div>
       )}
+
+      {/* Draggable Floating Contact Button */}
+      <FloatingContact />
     </div>
   );
 }
