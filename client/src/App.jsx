@@ -84,15 +84,22 @@ export default function App() {
       {showContact && (
         <div style={{position:'fixed',inset:0,zIndex:300,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,.6)',backdropFilter:'blur(2px)',padding:16}} onClick={() => setShowContact(false)}>
           <div onClick={e => e.stopPropagation()} style={{background:'#fff',borderRadius:24,width:'100%',maxWidth:330,padding:'32px 24px 24px',boxShadow:'0 20px 60px rgba(0,0,0,.2)',textAlign:'center',animation:'scaleIn .25s ease-out'}}>
-            <div style={{position:'relative',display:'inline-block',marginBottom:16}}>
-              <div style={{width:64,height:64,borderRadius:32,background:'linear-gradient(135deg,#0088CC,#00B2FF)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:30}}>✈️</div>
-              <div style={{position:'absolute',bottom:2,right:2,width:16,height:16,borderRadius:8,background:'#00A86B',border:'2px solid #fff'}}></div>
-            </div>
             <div style={{fontSize:18,fontWeight:800,color:'#0f0f0f',marginBottom:2}}>Contact Support</div>
-            <div style={{fontSize:12,color:'#00A86B',fontWeight:500,marginBottom:8}}>● Online — respond within minutes</div>
-            <div style={{fontSize:12,color:'#999',marginBottom:20}}>Reach us on Telegram for any questions</div>
-            <a href="https://t.me/Shopping_Operations" target="_blank" rel="noopener noreferrer" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,padding:14,background:'linear-gradient(135deg,#0088CC,#00B2FF)',borderRadius:14,textDecoration:'none',marginBottom:10,color:'#fff',fontSize:14,fontWeight:700}}>✈️ Open Telegram</a>
-            <div style={{fontSize:12,color:'#0088CC',marginBottom:18}}>@Shopping_Operations</div>
+            <div style={{fontSize:12,color:'#00A86B',fontWeight:500,marginBottom:20}}>● Online — respond within minutes</div>
+            <div style={{display:'flex',gap:12,marginBottom:12}}>
+              <a href="https://t.me/Shopping_Operations" target="_blank" rel="noopener noreferrer"
+                style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:6,padding:16,background:'#f0f7ff',borderRadius:16,textDecoration:'none',color:'#0088CC'}}>
+                <div style={{width:44,height:44,borderRadius:22,background:'linear-gradient(135deg,#0088CC,#00B2FF)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:22}}>✈️</div>
+                <span style={{fontSize:13,fontWeight:700}}>Telegram</span>
+                <span style={{fontSize:10,color:'#888'}}>@Shopping_Operations</span>
+              </a>
+              <a href="https://wa.me/15022028170" target="_blank" rel="noopener noreferrer"
+                style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:6,padding:16,background:'#f0fdf4',borderRadius:16,textDecoration:'none',color:'#25D366'}}>
+                <div style={{width:44,height:44,borderRadius:22,background:'linear-gradient(135deg,#25D366,#128C7E)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:22}}>💬</div>
+                <span style={{fontSize:13,fontWeight:700}}>WhatsApp</span>
+                <span style={{fontSize:10,color:'#888'}}>+1 502 202 8170</span>
+              </a>
+            </div>
             <button onClick={() => setShowContact(false)} style={{width:'100%',padding:12,background:'#f5f5f5',color:'#666',border:'none',borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer'}}>Close</button>
           </div>
         </div>
