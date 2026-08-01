@@ -239,7 +239,7 @@ router.get('/definitions', require('../middleware/admin'), async (req, res) => {
 });
 
 // Admin: PUT /api/tasks/definitions/:id
-router.put('/definitions/:id', async (req, res) => {
+router.put('/definitions/:id', require('../middleware/admin'), async (req, res) => {
   try {
     const { active, reward } = req.body;
     if (typeof active !== 'undefined') await run('UPDATE task_definitions SET active = ? WHERE id = ?', [active ? 1 : 0, req.params.id]);
@@ -250,7 +250,7 @@ router.put('/definitions/:id', async (req, res) => {
 });
 
 // Admin: POST /api/admin/notifications/send
-router.post('/send-notification', async (req, res) => {
+router.post('/send-notification', require('../middleware/admin'), async (req, res) => {
   try {
     const { target, user_email, title, body, type } = req.body;
     if (!title || !body) return res.status(400).json({ error: 'Title and body required' });

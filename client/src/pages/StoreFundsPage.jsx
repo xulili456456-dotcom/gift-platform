@@ -70,7 +70,7 @@ export default function StoreFundsPage() {
         <div style={{background:'#fff',borderRadius:20,padding:20,textAlign:'center',marginBottom:14}}>
           <div style={{fontSize:11,color:'#999',marginBottom:4}}>Available Balance</div>
           <div style={{fontSize:42,fontWeight:800,color:'#0f0f0f',lineHeight:1}}>
-            ${Math.floor(s.balance)}<span style={{fontSize:20,color:'#ccc'}}>.{(s.balance%1).toFixed(2).substring(2)}</span>
+            ${Math.floor(s.balance||0)}<span style={{fontSize:20,color:'#ccc'}}>.{((s.balance||0)%1).toFixed(2).substring(2)}</span>
           </div>
           <div style={{display:'flex',justifyContent:'center',gap:24,marginTop:10}}>
             <div><span style={{fontSize:10,color:'#999'}}>Security </span><span style={{fontSize:14,fontWeight:700}}>${(s.deposit||0).toFixed(0)}</span></div>

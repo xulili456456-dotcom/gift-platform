@@ -111,7 +111,7 @@ export default function RegisterPage() {
             <input value={form.referral_code} onChange={update('referral_code')} placeholder="Referral Code (optional)"
               style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:24,outline:'none'}} />
             <button onClick={handleSubmit} disabled={loading}
-              style={{width:'100%',padding:15,background:'#FF5000',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:16,opacity:loading?.5:1}}>
+              style={{width:'100%',padding:15,background:'#FF5000',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:16,opacity:loading?0.5:1}}>
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </div>

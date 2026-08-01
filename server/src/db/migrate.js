@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     user_id         INTEGER NOT NULL,
     title           TEXT NOT NULL,
     body            TEXT NOT NULL DEFAULT '',
-    type            TEXT NOT NULL DEFAULT 'info' CHECK(type IN ('info','success','warning')),
+    type            TEXT NOT NULL DEFAULT 'info' CHECK(type IN ('info','success','warning','error')),
     is_read         BOOLEAN NOT NULL DEFAULT FALSE,
     created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -308,6 +308,9 @@ async function migrate() {
   try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMP DEFAULT NULL`); } catch(e) { console.log('last_active_at skipped:', e.message); }
   try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS risk_tags TEXT DEFAULT ''`); } catch(e) { console.log('risk_tags skipped:', e.message); }
   try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone_prefix VARCHAR(10) DEFAULT '+1'`); } catch(e) { console.log('phone_prefix skipped:', e.message); }
+  // Update notification type constraint to include 'error'
+  try { await exec(`ALTER TABLE notifications DROP CONSTRAINT IF EXISTS notifications_type_check`); } catch(e) {}
+  try { await exec(`ALTER TABLE notifications ADD CONSTRAINT notifications_type_check CHECK(type IN ('info','success','warning','error'))`); } catch(e) { console.log('notification type constraint update skipped:', e.message); }
   // Add specific earning types for better categorization
   try { await exec(`ALTER TABLE task_earnings DROP CONSTRAINT IF EXISTS task_earnings_type_check`); } catch(e) {}
   try { await exec(`ALTER TABLE task_earnings ADD CONSTRAINT task_earnings_type_check CHECK(type IN ('checkin','ad','bonus','order_profit','admin_adjust','task_reward','commission'))`); } catch(e) { console.log('type constraint update skipped:', e.message); }
