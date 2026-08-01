@@ -5,8 +5,8 @@ export const authApi = {
     return client.post('/auth/login', { email, password });
   },
 
-  register({ email, phone, password, name, referral_code }) {
-    return client.post('/auth/register', { email, phone, password, name, referral_code });
+  register({ email, phone, phone_prefix, password, name, referral_code }) {
+    return client.post('/auth/register', { email, phone, phone_prefix, password, name, referral_code });
   },
 
   me() {
