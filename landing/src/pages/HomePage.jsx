@@ -199,7 +199,7 @@ export default function HomePage() {
                 <a href="https://gift-platform-h6um.onrender.com/register" target="_blank" rel="noopener noreferrer" className="btn btn-accent btn-lg no-underline">
                   Get Started — It's Free<ArrowRight size={18} />
                 </a>
-                <a href="https://cdn.trackusp.com/apks/sched/131bba388eeb580e/release.apk" download className="btn btn-outline btn-lg no-underline">📱 Download APK</a>
+                <Link to="/store" className="btn btn-outline btn-lg no-underline"><ShoppingCart size={18} />Browse Products</Link>
               </div>
 
               <div className="animate-fade-in-up mt-16 flex flex-wrap items-center justify-center gap-8" style={{ animationDelay: '0.35s' }}>
