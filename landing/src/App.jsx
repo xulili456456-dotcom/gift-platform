@@ -38,7 +38,8 @@ function AppLayout() {
 
 export default function App() {
   useEffect(() => {
-    if (localStorage.getItem('darkMode') === '1') {
+    // Default to dark mode on first visit; only light if user explicitly chose it
+    if (localStorage.getItem('darkMode') !== '0') {
       document.body.classList.add('dark')
     }
   }, [])
