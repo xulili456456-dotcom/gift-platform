@@ -271,9 +271,11 @@ router.get('/holdings', async (req, res) => {
     const elapsed = now - new Date(h.created_at).getTime();
     const progress = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
     const price = Number(h.product_price) || (cost > 0 ? Math.round(cost / 0.85 * 100) / 100 : 0);
+    const isFree = cost === 0 && price > 0;
     const { profit: p, rate } = calcProduct(price);
-    const roi = rate;
-    return { ...h, cost, profit: p, roi, progress, sellBy: h.sell_by };
+    const actualProfit = isFree ? Math.round(price * 0.05 * 100) / 100 : p;
+    const roi = isFree ? 5 : rate;
+    return { ...h, cost, profit: actualProfit, roi, progress, sellBy: h.sell_by };
   }));
 });
 
