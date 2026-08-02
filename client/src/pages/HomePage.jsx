@@ -98,18 +98,18 @@ export default function HomePage() {
           <span style={{fontSize:13,fontWeight:700}}>💰 Profit Overview</span>
           <span style={{fontSize:10,color:'#666'}}>{new Date().toLocaleDateString()}</span>
         </div>
-        <div style={{display:'flex',gap:12}}>
-          <div style={{flex:1,background:'rgba(255,255,255,0.06)',borderRadius:10,padding:10}}>
-            <div style={{fontSize:9,color:'#888',marginBottom:2}}>Today's Profit</div>
-            <div style={{fontSize:22,fontWeight:800,color:'#00A86B'}}>${todayEarned.toFixed(2)}</div>
+        <div style={{display:'flex',gap:8}}>
+          <div style={{flex:1,background:'rgba(255,255,255,0.06)',borderRadius:10,padding:'8px 6px',overflow:'hidden'}}>
+            <div style={{fontSize:8,color:'#888',marginBottom:2}}>Today</div>
+            <div style={{fontSize:14,fontWeight:700,color:'#00A86B',overflow:'hidden',textOverflow:'ellipsis'}}>${todayEarned.toFixed(2)}</div>
           </div>
-          <div style={{flex:1,background:'rgba(255,255,255,0.06)',borderRadius:10,padding:10}}>
-            <div style={{fontSize:9,color:'#888',marginBottom:2}}>Total Profit</div>
-            <div style={{fontSize:22,fontWeight:800,color:'#4FC3F7'}}>${netProfit.toFixed(2)}</div>
+          <div style={{flex:1,background:'rgba(255,255,255,0.06)',borderRadius:10,padding:'8px 6px',overflow:'hidden'}}>
+            <div style={{fontSize:8,color:'#888',marginBottom:2}}>Total Profit</div>
+            <div style={{fontSize:14,fontWeight:700,color:'#4FC3F7',overflow:'hidden',textOverflow:'ellipsis'}}>${netProfit.toFixed(2)}</div>
           </div>
-          <div style={{flex:1,background:'rgba(255,255,255,0.06)',borderRadius:10,padding:10}}>
-            <div style={{fontSize:9,color:'#888',marginBottom:2}}>Available</div>
-            <div style={{fontSize:22,fontWeight:800,color:'#FFD54F'}}>${balance.toFixed(2)}</div>
+          <div style={{flex:1,background:'rgba(255,255,255,0.06)',borderRadius:10,padding:'8px 6px',overflow:'hidden'}}>
+            <div style={{fontSize:8,color:'#888',marginBottom:2}}>Available</div>
+            <div style={{fontSize:14,fontWeight:700,color:'#FFD54F',overflow:'hidden',textOverflow:'ellipsis'}}>${balance.toFixed(2)}</div>
           </div>
         </div>
       </div>
