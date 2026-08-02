@@ -201,6 +201,9 @@ router.post('/orders/process', async (req, res) => {
     } else if (couldBeFree && freeProductCount >= 1) {
       await t.rollback();
       return res.status(400).json({ error: 'You already claimed this product for free today', productAlreadyClaimed: true });
+    } else if (couldBeFree && freeRemaining <= 0) {
+      await t.rollback();
+      return res.status(400).json({ error: 'All 5 free orders used today. This product requires deposit.', freeSlotsExhausted: true });
     }
 
     // Validate: non-free orders need deposit + balance
