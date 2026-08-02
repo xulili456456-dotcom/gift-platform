@@ -134,7 +134,7 @@ async function updateTaskProgress(userId, taskType, increment, valueIncrement = 
 }
 
 // ===== CHECK-IN (preserved from original) =====
-const { insert, tx } = require('../db/database');
+const { insert } = require('../db/database');
 const CHECKIN_REWARDS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
 
 function calcStreak(rows, skipToday = false) {
