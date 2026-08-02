@@ -100,18 +100,20 @@ router.get('/', async (req, res) => {
     );
     const orderMap = {};
     for (const row of orderRows) {
-      const cost = Number(row.product_price) || 0;
-      const profit = cost > 0 ? transactions.find(t => t.id === row.earning_id)?.amount || 0 : 0;
+      const totalReturn = transactions.find(t => t.id === row.earning_id)?.amount || 0;
+      let cost = Number(row.product_price) || 0;
+      if (cost === 0 && totalReturn > 0) cost = Math.round(totalReturn * 0.92 * 100) / 100;
+      const profit = Math.round((totalReturn - cost) * 100) / 100;
       const buyTime = new Date(row.buy_time);
       const sellTime = new Date(row.sell_time);
       const holdHours = Math.round((sellTime - buyTime) / 3600000 * 10) / 10;
       orderMap[row.earning_id] = {
-        productName: row.product_name || 'Unknown Product',
-        productPrice: cost,
+        productName: row.product_name || ('Order #' + row.order_id),
+        productPrice: Math.round(cost * 100) / 100,
         buyTime: row.buy_time,
         sellTime: row.sell_time,
         holdHours,
-        profitRate: cost > 0 ? Math.round((profit / cost) * 100) : 0,
+        profitRate: Math.round((profit / totalReturn) * 100),
       };
     }
     for (const t of transactions) {
