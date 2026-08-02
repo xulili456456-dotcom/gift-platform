@@ -330,6 +330,10 @@ router.get('/earnings-stats', async (req, res) => {
     "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done'",
     [store?.id || 0]
   );
+  const activeOrders = await get(
+    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'holding'",
+    [store?.id || 0]
+  );
   const balance = await get(
     "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
     [req.user.id, 'delivered']
@@ -356,6 +360,7 @@ router.get('/earnings-stats', async (req, res) => {
     totalProfit: Number(allTimeEarned?.total || 0),
     netProfit: Number(netProfit?.total || 0),
     totalOrders: Number(totalOrders?.c || 0),
+    activeOrders: Number(activeOrders?.c || 0),
     balance: bal,
     tomorrowEstimate,
     dailyGoal: 20,
@@ -562,9 +567,10 @@ router.post('/deposit', authMiddleware, async (req, res) => {
       if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, rest, 'bonus', 'delivered']);
       remaining -= deduct;
     }
-    const newDeposit = Number(store.deposit || 0) + amount;
-    await t.run('UPDATE stores SET deposit = ? WHERE id = ?', [newDeposit, store.id]);
+    // Atomic deposit increment — avoids lost-update race
+    await t.run('UPDATE stores SET deposit = deposit + ? WHERE id = ?', [amount, store.id]);
     await t.commit();
+    const newDeposit = Number(store.deposit || 0) + amount;
     try { require('./notifications').notify(req.user.id, '🔒 Deposit Added', `$${amount} locked as deposit. Max trade: $${newDeposit.toFixed(2)}`, 'success'); } catch {}
     res.json({ deposit: newDeposit, maxTrade: newDeposit });
   } catch (err) { await t.rollback().catch(() => {}); throw err; }
@@ -580,24 +586,31 @@ router.post('/withdraw-deposit', authMiddleware, async (req, res) => {
   const withdrawAmt = amount ? Math.min(amount, currentDeposit) : currentDeposit;
   if (withdrawAmt <= 0) return res.status(400).json({ error: 'No deposit to withdraw' });
 
-  // Check: active holdings must not exceed remaining deposit
-  const maxHolding = await get("SELECT COALESCE(MAX(amount), 0) as max_cost FROM store_orders WHERE store_id = ? AND status = 'holding'", [store.id]);
-  const newDeposit = currentDeposit - withdrawAmt;
-  if (Number(maxHolding?.max_cost || 0) > newDeposit) {
-    return res.status(400).json({
-      error: `Cannot withdraw: your largest active order costs $${Number(maxHolding.max_cost).toFixed(2)}`,
-      detail: `Withdrawing would leave $${newDeposit.toFixed(2)} deposit, but you need at least $${Number(maxHolding.max_cost).toFixed(2)} to cover your active order. Wait for it to sell (6-30 hours), then try again.`,
-      maxHoldingCost: Number(maxHolding.max_cost),
-      currentDeposit,
-      newDeposit,
-      withdrawAmt,
-    });
-  }
+  // Check: active holdings must not exceed remaining deposit (read inside tx)
+  const t = await tx();
+  try {
+    const storeRow = await t.get('SELECT deposit FROM stores WHERE id = ? FOR UPDATE', [store.id]);
+    const actualDeposit = Number(storeRow?.deposit || 0);
+    const actualWithdraw = Math.min(withdrawAmt, actualDeposit);
+    if (actualWithdraw <= 0) { await t.rollback(); return res.status(400).json({ error: 'No deposit to withdraw' }); }
 
-  const result = await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, withdrawAmt, 'bonus', 'delivered']);
-  await run('UPDATE stores SET deposit = ? WHERE id = ?', [newDeposit, store.id]);
-  try { require('./notifications').notify(req.user.id, '🔓 Deposit Returned', `$${withdrawAmt} returned to balance`, 'info'); } catch {}
-  res.json({ deposit: newDeposit, maxTrade: newDeposit, returned: withdrawAmt });
+    const maxHolding = await t.get("SELECT COALESCE(MAX(amount), 0) as max_cost FROM store_orders WHERE store_id = ? AND status = 'holding'", [store.id]);
+    const newDeposit = actualDeposit - actualWithdraw;
+    if (Number(maxHolding?.max_cost || 0) > newDeposit) {
+      await t.rollback();
+      return res.status(400).json({
+        error: `Cannot withdraw: your largest active order costs $${Number(maxHolding.max_cost).toFixed(2)}`,
+        detail: `Withdrawing would leave $${newDeposit.toFixed(2)} deposit, but you need at least $${Number(maxHolding.max_cost).toFixed(2)} to cover your active order. Wait for it to sell (6-30 hours), then try again.`,
+        maxHoldingCost: Number(maxHolding.max_cost), currentDeposit: actualDeposit, newDeposit, withdrawAmt: actualWithdraw,
+      });
+    }
+
+    await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, actualWithdraw, 'bonus', 'delivered']);
+    await t.run('UPDATE stores SET deposit = deposit - ? WHERE id = ?', [actualWithdraw, store.id]);
+    await t.commit();
+    try { require('./notifications').notify(req.user.id, '🔓 Deposit Returned', `$${actualWithdraw} returned to balance`, 'info'); } catch {}
+    res.json({ deposit: newDeposit, maxTrade: newDeposit, returned: actualWithdraw });
+  } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 
 module.exports = router;

@@ -58,12 +58,15 @@ router.get('/public-product/:pid', async (req, res) => {
 
 // POST /api/commissions/buy/:pid — someone buys through the share link
 router.post('/buy/:pid', authMiddleware, async (req, res) => {
-  const record = await get('SELECT * FROM share_commissions WHERE id = ? AND status = ?', [req.params.pid, 'pending']);
-  if (!record) return res.status(404).json({ error: 'Product not available or already sold' });
-
   const t = await tx();
   try {
-    await t.run("UPDATE share_commissions SET status = 'credited' WHERE id = ?", [record.id]);
+    // Read inside transaction with FOR UPDATE to prevent double-credit
+    const record = await t.get('SELECT * FROM share_commissions WHERE id = ? AND status = ? FOR UPDATE', [req.params.pid, 'pending']);
+    if (!record) { await t.rollback(); return res.status(404).json({ error: 'Product not available or already sold' }); }
+
+    const result = await t.run("UPDATE share_commissions SET status = 'credited' WHERE id = ? AND status = 'pending'", [record.id]);
+    if (result.rowCount === 0) { await t.rollback(); return res.status(400).json({ error: 'Already sold' }); }
+
     await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
       [record.sharer_id, Number(record.commission), 'commission', 'delivered']);
     await t.commit();

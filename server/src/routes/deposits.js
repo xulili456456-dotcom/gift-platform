@@ -46,13 +46,15 @@ router.get('/admin', authMiddleware, adminMiddleware, async (req, res) => {
 
 // Admin: confirm deposit
 router.put('/:id/confirm', authMiddleware, adminMiddleware, async (req, res) => {
-  const d = await get('SELECT * FROM deposits WHERE id = ? AND status = ?', [req.params.id, 'pending']);
-  if (!d) return res.status(404).json({ error: 'Deposit not found or already processed' });
-
   const t = await tx();
   try {
-    await t.run("UPDATE deposits SET status = 'confirmed', confirmed_at = NOW(), admin_note = ? WHERE id = ?",
+    const d = await t.get('SELECT * FROM deposits WHERE id = ? AND status = ? FOR UPDATE', [req.params.id, 'pending']);
+    if (!d) { await t.rollback(); return res.status(404).json({ error: 'Deposit not found or already processed' }); }
+
+    const result = await t.run("UPDATE deposits SET status = 'confirmed', confirmed_at = NOW(), admin_note = ? WHERE id = ? AND status = 'pending'",
       [req.body.note || '', d.id]);
+    if (result.rowCount === 0) { await t.rollback(); return res.status(400).json({ error: 'Already confirmed' }); }
+
     await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
       [d.user_id, Number(d.amount), 'bonus', 'delivered']);
     await t.commit();

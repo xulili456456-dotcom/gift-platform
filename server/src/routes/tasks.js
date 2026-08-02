@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/auth');
-const { all, get, run } = require('../db/database');
+const { all, get, run, tx } = require('../db/database');
 
 const router = Router();
 router.use(authMiddleware);
@@ -71,29 +71,31 @@ router.get('/', async (req, res) => {
 
 // POST /api/tasks/:taskType/claim
 router.post('/:taskType/claim', async (req, res) => {
+  const t = await tx();
   try {
     const { taskType } = req.params;
     const userId = req.user.id;
-    const task = await get('SELECT * FROM task_definitions WHERE task_type = ?', [taskType]);
-    if (!task) return res.status(404).json({ error: 'Task not found' });
+    const task = await t.get('SELECT * FROM task_definitions WHERE task_type = ?', [taskType]);
+    if (!task) { await t.rollback(); return res.status(404).json({ error: 'Task not found' }); }
 
     const key = periodKey(task.reset_period);
-    const progress = await get(
-      'SELECT * FROM task_progress WHERE user_id = ? AND task_type = ? AND period_key = ?',
+    const progress = await t.get(
+      'SELECT * FROM task_progress WHERE user_id = ? AND task_type = ? AND period_key = ? FOR UPDATE',
       [userId, taskType, key]
     );
-    if (!progress || !progress.completed) return res.status(400).json({ error: 'Task not completed' });
-    if (progress.claimed) return res.status(400).json({ error: 'Already claimed' });
+    if (!progress || !progress.completed) { await t.rollback(); return res.status(400).json({ error: 'Task not completed' }); }
+    if (progress.claimed) { await t.rollback(); return res.status(400).json({ error: 'Already claimed' }); }
 
-    await run("UPDATE task_progress SET claimed = TRUE, claimed_at = ? WHERE id = ?", [new Date().toISOString(), progress.id]);
-    await run('INSERT INTO task_reward_log (user_id, task_type, task_title, amount, created_at) VALUES (?,?,?,?,?)',
+    await t.run("UPDATE task_progress SET claimed = TRUE, claimed_at = ? WHERE id = ?", [new Date().toISOString(), progress.id]);
+    await t.run('INSERT INTO task_reward_log (user_id, task_type, task_title, amount, created_at) VALUES (?,?,?,?,?)',
       [userId, taskType, task.title, task.reward, new Date().toISOString()]);
-    // Credit the reward to user's spendable balance
-    await run("INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, 'task_reward', 'delivered')",
+    await t.run("INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, 'task_reward', 'delivered')",
       [userId, task.reward]);
 
+    await t.commit();
     res.json({ message: 'Reward claimed', amount: Number(task.reward) });
   } catch (err) {
+    await t.rollback().catch(() => {});
     console.error('Task claim error:', err);
     res.status(500).json({ error: 'Claim failed' });
   }

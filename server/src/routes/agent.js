@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/auth');
 const userModel = require('../models/user');
-const { get, all, run, insert } = require('../db/database');
+const { get, all, run, insert, tx } = require('../db/database');
 
 const router = Router();
 router.use(authMiddleware);
@@ -13,28 +13,38 @@ router.post('/balance', async (req, res) => {
     if (!user || !user.is_agent) return res.status(403).json({ error: 'Agent only' });
     const { target_user_id, amount, note } = req.body;
     if (!target_user_id || !amount) return res.status(400).json({ error: 'target_user_id and amount required' });
+    if (Math.abs(amount) > 100000) return res.status(400).json({ error: 'Amount exceeds agent limit' });
     // Verify target is in agent's team (via parent_id or invitations)
     const member = await get('SELECT id FROM users WHERE id = ? AND parent_id = ?', [target_user_id, req.user.id]);
     const invite = await get('SELECT id FROM invitations WHERE inviter_id = ? AND invitee_id = ?', [req.user.id, target_user_id]);
     if (!member && !invite) return res.status(403).json({ error: 'Not in your team' });
-    if (amount > 0) {
-      await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, amount, 'bonus', 'delivered']);
-    } else {
-      let remaining = Math.abs(amount);
-      const tasks = await all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC', [target_user_id, 'delivered']);
-      for (const task of tasks) {
-        if (remaining <= 0) break;
-        const deduct = Math.min(Number(task.amount), remaining);
-        await run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
-        const rest = Number(task.amount) - deduct;
-        if (rest > 0.001) await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, rest, 'bonus', 'delivered']);
-        remaining -= deduct;
+
+    const t = await tx();
+    try {
+      if (amount > 0) {
+        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, amount, 'bonus', 'delivered']);
+      } else {
+        let remaining = Math.abs(amount);
+        const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE', [target_user_id, 'delivered']);
+        for (const task of tasks) {
+          if (remaining <= 0) break;
+          const deduct = Math.min(Number(task.amount), remaining);
+          await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
+          const rest = Number(task.amount) - deduct;
+          if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, rest, 'bonus', 'delivered']);
+          remaining -= deduct;
+        }
+        if (remaining > 0.01) { await t.rollback(); return res.status(400).json({ error: `Insufficient balance. Shortfall: $${remaining.toFixed(2)}` }); }
       }
-      if (remaining > 0.01) return res.status(400).json({ error: `Insufficient balance. Shortfall: $${remaining.toFixed(2)}` });
+
+      await t.insert('INSERT INTO agent_operations (agent_id, target_user_id, action, amount, detail) VALUES (?,?,?,?,?)', [req.user.id, target_user_id, amount>0?'credit':'debit', amount, note||'']);
+      await t.commit();
+      const bal = await get('SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND status = ?', [target_user_id, 'delivered']);
+      res.json({ ok: true, newBalance: Number(bal?.total || 0) });
+    } catch (err) {
+      await t.rollback().catch(() => {});
+      throw err;
     }
-    await insert('INSERT INTO agent_operations (agent_id, target_user_id, action, amount, detail) VALUES (?,?,?,?,?)', [req.user.id, target_user_id, amount>0?'credit':'debit', amount, note||'']);
-    const bal = await get('SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND status = ?', [target_user_id, 'delivered']);
-    res.json({ ok: true, newBalance: Number(bal?.total || 0) });
   } catch(e) { console.error('Agent balance error:', e); res.status(500).json({ error: 'Failed: ' + e.message }); }
 });
 

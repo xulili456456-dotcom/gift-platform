@@ -6,7 +6,7 @@ const giftModel = require('../models/gift');
 const userGiftModel = require('../models/userGift');
 const invitationModel = require('../models/invitation');
 const settingsModel = require('../models/settings');
-const { get, all, run, insert } = require('../db/database');
+const { get, all, run, insert, tx } = require('../db/database');
 const { notify } = require('./notifications');
 const { lookupIps } = require('../utils/geoip');
 
@@ -251,38 +251,50 @@ router.post('/users/:id/balance', async (req, res) => {
   const amount = parseFloat(req.body.amount);
   const note = req.body.note || '';
   if (!amount || isNaN(amount)) return res.status(400).json({ error: 'Valid amount required' });
+  if (Math.abs(amount) > 1000000) return res.status(400).json({ error: 'Amount exceeds maximum limit' });
 
   const user = await userModel.findById(id);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
-  if (amount > 0) {
-    await insert(
-      'INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
-      [id, amount, 'admin_adjust', 'delivered']
-    );
-    try { require('./notifications').notify(id, '💰 余额到账', `管理员已为您充值 $${amount.toFixed(2)}${note ? ' ('+note+')' : ''}`, 'success'); } catch {}
-  } else {
-    let remaining = Math.abs(amount);
-    const tasks = await all(
-      'SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC',
-      [id, 'delivered']
-    );
-    for (const task of tasks) {
-      if (remaining <= 0) break;
-      const deduct = Math.min(Number(task.amount), remaining);
-      await run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
-      const rest = Number(task.amount) - deduct;
-      if (rest > 0.001) await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [id, rest, 'bonus', 'delivered']);
-      remaining -= deduct;
+  const t = await tx();
+  try {
+    if (amount > 0) {
+      await t.insert(
+        'INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+        [id, amount, 'admin_adjust', 'delivered']
+      );
+    } else {
+      let remaining = Math.abs(amount);
+      const tasks = await t.all(
+        'SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE',
+        [id, 'delivered']
+      );
+      for (const task of tasks) {
+        if (remaining <= 0) break;
+        const deduct = Math.min(Number(task.amount), remaining);
+        await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
+        const rest = Number(task.amount) - deduct;
+        if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [id, rest, 'bonus', 'delivered']);
+        remaining -= deduct;
+      }
+      if (remaining > 0.01) { await t.rollback(); return res.status(400).json({ error: `Insufficient balance. Shortfall: $${remaining.toFixed(2)}` }); }
     }
-    if (remaining > 0.01) return res.status(400).json({ error: `Insufficient balance. Shortfall: $${remaining.toFixed(2)}` });
-    try { require('./notifications').notify(id, '💰 余额调整', `管理员已从您的账户扣除 $${Math.abs(amount).toFixed(2)}${note ? ' ('+note+')' : ''}`, 'warning'); } catch {}
-  }
 
-  const bal = await get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [id, 'delivered']);
-  res.json({ ok: true, newBalance: Number(bal?.total || 0) });
-  // Audit log
-  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, amount>0?'credit':'debit', id, `$${Math.abs(amount).toFixed(2)} ${note}`]); } catch {}
+    await t.commit();
+    const bal = await get("SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [id, 'delivered']);
+    res.json({ ok: true, newBalance: Number(bal?.total || 0) });
+
+    if (amount > 0) {
+      try { require('./notifications').notify(id, '💰 余额到账', `管理员已为您充值 $${amount.toFixed(2)}${note ? ' ('+note+')' : ''}`, 'success'); } catch {}
+    } else {
+      try { require('./notifications').notify(id, '💰 余额调整', `管理员已从您的账户扣除 $${Math.abs(amount).toFixed(2)}${note ? ' ('+note+')' : ''}`, 'warning'); } catch {}
+    }
+    try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, amount>0?'credit':'debit', id, `$${Math.abs(amount).toFixed(2)} ${note}`]); } catch {}
+  } catch (err) {
+    await t.rollback().catch(() => {});
+    console.error('Balance adjust failed:', err);
+    res.status(500).json({ error: 'Balance adjustment failed' });
+  }
 });
 
 // ========== User Finance Summary ==========
@@ -888,30 +900,39 @@ router.post('/agent-balance', async (req, res) => {
     if (!user || !user.is_agent) return res.status(403).json({ error: 'Agent only' });
     const { target_user_id, amount, note } = req.body;
     if (!target_user_id || !amount) return res.status(400).json({ error: 'target_user_id and amount required' });
+    if (Math.abs(amount) > 100000) return res.status(400).json({ error: 'Amount exceeds agent limit' });
     // Verify target is in agent's downline
     const invitee = await get('SELECT i.id FROM invitations i WHERE i.inviter_id = ? AND i.invitee_id = ?', [req.user.id, target_user_id]);
     if (!invitee) return res.status(403).json({ error: 'Not in your team' });
-    if (amount > 0) {
-      await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, amount, 'bonus', 'delivered']);
-    } else {
-      let remaining = Math.abs(amount);
-      const tasks = await all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC', [target_user_id, 'delivered']);
-      for (const task of tasks) {
-        if (remaining <= 0) break;
-        const deduct = Math.min(Number(task.amount), remaining);
-        await run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
-        const rest = Number(task.amount) - deduct;
-        if (rest > 0.001) {
-          const frag = await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, rest, 'bonus', 'delivered']);
+
+    const t = await tx();
+    try {
+      if (amount > 0) {
+        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, amount, 'bonus', 'delivered']);
+      } else {
+        let remaining = Math.abs(amount);
+        const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE', [target_user_id, 'delivered']);
+        for (const task of tasks) {
+          if (remaining <= 0) break;
+          const deduct = Math.min(Number(task.amount), remaining);
+          await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
+          const rest = Number(task.amount) - deduct;
+          if (rest > 0.001) {
+            await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, rest, 'bonus', 'delivered']);
+          }
+          remaining -= deduct;
         }
-        remaining -= deduct;
+        if (remaining > 0.01) { await t.rollback(); return res.status(400).json({ error: `Insufficient balance. Shortfall: $${remaining.toFixed(2)}` }); }
       }
-      if (remaining > 0.01) return res.status(400).json({ error: `Insufficient balance. Shortfall: $${remaining.toFixed(2)}` });
+      await t.insert('INSERT INTO agent_operations (agent_id, target_user_id, action, amount, detail) VALUES (?,?,?,?,?)',
+        [req.user.id, target_user_id, amount>0?'credit':'debit', amount, note||'']);
+      await t.commit();
+      const bal = await get('SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND status = ?', [target_user_id, 'delivered']);
+      res.json({ ok: true, newBalance: Number(bal?.total || 0) });
+    } catch (err) {
+      await t.rollback().catch(() => {});
+      throw err;
     }
-    await insert('INSERT INTO agent_operations (agent_id, target_user_id, action, amount, detail) VALUES (?,?,?,?,?)',
-      [req.user.id, target_user_id, amount>0?'credit':'debit', amount, note||'']);
-    const bal = await get('SELECT COALESCE(SUM(amount),0) as total FROM task_earnings WHERE user_id = ? AND status = ?', [target_user_id, 'delivered']);
-    res.json({ ok: true, newBalance: Number(bal?.total || 0) });
   } catch(e) { console.error('Agent balance error:', e); res.status(500).json({ error: 'Failed: ' + e.message }); }
 });
 

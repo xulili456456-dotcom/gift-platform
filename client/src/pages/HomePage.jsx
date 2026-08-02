@@ -17,6 +17,7 @@ export default function HomePage() {
   const [totalEarned, setTotalEarned] = useState(0);
   const [netProfit, setNetProfit] = useState(0);
   const [todayEarned, setTodayEarned] = useState(0);
+  const [activeOrders, setActiveOrders] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { loadAll(); const t = setInterval(loadBalance, 15000); const s = setInterval(checkSell, 60000); return () => { clearInterval(t); clearInterval(s); }; }, []);
@@ -28,6 +29,7 @@ export default function HomePage() {
       setTotalEarned(data.totalProfit || 0);
       setNetProfit(data.netProfit || 0);
       setTodayEarned(data.todayProfit || 0);
+      setActiveOrders(data.activeOrders || 0);
     } catch {}
   };
   const loadAll = async () => {
@@ -42,6 +44,7 @@ export default function HomePage() {
       setTotalEarned(b.data?.totalProfit || 0);
       setNetProfit(b.data?.netProfit || 0);
       setTodayEarned(b.data?.todayProfit || 0);
+      setActiveOrders(b.data?.activeOrders || 0);
     } catch { toast.error('Failed to load'); }
     finally { setLoading(false); }
   };
@@ -84,7 +87,7 @@ export default function HomePage() {
             <div style={{fontSize:9,color:'#888'}}>Net Profit</div>
           </div>
           <div onClick={() => navigate('/store/funds')} style={{flex:1,background:'#1a1a1a',borderRadius:10,padding:8,textAlign:'center',cursor:'pointer'}}>
-            <div style={{fontSize:14,fontWeight:700,color:'#fff'}}>7</div>
+            <div style={{fontSize:14,fontWeight:700,color:'#fff'}}>{activeOrders}</div>
             <div style={{fontSize:9,color:'#888'}}>Active Orders</div>
           </div>
           <div onClick={() => navigate('/mine/team')} style={{flex:1,background:'#1a1a1a',borderRadius:10,padding:8,textAlign:'center',cursor:'pointer'}}>
