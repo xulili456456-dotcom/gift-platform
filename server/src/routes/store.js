@@ -343,6 +343,11 @@ router.get('/earnings-stats', async (req, res) => {
     "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status IN ('delivered','withdrawn') AND amount > 0 AND type IN ('order_profit','task_reward','commission','checkin')",
     [req.user.id]
   );
+  // Detailed breakdown by type
+  const breakdown = await all(
+    "SELECT type, COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status IN ('delivered','withdrawn') AND amount > 0 GROUP BY type ORDER BY total DESC",
+    [req.user.id]
+  );
   const bal = Number(balance?.total || 0);
   const tomorrowEstimate = Math.round(bal * 1.15 * 100) / 100;
 
@@ -353,7 +358,8 @@ router.get('/earnings-stats', async (req, res) => {
     totalOrders: Number(totalOrders?.c || 0),
     balance: bal,
     tomorrowEstimate,
-    dailyGoal: 20, // default daily goal
+    dailyGoal: 20,
+    breakdown: breakdown.map(r => ({ type: r.type, total: Number(r.total) })),
   });
 });
 
