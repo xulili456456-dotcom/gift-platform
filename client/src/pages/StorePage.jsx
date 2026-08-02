@@ -401,7 +401,8 @@ export default function StorePage() {
   const [freeProducts, setFreeProducts] = useState([]);
   const [freeRemaining, setFreeRemaining] = useState(0);
   const [claimedNames, setClaimedNames] = useState([]);
-  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); setClaimedNames(data.claimedNames||[]); }).catch(()=>{}); }, [status?.store?.doneToday]);
+  const freeProductsLoaded = useRef(false);
+  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); if (!freeProductsLoaded.current) { setClaimedNames(data.claimedNames||[]); freeProductsLoaded.current = true; } }).catch(()=>{}); }, [status?.store?.doneToday]);
 
   var daySeed = parseInt(new Date().toISOString().slice(0,10).replace(/-/g,''),10);
   const products = useMemo(() => {
