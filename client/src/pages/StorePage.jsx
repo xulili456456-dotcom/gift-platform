@@ -402,7 +402,9 @@ export default function StorePage() {
   const [freeRemaining, setFreeRemaining] = useState(0);
   const [claimedNames, setClaimedNames] = useState([]);
   const [freeLoaded, setFreeLoaded] = useState(false);
-  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); setClaimedNames(prev => prev.length === 0 ? (data.claimedNames||[]) : prev); setFreeLoaded(true); }).catch(()=>{}); }, [status?.store?.doneToday]);
+  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); setClaimedNames(prev => prev.length === 0 ? (data.claimedNames||[]) : prev); setFreeLoaded(true); }).catch(()=>{ setFreeLoaded(true); }); }, []);
+  // Re-fetch remaining count when orders complete
+  useEffect(() => { if (status?.store?.doneToday > 0) { client.get('/store/free-products').then(({data}) => { setFreeRemaining(data.remaining); }).catch(()=>{}); } }, [status?.store?.doneToday]);
 
   var daySeed = parseInt(new Date().toISOString().slice(0,10).replace(/-/g,''),10);
   const products = useMemo(() => {
@@ -729,9 +731,10 @@ export default function StorePage() {
           {products.map(p => {
             const isFreeProduct = freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0));
             const isAlreadyClaimed = isFreeProduct && claimedNames.includes(p.name);
-            const isFreeDisabled = isFreeProduct && (!freeLoaded || freeRemaining <= 0 || isAlreadyClaimed);
+            const isFreeDisabled = isFreeProduct && (freeRemaining <= 0 || isAlreadyClaimed);
+            const buyBlocked = isFreeDisabled || (!freeLoaded && isFreeProduct);
             return (
-            <div key={p.id} onClick={() => !isFreeDisabled && setDetail(p)} style={{background: isFreeDisabled ? '#f8f8f8' : '#fff',borderRadius:16,padding:14,cursor: isFreeDisabled ? 'default' : 'pointer',display:'flex',flexDirection:'column',gap:8,opacity: isFreeDisabled ? 0.5 : 1}}>
+            <div key={p.id} onClick={() => !buyBlocked && setDetail(p)} style={{background: buyBlocked ? '#f8f8f8' : '#fff',borderRadius:16,padding:14,cursor: buyBlocked ? 'default' : 'pointer',display:'flex',flexDirection:'column',gap:8,opacity: buyBlocked ? 0.5 : 1}}>
               <div style={{display:'flex',gap:12}}>
                 <div style={{width:80,height:80,background:'#f8f8f8',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,overflow:'hidden'}}>
                   <img src={p.img} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover'}} loading="lazy" />
