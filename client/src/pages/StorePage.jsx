@@ -961,7 +961,10 @@ export default function StorePage() {
             {(!orderHistory?.orders || orderHistory.orders.length === 0) && <p className="text-[11px] text-[#999] text-center py-4">No orders today</p>}
             {orderHistory?.orders?.slice(0, 20).map(o => {
               const profit = Number(o.profit) || 0;
-              const cost = profit > 0 ? Math.round(profit / 0.14 * 0.86 * 100) / 100 : 0;
+              const price = Number(o.product_price) || 0;
+              const isFree = profit > 0 && price > 0 && Number(o.amount || 0) === 0;
+              const cost = isFree ? 0 : Math.max(0, Math.round((price - profit) * 100) / 100);
+              const roi = isFree ? 'FREE' : (cost > 0 ? Math.round(profit / cost * 100) : '--');
               const isOpen = expandedOrder === o.id;
               return (
               <div key={o.id} className="border-b border-gray-100 last:border-0">
@@ -975,8 +978,8 @@ export default function StorePage() {
                 {isOpen && (
                 <div className="pb-2 text-[10px] space-y-1 text-[#565959] px-1">
                   <div className="flex justify-between"><span>Product</span><span className="text-[#0F1111] font-medium truncate max-w-[70%]">{o.product_name || `#${o.id}`}</span></div>
-                  <div className="flex justify-between"><span>Cost</span><span className="text-[#0F1111] font-medium">${cost.toFixed(2)}</span></div>
-                  <div className="flex justify-between"><span>Profit ({p.roi || Math.round(p.profit/p.price*100)}%)</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Cost</span><span className="text-[#0F1111] font-medium">{isFree ? 'FREE' : '$' + cost.toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Profit ({roi}{typeof roi === 'number' ? '%' : ''})</span><span className="text-[#067D62] font-bold">+${profit.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>Total Return</span><span className="text-[#0F1111] font-bold">${(cost + profit).toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>Time</span><span className="text-[#0F1111]">{new Date(o.created_at).toLocaleString()}</span></div>
                 </div>

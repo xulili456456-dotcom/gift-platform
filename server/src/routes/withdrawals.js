@@ -39,6 +39,7 @@ router.post('/', async (req, res) => {
     const tasks = await t.all('SELECT id, amount, type FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE',
       [req.user.id, 'delivered']);
     const deductedIds = [];
+    const fragmentIds = [];
 
     for (const task of tasks) {
       if (remaining <= 0) break;
@@ -49,7 +50,7 @@ router.post('/', async (req, res) => {
       if (rest > 0.001) {
         const frag = await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
           [req.user.id, rest, task.type, 'delivered']);
-        deductedIds.push(frag.id); // Track fragment for cancellation
+        fragmentIds.push(frag.id);
       }
       remaining -= deduct;
     }
@@ -60,10 +61,10 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Insufficient balance, withdrawal failed' });
     }
 
-    // Store all deducted IDs (original + fragments) as JSON array
+    // Store deducted + fragment IDs separately for safe cancellation
     const result = await t.insert(
       'INSERT INTO withdrawals (user_id, amount, network, wallet_address, status, deducted_ids) VALUES (?, ?, ?, ?, ?, ?)',
-      [req.user.id, amount, network, addr, 'pending', JSON.stringify(deductedIds)]
+      [req.user.id, amount, network, addr, 'pending', JSON.stringify({ deducted: deductedIds, fragments: fragmentIds })]
     );
 
     await t.commit();
@@ -95,17 +96,26 @@ router.delete('/:id', async (req, res) => {
 
     await t.run('UPDATE withdrawals SET status = ? WHERE id = ?', ['rejected', req.params.id]);
 
-    // Restore ALL deducted rows (original + fragments)
     if (w.deducted_ids) {
-      let ids;
-      try {
-        ids = JSON.parse(w.deducted_ids);
-      } catch {
-        ids = w.deducted_ids.split(',').map(Number).filter(Boolean);
-      }
-      for (const id of ids) {
-        // Only restore if still withdrawn (prevents double-spend via fragment reuse)
-        await t.run(`UPDATE task_earnings SET status = 'delivered' WHERE id = $1 AND status = 'withdrawn'`, [parseInt(id)]);
+      let parsed;
+      try { parsed = JSON.parse(w.deducted_ids); } catch { parsed = null; }
+
+      // New format: { deducted: [...], fragments: [...] }
+      if (parsed && parsed.deducted) {
+        // Restore original deducted rows
+        for (const id of parsed.deducted) {
+          await t.run(`UPDATE task_earnings SET status = 'delivered' WHERE id = $1 AND status = 'withdrawn'`, [parseInt(id)]);
+        }
+        // Delete fragments (remainders that duplicate restored originals)
+        for (const id of (parsed.fragments || [])) {
+          await t.run('DELETE FROM task_earnings WHERE id = $1', [parseInt(id)]);
+        }
+      } else {
+        // Legacy format: flat array of all IDs — best-effort restore
+        const ids = Array.isArray(parsed) ? parsed : String(w.deducted_ids).split(',').map(Number).filter(Boolean);
+        for (const id of ids) {
+          await t.run(`UPDATE task_earnings SET status = 'delivered' WHERE id = $1 AND status = 'withdrawn'`, [parseInt(id)]);
+        }
       }
     }
     await t.commit();

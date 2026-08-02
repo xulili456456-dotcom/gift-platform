@@ -236,13 +236,25 @@ router.get('/withdrawals', async (req, res) => {
 router.put('/withdrawals/:id', async (req, res) => {
   const id = parseInt(req.params.id);
   const { status, admin_note } = req.body;
-  if (!status) return res.status(400).json({ error: 'status required' });
-  const completedAt = status === 'completed' ? 'NOW()' : 'NULL';
-  await run(
-    `UPDATE withdrawals SET status = ?, admin_note = ?, completed_at = ${completedAt} WHERE id = ?`,
-    [status, admin_note || '', id]
-  );
-  res.json({ ok: true });
+  if (!['completed', 'rejected'].includes(status)) return res.status(400).json({ error: 'Status must be completed or rejected' });
+
+  const t = await tx();
+  try {
+    const w = await t.get('SELECT * FROM withdrawals WHERE id = ? FOR UPDATE', [id]);
+    if (!w) { await t.rollback(); return res.status(404).json({ error: 'Withdrawal not found' }); }
+    if (w.status !== 'pending') { await t.rollback(); return res.status(400).json({ error: 'Already processed' }); }
+
+    const completedAt = status === 'completed' ? new Date().toISOString() : null;
+    await t.run(
+      'UPDATE withdrawals SET status = ?, admin_note = ?, completed_at = ? WHERE id = ?',
+      [status, admin_note || '', completedAt, id]
+    );
+    await t.commit();
+    res.json({ ok: true });
+  } catch (err) {
+    await t.rollback().catch(() => {});
+    throw err;
+  }
 });
 
 // ========== Balance Adjustment ==========
@@ -543,6 +555,7 @@ router.post('/users/:id/reset-password', async (req, res) => {
   const id = parseInt(req.params.id);
   const { newPassword } = req.body;
   if (!newPassword || newPassword.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+  if (!/[a-zA-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) return res.status(400).json({ error: 'Password must contain both letters and numbers' });
 
   const { hashPassword } = require('../utils/password');
   const hash = await hashPassword(newPassword);

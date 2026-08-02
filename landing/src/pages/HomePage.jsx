@@ -251,20 +251,20 @@ export default function HomePage() {
         <section className="section bg-surface-alt">
           <div className="container-main">
             <RevealSection enhanced className="text-center mb-16">
-              <span className="section-label">Why Gift Haven</span>
-              <h2 className="section-title">Traditional E-Commerce vs Gift Haven</h2>
+              <span className="section-label">Why Shopee Shopping Operations</span>
+              <h2 className="section-title">Traditional E-Commerce vs Shopee Shopping Operations</h2>
               <p className="section-desc mx-auto">See why thousands are switching to task-based earning.</p>
             </RevealSection>
             <div className="max-w-4xl mx-auto">
               <div className="hidden md:grid grid-cols-[1fr,1fr,1fr] gap-4 mb-4 px-4">
-                <div /><div className="text-center text-sm font-semibold text-red-500/70 bg-red-50 dark:bg-red-500/3 rounded-xl py-3">❌ Traditional E-Commerce</div><div className="text-center text-sm font-semibold text-green-600 bg-green-50 dark:bg-green-500/3 rounded-xl py-3">✅ Gift Haven</div>
+                <div /><div className="text-center text-sm font-semibold text-red-500/70 bg-red-50 dark:bg-red-500/3 rounded-xl py-3">❌ Traditional E-Commerce</div><div className="text-center text-sm font-semibold text-green-600 bg-green-50 dark:bg-green-500/3 rounded-xl py-3">✅ Shopee Shopping Operations</div>
               </div>
               {comparisons.map((row, i) => (
                 <RevealSection key={i} enhanced style={{ transitionDelay: `${i * 0.06}s` }}>
                   <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,1fr] gap-2 md:gap-4 items-center py-4 px-4 rounded-xl hover:bg-white/50 dark:hover:bg-white/3 transition-colors">
                     <div className="flex items-center gap-3 font-semibold text-sm text-text"><div className="w-9 h-9 rounded-lg bg-accent/5 text-accent flex items-center justify-center shrink-0"><row.icon size={17} /></div>{row.aspect}</div>
                     <div className="text-sm text-red-500/70 dark:text-red-400/70 pl-12 md:pl-0 md:text-center font-medium"><span className="md:hidden text-[10px] uppercase text-text-muted mr-2">Traditional: </span>{row.traditional}</div>
-                    <div className="text-sm text-green-600 dark:text-green-400 font-semibold pl-12 md:pl-0 md:text-center"><span className="md:hidden text-[10px] uppercase text-text-muted mr-2">Gift Haven: </span>{row.haven}</div>
+                    <div className="text-sm text-green-600 dark:text-green-400 font-semibold pl-12 md:pl-0 md:text-center"><span className="md:hidden text-[10px] uppercase text-text-muted mr-2">Shopee Shopping Operations: </span>{row.haven}</div>
                   </div>
                 </RevealSection>
               ))}

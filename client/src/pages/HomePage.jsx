@@ -212,7 +212,6 @@ export default function HomePage() {
             <div style={{fontSize:20,marginBottom:6}}>👥</div>
             <div style={{fontSize:12,fontWeight:700,color:'#333'}}>My Team</div>
             <div style={{fontSize:10,color:'#999',marginTop:2}}>{totalInvites} members</div>
-            <div style={{fontSize:12,fontWeight:700,color:'#FF5000',marginTop:4}}>+${((totalInvites||0)*5).toFixed(0)} earned</div>
           </div>
           <div onClick={() => navigate('/mine/verify')} style={{flex:1,background:'#fff',borderRadius:14,padding:14,cursor:'pointer'}}>
             <div style={{fontSize:20,marginBottom:6}}>✅</div>

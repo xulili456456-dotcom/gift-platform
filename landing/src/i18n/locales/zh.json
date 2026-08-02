@@ -136,6 +136,16 @@
       { "step": "2", "title": "允许安装", "desc": "在设置中允许安装来自未知来源的应用" },
       { "step": "3", "title": "安装完成", "desc": "打开App，注册或登录你的账号即可使用" }
     ],
+    "heroTitle": "立即开始交易",
+    "heroDesc": "无需下载 — 直接在浏览器中使用。移动优先，全平台兼容。",
+    "step1Title": "打开浏览器",
+    "step1Desc": "兼容 Chrome、Safari、Firefox — 任何设备，任何平台。",
+    "step2Title": "创建账户",
+    "step2Desc": "30秒完成注册，只需邮箱和手机号。无需等待审核。",
+    "step3Title": "开始赚钱",
+    "step3Desc": "充值、选品、赚利润。首单$5免费。",
+    "ctaBtn": "打开应用 — 免费开始",
+    "ctaNote": "无需安装。无需APK。打开即用，即刻交易。",
     "coming_soon": "即将上线",
     "apk_placeholder": "APK 文件准备中，敬请期待...",
     "scanQr": "扫描二维码下载"

@@ -23,13 +23,13 @@ export default function RegisterPage() {
   const canNext = emailValid && pwValid;
 
   const handleSubmit = async () => {
-    if (!form.name.trim() || !form.phone) { toast.error('Please fill in all fields'); return; }
+    if (!form.name.trim() || !form.phone) { toast.error(t('auth.fillRequired')); return; }
     setLoading(true);
     try {
       await register({ email: form.email, phone: form.phone, phone_prefix: form.phone_prefix, password: form.password, name: form.name, referral_code: form.referral_code || undefined });
-      toast.success('Account created!');
+      toast.success(t('auth.accountCreated'));
       navigate('/home', { replace: true });
-    } catch (err) { toast.error(err.response?.data?.error || 'Registration failed'); setLoading(false); }
+    } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); setLoading(false); }
   };
 
   return (
@@ -37,38 +37,38 @@ export default function RegisterPage() {
       {/* Header */}
       <div style={{background:'#0f0f0f',padding:'50px 28px 36px',textAlign:'center',position:'relative'}}>
         {step === 2 && <button onClick={() => setStep(1)} style={{position:'absolute',left:16,top:50,background:'none',border:'none',cursor:'pointer',color:'#fff'}}><ChevronLeft size={22} /></button>}
-        <img src="/logo.jpg" alt="Logo" style={{width:48,height:48,borderRadius:12,objectFit:'cover',marginBottom:10}} />
-        <div style={{fontSize:14,fontWeight:700,color:'#fff'}}>Shopee Shopping Operations</div>
+        <img src="/logo.jpg" alt={t('app.name')} style={{width:48,height:48,borderRadius:12,objectFit:'cover',marginBottom:10}} />
+        <div style={{fontSize:14,fontWeight:700,color:'#fff'}}>{t('app.name')}</div>
       </div>
 
       {/* Form */}
       <div style={{flex:1,padding: step===1?'36px 28px':'30px 28px'}}>
         <div style={{fontSize:22,fontWeight:800,color:'#0f0f0f',marginBottom:4}}>
-          {step === 1 ? 'Create Account' : 'Complete Profile'}
+          {step === 1 ? t('auth.registerTitle') : t('auth.completeProfile')}
         </div>
         <div style={{fontSize:13,color:'#999',marginBottom: step===1?32:24}}>
-          {step === 1 ? 'Start earning today' : 'Just a few more details'}
+          {step === 1 ? t('auth.startEarning') : t('auth.justDetails')}
         </div>
 
         {step === 1 ? (
           <div>
-            <input type="email" value={form.email} onChange={update('email')} placeholder="Email"
+            <input type="email" value={form.email} onChange={update('email')} placeholder={t('auth.placeholderEmail')}
               style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:10,outline:'none'}} />
-            {form.email && !emailValid && <div style={{fontSize:11,color:'#E04500',marginBottom:8,marginTop:-6}}>Enter a valid email</div>}
-            <input type="password" value={form.password} onChange={update('password')} placeholder="Password (8+ characters)"
+            {form.email && !emailValid && <div style={{fontSize:11,color:'#E04500',marginBottom:8,marginTop:-6}}>{t('auth.validEmail')}</div>}
+            <input type="password" value={form.password} onChange={update('password')} placeholder={t('auth.placeholderPassHint')}
               style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:12,outline:'none'}} />
             <div style={{display:'flex',gap:4,marginBottom:28}}>
               <div style={{flex:1,height:3,borderRadius:2,background: form.password.length>=4?'#00A86B':'#eee'}} />
               <div style={{flex:1,height:3,borderRadius:2,background: pwValid?'#00A86B':'#eee'}} />
             </div>
-            <button onClick={() => { if (canNext) setStep(2); else toast.error('Please fill in valid email and password'); }}
+            <button onClick={() => { if (canNext) setStep(2); else toast.error(t('auth.validEmailPass')); }}
               style={{width:'100%',padding:15,background:'#FF5000',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:20,opacity: canNext?1:.5}}>
-              Continue
+              {t('auth.continueBtn')}
             </button>
           </div>
         ) : (
           <div>
-            <input type="text" value={form.name} onChange={update('name')} placeholder="Full Name"
+            <input type="text" value={form.name} onChange={update('name')} placeholder={t('auth.placeholderName')}
               style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:10,outline:'none'}} />
             <div style={{display:'flex',gap:8,marginBottom:10}}>
               <select value={form.phone_prefix} onChange={update('phone_prefix')}
@@ -105,20 +105,20 @@ export default function RegisterPage() {
                   {c:'+996',n:'KG'},{c:'+998',n:'UZ'},
                 ].sort((a,b)=>parseInt(a.c.replace('+',''))-parseInt(b.c.replace('+',''))).map(x=><option key={x.c} value={x.c}>{x.c} {x.n}</option>)}
               </select>
-              <input type="tel" value={form.phone} onChange={update('phone')} placeholder="Phone number"
+              <input type="tel" value={form.phone} onChange={update('phone')} placeholder={t('auth.placeholderPhone')}
                 style={{flex:1,padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,outline:'none'}} />
             </div>
-            <input value={form.referral_code} onChange={update('referral_code')} placeholder="Referral Code (optional)"
+            <input value={form.referral_code} onChange={update('referral_code')} placeholder={t('auth.placeholderReferral')}
               style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:24,outline:'none'}} />
             <button onClick={handleSubmit} disabled={loading}
               style={{width:'100%',padding:15,background:'#FF5000',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',marginBottom:16,opacity:loading?0.5:1}}>
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? t('auth.registering') : t('auth.registerBtn')}
             </button>
           </div>
         )}
 
         <div style={{textAlign:'center',fontSize:13,color:'#bbb'}}>
-          Already have an account? <Link to="/login" style={{color:'#FF5000',fontWeight:700,textDecoration:'none'}}>Sign In →</Link>
+          {t('auth.hasAccount')} <Link to="/login" style={{color:'#FF5000',fontWeight:700,textDecoration:'none'}}>{t('auth.loginLink')}</Link>
         </div>
       </div>
     </div>

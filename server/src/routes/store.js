@@ -176,6 +176,8 @@ router.post('/close', async (req, res) => {
 router.post('/orders/process', async (req, res) => {
   const { productPrice, productName } = req.body;
   if (!productPrice || productPrice <= 0) return res.status(400).json({ error: 'Missing product price' });
+  const pName = (productName || '').trim();
+  if (!pName || pName.length > 500) return res.status(400).json({ error: 'Invalid product name' });
 
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!store) return res.status(400).json({ error: 'Please open a store first' });
@@ -187,7 +189,7 @@ router.post('/orders/process', async (req, res) => {
   const FREE_SLOTS = 5;
   const FREE_MAX_COST = 50;
   const freeKey = 'free_used_' + req.user.id + '_' + today;
-  const freeProductKey = 'free_prod_' + req.user.id + '_' + today + '_' + productName;
+  const freeProductKey = 'free_prod_' + req.user.id + '_' + today + '_' + pName;
 
   let { cost, profit, totalReturn } = calcProduct(productPrice);
   const couldBeFree = cost <= FREE_MAX_COST;
@@ -275,7 +277,7 @@ router.post('/orders/process', async (req, res) => {
     }
 
     const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES ($1, $2, $3, 'holding', $4, $5, $6)",
-      [store.id, req.user.id, isFreeOrder ? 0 : cost, sellBy, productName || '', productPrice]);
+      [store.id, req.user.id, isFreeOrder ? 0 : cost, sellBy, pName, productPrice]);
     await t.commit();
 
     res.json({ id: result.id, cost: isFreeOrder ? 0 : cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: FREE_SLOTS - freeUsedCount - 1 });
@@ -321,6 +323,7 @@ router.post('/check-sell', async (req, res) => {
     if (!store) return res.json({ settled: [] });
     const due = await all("SELECT id, amount as cost, user_id, product_price FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
     const settled = [];
+    const errors = [];
     for (const order of due) {
       const orderCost = Number(order.cost);
       const price = Number(order.product_price) || (orderCost > 0 ? Math.round((orderCost / 0.85) * 100) / 100 : 0);
@@ -330,20 +333,21 @@ router.post('/check-sell', async (req, res) => {
       const creditAmount = isFreeOrder ? Math.round(price * FREE_PROFIT_RATE * 100) / 100 : totalReturn;
       const t = await tx();
       try {
-        await t.run("UPDATE store_orders SET status = 'done', amount = ?, processed_at = NOW() WHERE id = ?", [isFreeOrder ? creditAmount : profit, order.id]);
+        const updateRes = await t.run("UPDATE store_orders SET status = 'done', amount = ?, processed_at = NOW() WHERE id = ? AND status = 'holding'", [isFreeOrder ? creditAmount : profit, order.id]);
+        if (updateRes.changes === 0) { await t.rollback(); continue; } // Already settled by another request
         await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, creditAmount, 'order_profit', 'delivered']);
         await t.commit();
         settled.push({ id: order.id, cost: orderCost, profit: creditAmount, totalReturn: creditAmount });
       } catch (err) {
         console.error('Check-sell order failed:', err.code, err.message, 'order:', JSON.stringify(order));
         await t.rollback().catch(() => {});
-        return res.status(500).json({ error: 'Settlement failed: ' + (err.message || 'unknown'), code: err.code });
+        errors.push({ id: order.id, error: err.message || 'unknown' });
       }
     }
     if (settled.length > 0) {
       try { require('./notifications').notify(req.user.id, 'Item Sold', settled.length + ' item(s) sold, profit credited', 'success'); } catch {}
     }
-    res.json({ settled });
+    res.json({ settled, errors: errors.length > 0 ? errors : undefined });
   } catch (err) {
     console.error('Check-sell failed:', err.code, err.message);
     res.status(500).json({ error: 'Check-sell error: ' + (err.message || 'unknown') });

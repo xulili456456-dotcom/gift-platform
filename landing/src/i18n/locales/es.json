@@ -1,8 +1,8 @@
 {
   "app": {
     "name": "Shopee Shopping Operations",
-    "slogan": "Invita amigos, completa tareas, gana recompensas",
-    "cta_register": "Regístrate Gratis",
+    "slogan": "Plataforma de Tareas E-Commerce — Conéctate a marketplaces globales y gana con cada transacción",
+    "cta_register": "Descargar App",
     "cta_download": "Descargar App",
     "cta_share": "Compartir",
     "cta_store": "Abrir en App"
@@ -15,67 +15,91 @@
     "faq": "Preguntas"
   },
   "hero": {
-    "title": "Invita Amigos, Gana Premios",
-    "subtitle": "Completa tareas para ganar recompensas en efectivo y canjear regalos premium. Shopee Shopping Operations hace que cada compartir sea gratificante.",
-    "badge": "🔥 Más de 500,000 usuarios ya se unieron"
+    "title": "Amazon · Shopee · Lazada\nTú promocionas, nosotros cumplimos, tú ganas",
+    "subtitle": "Sin inventario. Sin envíos. Sin atención al cliente. Elige tareas de e-commerce en Shopee Shopping Operations, promociona productos de los principales marketplaces del mundo y obtén el margen de cada venta.",
+    "badge": "🔥 Conectado a 20+ plataformas: Amazon, Shopee, Lazada, AliExpress"
   },
   "stats": {
-    "users": "Usuarios",
-    "gifts": "Regalos Entregados",
-    "invites": "Invitaciones Activas",
-    "volume": "Volumen Total"
+    "users": "Revendedores",
+    "gifts": "Categorías",
+    "invites": "Pedidos Diarios",
+    "volume": "Pagos Totales"
+  },
+  "platforms": {
+    "label": "Conectado a Marketplaces Globales",
+    "title": "Tus tareas provienen de pedidos reales en estas plataformas",
+    "desc": "Integramos con 20+ APIs globales de e-commerce — Amazon, Shopee, Lazada, AliExpress, TikTok Shop y más. Cada tarea representa una transacción real. Tú ganas el margen, nosotros manejamos la cadena de suministro y logística.",
+    "items": [
+      { "name": "Amazon", "desc": "El marketplace más grande del mundo, 300M+ clientes", "color": "#FF9900" },
+      { "name": "Shopee", "desc": "#1 en el Sudeste Asiático, 700M+ usuarios", "color": "#EE4D2D" },
+      { "name": "Lazada", "desc": "6 países en el Sudeste Asiático", "color": "#0F1470" },
+      { "name": "AliExpress", "desc": "Plataforma global de comercio transfronterizo", "color": "#E62E04" },
+      { "name": "TikTok Shop", "desc": "El comercio social de más rápido crecimiento", "color": "#000000" },
+      { "name": "eBay", "desc": "Gigante global del marketplace C2C", "color": "#0064D2" }
+    ]
+  },
+  "value": {
+    "label": "Por qué Shopee Shopping Operations",
+    "title": "Gana beneficios de e-commerce sin ser vendedor",
+    "desc": "El e-commerce tradicional implica abastecimiento, inventario, operaciones, soporte y envíos. Nosotros nos encargamos de todo. Tú solo eliges tareas y compartes enlaces — gana una comisión por cada venta.",
+    "items": [
+      { "icon": "Package", "title": "Sin Inventario", "desc": "Sin stock, sin costos iniciales. Conexión directa a la cadena de suministro global — empieza con $0." },
+      { "icon": "Truck", "title": "Gestionamos la Logística", "desc": "Amazon FBA, Shopee Xpress y mensajería asociada cumplen cada pedido automáticamente." },
+      { "icon": "Headphones", "title": "Sin Atención al Cliente", "desc": "El servicio postventa lo gestionan las plataformas y marcas. Tú te enfocas solo en promocionar." },
+      { "icon": "TrendingUp", "title": "Márgenes Transparentes", "desc": "Precio de costo, precio de mercado, tu beneficio — todo visible por adelantado. Lo que ves es lo que ganas." }
+    ]
   },
   "how": {
     "label": "Cómo Funciona",
-    "title": "Gana dinero en 3 simples pasos",
-    "desc": "Comienza tu viaje de ganancias en solo tres pasos.",
-    "step1_title": "Crea tu Cuenta",
-    "step1_desc": "Regístrate gratis y obtén tu código de referido",
-    "step2_title": "Invita Amigos",
-    "step2_desc": "Comparte tu enlace y gana cuando se unan",
-    "step3_title": "Canjea Regalos",
-    "step3_desc": "Acumula puntos y canjea por efectivo o regalos premium"
+    "title": "Empieza a ganar en 3 simples pasos",
+    "desc": "Sin experiencia necesaria. Regístrate y empieza a ganar de inmediato.",
+    "step1_title": "Elige una Tarea",
+    "step1_desc": "Explora productos populares de Amazon, Shopee, Lazada. Cada tarea muestra exactamente cuánto ganarás por venta.",
+    "step2_title": "Comparte el Enlace",
+    "step2_desc": "Publica tu enlace en Instagram, TikTok, WhatsApp, Telegram — donde esté tu audiencia. Cada clic que convierte cuenta.",
+    "step3_title": "Gana el Margen",
+    "step3_desc": "Cuando el pedido se completa, tu beneficio llega automáticamente a tu billetera. Retira cuando quieras, sin comisiones ocultas."
   },
   "gifts": {
-    "label": "Regalos Premium",
-    "title": "Increíbles recompensas te esperan",
-    "desc": "Desde bonos en efectivo hasta los últimos gadgets — lo tenemos todo."
+    "label": "Tareas Destacadas",
+    "title": "Cada producto que promocionas te genera beneficio",
+    "desc": "Desde electrónicos hasta artículos para el hogar — nuestro equipo añade tareas de alto margen diariamente en todas las categorías."
   },
   "testimonials": {
-    "label": "Testimonios",
-    "title": "Lo que dicen nuestros usuarios",
-    "desc": "Historias reales de usuarios reales.",
+    "label": "Ganancias Reales",
+    "title": "Ellos ya están ganando dinero",
+    "desc": "Ganancias verificadas de revendedores en todo el mundo.",
     "items": [
       {
         "name": "Carlos",
-        "role": "Estudiante",
-        "text": "¡Esto es increíble! Gané más de $200 en mi primer mes haciendo tareas en mi tiempo libre. Mis compañeros también lo están usando ahora.",
-        "earned": "$340"
+        "role": "Estudiante · Medio Tiempo · México",
+        "text": "Publiqué enlaces de auriculares de Amazon en Instagram y TikTok. Hice más de 30 pedidos en mi primera semana, $5-8 de ganancia cada uno. Gané $340 en el primer mes. Cero molestias con envíos — perfecto para estudiantes.",
+        "earned": "$340/mes"
       },
       {
         "name": "María",
-        "role": "Ama de Casa",
-        "text": "Perfecto para ganar dinero extra mientras cuido a los niños. La selección de regalos es genial — conseguí un altavoz Bluetooth el mes pasado.",
-        "earned": "$720"
+        "role": "Ama de Casa · Argentina",
+        "text": "Comparto productos de Shopee para bebés en grupos de mamás y WhatsApp. 30 min al día, ganando $700+/mes. Mucho más fácil que el dropshipping — sin inventario, sin envíos.",
+        "earned": "$720/mes"
       },
       {
         "name": "Roberto",
-        "role": "Oficinista",
-        "text": "Hago tareas durante el almuerzo y las ganancias se acumulan rápido. El sistema de referidos de 3 niveles es genial.",
-        "earned": "$1,250"
+        "role": "Oficinista · Ingreso Extra · España",
+        "text": "Publico ofertas de tecnología de Lazada en Telegram y Twitter durante el almuerzo. Ahora genero $1,250/mes en ingresos pasivos de forma constante.",
+        "earned": "$1,250/mes"
       },
       {
         "name": "Ana",
-        "role": "Freelancer",
-        "text": "Un amigo me lo recomendó y al principio era escéptica. Pero después de mi primer retiro, me enganché. Ahora es parte de mi rutina diaria.",
-        "earned": "$520"
+        "role": "Freelancer · Tiempo Completo · Colombia",
+        "text": "Creo videos de productos en TikTok, Instagram Reels y YouTube Shorts. Construí una matriz de contenido — ahora gano $3,200/mes, superando mi trabajo anterior.",
+        "earned": "$3,200/mes"
       }
     ]
   },
   "store": {
     "label": "Tienda",
-    "title": "Productos premium a excelentes precios",
-    "desc": "Usa tus puntos ganados para canjear electrónicos, belleza, hogar y más.",
+    "title": "Explora productos de alto margen",
+    "desc": "Explora todas las categorías de productos disponibles para promocionar.",
     "all": "Todos",
     "digital": "Electrónicos",
     "women": "Mujer",
@@ -112,28 +136,43 @@
       { "step": "2", "title": "Permitir Instalación", "desc": "Activa 'Instalar de fuentes desconocidas' en ajustes" },
       { "step": "3", "title": "Instalar y Abrir", "desc": "Abre el APK, instala, regístrate o inicia sesión" }
     ],
+    "heroTitle": "Empieza a Operar Ahora",
+    "heroDesc": "Sin descarga necesaria — úsalo directamente en tu navegador. Móvil primero, funciona en todas partes.",
+    "step1Title": "Abre en el Navegador",
+    "step1Desc": "Funciona en Chrome, Safari, Firefox — cualquier dispositivo, cualquier plataforma.",
+    "step2Title": "Crea tu Cuenta",
+    "step2Desc": "Regístrate en 30 segundos con email y teléfono. Sin demoras de verificación.",
+    "step3Title": "Empieza a Ganar",
+    "step3Desc": "Deposita fondos, elige productos, gana beneficios. Tus primeros $5 son gratis.",
+    "ctaBtn": "Abrir App — Empieza Gratis",
+    "ctaNote": "Sin instalación. Sin APK. Solo abre y opera.",
     "coming_soon": "Próximamente",
     "apk_placeholder": "El archivo APK se está preparando, estate atento..."
   },
   "about": {
     "label": "Sobre Nosotros",
-    "title": "Haciendo que compartir sea gratificante",
-    "desc": "Shopee Shopping Operations fue fundada en 2024 con la misión de crear una plataforma donde todos puedan ganar recompensas compartiendo y completando tareas.",
+    "title": "Conectando el e-commerce global con oportunidades de ingreso",
+    "desc": "Shopee Shopping Operations fue fundada en 2024 con la misión de democratizar el acceso al e-commerce global — permitiendo que cualquier persona gane promocionando productos sin necesidad de inventario ni inversión inicial.",
     "mission_title": "Nuestra Misión",
-    "mission": "Conectar el valor entre las personas a través del compartir — convirtiendo cada recomendación en recompensas tangibles.",
+    "mission": "Hacer accesible el e-commerce para todos — convirtiendo cada promoción de producto en ingresos reales.",
     "vision_title": "Nuestra Visión",
-    "vision": "Convertirnos en la plataforma líder mundial de recompensas basada en tareas.",
+    "vision": "Convertirnos en el puente líder entre marketplaces globales y revendedores individuales.",
     "values_title": "Valores Fundamentales",
     "values": [
-      { "title": "Usuarios Primero", "desc": "Siempre priorizamos los intereses de nuestros usuarios." },
-      { "title": "Transparencia", "desc": "Todos los mecanismos de recompensa son abiertos y transparentes." },
-      { "title": "Innovación Continua", "desc": "Mejoramos constantemente el producto con nuevas formas de ganar." }
+      { "title": "Transparencia", "desc": "Todos los márgenes y ganancias son visibles por adelantado — sin sorpresas." },
+      { "title": "Innovación", "desc": "Conectamos constantemente nuevas plataformas y optimizamos herramientas de promoción." },
+      { "title": "Comunidad", "desc": "Creemos en el poder de las personas para impulsar el comercio global." }
     ]
   },
   "faq": {
     "label": "Preguntas",
     "title": "¿Tienes dudas? Tenemos respuestas",
-    "desc": "¿No encuentras lo que buscas? Escríbenos a support@haolixiangsong.com",
+    "desc": "¿No encuentras lo que buscas? Escríbenos a https://t.me/Shopping_Operations",
+    "searchPlaceholder": "Buscar preguntas frecuentes...",
+    "noResults": "No se encontraron resultados",
+    "noResultsHint": "Intenta con otras palabras clave",
+    "contactPrompt": "¿No encuentras tu respuesta?",
+    "contactButton": "Contáctanos en Telegram",
     "categories": {
       "platform": "Plataforma",
       "earning": "Ganancias",
@@ -142,32 +181,32 @@
       "tech": "Técnico"
     },
     "items": [
-      { "q": "¿Qué es Shopee Shopping Operations?", "a": "Shopee Shopping Operations es una plataforma de recompensas basada en invitaciones y tareas. Los usuarios ganan puntos y recompensas completando tareas diarias e invitando amigos.", "cat": "platform" },
-      { "q": "¿Es gratis?", "a": "¡Completamente gratis! Registro, tareas e invitaciones son totalmente gratuitos.", "cat": "platform" },
-      { "q": "¿Cómo gano recompensas?", "a": "Principalmente: 1) Completando tareas diarias; 2) Invitando amigos con comisión de hasta 3 niveles.", "cat": "earning" },
-      { "q": "¿Qué es la comisión de 3 niveles?", "a": "Ganas comisiones de las personas que invitas (Nivel 1), de quienes ellos invitan (Nivel 2) y de los invitados de estos (Nivel 3).", "cat": "earning" },
-      { "q": "¿Cuánto puedo ganar?", "a": "Varía por usuario. Usuarios regulares ganan algunos dólares al día. Los referidores activos ganan mucho más.", "cat": "earning" },
-      { "q": "¿Cómo retiro?", "a": "Ve a 'Mi Cuenta' → 'Billetera' → 'Retirar'. Retiro mínimo de $10, procesado en 1-3 días.", "cat": "withdraw" },
-      { "q": "¿Hay comisiones por retiro?", "a": "Usuarios regulares pagan 1%. Miembros VIP tienen retiros gratuitos.", "cat": "withdraw" },
-      { "q": "¿Cómo invito amigos?", "a": "En la página 'Tareas', toca 'Invitar Amigos'. Copia tu enlace o comparte tu código QR.", "cat": "invite" },
-      { "q": "¿Hay límite de invitaciones?", "a": "¡Sin límites! Cuantos más invites, más ganas.", "cat": "invite" },
-      { "q": "¿Qué dispositivos son compatibles?", "a": "Actualmente Android (app) y web (H5). Versión iOS en desarrollo.", "cat": "tech" },
-      { "q": "¿Están seguros mis datos?", "a": "Usamos encriptación de nivel bancario. Nunca venderemos tu información personal.", "cat": "tech" }
+      { "q": "¿Qué es Shopee Shopping Operations?", "a": "Shopee Shopping Operations es una plataforma de tareas de e-commerce. Eliges productos de marketplaces globales como Amazon, Shopee y Lazada, compartes enlaces de promoción y ganas el margen de cada venta completada.", "cat": "platform" },
+      { "q": "¿Es gratis?", "a": "¡Completamente gratis! Registro y uso de la plataforma son gratuitos. Solo necesitas depositar un pequeño fondo de garantía para comenzar a operar (totalmente reembolsable).", "cat": "platform" },
+      { "q": "¿Cómo gano?", "a": "Principalmente: 1) Promocionando productos y ganando el margen de cada venta; 2) Invitando amigos con comisión de hasta 3 niveles; 3) Completando tareas diarias.", "cat": "earning" },
+      { "q": "¿Qué es el sistema de tienda?", "a": "Abres una tienda virtual y seleccionas productos para promocionar. Cada producto tiene un margen de beneficio definido. Cuando alguien compra a través de tu enlace, ganas ese margen automáticamente.", "cat": "earning" },
+      { "q": "¿Cuánto puedo ganar?", "a": "Depende de tu actividad. Usuarios regulares ganan $10-50/día. Los más activos con tiendas grandes y redes de referidos generan $1,000+/mes.", "cat": "earning" },
+      { "q": "¿Cómo retiro?", "a": "Ve a 'Mi Cuenta' → 'Billetera' → 'Retirar'. Retiro mínimo de $1, compatible con TRC20/ERC20/BEP20.", "cat": "withdraw" },
+      { "q": "¿Hay comisiones por retiro?", "a": "Se aplica una tarifa de red del 1% por retiro.", "cat": "withdraw" },
+      { "q": "¿Cómo funciona el programa de referidos?", "a": "Comparte tu código de invitación. Ganas comisiones de las personas que invitas (Nivel 1), de quienes ellos invitan (Nivel 2) y de los invitados de estos (Nivel 3).", "cat": "invite" },
+      { "q": "¿Hay límite de invitaciones?", "a": "¡Sin límites! Cuantos más invites, más ganas en comisiones.", "cat": "invite" },
+      { "q": "¿Qué dispositivos son compatibles?", "a": "Actualmente Android (app APK) y web (H5). Versión iOS en desarrollo.", "cat": "tech" },
+      { "q": "¿Están seguros mis datos?", "a": "Usamos encriptación de nivel bancario y autenticación de dos factores. Nunca venderemos tu información personal.", "cat": "tech" }
     ]
   },
   "cta": {
     "title": "¿Listo para empezar a ganar?",
-    "subtitle": "¡Regístrate ahora y reclama tu bono de bienvenida!",
-    "button": "Regístrate Gratis — Recibe tu Bono"
+    "subtitle": "¡Descarga la app y comienza hoy!",
+    "button": "Descargar App — Empieza Gratis"
   },
   "footer": {
-    "description": "Shopee Shopping Operations — Conectando el valor compartido, haciendo que cada esfuerzo sea gratificante.",
+    "description": "Shopee Shopping Operations — Plataforma de tareas de e-commerce conectada a marketplaces globales.",
     "links": "Enlaces Rápidos",
     "legal": "Legal",
     "terms": "Términos de Servicio",
     "privacy": "Política de Privacidad",
     "contact": "Contacto",
-    "email": "support@haolixiangsong.com",
+    "email": "https://t.me/Shopping_Operations",
     "copyright": "© 2025 Shopee Shopping Operations. Todos los derechos reservados."
   },
   "common": {

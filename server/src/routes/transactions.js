@@ -163,11 +163,11 @@ router.get('/', async (req, res) => {
     );
     const depMap = {};
     for (const row of depRows) {
-      depMap[row.id] = { network: row.network, txHash: row.tx_hash };
+      depMap[row.id] = { network: row.network, txHash: row.tx_hash, amount: Number(row.amount) };
     }
     for (const t of transactions) {
       if (t.type === 'deposit') {
-        const match = Object.values(depMap).find(d => Math.abs(d.amount || 0 - t.amount) < 0.01 || true);
+        const match = Object.values(depMap).find(d => Math.abs(d.amount - t.amount) < 0.01);
         if (match) t.detail = { ...t.detail, network: match.network, txHash: match.txHash };
       }
     }
@@ -185,11 +185,11 @@ router.get('/', async (req, res) => {
     );
     const taskMap = {};
     for (const row of taskRows) {
-      taskMap[row.id] = { taskTitle: row.task_title, taskType: row.task_type };
+      taskMap[row.id] = { taskTitle: row.task_title, taskType: row.task_type, amount: Number(row.amount) };
     }
     for (const t of transactions) {
       if (t.type === 'task_reward') {
-        const match = Object.values(taskMap).find(tm => Math.abs(tm.amount || 0 - t.amount) < 0.01 || true);
+        const match = Object.values(taskMap).find(tm => Math.abs(tm.amount - t.amount) < 0.01);
         if (match) t.detail = { ...t.detail, taskTitle: match.taskTitle, taskType: match.taskType };
       }
     }

@@ -74,7 +74,7 @@ router.post('/:taskType/claim', async (req, res) => {
   try {
     const { taskType } = req.params;
     const userId = req.user.id;
-    const task = await t.get('SELECT * FROM task_definitions WHERE task_type = ?', [taskType]);
+    const task = await t.get('SELECT * FROM task_definitions WHERE task_type = ? AND active = TRUE', [taskType]);
     if (!task) { await t.rollback(); return res.status(404).json({ error: 'Task not found' }); }
 
     const key = periodKey(task.reset_period);
@@ -101,30 +101,36 @@ router.post('/:taskType/claim', async (req, res) => {
 });
 
 // Helper: update task progress (called from other routes)
+// Uses atomic UPDATE to prevent lost increments from concurrent calls
 async function updateTaskProgress(userId, taskType, increment, valueIncrement = 0) {
   try {
     const task = await get('SELECT * FROM task_definitions WHERE task_type = ?', [taskType]);
     if (!task || !task.active) return;
     const key = periodKey(task.reset_period);
-    let progress = await get(
+
+    // Atomic increment — no read-increment-write race
+    const updateResult = await run(
+      'UPDATE task_progress SET current_count = current_count + ?, current_value = current_value + ? WHERE user_id = ? AND task_type = ? AND period_key = ?',
+      [increment, valueIncrement, userId, taskType, key]
+    );
+
+    // If no row exists yet, insert initial row
+    if (updateResult.changes === 0) {
+      await run('INSERT INTO task_progress (user_id, task_type, current_count, current_value, period_key) VALUES (?,?,?,?,?)',
+        [userId, taskType, increment, valueIncrement, key]);
+    }
+
+    // Read updated counts to check completion
+    const progress = await get(
       'SELECT * FROM task_progress WHERE user_id = ? AND task_type = ? AND period_key = ?',
       [userId, taskType, key]
     );
-    if (!progress) {
-      const result = await insert('INSERT INTO task_progress (user_id, task_type, current_count, current_value, period_key) VALUES (?,?,?,?,?)',
-        [userId, taskType, increment, valueIncrement, key]);
-      progress = { id: result.id, current_count: increment, current_value: valueIncrement };
-    } else {
-      const nc = (progress.current_count || 0) + increment;
-      const nv = Number(progress.current_value || 0) + valueIncrement;
-      await run('UPDATE task_progress SET current_count = ?, current_value = ? WHERE id = ?', [nc, nv, progress.id]);
-      progress.current_count = nc;
-      progress.current_value = nv;
-    }
-    const countMet = task.target_count > 0 && progress.current_count >= task.target_count;
-    const valueMet = task.target_value > 0 && Number(progress.current_value) >= task.target_value;
-    if ((countMet || valueMet) && !progress.completed && progress.id) {
-      await run('UPDATE task_progress SET completed = TRUE WHERE id = ?', [progress.id]);
+    if (!progress) return;
+
+    const countMet = task.target_count > 0 && (progress.current_count || 0) >= task.target_count;
+    const valueMet = task.target_value > 0 && Number(progress.current_value || 0) >= task.target_value;
+    if ((countMet || valueMet) && !progress.completed) {
+      await run('UPDATE task_progress SET completed = TRUE WHERE id = ? AND completed = FALSE', [progress.id]);
     }
   } catch (err) {
     console.error('Task progress error:', err);
@@ -188,8 +194,6 @@ router.post('/checkin', async (req, res) => {
     await t.run("INSERT INTO task_earnings (user_id, amount, type) VALUES (?, ?, 'checkin')", [req.user.id, reward]);
     await t.commit();
     res.json({ amount: reward, streak: streak + 1 });
-    // Update check-in task progress
-    updateTaskProgress(req.user.id, 'daily_order_5', 0, 0).catch(()=>{});
   } catch (err) {
     try { await t.rollback(); } catch {}
     res.status(500).json({ error: 'Checkin failed' });

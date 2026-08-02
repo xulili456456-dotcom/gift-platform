@@ -136,6 +136,16 @@
       { "step": "2", "title": "Allow Installation", "desc": "Enable 'Install from unknown sources' in your device settings" },
       { "step": "3", "title": "Install & Launch", "desc": "Open the APK, install, then sign up or log in to start earning" }
     ],
+    "heroTitle": "Start Trading Now",
+    "heroDesc": "No download needed — use directly in your browser. Mobile first, works everywhere.",
+    "step1Title": "Open in Browser",
+    "step1Desc": "Works on Chrome, Safari, Firefox — any device, any platform.",
+    "step2Title": "Create Account",
+    "step2Desc": "Sign up in 30 seconds with email and phone. No verification delays.",
+    "step3Title": "Start Earning",
+    "step3Desc": "Deposit funds, pick products, earn profit. Your first $5 is free.",
+    "ctaBtn": "Open App — Get Started Free",
+    "ctaNote": "No installation. No APK. Just open and trade.",
     "coming_soon": "Coming Soon",
     "apk_placeholder": "APK file coming soon — stay tuned!",
     "scanQr": "Scan QR to download"

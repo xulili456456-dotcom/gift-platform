@@ -13,26 +13,26 @@ export default function DownloadPage() {
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-accent/10 mb-6">
             <Globe size={40} className="text-accent" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold mb-3 text-text">Start Trading Now</h1>
+          <h1 className="text-3xl md:text-4xl font-extrabold mb-3 text-text">{t('download.heroTitle')}</h1>
           <p className="text-text-secondary text-lg max-w-md mx-auto">
-            No download needed — use directly in your browser. Mobile first, works everywhere.
+            {t('download.heroDesc')}
           </p>
         </div>
 
         {/* Steps */}
         <div className="space-y-4 mb-10">
           {[
-            { step: '1', title: 'Open in Browser', desc: 'Works on Chrome, Safari, Firefox — any device, any platform.' },
-            { step: '2', title: 'Create Account', desc: 'Sign up in 30 seconds with email and phone. No verification delays.' },
-            { step: '3', title: 'Start Earning', desc: 'Deposit funds, pick products, earn profit. Your first $5 is free.' },
+            { step: '1', titleKey: 'download.step1Title', descKey: 'download.step1Desc' },
+            { step: '2', titleKey: 'download.step2Title', descKey: 'download.step2Desc' },
+            { step: '3', titleKey: 'download.step3Title', descKey: 'download.step3Desc' },
           ].map((s) => (
             <div key={s.step} className="flex items-start gap-4 bg-white dark:bg-surface p-5 rounded-2xl border border-border">
               <div className="w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center font-bold text-sm shrink-0">
                 {s.step}
               </div>
               <div>
-                <h3 className="font-semibold text-text mb-1">{s.title}</h3>
-                <p className="text-sm text-text-secondary">{s.desc}</p>
+                <h3 className="font-semibold text-text mb-1">{t(s.titleKey)}</h3>
+                <p className="text-sm text-text-secondary">{t(s.descKey)}</p>
               </div>
             </div>
           ))}
@@ -47,9 +47,9 @@ export default function DownloadPage() {
             className="btn btn-accent btn-lg inline-flex items-center gap-2 text-lg no-underline"
           >
             <ExternalLink size={20} />
-            Open App — Get Started Free
+            {t('download.ctaBtn')}
           </a>
-          <p className="text-text-muted text-sm mt-4">No installation. No APK. Just open and trade.</p>
+          <p className="text-text-muted text-sm mt-4">{t('download.ctaNote')}</p>
         </div>
 
       </div>

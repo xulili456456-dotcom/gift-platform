@@ -66,7 +66,10 @@ router.post('/register', registerLimiter, async (req, res) => {
     do {
       code = await generateReferralCode();
       attempts++;
-    } while (await userModel.findByReferralCode(code) && attempts < 10);
+    } while (await userModel.findByReferralCode(code) && attempts < 100);
+    if (await userModel.findByReferralCode(code)) {
+      return res.status(500).json({ error: 'Unable to generate referral code, please try again' });
+    }
 
     const passwordHash = await hashPassword(password);
     const user = await userModel.create({
@@ -184,6 +187,7 @@ router.post('/reset-password', resetLimiter, async (req, res) => {
     const { email, phone, newPassword } = req.body;
     if (!email || !phone || !newPassword) return res.status(400).json({ error: 'Please fill in all fields' });
     if (newPassword.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    if (!/[a-zA-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) return res.status(400).json({ error: 'Password must contain both letters and numbers' });
     const user = await userModel.findByEmail(email);
     if (!user || user.phone !== phone) return res.status(400).json({ error: 'Email or phone number does not match' });
     const newHash = await hashPassword(newPassword);

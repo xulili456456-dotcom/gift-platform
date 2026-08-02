@@ -83,12 +83,12 @@ function TermsContent() {
     <div className="prose prose-sm max-w-none text-text leading-relaxed space-y-6">
       <section>
         <h2 className="text-xl font-bold mb-3">1. Acceptance of Terms</h2>
-        <p className="text-text-secondary">By accessing or using Gift Haven ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree, please do not use our services.</p>
+        <p className="text-text-secondary">By accessing or using Shopee Shopping Operations ("the Platform"), you agree to be bound by these Terms of Service. If you do not agree, please do not use our services.</p>
       </section>
 
       <section>
         <h2 className="text-xl font-bold mb-3">2. Eligibility</h2>
-        <p className="text-text-secondary">You must be at least 18 years old to use Gift Haven. By registering, you represent that you meet this age requirement and can form legally binding contracts.</p>
+        <p className="text-text-secondary">You must be at least 18 years old to use Shopee Shopping Operations. By registering, you represent that you meet this age requirement and can form legally binding contracts.</p>
       </section>
 
       <section>
@@ -98,7 +98,7 @@ function TermsContent() {
 
       <section>
         <h2 className="text-xl font-bold mb-3">4. E-Commerce Tasks & Earnings</h2>
-        <p className="text-text-secondary">Gift Haven connects users with product promotion tasks from partnered e-commerce platforms (Amazon, Shopee, Lazada, etc.). Earnings are based on completed sales through your unique referral links. Commission rates are displayed per task and may vary by product category.</p>
+        <p className="text-text-secondary">Shopee Shopping Operations connects users with product promotion tasks from partnered e-commerce platforms (Amazon, Shopee, Lazada, etc.). Earnings are based on completed sales through your unique referral links. Commission rates are displayed per task and may vary by product category.</p>
         <p className="text-text-secondary mt-2">All earnings are subject to validation. Fraudulent activities (fake orders, self-referral, bot traffic) will result in forfeiture of earnings and account suspension.</p>
       </section>
 
@@ -114,12 +114,12 @@ function TermsContent() {
 
       <section>
         <h2 className="text-xl font-bold mb-3">7. Intellectual Property</h2>
-        <p className="text-text-secondary">Product listings, images, and descriptions from partner platforms remain the property of their respective owners. Gift Haven's branding, software, and platform design are our exclusive property.</p>
+        <p className="text-text-secondary">Product listings, images, and descriptions from partner platforms remain the property of their respective owners. Shopee Shopping Operations's branding, software, and platform design are our exclusive property.</p>
       </section>
 
       <section>
         <h2 className="text-xl font-bold mb-3">8. Limitation of Liability</h2>
-        <p className="text-text-secondary">Gift Haven acts as an intermediary between users and e-commerce platforms. We are not liable for: product quality issues, shipping delays, platform downtime, or inaccuracies in product data from third-party APIs. Earnings are not guaranteed and depend on your promotional efforts.</p>
+        <p className="text-text-secondary">Shopee Shopping Operations acts as an intermediary between users and e-commerce platforms. We are not liable for: product quality issues, shipping delays, platform downtime, or inaccuracies in product data from third-party APIs. Earnings are not guaranteed and depend on your promotional efforts.</p>
       </section>
 
       <section>
@@ -134,7 +134,7 @@ function TermsContent() {
 
       <section>
         <h2 className="text-xl font-bold mb-3">11. Contact</h2>
-        <p className="text-text-secondary">For questions about these terms, contact us at <a href="mailto:https://t.me/Shopping_Operations" className="text-accent">https://t.me/Shopping_Operations</a>.</p>
+        <p className="text-text-secondary">For questions about these terms, contact us at <a href="https://t.me/Shopping_Operations" className="text-accent">https://t.me/Shopping_Operations</a>.</p>
       </section>
     </div>
   )
@@ -185,7 +185,7 @@ function PrivacyContent() {
 
       <section>
         <h2 className="text-xl font-bold mb-3">9. Children's Privacy</h2>
-        <p className="text-text-secondary">Gift Haven is not intended for users under 18. We do not knowingly collect data from minors. If we discover such data, we will delete it immediately.</p>
+        <p className="text-text-secondary">Shopee Shopping Operations is not intended for users under 18. We do not knowingly collect data from minors. If we discover such data, we will delete it immediately.</p>
       </section>
 
       <section>
@@ -195,7 +195,7 @@ function PrivacyContent() {
 
       <section>
         <h2 className="text-xl font-bold mb-3">11. Contact</h2>
-        <p className="text-text-secondary">For privacy-related inquiries, contact our Data Protection Officer at <a href="mailto:https://t.me/Shopping_Operations" className="text-accent">https://t.me/Shopping_Operations</a>.</p>
+        <p className="text-text-secondary">For privacy-related inquiries, contact our Data Protection Officer at <a href="https://t.me/Shopping_Operations" className="text-accent">https://t.me/Shopping_Operations</a>.</p>
       </section>
     </div>
   )

@@ -177,6 +177,18 @@ body.dark .text-text-secondary { color: var(--color-text-secondary); }
 }
 
 /* ══════════════════════════════════════
+   Hero entrance animations
+   ══════════════════════════════════════ */
+.animate-fade-in {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ══════════════════════════════════════
    Reveal on scroll
    ══════════════════════════════════════ */
 .reveal {
