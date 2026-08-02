@@ -340,7 +340,7 @@ router.get('/earnings-stats', async (req, res) => {
   );
   // Net profit: income from order_profit + task_reward + commission (exclude admin_adjust)
   const netProfit = await get(
-    "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status IN ('delivered','withdrawn') AND amount > 0 AND type IN ('order_profit','task_reward','commission')",
+    "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status IN ('delivered','withdrawn') AND amount > 0 AND type IN ('order_profit','task_reward','commission','checkin')",
     [req.user.id]
   );
   const bal = Number(balance?.total || 0);
