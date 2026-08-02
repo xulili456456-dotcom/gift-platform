@@ -104,7 +104,8 @@ router.delete('/:id', async (req, res) => {
         ids = w.deducted_ids.split(',').map(Number).filter(Boolean);
       }
       for (const id of ids) {
-        await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['delivered', parseInt(id)]);
+        // Only restore if still withdrawn (prevents double-spend via fragment reuse)
+        await t.run(`UPDATE task_earnings SET status = 'delivered' WHERE id = $1 AND status = 'withdrawn'`, [parseInt(id)]);
       }
     }
     await t.commit();

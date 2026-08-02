@@ -10,7 +10,7 @@ const PLANS = [
   { id: 'basic', amount: 10, days: 30, bonus: 1.5, color: 'from-blue-500 to-blue-600', icon: Zap,
     giftKeys: ['stake.giftBasic1','stake.giftBasic2','stake.giftBasic3'],
     gifts: [{ invites: 1, value: 15 }, { invites: 3, value: 50 }, { invites: 8, value: 150 }]},
-  { id: 'pro', amount: 50, days: 30, bonus: 3.0, color: 'from-purple-500 to-purple-600', icon: Shield,
+  { id: 'pro', amount: 50, days: 30, bonus: 2.0, color: 'from-purple-500 to-purple-600', icon: Shield,
     giftKeys: ['stake.giftPro1','stake.giftPro2','stake.giftPro3','stake.giftPro4'],
     gifts: [{ invites: 1, value: 35 }, { invites: 3, value: 120 }, { invites: 8, value: 350 }, { invites: 20, value: 800 }]},
   { id: 'max', amount: 200, days: 30, bonus: 3.0, color: 'from-amber-500 to-amber-600', icon: Crown,

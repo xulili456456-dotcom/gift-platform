@@ -89,8 +89,8 @@ router.get('/', async (req, res) => {
   // Fetch order details for order_profit entries
   if (orderProfitIds.length > 0) {
     const orderRows = await all(
-      `SELECT o.id as order_id, o.product_name, o.product_price, o.created_at as buy_time, o.processed_at as sell_time,
-              te.id as earning_id
+      `SELECT o.id as order_id, o.product_name, o.product_price, o.amount as order_profit, o.created_at as buy_time, o.processed_at as sell_time,
+              te.id as earning_id, te.amount as total_return
        FROM store_orders o
        JOIN task_earnings te ON te.user_id = o.user_id AND te.type = 'order_profit'
          AND ABS(EXTRACT(EPOCH FROM te.created_at - o.processed_at)) < 5
@@ -100,20 +100,20 @@ router.get('/', async (req, res) => {
     );
     const orderMap = {};
     for (const row of orderRows) {
-      const totalReturn = transactions.find(t => t.id === row.earning_id)?.amount || 0;
-      let cost = Number(row.product_price) || 0;
-      if (cost === 0 && totalReturn > 0) cost = Math.round(totalReturn * 0.92 * 100) / 100;
-      const profit = Math.round((totalReturn - cost) * 100) / 100;
+      const totalReturn = Number(row.total_return) || 0;
+      const orderProfit = Number(row.order_profit) || 0;
+      // cost = totalReturn - profit; for free orders totalReturn ≈ profit
+      const cost = Math.round((totalReturn - orderProfit) * 100) / 100;
       const buyTime = new Date(row.buy_time);
       const sellTime = new Date(row.sell_time);
       const holdHours = Math.round((sellTime - buyTime) / 3600000 * 10) / 10;
       orderMap[row.earning_id] = {
         productName: row.product_name || ('Order #' + row.order_id),
-        productPrice: Math.round(cost * 100) / 100,
+        productPrice: Number(row.product_price) || Math.round(cost * 100) / 100,
         buyTime: row.buy_time,
         sellTime: row.sell_time,
         holdHours,
-        profitRate: Math.round((profit / totalReturn) * 100),
+        profitRate: cost > 0 ? Math.round((orderProfit / cost) * 100) : 0,
       };
     }
     for (const t of transactions) {

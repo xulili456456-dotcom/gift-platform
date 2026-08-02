@@ -767,7 +767,7 @@ export default function StorePage() {
                 <button onClick={(e) => { e.stopPropagation(); handleShare(p); }} style={{alignSelf:'flex-end',padding:'6px 20px',background:'#067D62',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:600,cursor:'pointer'}}>🔗 Share 3%</button>
               ) : isFreeDisabled ? (
                 <button disabled style={{alignSelf:'flex-end',padding:'6px 20px',background:'#eee',color:'#999',border:'none',borderRadius:8,fontSize:12,fontWeight:600}}>
-                  {isAlreadyClaimed ? '已领取' : freeRemaining <= 0 ? '已抢完' : '加载中'}
+                  {isAlreadyClaimed ? 'Claimed' : freeRemaining <= 0 ? 'Sold Out' : 'Free'}
                 </button>
               ) : (
                 <button onClick={(e) => { e.stopPropagation(); handleBuy(p); }} style={{alignSelf:'flex-end',padding:'6px 20px',background:'#00A86B',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:600,cursor:'pointer'}}>Buy</button>

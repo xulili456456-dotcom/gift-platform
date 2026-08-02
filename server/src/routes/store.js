@@ -202,6 +202,16 @@ router.post('/orders/process', async (req, res) => {
   const lockKey = parseInt(req.user.id) + 1000000;
   const t = await tx();
   try {
+    // Enforce daily order limit per tier (inside tx for accuracy)
+    const doneToday = await t.get(
+      `SELECT COUNT(*)::int as c FROM store_orders WHERE store_id = $1 AND status IN ('done','holding') AND created_at::date = $2::date`,
+      [store.id, today]
+    );
+    if (Number(doneToday?.c || 0) >= tier.dailyOrders) {
+      await t.rollback();
+      return res.status(400).json({ error: `Daily limit reached (${tier.dailyOrders} orders/day). Upgrade to a higher tier.`, dailyLimitReached: true });
+    }
+
     // Acquire advisory lock first — serializes free-order checks per user
     await t.run("SELECT pg_advisory_xact_lock($1)", [lockKey]);
 
@@ -464,7 +474,7 @@ router.get('/orders-history', async (req, res) => {
   else dateFilter = ''; // 'all' or any other value = no date filter
 
   const orders = await all(
-    `SELECT id, amount as profit, created_at, status, product_name FROM store_orders WHERE store_id = ? AND status = 'done' ${dateFilter} ORDER BY created_at DESC LIMIT 50`,
+    `SELECT id, amount as profit, product_price, created_at, status, product_name FROM store_orders WHERE store_id = ? AND status = 'done' ${dateFilter} ORDER BY created_at DESC LIMIT 50`,
     [store.id]);
 
   const summary = await get(
