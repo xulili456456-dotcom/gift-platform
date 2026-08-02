@@ -411,7 +411,10 @@ export default function StorePage() {
     if (status?.store?.freeRemaining !== undefined) {
       setFreeRemaining(status.store.freeRemaining);
     }
-  }, [status?.store?.freeRemaining]);
+    if (status?.store?.freeProductNames?.length > 0 && freeProducts.length === 0) {
+      setFreeProducts(status.store.freeProductNames.map(n => ({ name: n })));
+    }
+  }, [status?.store?.freeRemaining, status?.store?.freeProductNames]);
 
   var daySeed = parseInt(new Date().toISOString().slice(0,10).replace(/-/g,''),10);
   const freeProductNames = useMemo(() => freeProducts.map(fp => fp.name), [freeProducts]);
