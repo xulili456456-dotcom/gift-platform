@@ -41,6 +41,13 @@ export default function TransactionsPage() {
   }, [typeFilter]);
 
   useEffect(() => { loadData(1); }, [loadData]);
+  // Auto-refresh summary every 15s
+  useEffect(() => {
+    const t = setInterval(async () => {
+      try { const { data } = await client.get('/store/earnings-stats'); setSummary({ balance: data.balance || 0, netProfit: data.netProfit || 0 }); } catch {}
+    }, 15000);
+    return () => clearInterval(t);
+  }, []);
 
   const formatDate = (d) => {
     const dt = new Date(d);
