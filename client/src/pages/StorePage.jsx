@@ -570,8 +570,15 @@ export default function StorePage() {
         {buyConfirm && (
           <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={() => setBuyConfirm(null)}>
             <div style={{background:'#fff',borderRadius:16,padding:24,width:'100%',maxWidth:340}} onClick={e => e.stopPropagation()}>
-              <div style={{textAlign:'center',fontSize:32,marginBottom:12}}>🛒</div>
+              {(() => { const isFreeEligible = freeProducts.some(fp => fp.id === (parseInt(buyConfirm.img?.match(/\d+/)?.[0]) || 0)); const canBeFree = isFreeEligible && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name); return (
+              <div style={{textAlign:'center',fontSize:32,marginBottom:12}}>{canBeFree ? '🎁' : '🛒'}</div>
+              ); })()}
               <div style={{fontSize:15,fontWeight:700,color:'#222',marginBottom:2}}>Confirm Purchase</div>
+              {(() => { const isFreeEligible = freeProducts.some(fp => fp.id === (parseInt(buyConfirm.img?.match(/\d+/)?.[0]) || 0)); const canBeFree = isFreeEligible && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name); return (
+              <div style={{fontSize:12,fontWeight:600,color:canBeFree?'#00A86B':'#FF5000',marginBottom:8,background:canBeFree?'#E8F5E9':'#FFF5F0',borderRadius:8,padding:'4px 10px',display:'inline-block'}}>
+                {canBeFree ? `🎁 FREE ORDER (${freeRemaining} left)` : (isFreeEligible ? '💰 PAID ORDER (free slots used)' : '💰 PAID ORDER')}
+              </div>
+              ); })()}
               <div style={{fontSize:11,color:'#999',marginBottom:12,lineHeight:1.4}}>{buyConfirm.name}</div>
               <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:13}}>
                 <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Cost</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
