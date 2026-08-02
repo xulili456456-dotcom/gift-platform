@@ -14,11 +14,18 @@ export default function HomePage() {
   const [stats, setStats] = useState(null);
   const [claims, setClaims] = useState([]);
   const [balance, setBalance] = useState(0);
+  const [totalEarned, setTotalEarned] = useState(0);
+  const [todayEarned, setTodayEarned] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { loadAll(); const t = setInterval(loadBalance, 15000); return () => clearInterval(t); }, []);
   const loadBalance = async () => {
-    try { const { data } = await client.get('/store/earnings-stats'); setBalance(data.balance || 0); } catch {}
+    try {
+      const { data } = await client.get('/store/earnings-stats');
+      setBalance(data.balance || 0);
+      setTotalEarned(data.totalProfit || 0);
+      setTodayEarned(data.todayProfit || 0);
+    } catch {}
   };
   const loadAll = async () => {
     try {
@@ -66,7 +73,7 @@ export default function HomePage() {
         </div>
         <div style={{display:'flex',gap:8}}>
           <div onClick={() => navigate('/mine/wallet')} style={{flex:1,background:'#1a1a1a',borderRadius:10,padding:8,textAlign:'center',cursor:'pointer'}}>
-            <div style={{fontSize:14,fontWeight:700,color:'#FF5000'}}>${balance.toFixed(0)}</div>
+            <div style={{fontSize:14,fontWeight:700,color:'#FF5000'}}>${totalEarned.toFixed(0)}</div>
             <div style={{fontSize:9,color:'#888'}}>Total Earned</div>
           </div>
           <div onClick={() => navigate('/store/funds')} style={{flex:1,background:'#1a1a1a',borderRadius:10,padding:8,textAlign:'center',cursor:'pointer'}}>
@@ -88,8 +95,8 @@ export default function HomePage() {
         </div>
         <div style={{display:'flex',gap:12}}>
           <div style={{flex:1}}>
-            <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>Total Earned</div>
-            <div style={{fontSize:20,fontWeight:800,color:'#00A86B'}}>${balance.toFixed(2)}</div>
+            <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>Total Earned (all time)</div>
+            <div style={{fontSize:20,fontWeight:800,color:'#00A86B'}}>${totalEarned.toFixed(2)}</div>
             <div style={{fontSize:9,color:'#999'}}>all time</div>
           </div>
           <div style={{flex:1,textAlign:'center'}}>
