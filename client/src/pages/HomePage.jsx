@@ -31,10 +31,12 @@ export default function HomePage() {
     try {
       const [g, s, c, b] = await Promise.all([
         giftsApi.list(), referralApi.getStats(), claimsApi.list(),
-        client.get('/store/earnings-stats').catch(() => ({ data: { balance: 0 } }))
+        client.get('/store/earnings-stats').catch(() => ({ data: { balance: 0, totalProfit: 0, todayProfit: 0 } }))
       ]);
       setGifts(g.data); setStats(s.data); setClaims(c.data);
       setBalance(b.data?.balance || 0);
+      setTotalEarned(b.data?.totalProfit || 0);
+      setTodayEarned(b.data?.todayProfit || 0);
     } catch { toast.error('Failed to load'); }
     finally { setLoading(false); }
   };
