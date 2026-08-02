@@ -402,15 +402,28 @@ export default function StorePage() {
   const [freeRemaining, setFreeRemaining] = useState(0);
   const [claimedNames, setClaimedNames] = useState([]);
   const [freeLoaded, setFreeLoaded] = useState(false);
-  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); setClaimedNames(prev => prev.length === 0 ? (data.claimedNames||[]) : prev); setFreeLoaded(true); }).catch(()=>{ setFreeLoaded(true); }); }, []);
-  // Re-fetch remaining count when orders complete
-  useEffect(() => { if (status?.store?.doneToday > 0) { client.get('/store/free-products').then(({data}) => { setFreeRemaining(data.remaining); }).catch(()=>{}); } }, [status?.store?.doneToday]);
+  const loadFreeProducts = useCallback(async () => {
+    try {
+      const { data } = await client.get('/store/free-products');
+      setFreeProducts(data.products || []);
+      setFreeRemaining(data.remaining);
+      setClaimedNames(prev => prev.length === 0 ? (data.claimedNames || []) : prev);
+      console.log('Free products loaded: remaining=' + data.remaining, 'claimed=' + (data.claimedNames||[]).join(','));
+    } catch(e) {
+      console.error('Free products load failed:', e.message);
+    } finally {
+      setFreeLoaded(true);
+    }
+  }, []);
+  useEffect(() => { loadFreeProducts(); }, [loadFreeProducts]);
+  useEffect(() => { if (status?.store?.doneToday > 0) { loadFreeProducts(); } }, [status?.store?.doneToday, loadFreeProducts]);
 
   var daySeed = parseInt(new Date().toISOString().slice(0,10).replace(/-/g,''),10);
+  const freeProductNames = useMemo(() => freeProducts.map(fp => fp.name), [freeProducts]);
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
     let list = genProducts(status.store.tier, CAT_VALUES[catIdx], search, daySeed);
-    if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0)));
+    if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => fp.name === p.name));
     else if (affordableOnly) list = list.filter(p => p.costPrice <= (status.store.balance || 0));
     if (sortMode === 'profit') list.sort((a, b) => b.profit - a.profit);
     else if (sortMode === 'price') list.sort((a, b) => a.price - b.price);
@@ -575,11 +588,11 @@ export default function StorePage() {
         {buyConfirm && (
           <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={() => setBuyConfirm(null)}>
             <div style={{background:'#fff',borderRadius:16,padding:24,width:'100%',maxWidth:340}} onClick={e => e.stopPropagation()}>
-              {(() => { const isFreeEligible = freeProducts.some(fp => fp.id === (parseInt(buyConfirm.img?.match(/\d+/)?.[0]) || 0)); const canBeFree = isFreeEligible && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name); return (
+              {(() => { const isFreeEligible = freeProductNames.includes(buyConfirm.name); const canBeFree = isFreeEligible && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name); return (
               <div style={{textAlign:'center',fontSize:32,marginBottom:12}}>{canBeFree ? '🎁' : '🛒'}</div>
               ); })()}
               <div style={{fontSize:15,fontWeight:700,color:'#222',marginBottom:2}}>Confirm Purchase</div>
-              {(() => { const isFreeEligible = freeProducts.some(fp => fp.id === (parseInt(buyConfirm.img?.match(/\d+/)?.[0]) || 0)); const canBeFree = isFreeEligible && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name); return (
+              {(() => { const isFreeEligible = freeProductNames.includes(buyConfirm.name); const canBeFree = isFreeEligible && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name); return (
               <div style={{fontSize:12,fontWeight:600,color:canBeFree?'#00A86B':'#FF5000',marginBottom:8,background:canBeFree?'#E8F5E9':'#FFF5F0',borderRadius:8,padding:'4px 10px',display:'inline-block'}}>
                 {canBeFree ? `🎁 FREE ORDER (${freeRemaining} left)` : (isFreeEligible ? '💰 PAID ORDER (free slots used)' : '💰 PAID ORDER')}
               </div>
@@ -731,7 +744,7 @@ export default function StorePage() {
       <div className="flex-1 overflow-y-auto px-4 pt-2">
         <div className="flex flex-col gap-3">
           {products.map(p => {
-            const isFreeProduct = freeLoaded && freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0));
+            const isFreeProduct = freeLoaded && freeProductNames.includes(p.name);
             const isAlreadyClaimed = isFreeProduct && claimedNames.includes(p.name);
             const isFreeDisabled = isFreeProduct && (freeRemaining <= 0 || isAlreadyClaimed);
             return (
