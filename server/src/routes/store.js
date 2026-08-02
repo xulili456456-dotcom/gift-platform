@@ -175,10 +175,18 @@ router.post('/orders/process', async (req, res) => {
   const deposit = Number(store.deposit || 0);
 
   // Transaction: atomic free-slot check + deduct + create holding
+  // Use PostgreSQL advisory lock to prevent concurrent free-order bypass
+  const lockKey = parseInt(req.user.id) + 1000000;
   const t = await tx();
   try {
-    // Check free slots INSIDE transaction to prevent race conditions
-    const freeUsed = await t.get("SELECT value FROM admin_settings WHERE key = ? FOR UPDATE", [freeKey]);
+    // Acquire advisory lock first — serializes free-order checks per user
+    await t.run("SELECT pg_advisory_xact_lock($1)", [lockKey]);
+
+    // Ensure counter row exists (INSERT or ignore)
+    await t.run("INSERT INTO admin_settings (key, value) VALUES ($1, '0') ON CONFLICT (key) DO NOTHING", [freeKey]);
+
+    // Read current count under lock
+    const freeUsed = await t.get("SELECT value FROM admin_settings WHERE key = $1", [freeKey]);
     const freeUsedCount = Number(freeUsed?.value || 0);
     const freeRemaining = FREE_SLOTS - freeUsedCount;
     const isFreeOrder = couldBeFree && freeRemaining > 0;
@@ -192,51 +200,38 @@ router.post('/orders/process', async (req, res) => {
     if (!isFreeOrder) {
       if (cost > deposit) {
         await t.rollback();
-        return res.status(400).json({
-          error: 'Insufficient deposit',
-          need: cost, have: deposit, shortage: Math.round((cost - deposit) * 100) / 100,
-          depositRequired: true, freeRemaining
-        });
+        return res.status(400).json({ error: 'Insufficient deposit', need: cost, have: deposit, shortage: Math.round((cost - deposit) * 100) / 100, depositRequired: true, freeRemaining });
       }
       if (available < cost) {
         await t.rollback();
-        return res.status(400).json({
-          error: 'Insufficient balance',
-          need: cost, have: Math.max(0, available), shortage: Math.max(0, Math.round((cost - available) * 100) / 100),
-          balance: available, deposit,
-        });
+        return res.status(400).json({ error: 'Insufficient balance', need: cost, have: Math.max(0, available), shortage: Math.max(0, Math.round((cost - available) * 100) / 100), balance: available, deposit });
       }
     }
 
-    // Deduct balance (skip for free orders — no cost deducted)
+    // Deduct balance (skip for free orders)
     if (!isFreeOrder) {
       let remaining = cost;
-      const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE', [req.user.id, 'delivered']);
+      const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = $1 AND status = $2 ORDER BY id ASC FOR UPDATE', [req.user.id, 'delivered']);
       for (const task of tasks) {
         if (remaining <= 0) break;
         const deduct = Math.min(Number(task.amount), remaining);
-        await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
+        await t.run('UPDATE task_earnings SET status = $1 WHERE id = $2', ['withdrawn', task.id]);
         const rest = Number(task.amount) - deduct;
-        if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, rest, 'bonus', 'delivered']);
+        if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES ($1, $2, $3, $4)', [req.user.id, rest, 'bonus', 'delivered']);
         remaining -= deduct;
       }
-      if (remaining > 0.01) {
-        await t.rollback();
-        return res.status(400).json({ error: 'Balance changed during checkout, please try again' });
-      }
+      if (remaining > 0.01) { await t.rollback(); return res.status(400).json({ error: 'Balance changed during checkout, please try again' }); }
     }
 
-    // Random sell time: 6-30 hours from now
     const sellHours = 6 + Math.random() * 24;
     const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
 
-    // Atomically increment free order counter
+    // Update free counter
     if (isFreeOrder) {
-      await t.run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?",
-        [freeKey, String(freeUsedCount + 1), String(freeUsedCount + 1)]);
+      await t.run("UPDATE admin_settings SET value = $1 WHERE key = $2", [String(freeUsedCount + 1), freeKey]);
     }
 
-    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES (?, ?, ?, 'holding', ?, ?, ?)",
+    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES ($1, $2, $3, 'holding', $4, $5, $6)",
       [store.id, req.user.id, isFreeOrder ? 0 : cost, sellBy, productName || '', productPrice]);
     await t.commit();
 
