@@ -731,12 +731,11 @@ export default function StorePage() {
       <div className="flex-1 overflow-y-auto px-4 pt-2">
         <div className="flex flex-col gap-3">
           {products.map(p => {
-            const isFreeProduct = freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0));
+            const isFreeProduct = freeLoaded && freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0));
             const isAlreadyClaimed = isFreeProduct && claimedNames.includes(p.name);
             const isFreeDisabled = isFreeProduct && (freeRemaining <= 0 || isAlreadyClaimed);
-            const buyBlocked = isFreeDisabled || (!freeLoaded && isFreeProduct);
             return (
-            <div key={p.id} onClick={() => !buyBlocked && setDetail(p)} style={{background: buyBlocked ? '#f8f8f8' : '#fff',borderRadius:16,padding:14,cursor: buyBlocked ? 'default' : 'pointer',display:'flex',flexDirection:'column',gap:8,opacity: buyBlocked ? 0.5 : 1}}>
+            <div key={p.id} onClick={() => !isFreeDisabled && setDetail(p)} style={{background: isFreeDisabled ? '#f8f8f8' : '#fff',borderRadius:16,padding:14,cursor: isFreeDisabled ? 'default' : 'pointer',display:'flex',flexDirection:'column',gap:8,opacity: isFreeDisabled ? 0.5 : 1}}>
               <div style={{display:'flex',gap:12}}>
                 <div style={{width:80,height:80,background:'#f8f8f8',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,overflow:'hidden'}}>
                   <img src={p.img} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover'}} loading="lazy" />
@@ -758,7 +757,7 @@ export default function StorePage() {
                 <button onClick={(e) => { e.stopPropagation(); handleShare(p); }} style={{alignSelf:'flex-end',padding:'6px 20px',background:'#067D62',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:600,cursor:'pointer'}}>🔗 Share 3%</button>
               ) : isFreeDisabled ? (
                 <button disabled style={{alignSelf:'flex-end',padding:'6px 20px',background:'#eee',color:'#999',border:'none',borderRadius:8,fontSize:12,fontWeight:600}}>
-                  {isAlreadyClaimed ? '已领取' : '已抢完'}
+                  {isAlreadyClaimed ? '已领取' : freeRemaining <= 0 ? '已抢完' : '加载中'}
                 </button>
               ) : (
                 <button onClick={(e) => { e.stopPropagation(); handleBuy(p); }} style={{alignSelf:'flex-end',padding:'6px 20px',background:'#00A86B',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:600,cursor:'pointer'}}>Buy</button>
