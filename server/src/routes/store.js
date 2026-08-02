@@ -492,7 +492,15 @@ router.get('/free-products', authMiddleware, async (req, res) => {
   const count = await get("SELECT value FROM admin_settings WHERE key = ?", [countKey]);
   const remaining = Math.max(0, 5 - Number(count?.value || 0));
 
-  res.json({ products, remaining });
+  // Get already-claimed free product names for today
+  const claimedRows = await all(
+    "SELECT key FROM admin_settings WHERE key LIKE ? AND value = '1'",
+    ['free_prod_' + req.user.id + '_' + today + '_%']
+  );
+  const prefix = 'free_prod_' + req.user.id + '_' + today + '_';
+  const claimedNames = claimedRows.map(r => r.key.replace(prefix, ''));
+
+  res.json({ products, remaining, claimedNames });
 });
 
 // POST /api/store/claim-free/:productId — claim AND buy a free product

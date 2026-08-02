@@ -400,7 +400,8 @@ export default function StorePage() {
   useEffect(() => { client.get(`/store/orders-history?period=${orderPeriod}`).then(({data}) => setOrderHistory(data)).catch(()=>{}); }, [orderPeriod, status?.store?.doneToday]);
   const [freeProducts, setFreeProducts] = useState([]);
   const [freeRemaining, setFreeRemaining] = useState(0);
-  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); }).catch(()=>{}); }, [status?.store?.doneToday]);
+  const [claimedNames, setClaimedNames] = useState([]);
+  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); setClaimedNames(data.claimedNames||[]); }).catch(()=>{}); }, [status?.store?.doneToday]);
 
   var daySeed = parseInt(new Date().toISOString().slice(0,10).replace(/-/g,''),10);
   const products = useMemo(() => {
@@ -463,6 +464,7 @@ export default function StorePage() {
       // Instant balance + free counter update
       setStatus(prev => prev?.store ? { ...prev, store: { ...prev.store, balance: prev.store.balance - (data.isFreeOrder ? 0 : data.cost), doneToday: prev.store.doneToday + 1, freeRemaining: data.freeRemaining ?? prev.store.freeRemaining } } : prev);
       setFreeRemaining(data.freeRemaining ?? freeRemaining);
+      if (data.isFreeOrder && buyConfirm) setClaimedNames(prev => [...prev, buyConfirm.name]);
       setBuyConfirm(null);
       loadStatus(); loadHoldings(); loadEarnings();
     } catch (err) {
@@ -718,9 +720,10 @@ export default function StorePage() {
         <div className="flex flex-col gap-3">
           {products.map(p => {
             const isFreeProduct = freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0));
-            const isFreeSoldOut = sortMode === 'free' && freeRemaining <= 0 && isFreeProduct;
+            const isAlreadyClaimed = isFreeProduct && claimedNames.includes(p.name);
+            const isFreeDisabled = isFreeProduct && (freeRemaining <= 0 || isAlreadyClaimed);
             return (
-            <div key={p.id} onClick={() => !isFreeSoldOut && setDetail(p)} style={{background:'#fff',borderRadius:16,padding:14,cursor:'pointer',display:'flex',flexDirection:'column',gap:8,opacity:isFreeSoldOut?0.5:1}}>
+            <div key={p.id} onClick={() => !isFreeDisabled && setDetail(p)} style={{background: isFreeDisabled ? '#f8f8f8' : '#fff',borderRadius:16,padding:14,cursor: isFreeDisabled ? 'default' : 'pointer',display:'flex',flexDirection:'column',gap:8,opacity: isFreeDisabled ? 0.5 : 1}}>
               <div style={{display:'flex',gap:12}}>
                 <div style={{width:80,height:80,background:'#f8f8f8',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,overflow:'hidden'}}>
                   <img src={p.img} alt={p.name} style={{width:'100%',height:'100%',objectFit:'cover'}} loading="lazy" />
@@ -740,8 +743,10 @@ export default function StorePage() {
               </div>
               {tradeMode === 'share' ? (
                 <button onClick={(e) => { e.stopPropagation(); handleShare(p); }} style={{alignSelf:'flex-end',padding:'6px 20px',background:'#067D62',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:600,cursor:'pointer'}}>🔗 Share 3%</button>
-              ) : isFreeSoldOut ? (
-                <button disabled style={{alignSelf:'flex-end',padding:'6px 20px',background:'#eee',color:'#999',border:'none',borderRadius:8,fontSize:12,fontWeight:600}}>已抢完</button>
+              ) : isFreeDisabled ? (
+                <button disabled style={{alignSelf:'flex-end',padding:'6px 20px',background:'#eee',color:'#999',border:'none',borderRadius:8,fontSize:12,fontWeight:600}}>
+                  {isAlreadyClaimed ? '已领取' : '已抢完'}
+                </button>
               ) : (
                 <button onClick={(e) => { e.stopPropagation(); handleBuy(p); }} style={{alignSelf:'flex-end',padding:'6px 20px',background:'#00A86B',color:'#fff',border:'none',borderRadius:8,fontSize:12,fontWeight:600,cursor:'pointer'}}>Buy</button>
               )}
