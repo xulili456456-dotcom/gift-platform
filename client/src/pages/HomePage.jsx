@@ -18,10 +18,12 @@ export default function HomePage() {
   const [netProfit, setNetProfit] = useState(0);
   const [todayEarned, setTodayEarned] = useState(0);
   const [activeOrders, setActiveOrders] = useState(0);
+  const [holdings, setHoldings] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { loadAll(); const t = setInterval(loadBalance, 15000); const s = setInterval(checkSell, 60000); return () => { clearInterval(t); clearInterval(s); }; }, []);
-  const checkSell = async () => { try { await client.post('/store/check-sell'); loadBalance(); } catch {} };
+  const checkSell = async () => { try { await client.post('/store/check-sell'); loadBalance(); loadHoldings(); } catch {} };
+  const loadHoldings = async () => { try { const { data } = await client.get('/store/holdings'); setHoldings(data || []); } catch {} };
   const loadBalance = async () => {
     try {
       const { data } = await client.get('/store/earnings-stats');
@@ -45,6 +47,8 @@ export default function HomePage() {
       setNetProfit(b.data?.netProfit || 0);
       setTodayEarned(b.data?.todayProfit || 0);
       setActiveOrders(b.data?.activeOrders || 0);
+      // Holdings
+      client.get('/store/holdings').then(({data}) => setHoldings(data||[])).catch(()=>{});
     } catch { toast.error('Failed to load'); }
     finally { setLoading(false); }
   };
@@ -139,11 +143,47 @@ export default function HomePage() {
             <div style={{fontSize:13,fontWeight:700,color:'#0f0f0f'}}>📊 Active Holdings</div>
             <span onClick={() => navigate('/store')} style={{fontSize:11,color:'#FF5000',fontWeight:600,cursor:'pointer'}}>Browse Store ›</span>
           </div>
-          <div style={{textAlign:'center',padding:24,background:'#fff',borderRadius:14}}>
-            <div style={{fontSize:28,marginBottom:8}}>🛒</div>
-            <div style={{fontSize:12,color:'#999',marginBottom:8}}>No active holdings yet</div>
-            <button onClick={() => navigate('/store')} style={{padding:'8px 20px',background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:12,fontWeight:600,cursor:'pointer'}}>Start Trading</button>
-          </div>
+          {holdings.length === 0 ? (
+            <div style={{textAlign:'center',padding:24,background:'#fff',borderRadius:14}}>
+              <div style={{fontSize:28,marginBottom:8}}>🛒</div>
+              <div style={{fontSize:12,color:'#999',marginBottom:8}}>No active holdings yet</div>
+              <button onClick={() => navigate('/store')} style={{padding:'8px 20px',background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:12,fontWeight:600,cursor:'pointer'}}>Start Trading</button>
+            </div>
+          ) : (
+            <div style={{background:'#fff',borderRadius:14,overflow:'hidden'}}>
+              {holdings.slice(0, 5).map((h, i) => (
+                <div key={h.id} style={{
+                  padding:'12px 14px', display:'flex', alignItems:'center', gap:10,
+                  borderBottom: i < Math.min(holdings.length, 5) - 1 ? '1px solid #f0f0f0' : 'none',
+                }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: 10, background: '#E8F8F0',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0,
+                  }}>📦</div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:11,fontWeight:600,color:'#333',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>
+                      {h.product_name || 'Product'}
+                    </div>
+                    <div style={{display:'flex',alignItems:'center',gap:6,marginTop:2}}>
+                      <div style={{height:4,flex:1,background:'#eee',borderRadius:2,overflow:'hidden'}}>
+                        <div style={{height:'100%',width:Math.min(100, h.progress||0)+'%',background:'#00A86B',borderRadius:2,transition:'width 1s'}} />
+                      </div>
+                      <span style={{fontSize:9,color:'#999',whiteSpace:'nowrap'}}>{h.progress || 0}%</span>
+                    </div>
+                  </div>
+                  <div style={{textAlign:'right'}}>
+                    <div style={{fontSize:12,fontWeight:700,color:'#FF5000'}}>+${(h.profit || 0).toFixed(2)}</div>
+                    <div style={{fontSize:9,color:'#bbb'}}>{(h.roi || 0).toFixed(0)}% ROI</div>
+                  </div>
+                </div>
+              ))}
+              {holdings.length > 5 && (
+                <div onClick={() => navigate('/store')} style={{textAlign:'center',padding:10,color:'#FF5000',fontSize:11,fontWeight:600,cursor:'pointer',borderTop:'1px solid #f0f0f0'}}>
+                  +{holdings.length - 5} more ›
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* ===== INVITE BANNER ===== */}
