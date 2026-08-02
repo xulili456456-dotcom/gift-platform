@@ -14,11 +14,12 @@ const TYPE_LABELS = {
   deposit_return: 'Deposit Returned',
   agent_reward: 'Agent Reward',
   staking_refund: 'Staking Refund',
-  balance_split: 'Balance Split',
   bonus: 'Legacy Balance',
   ad: 'Ad Reward',
   admin_adjust: 'Admin Adjustment',
 };
+
+const HIDDEN_TYPES = ['balance_split'];
 
 // GET /api/transactions — full money movement history
 router.get('/', async (req, res) => {
@@ -36,7 +37,7 @@ router.get('/', async (req, res) => {
   }
 
   const countResult = await all(
-    `SELECT COUNT(*) as c FROM task_earnings WHERE user_id = ? ${typeClause}`,
+    `SELECT COUNT(*) as c FROM task_earnings WHERE user_id = ? ${typeClause} AND type != ALL(ARRAY['balance_split'])`,
     params
   );
   const total = Number(countResult[0]?.c || 0);
@@ -45,12 +46,13 @@ router.get('/', async (req, res) => {
     `SELECT id, amount, type, status, created_at
      FROM task_earnings
      WHERE user_id = ? ${typeClause}
+       AND type != ALL(ARRAY['balance_split'])
      ORDER BY created_at DESC
      LIMIT ? OFFSET ?`,
     [...params, limit, offset]
   );
 
-  // Calculate running balance (from oldest to newest)
+  // Calculate running balance (from oldest to newest, includes hidden types for correct balance)
   let balance = 0;
   const allForBalance = await all(
     `SELECT id, amount, type, status FROM task_earnings WHERE user_id = ? ORDER BY created_at ASC`,
@@ -196,7 +198,7 @@ router.get('/', async (req, res) => {
     total,
     page,
     totalPages: Math.ceil(total / limit),
-    types: Object.keys(TYPE_LABELS).map(k => ({ key: k, label: TYPE_LABELS[k] })),
+    types: Object.keys(TYPE_LABELS).filter(k => !HIDDEN_TYPES.includes(k)).map(k => ({ key: k, label: TYPE_LABELS[k] })),
   });
 });
 

@@ -36,7 +36,9 @@ export default function TransactionsPage() {
         client.get(`/transactions?page=${p}&limit=30${typeFilter ? '&type=' + typeFilter : ''}`),
         client.get('/store/earnings-stats').catch(() => ({ data: {} })),
       ]);
-      setTransactions(txRes.data.transactions || []);
+      // Filter out internal balance_split entries - they're accounting artifacts, not real transactions
+      const visibleTx = (txRes.data.transactions || []).filter(tx => tx.type !== 'balance_split');
+      setTransactions(visibleTx);
       setTotalPages(txRes.data.totalPages || 1);
       setTypes(txRes.data.types || []);
       setPage(p);
