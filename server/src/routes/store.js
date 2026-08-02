@@ -517,8 +517,8 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   const totalReturn = Math.round((cost + profit) * 100) / 100;
 
   // Transaction: atomic free-slot check + create holding
-  const lockKey = parseInt(req.user.id) + 2000000;
-  const productKey = 'free_claim_prod_' + req.user.id + '_' + today + '_' + productId;
+  const lockKey = parseInt(req.user.id) + 1000000;
+  const productKey = 'free_prod_' + req.user.id + '_' + today + '_' + productId;
   const t = await tx();
   try {
     await t.run("SELECT pg_advisory_xact_lock($1)", [lockKey]);
