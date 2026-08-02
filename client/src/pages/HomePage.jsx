@@ -32,6 +32,7 @@ export default function HomePage() {
       setNetProfit(data.netProfit || 0);
       setTodayEarned(data.todayProfit || 0);
       setActiveOrders(data.activeOrders || 0);
+      loadHoldings();
     } catch {}
   };
   const loadAll = async () => {
