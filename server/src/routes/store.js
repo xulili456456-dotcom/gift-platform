@@ -165,75 +165,88 @@ router.post('/orders/process', async (req, res) => {
   const FREE_SLOTS = 5;
   const FREE_MAX_COST = 50;
   const freeKey = 'free_used_' + req.user.id + '_' + today;
-  const freeUsed = await get("SELECT value FROM admin_settings WHERE key = ?", [freeKey]);
-  const freeRemaining = FREE_SLOTS - Number(freeUsed?.value || 0);
 
   let { cost, profit, totalReturn } = calcProduct(productPrice);
-  const isFreeOrder = cost <= FREE_MAX_COST && freeRemaining > 0;
-
-  // Recalculate for free orders (5% instead of 15%)
-  if (isFreeOrder) {
-    profit = Math.round(productPrice * FREE_PROFIT_RATE * 100) / 100;
-    totalReturn = Math.round((cost + profit) * 100) / 100;
-  }
+  const couldBeFree = cost <= FREE_MAX_COST;
 
   // Check available balance (exclude locked in holdings)
   const availBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
   const available = Number(availBal?.total || 0);
-
-  // Deposit check: cost must not exceed deposit (skip for free orders)
   const deposit = Number(store.deposit || 0);
-  if (!isFreeOrder && cost > deposit) {
-    return res.status(400).json({
-      error: 'Insufficient deposit',
-      need: cost, have: deposit, shortage: Math.round((cost - deposit) * 100) / 100,
-      depositRequired: true, freeRemaining
-    });
-  }
 
-  if (available < cost) {
-    return res.status(400).json({
-      error: 'Insufficient balance',
-      need: cost, have: Math.max(0, available), shortage: Math.max(0, Math.round((cost - available) * 100) / 100),
-      balance: Number(availBal?.total || 0), deposit,
-    });
-  }
-
-  // Transaction: deduct + create holding
+  // Transaction: atomic free-slot check + deduct + create holding
   const t = await tx();
   try {
-    let remaining = cost;
-    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE', [req.user.id, 'delivered']);
-    for (const task of tasks) {
-      if (remaining <= 0) break;
-      const deduct = Math.min(Number(task.amount), remaining);
-      await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
-      const rest = Number(task.amount) - deduct;
-      if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, rest, 'bonus', 'delivered']);
-      remaining -= deduct;
+    // Check free slots INSIDE transaction to prevent race conditions
+    const freeUsed = await t.get("SELECT value FROM admin_settings WHERE key = ? FOR UPDATE", [freeKey]);
+    const freeUsedCount = Number(freeUsed?.value || 0);
+    const freeRemaining = FREE_SLOTS - freeUsedCount;
+    const isFreeOrder = couldBeFree && freeRemaining > 0;
+
+    if (isFreeOrder) {
+      profit = Math.round(productPrice * FREE_PROFIT_RATE * 100) / 100;
+      totalReturn = Math.round((cost + profit) * 100) / 100;
+    }
+
+    // Validate: non-free orders need deposit + balance
+    if (!isFreeOrder) {
+      if (cost > deposit) {
+        await t.rollback();
+        return res.status(400).json({
+          error: 'Insufficient deposit',
+          need: cost, have: deposit, shortage: Math.round((cost - deposit) * 100) / 100,
+          depositRequired: true, freeRemaining
+        });
+      }
+      if (available < cost) {
+        await t.rollback();
+        return res.status(400).json({
+          error: 'Insufficient balance',
+          need: cost, have: Math.max(0, available), shortage: Math.max(0, Math.round((cost - available) * 100) / 100),
+          balance: available, deposit,
+        });
+      }
+    }
+
+    // Deduct balance (skip for free orders — no cost deducted)
+    if (!isFreeOrder) {
+      let remaining = cost;
+      const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE', [req.user.id, 'delivered']);
+      for (const task of tasks) {
+        if (remaining <= 0) break;
+        const deduct = Math.min(Number(task.amount), remaining);
+        await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
+        const rest = Number(task.amount) - deduct;
+        if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, rest, 'bonus', 'delivered']);
+        remaining -= deduct;
+      }
+      if (remaining > 0.01) {
+        await t.rollback();
+        return res.status(400).json({ error: 'Balance changed during checkout, please try again' });
+      }
     }
 
     // Random sell time: 6-30 hours from now
     const sellHours = 6 + Math.random() * 24;
     const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
 
-    // Increment free order counter INSIDE transaction
-    let freeUsedCount = Number(freeUsed?.value || 0);
+    // Atomically increment free order counter
     if (isFreeOrder) {
-      freeUsedCount += 1;
-      await t.run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [freeKey, String(freeUsedCount), String(freeUsedCount)]);
+      await t.run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?",
+        [freeKey, String(freeUsedCount + 1), String(freeUsedCount + 1)]);
     }
 
-    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES (?, ?, ?, 'holding', ?, ?, ?)", [store.id, req.user.id, cost, sellBy, productName || '', productPrice]);
+    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES (?, ?, ?, 'holding', ?, ?, ?)",
+      [store.id, req.user.id, isFreeOrder ? 0 : cost, sellBy, productName || '', productPrice]);
     await t.commit();
 
-    res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: FREE_SLOTS - freeUsedCount });
+    res.json({ id: result.id, cost: isFreeOrder ? 0 : cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: FREE_SLOTS - freeUsedCount - 1 });
 
-    // Update task progress (async, don't block response)
+    // Update task progress (async)
     const uid = req.user.id;
     updateTaskProgress(uid, 'daily_order_5', 1).catch(()=>{});
     updateTaskProgress(uid, 'first_order', 1).catch(()=>{});
-    if (cost >= 100) updateTaskProgress(uid, 'high_value_order', 1, cost).catch(()=>{});
+    if (productPrice >= 100) updateTaskProgress(uid, 'high_value_order', 1, productPrice).catch(()=>{});
     if (profit > 0) updateTaskProgress(uid, 'profit_streak', 1).catch(()=>{});
   } catch (err) {
     console.error('Buy order failed:', err.code, err.message, err.detail);
@@ -269,14 +282,18 @@ router.post('/check-sell', async (req, res) => {
     const due = await all("SELECT id, amount as cost, user_id, product_price FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
     const settled = [];
     for (const order of due) {
-      const price = Number(order.product_price) || Math.round((Number(order.cost) / 0.85) * 100) / 100;
+      const orderCost = Number(order.cost);
+      const price = Number(order.product_price) || (orderCost > 0 ? Math.round((orderCost / 0.85) * 100) / 100 : 0);
+      const isFreeOrder = orderCost === 0 && price > 0;
       const { profit, totalReturn } = calcProduct(price);
+      // Free orders: user paid $0, only credit the profit (not cost+profit)
+      const creditAmount = isFreeOrder ? Math.round(price * FREE_PROFIT_RATE * 100) / 100 : totalReturn;
       const t = await tx();
       try {
-        await t.run("UPDATE store_orders SET status = 'done', amount = ?, processed_at = NOW() WHERE id = ?", [profit, order.id]);
-        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, totalReturn, 'order_profit', 'delivered']);
+        await t.run("UPDATE store_orders SET status = 'done', amount = ?, processed_at = NOW() WHERE id = ?", [isFreeOrder ? creditAmount : profit, order.id]);
+        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, creditAmount, 'order_profit', 'delivered']);
         await t.commit();
-        settled.push({ id: order.id, cost: Number(order.cost), profit, totalReturn });
+        settled.push({ id: order.id, cost: orderCost, profit: creditAmount, totalReturn: creditAmount });
       } catch (err) {
         console.error('Check-sell order failed:', err.code, err.message, 'order:', JSON.stringify(order));
         await t.rollback().catch(() => {});
@@ -469,10 +486,6 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   const product = products.find(p => p.id === productId);
   if (!product) return res.status(400).json({ error: `Product #${productId} not found. Available: [${products.map(p=>p.id).join(',')}]` });
 
-  const count = await get("SELECT value FROM admin_settings WHERE key = ?", [countKey]);
-  const used = Number(count?.value || 0);
-  if (used >= 5) return res.status(400).json({ error: 'All free orders claimed for today' });
-
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!store) return res.status(400).json({ error: 'Please open a store first' });
 
@@ -480,35 +493,22 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   const profit = Math.round(product.price * 0.05 * 100) / 100;
   const totalReturn = Math.round((cost + profit) * 100) / 100;
 
-  // Check balance
-  const taskBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
-  const available = Number(taskBal?.total || 0);
-  if (available < cost) return res.status(400).json({ error: `Insufficient balance. Need $${cost}, have $${available.toFixed(2)}`, need: cost, have: available, shortage: Math.round((cost - available) * 100) / 100 });
-
-  // Transaction: deduct + create holding + increment per-user counter
+  // Transaction: atomic free-slot check + create holding
   const t = await tx();
   try {
-    let remaining = cost;
-    const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE', [req.user.id, 'delivered']);
-    for (const task of tasks) {
-      if (remaining <= 0) break;
-      const deduct = Math.min(Number(task.amount), remaining);
-      await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
-      const rest = Number(task.amount) - deduct;
-      if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, rest, 'bonus', 'delivered']);
-      remaining -= deduct;
-    }
+    const count = await t.get("SELECT value FROM admin_settings WHERE key = ? FOR UPDATE", [countKey]);
+    const used = Number(count?.value || 0);
+    if (used >= 5) { await t.rollback(); return res.status(400).json({ error: 'All free orders claimed for today' }); }
 
+    // Skip balance deduction for free order — no cost charged
     const sellHours = 6 + Math.random() * 24;
     const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
-    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES (?, ?, ?, 'holding', ?, ?, ?)", [store.id, req.user.id, cost, sellBy, product.name, product.price]);
+    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES (?, ?, 0, 'holding', ?, ?, ?)", [store.id, req.user.id, sellBy, product.name, product.price]);
 
-    // Increment per-user free counter
     await t.run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [countKey, String(used + 1), String(used + 1)]);
-
     await t.commit();
-    try { require('./notifications').notify(req.user.id, '🔥 Free Order Grabbed!', `${product.name} - Cost $${cost}, profit $${profit}`, 'success'); } catch {}
-    res.json({ id: result.id, cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder: true, remaining: Math.max(0, 5 - (used + 1)) });
+    try { require('./notifications').notify(req.user.id, '🔥 Free Order Grabbed!', `${product.name} - Profit $${profit}`, 'success'); } catch {}
+    res.json({ id: result.id, cost: 0, profit, totalReturn, sellBy, status: 'holding', isFreeOrder: true, remaining: Math.max(0, 5 - used - 1) });
   } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 
