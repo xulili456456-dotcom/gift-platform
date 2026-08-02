@@ -16,7 +16,10 @@ export default function HomePage() {
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { loadAll(); }, []);
+  useEffect(() => { loadAll(); const t = setInterval(loadBalance, 15000); return () => clearInterval(t); }, []);
+  const loadBalance = async () => {
+    try { const { data } = await client.get('/store/earnings-stats'); setBalance(data.balance || 0); } catch {}
+  };
   const loadAll = async () => {
     try {
       const [g, s, c, b] = await Promise.all([
