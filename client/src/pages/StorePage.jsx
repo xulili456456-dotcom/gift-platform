@@ -401,31 +401,26 @@ export default function StorePage() {
   const [freeProducts, setFreeProducts] = useState([]);
   const [freeRemaining, setFreeRemaining] = useState(0);
   const [claimedNames, setClaimedNames] = useState([]);
-  const [freeLoaded, setFreeLoaded] = useState(false);
+  const [freeRenderKey, setFreeRenderKey] = useState(0); // force re-render when free data loads
+  const freeLoadedRef = useRef(false);
   const loadFreeProducts = useCallback(async () => {
     try {
       const { data } = await client.get('/store/free-products');
       setFreeProducts(data.products || []);
       setFreeRemaining(data.remaining);
       setClaimedNames(prev => prev.length === 0 ? (data.claimedNames || []) : prev);
-    } catch(e) {
-      console.error('Free products load failed:', e.message);
-    } finally {
-      setFreeLoaded(true);
-    }
+      freeLoadedRef.current = true;
+      setFreeRenderKey(k => k + 1);
+    } catch(e) { /* ignore */ }
   }, []);
   useEffect(() => { loadFreeProducts(); }, [loadFreeProducts]);
-  useEffect(() => { if (status?.store?.doneToday > 0) { loadFreeProducts(); } }, [status?.store?.doneToday, loadFreeProducts]);
-  // Also read free data from status API (available immediately with store status)
+  // Pick up freeRemaining from status immediately
   useEffect(() => {
-    if (status?.store?.freeProductNames) {
-      setFreeRemaining(status.store.freeRemaining || 0);
-      if (status.store.freeProductNames.length > 0 && freeProducts.length === 0) {
-        setFreeProducts(status.store.freeProductNames.map(n => ({ name: n })));
-      }
-      setFreeLoaded(true);
+    if (status?.store?.freeRemaining !== undefined) {
+      setFreeRemaining(status.store.freeRemaining);
+      if (!freeLoadedRef.current) { freeLoadedRef.current = true; setFreeRenderKey(k => k + 1); }
     }
-  }, [status?.store?.freeRemaining, status?.store?.freeProductNames]);
+  }, [status?.store?.freeRemaining]);
 
   var daySeed = parseInt(new Date().toISOString().slice(0,10).replace(/-/g,''),10);
   const freeProductNames = useMemo(() => freeProducts.map(fp => fp.name), [freeProducts]);
@@ -753,7 +748,7 @@ export default function StorePage() {
       <div className="flex-1 overflow-y-auto px-4 pt-2">
         <div className="flex flex-col gap-3">
           {products.map(p => {
-            const isFreeProduct = freeLoaded && freeProductNames.includes(p.name);
+            const isFreeProduct = freeLoadedRef.current && freeProductNames.includes(p.name);
             const isAlreadyClaimed = isFreeProduct && claimedNames.includes(p.name);
             const isFreeDisabled = isFreeProduct && (freeRemaining <= 0 || isAlreadyClaimed);
             return (
