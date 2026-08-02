@@ -10,7 +10,12 @@ const TYPE_LABELS = {
   task_reward: 'Task Reward',
   commission: 'Referral Commission',
   checkin: 'Daily Check-in',
-  bonus: 'Deposit / Adjustment',
+  deposit: 'Deposit Confirmed',
+  deposit_return: 'Deposit Returned',
+  agent_reward: 'Agent Reward',
+  staking_refund: 'Staking Refund',
+  balance_split: 'Balance Split',
+  bonus: 'Legacy Balance',
   ad: 'Ad Reward',
   admin_adjust: 'Admin Adjustment',
 };

@@ -8,9 +8,14 @@ const TYPE_COLORS = {
   task_reward: { color: '#4C6EF5', bg: '#EEF2FF' },
   commission: { color: '#FF5000', bg: '#FFF5F0' },
   checkin: { color: '#F59E0B', bg: '#FFFDEB' },
+  deposit: { color: '#20C997', bg: '#E6FCF5' },
+  deposit_return: { color: '#339AF0', bg: '#E7F5FF' },
+  agent_reward: { color: '#F06595', bg: '#FFF0F6' },
+  staking_refund: { color: '#7950F2', bg: '#F3F0FF' },
+  balance_split: { color: '#868E96', bg: '#F1F3F5' },
   bonus: { color: '#845EF7', bg: '#F3F0FF' },
-  ad: { color: '#20C997', bg: '#E6FCF5' },
-  admin_adjust: { color: '#F06595', bg: '#FFF0F6' },
+  ad: { color: '#FCC419', bg: '#FFF9DB' },
+  admin_adjust: { color: '#E03131', bg: '#FFF0F0' },
 };
 
 export default function TransactionsPage() {
@@ -127,6 +132,11 @@ export default function TransactionsPage() {
                      tx.type === 'task_reward' ? '🎯' :
                      tx.type === 'commission' ? '🔗' :
                      tx.type === 'checkin' ? '📅' :
+                     tx.type === 'deposit' ? '💵' :
+                     tx.type === 'deposit_return' ? '🔓' :
+                     tx.type === 'agent_reward' ? '🤝' :
+                     tx.type === 'staking_refund' ? '🔒' :
+                     tx.type === 'balance_split' ? '🔄' :
                      tx.type === 'bonus' ? '💰' :
                      tx.type === 'ad' ? '📢' : '⚙️'}
                   </div>

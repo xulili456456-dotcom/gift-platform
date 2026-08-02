@@ -224,7 +224,7 @@ router.post('/orders/process', async (req, res) => {
         const deduct = Math.min(Number(task.amount), remaining);
         await t.run('UPDATE task_earnings SET status = $1 WHERE id = $2', ['withdrawn', task.id]);
         const rest = Number(task.amount) - deduct;
-        if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES ($1, $2, $3, $4)', [req.user.id, rest, 'bonus', 'delivered']);
+        if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES ($1, $2, $3, $4)', [req.user.id, rest, 'balance_split', 'delivered']);
         remaining -= deduct;
       }
       if (remaining > 0.01) { await t.rollback(); return res.status(400).json({ error: 'Balance changed during checkout, please try again' }); }
@@ -564,7 +564,7 @@ router.post('/deposit', authMiddleware, async (req, res) => {
       const deduct = Math.min(Number(task.amount), remaining);
       await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
       const rest = Number(task.amount) - deduct;
-      if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, rest, 'bonus', 'delivered']);
+      if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, rest, 'balance_split', 'delivered']);
       remaining -= deduct;
     }
     // Atomic deposit increment — avoids lost-update race
@@ -605,7 +605,7 @@ router.post('/withdraw-deposit', authMiddleware, async (req, res) => {
       });
     }
 
-    await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, actualWithdraw, 'bonus', 'delivered']);
+    await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, actualWithdraw, 'deposit_return', 'delivered']);
     await t.run('UPDATE stores SET deposit = deposit - ? WHERE id = ?', [actualWithdraw, store.id]);
     await t.commit();
     try { require('./notifications').notify(req.user.id, '🔓 Deposit Returned', `$${actualWithdraw} returned to balance`, 'info'); } catch {}

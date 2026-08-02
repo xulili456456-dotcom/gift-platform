@@ -53,7 +53,7 @@ router.post('/', authMiddleware, async (req, res) => {
       const rest = Number(task.amount) - deduct;
       if (rest > 0.001) {
         await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
-          [req.user.id, rest, 'bonus', 'delivered']);
+          [req.user.id, rest, 'balance_split', 'delivered']);
       }
       remaining -= deduct;
     }
@@ -98,7 +98,7 @@ router.post('/unlock', authMiddleware, async (req, res) => {
     // Return refund to balance
     if (refund > 0) {
       await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
-        [req.user.id, refund, 'bonus', 'delivered']);
+        [req.user.id, refund, 'staking_refund', 'delivered']);
     }
 
     // Update status instead of deleting

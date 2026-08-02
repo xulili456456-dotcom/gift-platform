@@ -56,7 +56,7 @@ router.put('/:id/confirm', authMiddleware, adminMiddleware, async (req, res) => 
     if (result.rowCount === 0) { await t.rollback(); return res.status(400).json({ error: 'Already confirmed' }); }
 
     await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
-      [d.user_id, Number(d.amount), 'bonus', 'delivered']);
+      [d.user_id, Number(d.amount), 'deposit', 'delivered']);
     await t.commit();
     try { require('./notifications').notify(d.user_id, '💵 Deposit Confirmed', `$${Number(d.amount)} has been credited to your account`, 'success'); } catch {}
     res.json({ ok: true, message: 'Deposit confirmed' });

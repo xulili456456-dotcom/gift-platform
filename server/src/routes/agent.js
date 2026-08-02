@@ -22,7 +22,7 @@ router.post('/balance', async (req, res) => {
     const t = await tx();
     try {
       if (amount > 0) {
-        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, amount, 'bonus', 'delivered']);
+        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, amount, 'agent_reward', 'delivered']);
       } else {
         let remaining = Math.abs(amount);
         const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE', [target_user_id, 'delivered']);
@@ -31,7 +31,7 @@ router.post('/balance', async (req, res) => {
           const deduct = Math.min(Number(task.amount), remaining);
           await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
           const rest = Number(task.amount) - deduct;
-          if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, rest, 'bonus', 'delivered']);
+          if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [target_user_id, rest, 'balance_split', 'delivered']);
           remaining -= deduct;
         }
         if (remaining > 0.01) { await t.rollback(); return res.status(400).json({ error: `Insufficient balance. Shortfall: $${remaining.toFixed(2)}` }); }
