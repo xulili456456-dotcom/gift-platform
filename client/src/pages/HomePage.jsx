@@ -101,7 +101,7 @@ export default function HomePage() {
       <div style={{margin:'12px 12px 0',background:'linear-gradient(135deg,#0f0f0f,#1a1a2e)',borderRadius:14,padding:16,color:'#fff'}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
           <span style={{fontSize:13,fontWeight:700}}>💰 Profit Overview</span>
-          <span style={{fontSize:10,color:'#666'}}>{new Date().toLocaleDateString()}</span>
+          <span onClick={() => navigate('/mine/transactions')} style={{fontSize:10,color:'#4FC3F7',cursor:'pointer'}}>View Details ›</span>
         </div>
         <div style={{display:'flex',gap:8}}>
           <div style={{flex:1,background:'rgba(255,255,255,0.06)',borderRadius:10,padding:'8px 6px',overflow:'hidden'}}>

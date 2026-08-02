@@ -6,7 +6,7 @@ import { giftsApi } from '../api/gifts';
 import { referralApi } from '../api/referral';
 import client from '../api/client';
 import useAuthStore from '../store/authStore';
-import { Users, CreditCard, Bell, Globe, Lock, Shield, ChevronRight, Info, ArrowUpRight, MessageCircle, Camera, Store } from 'lucide-react';
+import { Users, CreditCard, Bell, Globe, Lock, Shield, ChevronRight, Info, ArrowUpRight, MessageCircle, Camera, Store, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const langs = [
@@ -96,6 +96,7 @@ export default function MinePage() {
         <MenuRow icon={<Users size={17} color="#4C6EF5"/>} iconBg="#EEF2FF" label={t('mine.myTeam')} desc={t('mine.myTeamDesc')} onClick={()=>navigate('/mine/team')}/>
         <MenuRow icon={<Store size={17} color="#FF5000"/>} iconBg="#FFF5F0" label={t('mine.myStore')} desc={t('mine.myStoreDesc')} onClick={()=>navigate('/store')}/>
         <MenuRow icon={<ArrowUpRight size={17} color="#00A86B"/>} iconBg="#E8F5E9" label="Trading History" desc="View your orders & holdings" onClick={()=>navigate('/store/funds')}/>
+        <MenuRow icon={<FileText size={17} color="#845EF7"/>} iconBg="#F3F0FF" label="Transaction History" desc="All money in & out" onClick={()=>navigate('/mine/transactions')}/>
       </div>
 
       {/* Account Group */}
