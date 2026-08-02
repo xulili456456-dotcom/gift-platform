@@ -474,6 +474,8 @@ export default function StorePage() {
       const d = err.response?.data;
       if (d?.depositRequired) { setBuyConfirm(null); setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, isDeposit: true, balance: d.balance }); }
       else if (d?.shortage) { setBuyConfirm(null); setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, balance: d.balance, deposit: d.deposit }); }
+      else if (d?.freeSlotsExhausted) { setFreeRemaining(0); setBuyConfirm(null); toast.error('All 5 free orders used today'); }
+      else if (d?.productAlreadyClaimed) { if (buyConfirm) setClaimedNames(prev => [...prev, buyConfirm.name]); setBuyConfirm(null); toast.error(d.error); }
       else toast.error(d?.error || t('common.operationFailed'));
     }
     setBuying(false);
