@@ -4,6 +4,7 @@ import useAuthStore from '../store/authStore';
 import { giftsApi } from '../api/gifts';
 import { referralApi } from '../api/referral';
 import { claimsApi } from '../api/claims';
+import client from '../api/client';
 import toast from 'react-hot-toast';
 
 export default function HomePage() {
@@ -12,19 +13,23 @@ export default function HomePage() {
   const [gifts, setGifts] = useState([]);
   const [stats, setStats] = useState(null);
   const [claims, setClaims] = useState([]);
+  const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { loadAll(); }, []);
   const loadAll = async () => {
     try {
-      const [g, s, c] = await Promise.all([giftsApi.list(), referralApi.getStats(), claimsApi.list()]);
+      const [g, s, c, b] = await Promise.all([
+        giftsApi.list(), referralApi.getStats(), claimsApi.list(),
+        client.get('/store/earnings-stats').catch(() => ({ data: { balance: 0 } }))
+      ]);
       setGifts(g.data); setStats(s.data); setClaims(c.data);
+      setBalance(b.data?.balance || 0);
     } catch { toast.error('Failed to load'); }
     finally { setLoading(false); }
   };
 
   const effective = stats?.effective_invites || 0;
-  const totalEarned = claims.filter(c => c.status !== 'rejected').reduce((s, c) => s + (c.value || 0), 0);
   const totalInvites = stats?.total_invites || 0;
   const referralCode = stats?.referral_code || (user && user.referral_code) || '------';
 
@@ -53,12 +58,12 @@ export default function HomePage() {
           </div>
           <div style={{flex:1,minWidth:0}}>
             <div style={{fontSize:11,color:'#aaa'}}>Total Balance</div>
-            <div style={{fontSize:22,fontWeight:800}}>${totalEarned.toFixed(2)}</div>
+            <div style={{fontSize:22,fontWeight:800}}>${balance.toFixed(2)}</div>
           </div>
         </div>
         <div style={{display:'flex',gap:8}}>
           <div onClick={() => navigate('/mine/wallet')} style={{flex:1,background:'#1a1a1a',borderRadius:10,padding:8,textAlign:'center',cursor:'pointer'}}>
-            <div style={{fontSize:14,fontWeight:700,color:'#FF5000'}}>${totalEarned.toFixed(0)}</div>
+            <div style={{fontSize:14,fontWeight:700,color:'#FF5000'}}>${balance.toFixed(0)}</div>
             <div style={{fontSize:9,color:'#888'}}>Total Earned</div>
           </div>
           <div onClick={() => navigate('/store/funds')} style={{flex:1,background:'#1a1a1a',borderRadius:10,padding:8,textAlign:'center',cursor:'pointer'}}>
@@ -81,7 +86,7 @@ export default function HomePage() {
         <div style={{display:'flex',gap:12}}>
           <div style={{flex:1}}>
             <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>Total Earned</div>
-            <div style={{fontSize:20,fontWeight:800,color:'#00A86B'}}>${totalEarned.toFixed(2)}</div>
+            <div style={{fontSize:20,fontWeight:800,color:'#00A86B'}}>${balance.toFixed(2)}</div>
             <div style={{fontSize:9,color:'#999'}}>all time</div>
           </div>
           <div style={{flex:1,textAlign:'center'}}>
