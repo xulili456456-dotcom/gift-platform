@@ -416,7 +416,7 @@ export default function StorePage() {
     }
   }, [status?.store?.freeRemaining, status?.store?.freeProductNames]);
 
-  var daySeed = parseInt(new Date().toISOString().slice(0,10).replace(/-/g,''),10);
+  var daySeed = new Date().toISOString().slice(0,10).split('-').reduce((s,x) => s + parseInt(x), 0);
   const freeProductNames = useMemo(() => freeProducts.map(fp => fp.name), [freeProducts]);
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
