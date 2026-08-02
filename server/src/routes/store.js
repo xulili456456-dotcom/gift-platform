@@ -335,7 +335,12 @@ router.get('/earnings-stats', async (req, res) => {
     [req.user.id, 'delivered']
   );
   const allTimeEarned = await get(
-    "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status IN ('delivered','withdrawn')",
+    "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status IN ('delivered','withdrawn') AND amount > 0",
+    [req.user.id]
+  );
+  // Net profit: income from order_profit + task_reward + commission (exclude admin_adjust)
+  const netProfit = await get(
+    "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status IN ('delivered','withdrawn') AND amount > 0 AND type IN ('order_profit','task_reward','commission')",
     [req.user.id]
   );
   const bal = Number(balance?.total || 0);
@@ -344,6 +349,7 @@ router.get('/earnings-stats', async (req, res) => {
   res.json({
     todayProfit: Number(todayProfit?.total || 0),
     totalProfit: Number(allTimeEarned?.total || 0),
+    netProfit: Number(netProfit?.total || 0),
     totalOrders: Number(totalOrders?.c || 0),
     balance: bal,
     tomorrowEstimate,
