@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/auth');
-const { all, get, run, tx } = require('../db/database');
+const { all, get, run, tx, insert } = require('../db/database');
 
 const router = Router();
 router.use(authMiddleware);
@@ -30,7 +30,6 @@ router.get('/', async (req, res) => {
         [userId, task.task_type, key]
       );
       if (!progress) {
-        const { insert } = require('../db/database');
         const newP = await insert('INSERT INTO task_progress (user_id, task_type, current_count, current_value, period_key) VALUES (?,?,0,0,?)',
           [userId, task.task_type, key]);
         progress = { id: newP.id, current_count: 0, current_value: 0, completed: false, claimed: false };
@@ -112,7 +111,6 @@ async function updateTaskProgress(userId, taskType, increment, valueIncrement = 
       [userId, taskType, key]
     );
     if (!progress) {
-      const { insert } = require('../db/database');
       const result = await insert('INSERT INTO task_progress (user_id, task_type, current_count, current_value, period_key) VALUES (?,?,?,?,?)',
         [userId, taskType, increment, valueIncrement, key]);
       progress = { id: result.id, current_count: increment, current_value: valueIncrement };
@@ -133,8 +131,7 @@ async function updateTaskProgress(userId, taskType, increment, valueIncrement = 
   }
 }
 
-// ===== CHECK-IN (preserved from original) =====
-const { insert } = require('../db/database');
+// ===== CHECK-IN =====
 const CHECKIN_REWARDS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
 
 function calcStreak(rows, skipToday = false) {
