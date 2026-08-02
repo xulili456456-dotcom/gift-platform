@@ -27,6 +27,7 @@ export default function TransactionsPage() {
   const [typeFilter, setTypeFilter] = useState('');
   const [types, setTypes] = useState([]);
   const [summary, setSummary] = useState({ balance: 0, netProfit: 0 });
+  const [expandedId, setExpandedId] = useState(null);
 
   const loadData = useCallback(async (p = 1) => {
     setLoading(true);
@@ -112,44 +113,97 @@ export default function TransactionsPage() {
           <>
             {transactions.map((tx, i) => {
               const tc = TYPE_COLORS[tx.type] || { color: '#666', bg: '#f5f5f5' };
+              const isExpanded = expandedId === tx.id;
+              const hasDetail = tx.detail && (tx.detail.productName || tx.detail.taskTitle || tx.detail.network);
+              const isFirst = i === 0, isLast = i === transactions.length - 1;
+              const radius = isFirst && isLast ? 14 : isFirst ? '14px 14px 0 0' : isLast && !isExpanded ? '0 0 14px 14px' : 0;
               return (
-                <div key={tx.id} style={{
-                  background:'#fff', borderRadius: i === 0 ? '14px 14px 0 0' : 0,
-                  borderBottom: i < transactions.length - 1 ? '1px solid #f0f0f0' : 'none',
-                  borderRadius2: i === transactions.length - 1 ? '0 0 14px 14px' : 0,
-                  padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10,
-                  borderRadius: i === 0 && transactions.length === 1 ? 14
-                    : i === 0 ? '14px 14px 0 0'
-                    : i === transactions.length - 1 ? '0 0 14px 14px'
-                    : 0,
-                }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: 18, background: tc.bg,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 14, flexShrink: 0,
+                <div key={tx.id}>
+                  <div onClick={() => setExpandedId(isExpanded ? null : tx.id)} style={{
+                    background:'#fff', borderBottom: isExpanded ? 'none' : (isLast ? 'none' : '1px solid #f0f0f0'),
+                    padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10,
+                    borderRadius: radius, cursor: hasDetail ? 'pointer' : 'default',
                   }}>
-                    {tx.type === 'order_profit' ? '📦' :
-                     tx.type === 'task_reward' ? '🎯' :
-                     tx.type === 'commission' ? '🔗' :
-                     tx.type === 'checkin' ? '📅' :
-                     tx.type === 'deposit' ? '💵' :
-                     tx.type === 'deposit_return' ? '🔓' :
-                     tx.type === 'agent_reward' ? '🤝' :
-                     tx.type === 'staking_refund' ? '🔒' :
-                     tx.type === 'balance_split' ? '🔄' :
-                     tx.type === 'bonus' ? '💰' :
-                     tx.type === 'ad' ? '📢' : '⚙️'}
-                  </div>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:12,fontWeight:600,color:'#333'}}>{tx.typeLabel}</div>
-                    <div style={{fontSize:10,color:'#999'}}>{formatDate(tx.createdAt)}</div>
-                  </div>
-                  <div style={{textAlign:'right'}}>
-                    <div style={{fontSize:14,fontWeight:700,color:tc.color}}>
-                      {tx.amount >= 0 ? '+' : ''}{tx.amount.toFixed(2)}
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 18, background: tc.bg,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 14, flexShrink: 0,
+                    }}>
+                      {tx.type === 'order_profit' ? '📦' :
+                       tx.type === 'task_reward' ? '🎯' :
+                       tx.type === 'commission' ? '🔗' :
+                       tx.type === 'checkin' ? '📅' :
+                       tx.type === 'deposit' ? '💵' :
+                       tx.type === 'deposit_return' ? '🔓' :
+                       tx.type === 'agent_reward' ? '🤝' :
+                       tx.type === 'staking_refund' ? '🔒' :
+                       tx.type === 'balance_split' ? '🔄' :
+                       tx.type === 'bonus' ? '💰' :
+                       tx.type === 'ad' ? '📢' : '⚙️'}
                     </div>
-                    <div style={{fontSize:9,color:'#bbb'}}>Bal: ${tx.balance.toFixed(2)}</div>
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{fontSize:12,fontWeight:600,color:'#333'}}>
+                        {tx.typeLabel}
+                        {hasDetail && <span style={{fontSize:10,color:'#bbb',marginLeft:4}}>{isExpanded ? '▲' : '▼'}</span>}
+                      </div>
+                      <div style={{fontSize:10,color:'#999'}}>{formatDate(tx.createdAt)}</div>
+                    </div>
+                    <div style={{textAlign:'right'}}>
+                      <div style={{fontSize:14,fontWeight:700,color:tc.color}}>
+                        {tx.amount >= 0 ? '+' : ''}{tx.amount.toFixed(2)}
+                      </div>
+                      <div style={{fontSize:9,color:'#bbb'}}>Bal: ${tx.balance.toFixed(2)}</div>
+                    </div>
                   </div>
+
+                  {/* Expanded Detail Panel */}
+                  {isExpanded && tx.detail && (
+                    <div style={{
+                      background: '#fafafa', borderBottomLeftRadius: isLast ? 14 : 0,
+                      borderBottomRightRadius: isLast ? 14 : 0,
+                      borderBottom: isLast ? 'none' : '1px solid #f0f0f0',
+                      padding: '8px 14px 12px 60px',
+                    }}>
+                      {tx.type === 'order_profit' && tx.detail.productName && (
+                        <div style={{fontSize:11,color:'#555',lineHeight:'18px'}}>
+                          <div><b>Product:</b> {tx.detail.productName}</div>
+                          <div><b>Price:</b> ${(tx.detail.productPrice || 0).toFixed(2)} · <b>Held:</b> {tx.detail.holdHours || '?'}h</div>
+                          <div><b>Profit Rate:</b> <span style={{color:'#00A86B',fontWeight:600}}>{tx.detail.profitRate}%</span></div>
+                          {tx.detail.buyTime && <div style={{color:'#999'}}>Bought: {formatDate(tx.detail.buyTime)}</div>}
+                          {tx.detail.sellTime && <div style={{color:'#999'}}>Sold: {formatDate(tx.detail.sellTime)}</div>}
+                        </div>
+                      )}
+                      {tx.type === 'commission' && tx.detail.productName && (
+                        <div style={{fontSize:11,color:'#555',lineHeight:'18px'}}>
+                          <div><b>Product:</b> {tx.detail.productName}</div>
+                          <div><b>Price:</b> ${(tx.detail.productPrice || 0).toFixed(2)} · <b>Rate:</b> {tx.detail.commissionRate || '3%'}</div>
+                          <div><b>Commission Earned:</b> <span style={{color:'#FF5000',fontWeight:600}}>+${(tx.detail.commission || tx.amount).toFixed(2)}</span></div>
+                        </div>
+                      )}
+                      {tx.type === 'deposit' && tx.detail.network && (
+                        <div style={{fontSize:11,color:'#555',lineHeight:'18px'}}>
+                          <div><b>Network:</b> {tx.detail.network.toUpperCase()}</div>
+                          {tx.detail.txHash && <div style={{wordBreak:'break-all'}}><b>TX:</b> <span style={{color:'#999',fontSize:9}}>{tx.detail.txHash}</span></div>}
+                        </div>
+                      )}
+                      {tx.type === 'task_reward' && tx.detail.taskTitle && (
+                        <div style={{fontSize:11,color:'#555',lineHeight:'18px'}}>
+                          <div><b>Task:</b> {tx.detail.taskTitle}</div>
+                        </div>
+                      )}
+                      {(tx.type === 'deposit_return' || tx.type === 'staking_refund') && (
+                        <div style={{fontSize:11,color:'#555'}}>
+                          {tx.type === 'deposit_return' ? 'Store deposit returned to balance' : 'Staking plan unlocked, funds returned to balance'}
+                        </div>
+                      )}
+                      {tx.type === 'checkin' && (
+                        <div style={{fontSize:11,color:'#555'}}>Daily check-in streak reward</div>
+                      )}
+                      {tx.type === 'balance_split' && (
+                        <div style={{fontSize:11,color:'#999'}}>System remainder from transaction balance split</div>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
