@@ -334,13 +334,16 @@ router.get('/earnings-stats', async (req, res) => {
     "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
     [req.user.id, 'delivered']
   );
-  // Estimate tomorrow's potential: current balance * 1.15 (compound)
+  const allTimeEarned = await get(
+    "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status IN ('delivered','withdrawn')",
+    [req.user.id]
+  );
   const bal = Number(balance?.total || 0);
   const tomorrowEstimate = Math.round(bal * 1.15 * 100) / 100;
 
   res.json({
     todayProfit: Number(todayProfit?.total || 0),
-    totalProfit: Number(totalProfit?.total || 0),
+    totalProfit: Number(allTimeEarned?.total || 0),
     totalOrders: Number(totalOrders?.c || 0),
     balance: bal,
     tomorrowEstimate,
