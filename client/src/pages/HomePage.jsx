@@ -78,7 +78,7 @@ export default function HomePage() {
         </div>
         <div style={{display:'flex',gap:8}}>
           <div onClick={() => navigate('/mine/wallet')} style={{flex:1,background:'#1a1a1a',borderRadius:10,padding:8,textAlign:'center',cursor:'pointer'}}>
-            <div style={{fontSize:14,fontWeight:700,color:'#00A86B'}}>${netProfit.toFixed(0)}</div>
+            <div style={{fontSize:14,fontWeight:700,color:'#00A86B'}}>${netProfit.toFixed(2)}</div>
             <div style={{fontSize:9,color:'#888'}}>Net Profit</div>
           </div>
           <div onClick={() => navigate('/store/funds')} style={{flex:1,background:'#1a1a1a',borderRadius:10,padding:8,textAlign:'center',cursor:'pointer'}}>
@@ -92,27 +92,24 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ===== TODAY OVERVIEW ===== */}
-      <div style={{margin:'12px 12px 0',background:'linear-gradient(135deg,#FFF5F0,#FFEBE0)',borderRadius:14,padding:14}}>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
-          <span style={{fontSize:11,color:'#999'}}>Today's Performance</span>
-          <span style={{fontSize:10,color:'#bbb'}}>{new Date().toLocaleDateString()}</span>
+      {/* ===== PROFIT OVERVIEW ===== */}
+      <div style={{margin:'12px 12px 0',background:'linear-gradient(135deg,#0f0f0f,#1a1a2e)',borderRadius:14,padding:16,color:'#fff'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+          <span style={{fontSize:13,fontWeight:700}}>💰 Profit Overview</span>
+          <span style={{fontSize:10,color:'#666'}}>{new Date().toLocaleDateString()}</span>
         </div>
         <div style={{display:'flex',gap:12}}>
-          <div style={{flex:1}}>
-            <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>Total Earned (all time)</div>
-            <div style={{fontSize:20,fontWeight:800,color:'#00A86B'}}>${totalEarned.toFixed(2)}</div>
-            <div style={{fontSize:9,color:'#999'}}>all time</div>
+          <div style={{flex:1,background:'rgba(255,255,255,0.06)',borderRadius:10,padding:10}}>
+            <div style={{fontSize:9,color:'#888',marginBottom:2}}>Today's Profit</div>
+            <div style={{fontSize:22,fontWeight:800,color:'#00A86B'}}>${todayEarned.toFixed(2)}</div>
           </div>
-          <div style={{flex:1,textAlign:'center'}}>
-            <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>Effective Invites</div>
-            <div style={{fontSize:20,fontWeight:800,color:'#0f0f0f'}}>{effective}</div>
-            <div style={{fontSize:9,color:'#999'}}>{totalInvites} total</div>
+          <div style={{flex:1,background:'rgba(255,255,255,0.06)',borderRadius:10,padding:10}}>
+            <div style={{fontSize:9,color:'#888',marginBottom:2}}>Total Profit</div>
+            <div style={{fontSize:22,fontWeight:800,color:'#4FC3F7'}}>${netProfit.toFixed(2)}</div>
           </div>
-          <div style={{flex:1,textAlign:'right'}}>
-            <div style={{fontSize:9,color:'#bbb',marginBottom:2}}>Gifts Available</div>
-            <div style={{fontSize:20,fontWeight:800,color:'#FF5000'}}>{gifts.length}</div>
-            <div style={{fontSize:9,color:'#999'}}>to claim</div>
+          <div style={{flex:1,background:'rgba(255,255,255,0.06)',borderRadius:10,padding:10}}>
+            <div style={{fontSize:9,color:'#888',marginBottom:2}}>Available</div>
+            <div style={{fontSize:22,fontWeight:800,color:'#FFD54F'}}>${balance.toFixed(2)}</div>
           </div>
         </div>
       </div>
