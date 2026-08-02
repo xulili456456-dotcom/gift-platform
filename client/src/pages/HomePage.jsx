@@ -19,7 +19,8 @@ export default function HomePage() {
   const [todayEarned, setTodayEarned] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { loadAll(); const t = setInterval(loadBalance, 15000); return () => clearInterval(t); }, []);
+  useEffect(() => { loadAll(); const t = setInterval(loadBalance, 15000); const s = setInterval(checkSell, 60000); return () => { clearInterval(t); clearInterval(s); }; }, []);
+  const checkSell = async () => { try { await client.post('/store/check-sell'); loadBalance(); } catch {} };
   const loadBalance = async () => {
     try {
       const { data } = await client.get('/store/earnings-stats');
@@ -31,6 +32,7 @@ export default function HomePage() {
   };
   const loadAll = async () => {
     try {
+      await client.post('/store/check-sell').catch(() => {});
       const [g, s, c, b] = await Promise.all([
         giftsApi.list(), referralApi.getStats(), claimsApi.list(),
         client.get('/store/earnings-stats').catch(() => ({ data: { balance: 0, totalProfit: 0, netProfit: 0, todayProfit: 0 } }))
