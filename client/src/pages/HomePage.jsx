@@ -142,7 +142,7 @@ export default function HomePage() {
         <div style={{marginBottom:16}}>
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
             <div style={{fontSize:13,fontWeight:700,color:'#0f0f0f'}}>📊 Active Holdings</div>
-            <span onClick={() => navigate('/store')} style={{fontSize:11,color:'#FF5000',fontWeight:600,cursor:'pointer'}}>Browse Store ›</span>
+            <span onClick={() => navigate('/store/funds')} style={{fontSize:11,color:'#FF5000',fontWeight:600,cursor:'pointer'}}>View All ›</span>
           </div>
           {holdings.length === 0 ? (
             <div style={{textAlign:'center',padding:24,background:'#fff',borderRadius:14}}>
@@ -179,7 +179,7 @@ export default function HomePage() {
                 </div>
               ))}
               {holdings.length > 5 && (
-                <div onClick={() => navigate('/store')} style={{textAlign:'center',padding:10,color:'#FF5000',fontSize:11,fontWeight:600,cursor:'pointer',borderTop:'1px solid #f0f0f0'}}>
+                <div onClick={() => navigate('/store/funds')} style={{textAlign:'center',padding:10,color:'#FF5000',fontSize:11,fontWeight:600,cursor:'pointer',borderTop:'1px solid #f0f0f0'}}>
                   +{holdings.length - 5} more ›
                 </div>
               )}
