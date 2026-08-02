@@ -457,9 +457,12 @@ export default function StorePage() {
     setBuying(true);
     try {
       const { data } = await client.post('/store/orders/process', { productPrice: buyConfirm.price, productName: buyConfirm.name });
-      toast.success(`${t('store.boughtMsg')} ${new Date(data.sellBy).toLocaleDateString()}`);
-      // Instant balance update
-      setStatus(prev => prev?.store ? { ...prev, store: { ...prev.store, balance: prev.store.balance - buyConfirm.costPrice, doneToday: prev.store.doneToday + 1 } } : prev);
+      toast.success(data.isFreeOrder
+        ? `🎁 Free order! +$${data.profit.toFixed(2)} profit (${data.freeRemaining} free left)`
+        : `🛒 Bought! Cost $${data.cost.toFixed(2)} · Sell by ${new Date(data.sellBy).toLocaleDateString()}`);
+      // Instant balance + free counter update
+      setStatus(prev => prev?.store ? { ...prev, store: { ...prev.store, balance: prev.store.balance - (data.isFreeOrder ? 0 : data.cost), doneToday: prev.store.doneToday + 1, freeRemaining: data.freeRemaining ?? prev.store.freeRemaining } } : prev);
+      setFreeRemaining(data.freeRemaining ?? freeRemaining);
       setBuyConfirm(null);
       loadStatus(); loadHoldings(); loadEarnings();
     } catch (err) {
