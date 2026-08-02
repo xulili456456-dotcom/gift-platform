@@ -497,18 +497,26 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   const totalReturn = Math.round((cost + profit) * 100) / 100;
 
   // Transaction: atomic free-slot check + create holding
+  const lockKey = parseInt(req.user.id) + 2000000;
+  const productKey = 'free_claim_prod_' + req.user.id + '_' + today + '_' + productId;
   const t = await tx();
   try {
-    const count = await t.get("SELECT value FROM admin_settings WHERE key = ? FOR UPDATE", [countKey]);
+    await t.run("SELECT pg_advisory_xact_lock($1)", [lockKey]);
+    await t.run("INSERT INTO admin_settings (key, value) VALUES ($1, '0') ON CONFLICT (key) DO NOTHING", [countKey]);
+    await t.run("INSERT INTO admin_settings (key, value) VALUES ($1, '0') ON CONFLICT (key) DO NOTHING", [productKey]);
+
+    const count = await t.get("SELECT value FROM admin_settings WHERE key = $1", [countKey]);
+    const prodCount = await t.get("SELECT value FROM admin_settings WHERE key = $1", [productKey]);
     const used = Number(count?.value || 0);
     if (used >= 5) { await t.rollback(); return res.status(400).json({ error: 'All free orders claimed for today' }); }
+    if (Number(prodCount?.value || 0) >= 1) { await t.rollback(); return res.status(400).json({ error: 'You already claimed this product today' }); }
 
-    // Skip balance deduction for free order — no cost charged
     const sellHours = 6 + Math.random() * 24;
     const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
-    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES (?, ?, 0, 'holding', ?, ?, ?)", [store.id, req.user.id, sellBy, product.name, product.price]);
+    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES ($1, $2, 0, 'holding', $3, $4, $5)", [store.id, req.user.id, sellBy, product.name, product.price]);
 
-    await t.run("INSERT INTO admin_settings (key, value) VALUES (?, ?) ON CONFLICT (key) DO UPDATE SET value = ?", [countKey, String(used + 1), String(used + 1)]);
+    await t.run("UPDATE admin_settings SET value = $1 WHERE key = $2", [String(used + 1), countKey]);
+    await t.run("UPDATE admin_settings SET value = '1' WHERE key = $1", [productKey]);
     await t.commit();
     try { require('./notifications').notify(req.user.id, '🔥 Free Order Grabbed!', `${product.name} - Profit $${profit}`, 'success'); } catch {}
     res.json({ id: result.id, cost: 0, profit, totalReturn, sellBy, status: 'holding', isFreeOrder: true, remaining: Math.max(0, 5 - used - 1) });
