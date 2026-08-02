@@ -495,10 +495,10 @@ router.get('/free-products', authMiddleware, async (req, res) => {
     products = products.map(p => ({ id: p.id, name: p.name, price: p.price, img: p.img }));
   }
   if (!products.length) {
-    // Generate 5 random products with price ≤ $100
+    // Generate 5 random products with cost ≤ $50 (price ≤ $50 ensures this)
     try {
       const catalog = require('../data/products.json');
-      const eligible = catalog.filter(p => p.price <= 100);
+      const eligible = catalog.filter(p => p.price <= 50);
       const shuffled = eligible.sort(() => Math.random() - 0.5);
       products = shuffled.slice(0, 5).map(p => ({ id: p.id, name: p.name, price: p.price, img: p.img }));
     } catch (e) {
