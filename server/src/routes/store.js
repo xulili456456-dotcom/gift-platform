@@ -161,10 +161,11 @@ router.post('/orders/process', async (req, res) => {
   const tier = TIERS[store.tier];
   const today = new Date().toISOString().slice(0, 10);
 
-  // Free daily orders: 5 slots/day per user, cost ≤ $50, no deposit needed, 5% profit
+  // Free daily orders: 5 slots/day per user, each product max 1 free order/day
   const FREE_SLOTS = 5;
   const FREE_MAX_COST = 50;
   const freeKey = 'free_used_' + req.user.id + '_' + today;
+  const freeProductKey = 'free_prod_' + req.user.id + '_' + today + '_' + productName;
 
   let { cost, profit, totalReturn } = calcProduct(productPrice);
   const couldBeFree = cost <= FREE_MAX_COST;
@@ -182,18 +183,24 @@ router.post('/orders/process', async (req, res) => {
     // Acquire advisory lock first — serializes free-order checks per user
     await t.run("SELECT pg_advisory_xact_lock($1)", [lockKey]);
 
-    // Ensure counter row exists (INSERT or ignore)
+    // Ensure counter rows exist
     await t.run("INSERT INTO admin_settings (key, value) VALUES ($1, '0') ON CONFLICT (key) DO NOTHING", [freeKey]);
+    await t.run("INSERT INTO admin_settings (key, value) VALUES ($1, '0') ON CONFLICT (key) DO NOTHING", [freeProductKey]);
 
-    // Read current count under lock
+    // Read counts under lock
     const freeUsed = await t.get("SELECT value FROM admin_settings WHERE key = $1", [freeKey]);
+    const freeProductUsed = await t.get("SELECT value FROM admin_settings WHERE key = $1", [freeProductKey]);
     const freeUsedCount = Number(freeUsed?.value || 0);
+    const freeProductCount = Number(freeProductUsed?.value || 0);
     const freeRemaining = FREE_SLOTS - freeUsedCount;
-    const isFreeOrder = couldBeFree && freeRemaining > 0;
+    const isFreeOrder = couldBeFree && freeRemaining > 0 && freeProductCount < 1;
 
     if (isFreeOrder) {
       profit = Math.round(productPrice * FREE_PROFIT_RATE * 100) / 100;
       totalReturn = Math.round((cost + profit) * 100) / 100;
+    } else if (couldBeFree && freeProductCount >= 1) {
+      await t.rollback();
+      return res.status(400).json({ error: 'You already claimed this product for free today', productAlreadyClaimed: true });
     }
 
     // Validate: non-free orders need deposit + balance
@@ -226,9 +233,10 @@ router.post('/orders/process', async (req, res) => {
     const sellHours = 6 + Math.random() * 24;
     const sellBy = new Date(Date.now() + sellHours * 3600000).toISOString();
 
-    // Update free counter
+    // Update free counters
     if (isFreeOrder) {
       await t.run("UPDATE admin_settings SET value = $1 WHERE key = $2", [String(freeUsedCount + 1), freeKey]);
+      await t.run("UPDATE admin_settings SET value = '1' WHERE key = $1", [freeProductKey]);
     }
 
     const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES ($1, $2, $3, 'holding', $4, $5, $6)",
