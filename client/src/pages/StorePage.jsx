@@ -400,25 +400,16 @@ export default function StorePage() {
   useEffect(() => { client.get(`/store/orders-history?period=${orderPeriod}`).then(({data}) => setOrderHistory(data)).catch(()=>{}); }, [orderPeriod, status?.store?.doneToday]);
   const [freeProducts, setFreeProducts] = useState([]);
   const [freeRemaining, setFreeRemaining] = useState(0);
-  const [claimedNames, setClaimedNames] = useState([]);
-  const [freeRenderKey, setFreeRenderKey] = useState(0); // force re-render when free data loads
-  const freeLoadedRef = useRef(false);
-  const loadFreeProducts = useCallback(async () => {
-    try {
-      const { data } = await client.get('/store/free-products');
+  const claimedNames = status?.store?.claimedFreeNames || [];
+  useEffect(() => {
+    client.get('/store/free-products').then(({data}) => {
       setFreeProducts(data.products || []);
       setFreeRemaining(data.remaining);
-      setClaimedNames(prev => prev.length === 0 ? (data.claimedNames || []) : prev);
-      freeLoadedRef.current = true;
-      setFreeRenderKey(k => k + 1);
-    } catch(e) { /* ignore */ }
+    }).catch(()=>{});
   }, []);
-  useEffect(() => { loadFreeProducts(); }, [loadFreeProducts]);
-  // Pick up freeRemaining from status immediately
   useEffect(() => {
     if (status?.store?.freeRemaining !== undefined) {
       setFreeRemaining(status.store.freeRemaining);
-      if (!freeLoadedRef.current) { freeLoadedRef.current = true; setFreeRenderKey(k => k + 1); }
     }
   }, [status?.store?.freeRemaining]);
 
@@ -484,7 +475,6 @@ export default function StorePage() {
       // Instant balance + free counter update
       setStatus(prev => prev?.store ? { ...prev, store: { ...prev.store, balance: prev.store.balance - (data.isFreeOrder ? 0 : data.cost), doneToday: prev.store.doneToday + 1, freeRemaining: data.freeRemaining ?? prev.store.freeRemaining } } : prev);
       setFreeRemaining(data.freeRemaining ?? freeRemaining);
-      if (data.isFreeOrder && buyConfirm) setClaimedNames(prev => [...prev, buyConfirm.name]);
       setBuyConfirm(null);
       loadStatus(); loadHoldings(); loadEarnings();
     } catch (err) {
@@ -492,7 +482,7 @@ export default function StorePage() {
       if (d?.depositRequired) { setBuyConfirm(null); setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, isDeposit: true, balance: d.balance }); }
       else if (d?.shortage) { setBuyConfirm(null); setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, balance: d.balance, deposit: d.deposit }); }
       else if (d?.freeSlotsExhausted) { setFreeRemaining(0); setBuyConfirm(null); toast.error('All 5 free orders used today'); }
-      else if (d?.productAlreadyClaimed) { if (buyConfirm) setClaimedNames(prev => [...prev, buyConfirm.name]); setBuyConfirm(null); toast.error(d.error); }
+      else if (d?.productAlreadyClaimed) { setBuyConfirm(null); toast.error(d.error); }
       else toast.error(d?.error || t('common.operationFailed'));
     }
     setBuying(false);
@@ -748,7 +738,7 @@ export default function StorePage() {
       <div className="flex-1 overflow-y-auto px-4 pt-2">
         <div className="flex flex-col gap-3">
           {products.map(p => {
-            const isFreeProduct = freeLoadedRef.current && freeProductNames.includes(p.name);
+            const isFreeProduct = freeProductNames.length > 0 && freeProductNames.includes(p.name);
             const isAlreadyClaimed = isFreeProduct && claimedNames.includes(p.name);
             const isFreeDisabled = isFreeProduct && (freeRemaining <= 0 || isAlreadyClaimed);
             return (

@@ -63,6 +63,17 @@ async function getFreeProductNames(userId, today) {
   } catch { return []; }
 }
 
+async function getClaimedFreeNames(userId, today) {
+  try {
+    const rows = await all(
+      "SELECT key FROM admin_settings WHERE key LIKE ? AND value = '1'",
+      ['free_prod_' + userId + '_' + today + '_%']
+    );
+    const prefix = 'free_prod_' + userId + '_' + today + '_';
+    return rows.map(r => r.key.replace(prefix, ''));
+  } catch { return []; }
+}
+
 // GET /api/store/tiers
 router.get('/tiers', (req, res) => {
   res.json(TIERS);
@@ -122,6 +133,7 @@ router.get('/status', async (req, res) => {
       freeRemaining: Math.max(0, 5 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_used_' + req.user.id + '_' + today]))?.value || 0)),
       // Include free product names and claimed list so frontend has them immediately
       freeProductNames: (await getFreeProductNames(req.user.id, today)),
+      claimedFreeNames: (await getClaimedFreeNames(req.user.id, today)),
     },
   });
 });
