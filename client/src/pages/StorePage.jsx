@@ -423,6 +423,7 @@ export default function StorePage() {
       if (status.store.freeProductNames.length > 0 && freeProducts.length === 0) {
         setFreeProducts(status.store.freeProductNames.map(n => ({ name: n })));
       }
+      setFreeLoaded(true);
     }
   }, [status?.store?.freeRemaining, status?.store?.freeProductNames]);
 
