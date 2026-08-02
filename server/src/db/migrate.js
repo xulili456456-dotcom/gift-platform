@@ -314,6 +314,7 @@ async function migrate() {
   // Add specific earning types for better categorization
   try { await exec(`ALTER TABLE task_earnings DROP CONSTRAINT IF EXISTS task_earnings_type_check`); } catch(e) {}
   try { await exec(`ALTER TABLE task_earnings ADD CONSTRAINT task_earnings_type_check CHECK(type IN ('checkin','ad','bonus','order_profit','admin_adjust','task_reward','commission','deposit','deposit_return','agent_reward','staking_refund','balance_split'))`); } catch(e) { console.log('type constraint update skipped:', e.message); }
+  try { await exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_checkin_unique ON task_earnings (user_id, (created_at::date)) WHERE type = 'checkin'`); } catch(e) { console.log('checkin index skipped:', e.message); }
   // Agent system
   try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_agent BOOLEAN DEFAULT FALSE`); } catch(e) { console.log('is_agent skipped:', e.message); }
   try { await exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS agent_commission NUMERIC DEFAULT 0.5`); } catch(e) { console.log('agent_commission skipped:', e.message); }

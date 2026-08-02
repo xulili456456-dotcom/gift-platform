@@ -285,11 +285,11 @@ router.post('/users/:id/balance', async (req, res) => {
     res.json({ ok: true, newBalance: Number(bal?.total || 0) });
 
     if (amount > 0) {
-      try { require('./notifications').notify(id, '💰 余额到账', `管理员已为您充值 $${amount.toFixed(2)}${note ? ' ('+note+')' : ''}`, 'success'); } catch {}
+      try { require('./notifications').notify(id, '💰 余额到账', `管理员已为您充值 $${amount.toFixed(2)}${note ? ' ('+note+')' : ''}`, 'success'); } catch(e) { console.error('Audit log failed:', e.message); }
     } else {
-      try { require('./notifications').notify(id, '💰 余额调整', `管理员已从您的账户扣除 $${Math.abs(amount).toFixed(2)}${note ? ' ('+note+')' : ''}`, 'warning'); } catch {}
+      try { require('./notifications').notify(id, '💰 余额调整', `管理员已从您的账户扣除 $${Math.abs(amount).toFixed(2)}${note ? ' ('+note+')' : ''}`, 'warning'); } catch(e) { console.error('Audit log failed:', e.message); }
     }
-    try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, amount>0?'credit':'debit', id, `$${Math.abs(amount).toFixed(2)} ${note}`]); } catch {}
+    try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, amount>0?'credit':'debit', id, `$${Math.abs(amount).toFixed(2)} ${note}`]); } catch(e) { console.error('Audit log failed:', e.message); }
   } catch (err) {
     await t.rollback().catch(() => {});
     console.error('Balance adjust failed:', err);
@@ -316,7 +316,7 @@ router.put('/users/:id/notes', async (req, res) => {
   const entry = `[${now}] ${req.body.notes || ''}`;
   const newNotes = old ? old + '\n' + entry : entry;
   await run('UPDATE users SET admin_notes = ? WHERE id = ?', [newNotes, id]);
-  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, 'notes', id, req.body.notes || '']); } catch {}
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, 'notes', id, req.body.notes || '']); } catch(e) { console.error('Audit log failed:', e.message); }
   res.json({ ok: true });
 });
 
@@ -327,7 +327,7 @@ router.post('/users/:id/login-as', async (req, res) => {
   if (!user) return res.status(404).json({ error: 'User not found' });
   const { signAccessToken } = require('../utils/jwt');
   const token = signAccessToken({ id: user.id, email: user.email, is_admin: false });
-  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, 'login_as', id, user.email]); } catch {}
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, 'login_as', id, user.email]); } catch(e) { console.error('Audit log failed:', e.message); }
   res.json({ token, redirect: '/store?token=' + token });
 });
 
@@ -343,7 +343,7 @@ router.post('/users/batch', async (req, res) => {
     else if (action === 'unfreeze') { await run('UPDATE users SET frozen = FALSE WHERE id = ?', [id]); affected++; }
     else if (action === 'delete') { await run('DELETE FROM users WHERE id = ?', [id]); affected++; }
   }
-  try { await insert('INSERT INTO admin_audit_log (admin_id, action, detail) VALUES (?,?,?)', [req.user.id, 'batch_'+action, `${affected} users: ${ids.join(',')}`]); } catch {}
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, detail) VALUES (?,?,?)', [req.user.id, 'batch_'+action, `${affected} users: ${ids.join(',')}`]); } catch(e) { console.error('Audit log failed:', e.message); }
   res.json({ ok: true, affected });
 });
 
@@ -369,7 +369,7 @@ router.post('/convert-referral-codes', async (req, res) => {
     count++;
   }
   await run("INSERT INTO admin_settings (key, value) VALUES ('referral_counter', ?) ON CONFLICT (key) DO UPDATE SET value = ?", [String(start + count - 1), String(start + count - 1)]);
-  try { await insert('INSERT INTO admin_audit_log (admin_id, action, detail) VALUES (?,?,?)', [req.user.id, 'convert_codes', count+' users']); } catch {}
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, detail) VALUES (?,?,?)', [req.user.id, 'convert_codes', count+' users']); } catch(e) { console.error('Audit log failed:', e.message); }
   res.json({ ok: true, converted: count });
 });
 
@@ -534,7 +534,7 @@ router.put('/users/:id/freeze', async (req, res) => {
   const id = parseInt(req.params.id);
   const { frozen } = req.body;
   await run('UPDATE users SET frozen = ? WHERE id = ?', [!!frozen, id]);
-  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, frozen?'freeze':'unfreeze', id, '']); } catch {}
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, frozen?'freeze':'unfreeze', id, '']); } catch(e) { console.error('Audit log failed:', e.message); }
   res.json({ ok: true, frozen: !!frozen });
 });
 
@@ -547,7 +547,7 @@ router.post('/users/:id/reset-password', async (req, res) => {
   const { hashPassword } = require('../utils/password');
   const hash = await hashPassword(newPassword);
   await run('UPDATE users SET password_hash = ? WHERE id = ?', [hash, id]);
-  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, 'reset_pw', id, '']); } catch {}
+  try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, 'reset_pw', id, '']); } catch(e) { console.error('Audit log failed:', e.message); }
   res.json({ ok: true });
 });
 

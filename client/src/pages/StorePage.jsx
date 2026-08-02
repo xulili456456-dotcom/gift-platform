@@ -395,6 +395,7 @@ export default function StorePage() {
   const loadHoldings = useCallback(async () => { try { const { data } = await client.get('/store/holdings'); setHoldings(data); } catch {} }, []);
 
   useEffect(() => { loadStatus(); loadEarnings(); checkSell(); loadHoldings(); client.get('/notifications').then(({data}) => setNotifCount(data.unread||0)).catch(()=>{}); }, []);
+  useEffect(() => { const t = setInterval(checkSell, 60000); return () => clearInterval(t); }, []);
   useEffect(() => { client.get('/store/analytics').then(({data}) => setAnalytics(data)).catch(()=>{}); }, [status?.store?.doneToday]);
   useEffect(() => { client.get(`/store/orders-history?period=${orderPeriod}`).then(({data}) => setOrderHistory(data)).catch(()=>{}); }, [orderPeriod, status?.store?.doneToday]);
   const [freeProducts, setFreeProducts] = useState([]);
