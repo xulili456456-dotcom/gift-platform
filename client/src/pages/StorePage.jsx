@@ -401,7 +401,8 @@ export default function StorePage() {
   const [freeProducts, setFreeProducts] = useState([]);
   const [freeRemaining, setFreeRemaining] = useState(0);
   const [claimedNames, setClaimedNames] = useState([]);
-  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); setClaimedNames(prev => prev.length === 0 ? (data.claimedNames||[]) : prev); }).catch(()=>{}); }, [status?.store?.doneToday]);
+  const [freeLoaded, setFreeLoaded] = useState(false);
+  useEffect(() => { client.get('/store/free-products').then(({data}) => { setFreeProducts(data.products||[]); setFreeRemaining(data.remaining); setClaimedNames(prev => prev.length === 0 ? (data.claimedNames||[]) : prev); setFreeLoaded(true); }).catch(()=>{}); }, [status?.store?.doneToday]);
 
   var daySeed = parseInt(new Date().toISOString().slice(0,10).replace(/-/g,''),10);
   const products = useMemo(() => {
@@ -728,7 +729,7 @@ export default function StorePage() {
           {products.map(p => {
             const isFreeProduct = freeProducts.some(fp => fp.id === (parseInt(p.img?.match(/\d+/)?.[0]) || 0));
             const isAlreadyClaimed = isFreeProduct && claimedNames.includes(p.name);
-            const isFreeDisabled = isFreeProduct && (freeRemaining <= 0 || isAlreadyClaimed);
+            const isFreeDisabled = isFreeProduct && (!freeLoaded || freeRemaining <= 0 || isAlreadyClaimed);
             return (
             <div key={p.id} onClick={() => !isFreeDisabled && setDetail(p)} style={{background: isFreeDisabled ? '#f8f8f8' : '#fff',borderRadius:16,padding:14,cursor: isFreeDisabled ? 'default' : 'pointer',display:'flex',flexDirection:'column',gap:8,opacity: isFreeDisabled ? 0.5 : 1}}>
               <div style={{display:'flex',gap:12}}>
