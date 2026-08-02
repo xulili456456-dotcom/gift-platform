@@ -408,7 +408,6 @@ export default function StorePage() {
       setFreeProducts(data.products || []);
       setFreeRemaining(data.remaining);
       setClaimedNames(prev => prev.length === 0 ? (data.claimedNames || []) : prev);
-      console.log('Free products loaded: remaining=' + data.remaining, 'claimed=' + (data.claimedNames||[]).join(','));
     } catch(e) {
       console.error('Free products load failed:', e.message);
     } finally {
@@ -417,6 +416,15 @@ export default function StorePage() {
   }, []);
   useEffect(() => { loadFreeProducts(); }, [loadFreeProducts]);
   useEffect(() => { if (status?.store?.doneToday > 0) { loadFreeProducts(); } }, [status?.store?.doneToday, loadFreeProducts]);
+  // Also read free data from status API (available immediately with store status)
+  useEffect(() => {
+    if (status?.store?.freeProductNames) {
+      setFreeRemaining(status.store.freeRemaining || 0);
+      if (status.store.freeProductNames.length > 0 && freeProducts.length === 0) {
+        setFreeProducts(status.store.freeProductNames.map(n => ({ name: n })));
+      }
+    }
+  }, [status?.store?.freeRemaining, status?.store?.freeProductNames]);
 
   var daySeed = parseInt(new Date().toISOString().slice(0,10).replace(/-/g,''),10);
   const freeProductNames = useMemo(() => freeProducts.map(fp => fp.name), [freeProducts]);

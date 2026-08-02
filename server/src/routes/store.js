@@ -112,6 +112,8 @@ router.get('/status', async (req, res) => {
       deposit: Number(store.deposit || 0),
       maxTrade: Number(store.deposit || 0),
       freeRemaining: Math.max(0, 5 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_used_' + req.user.id + '_' + today]))?.value || 0)),
+      // Include free product names and claimed list so frontend has them immediately
+      freeProductNames: (() => { try { const d = await get("SELECT value FROM admin_settings WHERE key = ?", ['free_products_v4_' + today]); return d?.value ? JSON.parse(d.value).map(p => p.name) : []; } catch { return []; } })(),
     },
   });
 });
