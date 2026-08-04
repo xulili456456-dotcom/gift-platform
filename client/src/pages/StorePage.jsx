@@ -582,36 +582,37 @@ export default function StorePage() {
         </div>
 
         {/* Buy Confirm Modal (detail view) */}
-        {buyConfirm && (
+        {buyConfirm && (() => {
+          const isFreeEligible = freeProductNames.includes(buyConfirm.name);
+          const canBeFree = isFreeEligible && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name);
+          const displayCost = canBeFree ? 0 : buyConfirm.costPrice;
+          const displayProfit = canBeFree ? Math.round(buyConfirm.price * 0.05 * 100) / 100 : buyConfirm.profit;
+          return (
           <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={() => setBuyConfirm(null)}>
             <div style={{background:'#fff',borderRadius:16,padding:24,width:'100%',maxWidth:340}} onClick={e => e.stopPropagation()}>
-              {(() => { const isFreeEligible = freeProductNames.includes(buyConfirm.name); const canBeFree = isFreeEligible && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name); return (
               <div style={{textAlign:'center',fontSize:32,marginBottom:12}}>{canBeFree ? '🎁' : '🛒'}</div>
-              ); })()}
               <div style={{fontSize:15,fontWeight:700,color:'#222',marginBottom:2}}>Confirm Purchase</div>
-              {(() => { const isFreeEligible = freeProductNames.includes(buyConfirm.name); const canBeFree = isFreeEligible && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name); return (
               <div style={{fontSize:12,fontWeight:600,color:canBeFree?'#00A86B':'#FF5000',marginBottom:8,background:canBeFree?'#E8F5E9':'#FFF5F0',borderRadius:8,padding:'4px 10px',display:'inline-block'}}>
                 {canBeFree ? `🎁 FREE ORDER (${freeRemaining} left)` : (isFreeEligible ? '💰 PAID ORDER (free slots used)' : '💰 PAID ORDER')}
               </div>
-              ); })()}
               <div style={{fontSize:11,color:'#999',marginBottom:12,lineHeight:1.4}}>{buyConfirm.name}</div>
               <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:13}}>
-                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Cost</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
-                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Profit</span><span style={{fontWeight:600,color:'#00A86B'}}>+${buyConfirm.profit.toFixed(2)}</span></div>
-                <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Total Return</span><span style={{fontWeight:700}}>${(buyConfirm.costPrice+buyConfirm.profit).toFixed(2)}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Cost</span><span style={{fontWeight:600}}>{canBeFree ? 'FREE' : '$'+displayCost.toFixed(2)}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Profit</span><span style={{fontWeight:600,color:'#00A86B'}}>+${displayProfit.toFixed(2)}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Total Return</span><span style={{fontWeight:700}}>${(displayCost+displayProfit).toFixed(2)}</span></div>
               </div>
-              <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:12}}>
-                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Required Security</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
+              {!canBeFree && <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:12}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Required Security</span><span style={{fontWeight:600}}>${displayCost.toFixed(2)}</span></div>
                 <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Your Security Deposit</span><span style={{fontWeight:600}}>${(s.deposit||0).toFixed(2)}</span></div>
-                <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Status</span>{(s.deposit||0)>=buyConfirm.costPrice?<span style={{fontWeight:700,color:'#00A86B'}}>✓ Covered</span>:<span style={{fontWeight:700,color:'#CC0C39'}}>Short ${(buyConfirm.costPrice-(s.deposit||0)).toFixed(2)}</span>}</div>
-              </div>
+                <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Status</span>{(s.deposit||0)>=displayCost?<span style={{fontWeight:700,color:'#00A86B'}}>✓ Covered</span>:<span style={{fontWeight:700,color:'#CC0C39'}}>Short ${(displayCost-(s.deposit||0)).toFixed(2)}</span>}</div>
+              </div>}
               <div style={{display:'flex',gap:8}}>
                 <button onClick={() => setBuyConfirm(null)} style={{flex:1,padding:'10px 0',background:'#f5f5f5',border:'none',borderRadius:10,fontSize:14,fontWeight:600,color:'#666',cursor:'pointer'}}>Cancel</button>
-                <button onClick={handleConfirmBuy} disabled={buying} style={{flex:1,padding:'10px 0',background:'#00A86B',border:'none',borderRadius:10,fontSize:14,fontWeight:700,color:'#fff',cursor:'pointer'}}>{buying?'...':`Buy $${buyConfirm.costPrice.toFixed(2)}`}</button>
+                <button onClick={handleConfirmBuy} disabled={buying} style={{flex:1,padding:'10px 0',background:canBeFree?'#00A86B':'#FF5000',border:'none',borderRadius:10,fontSize:14,fontWeight:700,color:'#fff',cursor:'pointer'}}>{buying?'...':canBeFree?'Claim Free':`Buy $${displayCost.toFixed(2)}`}</button>
               </div>
             </div>
-          </div>
-        )}
+          </div>)
+        })()}
 
         {showInsufficient && (
           <div style={{position:'fixed',inset:0,zIndex:200,background:'rgba(0,0,0,.4)',backdropFilter:'blur(2px)',display:'flex',alignItems:'flex-end',justifyContent:'center'}} onClick={() => setShowInsufficient(null)}>
@@ -994,29 +995,35 @@ export default function StorePage() {
       </>)}
 
       {/* Buy Confirmation Modal (list view) */}
-      {buyConfirm && (
+      {buyConfirm && (() => {
+        const isFreeEligible2 = freeProductNames.includes(buyConfirm.name);
+        const canBeFree2 = isFreeEligible2 && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name);
+        const dCost = canBeFree2 ? 0 : buyConfirm.costPrice;
+        const dProfit = canBeFree2 ? Math.round(buyConfirm.price * 0.05 * 100) / 100 : buyConfirm.profit;
+        return (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={() => setBuyConfirm(null)}>
           <div style={{background:'#fff',borderRadius:16,padding:24,width:'100%',maxWidth:340}} onClick={e => e.stopPropagation()}>
-            <div style={{textAlign:'center',fontSize:32,marginBottom:12}}>🛒</div>
+            <div style={{textAlign:'center',fontSize:32,marginBottom:12}}>{canBeFree2 ? '🎁' : '🛒'}</div>
             <div style={{fontSize:15,fontWeight:700,color:'#222',marginBottom:2}}>Confirm Purchase</div>
+            {canBeFree2 && <div style={{fontSize:12,fontWeight:600,color:'#00A86B',marginBottom:8,background:'#E8F5E9',borderRadius:8,padding:'4px 10px',display:'inline-block'}}>🎁 FREE ORDER</div>}
             <div style={{fontSize:11,color:'#999',marginBottom:12,lineHeight:1.4}}>{buyConfirm.name}</div>
             <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:13}}>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Cost</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Profit</span><span style={{fontWeight:600,color:'#00A86B'}}>+${buyConfirm.profit.toFixed(2)}</span></div>
-              <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Total Return</span><span style={{fontWeight:700}}>${(buyConfirm.costPrice+buyConfirm.profit).toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Cost</span><span style={{fontWeight:600}}>{canBeFree2 ? 'FREE' : '$'+dCost.toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Profit</span><span style={{fontWeight:600,color:'#00A86B'}}>+${dProfit.toFixed(2)}</span></div>
+              <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Total Return</span><span style={{fontWeight:700}}>${(dCost+dProfit).toFixed(2)}</span></div>
             </div>
-            <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:12}}>
-              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Required Security</span><span style={{fontWeight:600}}>${buyConfirm.costPrice.toFixed(2)}</span></div>
+            {!canBeFree2 && <div style={{background:'#f8f8f8',borderRadius:12,padding:12,marginBottom:12,fontSize:12}}>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Required Security</span><span style={{fontWeight:600}}>${dCost.toFixed(2)}</span></div>
               <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Your Security Deposit</span><span style={{fontWeight:600}}>${(s.deposit||0).toFixed(2)}</span></div>
-              <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Status</span>{(s.deposit||0)>=buyConfirm.costPrice?<span style={{fontWeight:700,color:'#00A86B'}}>✓ Covered</span>:<span style={{fontWeight:700,color:'#CC0C39'}}>Short ${(buyConfirm.costPrice-(s.deposit||0)).toFixed(2)}</span>}</div>
-            </div>
+              <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid #eee'}}><span style={{color:'#999'}}>Status</span>{(s.deposit||0)>=dCost?<span style={{fontWeight:700,color:'#00A86B'}}>✓ Covered</span>:<span style={{fontWeight:700,color:'#CC0C39'}}>Short ${(dCost-(s.deposit||0)).toFixed(2)}</span>}</div>
+            </div>}
             <div style={{display:'flex',gap:8}}>
               <button onClick={() => setBuyConfirm(null)} style={{flex:1,padding:'10px 0',background:'#f5f5f5',border:'none',borderRadius:10,fontSize:14,fontWeight:600,color:'#666',cursor:'pointer'}}>Cancel</button>
-              <button onClick={handleConfirmBuy} disabled={buying} style={{flex:1,padding:'10px 0',background:'#00A86B',border:'none',borderRadius:10,fontSize:14,fontWeight:700,color:'#fff',cursor:'pointer'}}>{buying?'...':`Buy $${buyConfirm.costPrice.toFixed(2)}`}</button>
+              <button onClick={handleConfirmBuy} disabled={buying} style={{flex:1,padding:'10px 0',background:canBeFree2?'#00A86B':'#FF5000',border:'none',borderRadius:10,fontSize:14,fontWeight:700,color:'#fff',cursor:'pointer'}}>{buying?'...':canBeFree2?'Claim Free':`Buy $${dCost.toFixed(2)}`}</button>
             </div>
           </div>
         </div>
-      )}
+      )})()}
 
       {/* Draggable Floating Contact Button */}
       <FloatingContact />
