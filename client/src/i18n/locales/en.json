@@ -405,7 +405,7 @@
     "hint": "Withdrawals are processed within 24 hours",
     "noWallet": "Bind wallet first",
     "bindFirst": "You need to bind a crypto wallet before withdrawing",
-    "minAmount": "Minimum withdrawal is $1",
+    "minAmount": "Minimum withdrawal is $20",
     "minPlaceholder": "Min $20",
     "invalidAmount": "Enter a valid amount",
     "insufficient": "Insufficient balance",

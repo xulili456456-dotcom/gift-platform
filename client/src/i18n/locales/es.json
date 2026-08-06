@@ -413,7 +413,7 @@
     "history": "Historial de retiros",
     "done": "Completado",
     "failed": "Fallido",
-    "minAmount": "Minimum withdrawal is $1",
+    "minAmount": "Retiro mínimo: $20",
     "minPlaceholder": "Min $20"
   },
   "vip": {

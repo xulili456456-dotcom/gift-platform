@@ -423,7 +423,7 @@
   "withdraw": {
     "title": "Pengeluaran",
     "balance": "Baki",
-    "minAmount": "Pengeluaran minimum ialah $1",
+    "minAmount": "Pengeluaran minimum ialah $20",
     "minPlaceholder": "Min $1",
     "insufficient": "Baki tidak mencukupi",
     "noWallet": "Sila ikat dompet dahulu",

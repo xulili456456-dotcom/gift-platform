@@ -39,7 +39,7 @@ export default function WithdrawPage() {
 
   const handleWithdraw = async () => {
     const amt = parseFloat(amount);
-    if (!amt || amt < 1) { toast.error(t('withdraw.minAmount')); return; }
+    if (!amt || amt < 20) { toast.error(t('withdraw.minAmount')); return; }
     if (amt > availableBalance) { toast.error(t('withdraw.insufficient')); return; }
     if (!walletAddress) { toast.error('Please enter wallet address'); return; }
     setSubmitting(true);
@@ -77,7 +77,7 @@ export default function WithdrawPage() {
 
         <div style={{background:'#fff',borderRadius:20,padding:20,marginBottom:14}}>
             <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Amount</div>
-            <div style={{fontSize:10,color:'#999',marginBottom:6}}>Min $1 · Fee 1%</div>
+            <div style={{fontSize:10,color:'#999',marginBottom:6}}>Min $20 · Fee 1%</div>
             <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Enter amount" style={{width:'100%',padding:'12px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:24,fontWeight:700,outline:'none',marginBottom:12}} />
             <div style={{display:'flex',gap:8,marginBottom:14}}>
               {[100,500,1000].map(v=><button key={v} onClick={()=>setAmount(String(v))} style={{flex:1,padding:8,background:'#f5f5f5',border:'none',borderRadius:10,fontSize:12,fontWeight:600,color:'#666',cursor:'pointer'}}>${v}</button>)}
