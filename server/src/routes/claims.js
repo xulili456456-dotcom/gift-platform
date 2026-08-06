@@ -54,7 +54,41 @@ router.post('/', async (req, res) => {
     }
 
     await t.commit();
-    require('./notifications').notify(req.user.id, '🎁 Gift Claimed', `Claimed: ${g.name}`, 'success');
+
+    // Auto-process: check KYC and approve/reject immediately
+    if (gift.required_invites > 0) {
+      try {
+        const kycCnt = await require('../db/database').get(
+          `SELECT COUNT(*) as cnt FROM invitations i
+           JOIN kyc_submissions k ON k.user_id = i.invitee_id AND k.status = 'approved'
+           WHERE i.inviter_id = $1 AND i.level = 1`,
+          [req.user.id]
+        );
+        const validKyc = Number(kycCnt?.cnt) || 0;
+
+        if (validKyc >= gift.required_invites) {
+          await userGiftModel.updateStatus(result.id, 'delivered', '系统自动审核通过');
+          if (gift.value > 0) {
+            await require('../db/database').run(
+              'INSERT INTO task_earnings (user_id, amount, type, status) VALUES ($1, $2, $3, $4)',
+              [req.user.id, gift.value, 'task_reward', 'delivered']);
+          }
+          require('./notifications').notify(req.user.id, '🎁 Claim Approved', `Your ${gift.name} claim was auto-approved! $${gift.value} credited.`, 'success');
+          return res.status(201).json({ id: result.id, gift_id: gift.id, status: 'delivered', auto: true });
+        } else {
+          await userGiftModel.updateStatus(result.id, 'rejected', '下级KYC实名不足');
+          if (gift.stock >= 0) {
+            await require('../db/database').run('UPDATE gifts SET stock = stock + 1 WHERE id = $1 AND stock >= 0', [gift.id]);
+          }
+          require('./notifications').notify(req.user.id, 'Claim Rejected', `Your ${gift.name} claim was auto-rejected: ${validKyc}/${gift.required_invites} downline KYC verified. Please ensure your referrals complete real-name verification.`, 'warning');
+          return res.status(201).json({ id: result.id, gift_id: gift.id, status: 'rejected', auto: true, reason: 'kyc_insufficient' });
+        }
+      } catch (autoErr) {
+        console.error('Auto-process claim failed, leaving pending:', autoErr.message);
+      }
+    }
+
+    require('./notifications').notify(req.user.id, '🎁 Gift Claimed', `Claimed: ${gift.name}`, 'success');
     res.status(201).json({ id: result.id, gift_id: gift.id, status: 'pending' });
   } catch (err) {
     await t.rollback().catch(() => {});
