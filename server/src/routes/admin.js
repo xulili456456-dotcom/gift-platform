@@ -1,9 +1,15 @@
 const geoip = require('geoip-lite');
 
+function countryToFlag(code) {
+  if (!code) return '';
+  return String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+}
+
 function ipToCountry(ip) {
   if (!ip || ip === 'unknown') return null;
   const geo = geoip.lookup(ip);
-  return geo ? geo.country : null;
+  if (!geo || !geo.country) return null;
+  return countryToFlag(geo.country) + ' ' + geo.country;
 }
 const userGiftModel = require('../models/userGift');
 const invitationModel = require('../models/invitation');
@@ -402,11 +408,12 @@ router.get('/users-filtered', async (req, res) => {
 
   const total = await get(`SELECT COUNT(*) as c FROM users u LEFT JOIN stores s ON s.user_id = u.id LEFT JOIN kyc_submissions k ON k.user_id = u.id ${where}`, params);
   const users = await all(
-    `SELECT u.id, u.email, u.phone, u.phone_prefix, u.name, u.referral_code, u.is_admin, u.is_active, u.frozen, u.created_at, u.ip_address, u.admin_notes, u.last_active_at, u.risk_tags,
+    `SELECT u.id, u.email, u.phone, u.phone_prefix, u.name, u.referral_code, u.is_admin, u.is_active, u.frozen, u.created_at, u.admin_notes, u.last_active_at, u.risk_tags,
             COALESCE(s.id, 0) as store_id, s.tier, s.deposit as store_deposit, s.status as store_status,
             COALESCE((SELECT SUM(amount) FROM task_earnings WHERE user_id = u.id AND status = 'delivered'), 0) as balance,
             COALESCE(k.status, '') as kyc_status,
-            p.name as parent_name, p.email as parent_email, p.referral_code as parent_code, p.id as parent_id
+            p.name as parent_name, p.email as parent_email, p.referral_code as parent_code, p.id as parent_id,
+            (SELECT ip_address FROM ip_log WHERE user_id = u.id ORDER BY created_at DESC LIMIT 1) as ip_address
      FROM users u
      LEFT JOIN stores s ON s.user_id = u.id
      LEFT JOIN kyc_submissions k ON k.user_id = u.id
