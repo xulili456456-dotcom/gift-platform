@@ -40,8 +40,13 @@ router.get('/stats', async (req, res) => {
   const rawStats = await invitationModel.getStats(req.user.id);
   const effective = await invitationModel.getEffectiveCount(req.user.id);
 
-  // Get recent invitees
-  const level1Invitees = await invitationModel.getInvitees(req.user.id, 1, 1, 100);
+  // Get all invitees (level 1, 2, 3)
+  const [l1, l2, l3] = await Promise.all([
+    invitationModel.getInvitees(req.user.id, 1, 1, 500),
+    invitationModel.getInvitees(req.user.id, 2, 1, 500),
+    invitationModel.getInvitees(req.user.id, 3, 1, 500),
+  ]);
+  const allInvitees = [...l1.invitees, ...l2.invitees, ...l3.invitees];
 
   res.json({
     referral_code: user.referral_code,
@@ -51,7 +56,7 @@ router.get('/stats', async (req, res) => {
     total_invites: rawStats.total,
     effective_invites: effective.effective,
     breakdown: effective.breakdown,
-    recent_invitees: level1Invitees.invitees,
+    recent_invitees: allInvitees,
   });
 });
 
