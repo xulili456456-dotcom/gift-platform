@@ -10,8 +10,14 @@ router.use(authMiddleware);
 router.post('/', async (req, res) => {
   let { amount, network, wallet_address } = req.body;
   amount = parseFloat(amount);
-  if (!amount || amount < 20) return res.status(400).json({ error: 'Minimum withdrawal amount is $20' });
+  if (!amount || amount < 0) return res.status(400).json({ error: 'Minimum withdrawal amount is $0' });
   if (!network || !wallet_address) return res.status(400).json({ error: 'Please provide the network and wallet address' });
+
+  // KYC check
+  const kyc = await get('SELECT status FROM kyc_submissions WHERE user_id = ? ORDER BY created_at DESC LIMIT 1', [req.user.id]);
+  if (!kyc || kyc.status !== 'approved') {
+    return res.status(400).json({ error: '请先完成实名认证 (KYC) 后才能提现。Go to Mine > KYC Verification to submit.' });
+  }
 
   // Wallet address format validation
   const addr = wallet_address.trim();
