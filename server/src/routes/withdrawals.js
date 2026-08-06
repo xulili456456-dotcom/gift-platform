@@ -10,7 +10,7 @@ router.use(authMiddleware);
 router.post('/', async (req, res) => {
   let { amount, network, wallet_address } = req.body;
   amount = parseFloat(amount);
-  if (!amount || amount < 0) return res.status(400).json({ error: 'Minimum withdrawal amount is $0' });
+  if (!amount || amount < 20) return res.status(400).json({ error: 'Minimum withdrawal amount is $20' });
   if (!network || !wallet_address) return res.status(400).json({ error: 'Please provide the network and wallet address' });
 
   // KYC check
