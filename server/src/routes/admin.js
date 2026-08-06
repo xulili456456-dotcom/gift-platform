@@ -1,12 +1,17 @@
-function ipToCountry(ip) {
-  return null; // resolved client-side via ipapi.co
-}
+const { Router } = require('express');
+const authMiddleware = require('../middleware/auth');
+const adminMiddleware = require('../middleware/admin');
+const userModel = require('../models/user');
+const giftModel = require('../models/gift');
 const userGiftModel = require('../models/userGift');
 const invitationModel = require('../models/invitation');
 const settingsModel = require('../models/settings');
 const { get, all, run, insert, tx } = require('../db/database');
 const { notify } = require('./notifications');
-const { lookupIps } = require('../utils/geoip');
+
+function ipToCountry(ip) {
+  return null; // resolved client-side via ipapi.co
+}
 
 const router = Router();
 router.use(authMiddleware);
