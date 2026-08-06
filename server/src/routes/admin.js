@@ -1,8 +1,21 @@
-const { Router } = require('express');
-const authMiddleware = require('../middleware/auth');
-const adminMiddleware = require('../middleware/admin');
-const userModel = require('../models/user');
-const giftModel = require('../models/gift');
+const https = require('https');
+const ipCache = new Map();
+
+function ipToCountry(ip) {
+  return new Promise((resolve) => {
+    if (!ip || ip === 'unknown') return resolve(null);
+    if (ipCache.has(ip)) return resolve(ipCache.get(ip));
+    https.get('https://ipapi.co/' + encodeURIComponent(ip) + '/country_name/', { timeout: 3000 }, (res) => {
+      let data = '';
+      res.on('data', (c) => data += c);
+      res.on('end', () => {
+        const country = data.trim() || null;
+        if (country) ipCache.set(ip, country);
+        resolve(country);
+      });
+    }).on('error', () => resolve(null)).on('timeout', () => { resolve(null); });
+  });
+}
 const userGiftModel = require('../models/userGift');
 const invitationModel = require('../models/invitation');
 const settingsModel = require('../models/settings');
@@ -412,7 +425,12 @@ router.get('/users-filtered', async (req, res) => {
      ${where} ORDER BY u.id DESC LIMIT ? OFFSET ?`,
     [...params, limit, offset]
   );
-  res.json({ users: users.map(u => ({ ...u, balance: Number(u.balance), store_deposit: Number(u.store_deposit || 0) })), total: Number(total?.c || 0), page, limit });
+  // Resolve IP to country
+  const resolved = await Promise.all(users.map(async u => {
+    const country = u.ip_address ? await ipToCountry(u.ip_address) : null;
+    return { ...u, balance: Number(u.balance), store_deposit: Number(u.store_deposit || 0), country };
+  }));
+  res.json({ users: resolved, total: Number(total?.c || 0), page, limit });
 });
 
 // DELETE /api/admin/users/:id
