@@ -297,9 +297,9 @@ router.post('/users/:id/balance', async (req, res) => {
     res.json({ ok: true, newBalance: Number(bal?.total || 0) });
 
     if (amount > 0) {
-      try { require('./notifications').notify(id, '💰 资金到账', `已到账 $${amount.toFixed(2)}${note ? ' ('+note+')' : ''}`, 'success'); } catch(e) { console.error('Notify failed:', e.message); }
+      try { require('./notifications').notify(id, '账户充值成功', `+ $${amount.toFixed(2)} 已存入您的账户余额`, 'success'); } catch(e) { console.error('Notify failed:', e.message); }
     } else {
-      try { require('./notifications').notify(id, '💰 资金转出', `已转出 $${Math.abs(amount).toFixed(2)}${note ? ' ('+note+')' : ''}`, 'warning'); } catch(e) { console.error('Notify failed:', e.message); }
+      try { require('./notifications').notify(id, '账户提款成功', `- $${Math.abs(amount).toFixed(2)} 已从您的账户余额扣除`, 'warning'); } catch(e) { console.error('Notify failed:', e.message); }
     }
     try { await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)', [req.user.id, amount>0?'credit':'debit', id, `$${Math.abs(amount).toFixed(2)} ${note}`]); } catch(e) { console.error('Audit log failed:', e.message); }
   } catch (err) {
