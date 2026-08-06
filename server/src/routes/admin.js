@@ -9,8 +9,21 @@ const settingsModel = require('../models/settings');
 const { get, all, run, insert, tx } = require('../db/database');
 const { notify } = require('./notifications');
 
-function ipToCountry(ip) {
-  return null; // resolved client-side via ipapi.co
+const countryCache = new Map();
+async function ipToCountry(ip) {
+  if (!ip || ip === 'unknown') return null;
+  if (countryCache.has(ip)) return countryCache.get(ip);
+  try {
+    const res = await fetch('http://ip-api.com/json/' + encodeURIComponent(ip) + '?fields=countryCode');
+    const data = await res.json();
+    if (data && data.countryCode) {
+      const flag = String.fromCodePoint(...[...data.countryCode].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+      const text = flag + ' ' + data.countryCode;
+      countryCache.set(ip, text);
+      return text;
+    }
+  } catch (e) {}
+  return null;
 }
 
 const router = Router();
@@ -416,11 +429,11 @@ router.get('/users-filtered', async (req, res) => {
      ${where} ORDER BY u.id DESC LIMIT ? OFFSET ?`,
     [...params, limit, offset]
   );
-  // Resolve IP to country (synchronous, offline)
-  const resolved = users.map(u => ({
+  // Resolve IP to country
+  const resolved = await Promise.all(users.map(async u => ({
     ...u, balance: Number(u.balance), store_deposit: Number(u.store_deposit || 0),
-    country: u.ip_address ? ipToCountry(u.ip_address) : null
-  }));
+    country: u.ip_address ? await ipToCountry(u.ip_address) : null
+  })));
   res.json({ users: resolved, total: Number(total?.c || 0), page, limit });
 });
 
