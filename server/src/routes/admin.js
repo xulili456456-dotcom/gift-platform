@@ -1,15 +1,5 @@
-const geoip = require('geoip-lite');
-
-function countryToFlag(code) {
-  if (!code) return '';
-  return String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
-}
-
 function ipToCountry(ip) {
-  if (!ip || ip === 'unknown') return null;
-  const geo = geoip.lookup(ip);
-  if (!geo || !geo.country) return null;
-  return countryToFlag(geo.country) + ' ' + geo.country;
+  return null; // resolved client-side via ipapi.co
 }
 const userGiftModel = require('../models/userGift');
 const invitationModel = require('../models/invitation');
