@@ -6,14 +6,7 @@ const router = Router();
 router.use(authMiddleware);
 
 function periodKey(type) {
-  const now = new Date();
-  if (type === 'daily') return now.toISOString().slice(0, 10);
-  if (type === 'weekly') {
-    const d = new Date(now);
-    d.setDate(d.getDate() - d.getDay());
-    return d.toISOString().slice(0, 10);
-  }
-  return 'all';
+  return 'once';
 }
 
 // GET /api/tasks
