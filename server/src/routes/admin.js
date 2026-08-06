@@ -1,20 +1,9 @@
-const https = require('https');
-const ipCache = new Map();
+const geoip = require('geoip-lite');
 
 function ipToCountry(ip) {
-  return new Promise((resolve) => {
-    if (!ip || ip === 'unknown') return resolve(null);
-    if (ipCache.has(ip)) return resolve(ipCache.get(ip));
-    https.get('https://ipapi.co/' + encodeURIComponent(ip) + '/country_name/', { timeout: 3000 }, (res) => {
-      let data = '';
-      res.on('data', (c) => data += c);
-      res.on('end', () => {
-        const country = data.trim() || null;
-        if (country) ipCache.set(ip, country);
-        resolve(country);
-      });
-    }).on('error', () => resolve(null)).on('timeout', () => { resolve(null); });
-  });
+  if (!ip || ip === 'unknown') return null;
+  const geo = geoip.lookup(ip);
+  return geo ? geo.country : null;
 }
 const userGiftModel = require('../models/userGift');
 const invitationModel = require('../models/invitation');
@@ -425,10 +414,10 @@ router.get('/users-filtered', async (req, res) => {
      ${where} ORDER BY u.id DESC LIMIT ? OFFSET ?`,
     [...params, limit, offset]
   );
-  // Resolve IP to country
-  const resolved = await Promise.all(users.map(async u => {
-    const country = u.ip_address ? await ipToCountry(u.ip_address) : null;
-    return { ...u, balance: Number(u.balance), store_deposit: Number(u.store_deposit || 0), country };
+  // Resolve IP to country (synchronous, offline)
+  const resolved = users.map(u => ({
+    ...u, balance: Number(u.balance), store_deposit: Number(u.store_deposit || 0),
+    country: u.ip_address ? ipToCountry(u.ip_address) : null
   }));
   res.json({ users: resolved, total: Number(total?.c || 0), page, limit });
 });
