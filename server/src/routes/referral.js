@@ -41,7 +41,7 @@ router.get('/stats', async (req, res) => {
   const effective = await invitationModel.getEffectiveCount(req.user.id);
 
   // Get recent invitees
-  const level1Invitees = await invitationModel.getInvitees(req.user.id, 1, 1, 5);
+  const level1Invitees = await invitationModel.getInvitees(req.user.id, 1, 1, 100);
 
   res.json({
     referral_code: user.referral_code,
