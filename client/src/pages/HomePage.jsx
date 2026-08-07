@@ -100,8 +100,9 @@ export default function HomePage() {
   const ordersToNext = tier.next ? tier.nextThreshold - totalOrders : 0;
   const displayPct = Math.min(100, Math.max(0, tierPct));
   const lockedInHoldings = holdings.reduce((s, h) => s + (h.cost || 0), 0);
-  const freeMargin = Math.max(0, balance - lockedInHoldings);
-  const marginPct = balance > 0 ? Math.round((freeMargin / balance) * 100) : null;
+  const totalAvailable = balance + deposit;
+  const freeMargin = Math.max(0, totalAvailable - lockedInHoldings);
+  const marginPct = totalAvailable > 0 ? Math.round((freeMargin / totalAvailable) * 100) : null;
   const avatarChar = (user?.name || user?.email || '?')[0].toUpperCase();
 
   // Handlers
