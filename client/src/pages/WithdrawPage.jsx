@@ -22,6 +22,9 @@ export default function WithdrawPage() {
   const [storeDeposit, setStoreDeposit] = useState(0);
   const [holdingsLocked, setHoldingsLocked] = useState(0);
   const [holdingsCount, setHoldingsCount] = useState(0);
+  const [todayProfit, setTodayProfit] = useState(0);
+  const [totalProfit, setTotalProfit] = useState(0);
+  const [earningsBalance, setEarningsBalance] = useState(0);
 
   const loadData = () => {
     Promise.all([
@@ -35,7 +38,12 @@ export default function WithdrawPage() {
         setClaims(c.data);
         setTaskBalance(b.data);
         setWithdrawals(w.data || []);
-        if (earn.data) setStoreDeposit(earn.data.deposit || 0);
+        if (earn.data) {
+          setStoreDeposit(earn.data.deposit || 0);
+          setTodayProfit(earn.data.todayProfit || 0);
+          setTotalProfit(earn.data.netProfit || 0);
+          setEarningsBalance(earn.data.balance || 0);
+        }
         const h = hold.data || [];
         setHoldingsLocked(h.reduce((s, h) => s + (h.cost || 0), 0));
         setHoldingsCount(h.length);
@@ -88,69 +96,81 @@ export default function WithdrawPage() {
       <div style={{padding:16}}>
         {/* Balance Breakdown */}
         <div style={{background:'#fff',borderRadius:18,padding:20,marginBottom:14}}>
-          <div style={{fontSize:11,color:'#999',marginBottom:12,textTransform:'uppercase',letterSpacing:.5,fontWeight:600}}>Balance Overview</div>
+          <div style={{fontSize:11,color:'#999',marginBottom:14,textTransform:'uppercase',letterSpacing:.5,fontWeight:600}}>Balance Overview</div>
 
-          {/* Main: Available */}
-          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}}>
+          {/* Available (withdrawable) */}
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}>
             <div style={{display:'flex',alignItems:'center',gap:10}}>
               <div style={{width:40,height:40,borderRadius:12,background:'#E8F8F0',display:'flex',alignItems:'center',justifyContent:'center'}}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00A86B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="1" x2="12" y2="3"/><polyline points="8 10 12 14 16 10"/></svg>
               </div>
               <div>
-                <div style={{fontSize:10,color:'#999',fontWeight:500}}>Available Balance</div>
-                <div style={{fontSize:11,color:'#999'}}>Can be withdrawn now</div>
+                <div style={{fontSize:12,fontWeight:600,color:'#0f0f0f'}}>Available Balance</div>
+                <div style={{fontSize:10,color:'#999'}}>Can withdraw now</div>
               </div>
             </div>
-            <div style={{fontSize:24,fontWeight:800,color:'#00A86B'}}>${availableBalance.toFixed(2)}</div>
+            <div style={{fontSize:22,fontWeight:800,color:'#00A86B'}}>${availableBalance.toFixed(2)}</div>
+          </div>
+
+          {/* Profit lines under Available */}
+          <div style={{marginLeft:50,marginBottom:12}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:4}}>
+              <span style={{fontSize:11,color:'#999'}}>Today's Profit</span>
+              <span style={{fontSize:12,fontWeight:600,color:'#00A86B'}}>+${todayProfit.toFixed(2)}</span>
+            </div>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <span style={{fontSize:11,color:'#999'}}>Total Net Profit</span>
+              <span style={{fontSize:12,fontWeight:600,color:'#00A86B'}}>+${totalProfit.toFixed(2)}</span>
+            </div>
           </div>
 
           {/* Divider */}
-          <div style={{height:1,background:'#f0f0f5',marginBottom:14}} />
+          <div style={{height:1,background:'#f0f0f5',marginBottom:12}} />
 
-          {/* Detail Lines */}
-          <div style={{display:'flex',flexDirection:'column',gap:10}}>
-            {/* Store Deposit (Margin) */}
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-              <div style={{display:'flex',alignItems:'center',gap:8}}>
-                <div style={{width:6,height:6,borderRadius:3,background:'#F59E0B'}} />
-                <span style={{fontSize:12,color:'#666'}}>Store Deposit <span style={{fontSize:10,color:'#999'}}>(Margin)</span></span>
+          {/* Store Deposit (Margin) - cannot use directly */}
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:6}}>
+            <div style={{display:'flex',alignItems:'center',gap:10}}>
+              <div style={{width:40,height:40,borderRadius:12,background:'#FFF8E1',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
               </div>
-              <span style={{fontSize:13,fontWeight:600,color:'#F59E0B'}}>${storeDeposit.toFixed(2)}</span>
+              <div>
+                <div style={{fontSize:12,fontWeight:600,color:'#0f0f0f'}}>Store Deposit</div>
+                <div style={{fontSize:10,color:'#999'}}>Margin · Cannot withdraw</div>
+              </div>
             </div>
+            <div style={{fontSize:22,fontWeight:800,color:'#F59E0B'}}>${storeDeposit.toFixed(2)}</div>
+          </div>
 
-            {/* In Trading (locked within deposit) */}
+          {/* Sub-breakdown within deposit */}
+          <div style={{marginLeft:50}}>
             {holdingsLocked > 0 && (
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingLeft:14}}>
-                <div style={{display:'flex',alignItems:'center',gap:8}}>
-                  <div style={{width:4,height:4,borderRadius:2,background:'#4C6EF5'}} />
-                  <span style={{fontSize:11,color:'#999'}}>In Trading <span style={{fontSize:10}}>({holdingsCount} active)</span></span>
-                </div>
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:4}}>
+                <span style={{fontSize:11,color:'#999'}}>In Trading ({holdingsCount} active)</span>
                 <span style={{fontSize:12,fontWeight:600,color:'#4C6EF5'}}>-${holdingsLocked.toFixed(2)}</span>
               </div>
             )}
-
-            {/* Free in store */}
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingLeft:14}}>
-              <div style={{display:'flex',alignItems:'center',gap:8}}>
-                <div style={{width:4,height:4,borderRadius:2,background:'#ccc'}} />
-                <span style={{fontSize:11,color:'#999'}}>Available in Store</span>
-              </div>
-              <span style={{fontSize:12,fontWeight:600,color:'#999'}}>${storeFree.toFixed(2)}</span>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+              <span style={{fontSize:11,color:'#999'}}>Available in Store</span>
+              <span style={{fontSize:12,fontWeight:600,color:'#666'}}>${storeFree.toFixed(2)}</span>
             </div>
-
-            {/* Total */}
-            <div style={{borderTop:'1px solid #f0f0f5',paddingTop:10,marginTop:2,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-              <span style={{fontSize:13,fontWeight:700,color:'#0f0f0f'}}>Total Assets</span>
-              <span style={{fontSize:16,fontWeight:800,color:'#0f0f0f'}}>${totalAssets.toFixed(2)}</span>
-            </div>
-
-            {pendingBalance > 0 && (
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:4}}>
-                <span style={{fontSize:11,color:'#F59E0B'}}>Pending Claims</span>
-                <span style={{fontSize:12,fontWeight:600,color:'#F59E0B'}}>${pendingBalance.toFixed(2)}</span>
-              </div>
-            )}
           </div>
+
+          {/* Divider */}
+          <div style={{height:1,background:'#f0f0f5',margin:'12px 0'}} />
+
+          {/* Total */}
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <span style={{fontSize:14,fontWeight:700,color:'#0f0f0f'}}>Total Assets</span>
+            <span style={{fontSize:20,fontWeight:800,color:'#0f0f0f'}}>${totalAssets.toFixed(2)}</span>
+          </div>
+          <div style={{fontSize:10,color:'#999',marginTop:4}}>Available ${availableBalance.toFixed(2)} + Deposit ${storeDeposit.toFixed(2)}</div>
+
+          {pendingBalance > 0 && (
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,paddingTop:8,borderTop:'1px solid #f0f0f5'}}>
+              <span style={{fontSize:11,color:'#F59E0B'}}>Pending Claims</span>
+              <span style={{fontSize:12,fontWeight:600,color:'#F59E0B'}}>${pendingBalance.toFixed(2)}</span>
+            </div>
+          )}
         </div>
 
         {/* Withdraw Form */}
