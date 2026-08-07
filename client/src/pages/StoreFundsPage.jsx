@@ -104,22 +104,42 @@ export default function StoreFundsPage() {
             </div>
           )}
           {withdrawError && (
-            <div style={{background:'#FFF5F5',border:'1px solid #FFCDD2',borderRadius:14,padding:16,marginTop:12}}>
-              <div style={{display:'flex',alignItems:'flex-start',gap:10}}>
-                <div style={{width:32,height:32,borderRadius:16,background:'#FFCDD2',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#CC0C39" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div style={{background:'#FFFBEB',border:'1px solid #FDE68A',borderRadius:16,padding:20,marginTop:12}}>
+              <div style={{display:'flex',alignItems:'flex-start',gap:12}}>
+                <div style={{width:36,height:36,borderRadius:18,background:'#FEF3C7',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 </div>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:13,fontWeight:700,color:'#CC0C39',marginBottom:4}}>Cannot withdraw right now</div>
-                  <div style={{fontSize:12,color:'#666',lineHeight:1.5}}>{withdrawError.detail || withdrawError.error}</div>
+                  <div style={{fontSize:14,fontWeight:700,color:'#92400E',marginBottom:6}}>Cannot Withdraw Deposit</div>
+                  <div style={{fontSize:12,color:'#92400E',lineHeight:1.7}}>
+                    You have <strong>{holdings.length} active orders</strong> currently being traded. Your deposit acts as collateral while orders are open.
+                  </div>
+                  <div style={{fontSize:12,color:'#92400E',lineHeight:1.7,marginTop:4}}>
+                    Your largest order requires <strong>${withdrawError.maxHoldingCost?.toFixed(2) || '0'}</strong> in deposit. If you withdraw now, your deposit will drop below that amount and your orders may be affected.
+                  </div>
+
                   {withdrawError.maxHoldingCost && (
-                    <div style={{display:'flex',gap:16,marginTop:10,paddingTop:10,borderTop:'1px solid #FFCDD2'}}>
-                      <div><div style={{fontSize:9,color:'#999'}}>Max Order</div><div style={{fontSize:14,fontWeight:700,color:'#0f0f0f'}}>${withdrawError.maxHoldingCost.toFixed(2)}</div></div>
-                      <div><div style={{fontSize:9,color:'#999'}}>Your Deposit</div><div style={{fontSize:14,fontWeight:700,color:'#F59E0B'}}>${(withdrawError.currentDeposit||0).toFixed(2)}</div></div>
-                      <div><div style={{fontSize:9,color:'#999'}}>After Withdraw</div><div style={{fontSize:14,fontWeight:700,color:'#EF4444'}}>${(withdrawError.newDeposit||0).toFixed(2)}</div></div>
+                    <div style={{display:'flex',gap:16,marginTop:14,paddingTop:14,borderTop:'1px solid #FDE68A'}}>
+                      <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
+                        <div style={{fontSize:9,color:'#999',marginBottom:2}}>Current Deposit</div>
+                        <div style={{fontSize:16,fontWeight:700,color:'#F59E0B'}}>${(withdrawError.currentDeposit||0).toFixed(0)}</div>
+                      </div>
+                      <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
+                        <div style={{fontSize:9,color:'#999',marginBottom:2}}>Minimum Required</div>
+                        <div style={{fontSize:16,fontWeight:700,color:'#0f0f0f'}}>${withdrawError.maxHoldingCost.toFixed(0)}</div>
+                      </div>
+                      <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
+                        <div style={{fontSize:9,color:'#999',marginBottom:2}}>Can Withdraw</div>
+                        <div style={{fontSize:16,fontWeight:700,color:'#00A86B'}}>${Math.max(0, (withdrawError.currentDeposit||0) - withdrawError.maxHoldingCost).toFixed(0)}</div>
+                      </div>
                     </div>
                   )}
-                  <button onClick={() => setWithdrawError(null)} style={{marginTop:10,padding:'6px 14px',background:'#fff',color:'#666',border:'1px solid #ddd',borderRadius:8,fontSize:11,fontWeight:600,cursor:'pointer'}}>Dismiss</button>
+
+                  <div style={{fontSize:11,color:'#92400E',marginTop:12,padding:'10px 14px',background:'#FEF3C7',borderRadius:10,lineHeight:1.6}}>
+                    <strong>What to do:</strong> Wait for your orders to complete (6-30 hours). Once an order is done, the locked funds are released and you can withdraw that portion of your deposit. You don't need to wait for all orders to finish — each completed order frees up part of your deposit.
+                  </div>
+
+                  <button onClick={() => setWithdrawError(null)} style={{marginTop:12,padding:'8px 18px',background:'#fff',color:'#92400E',border:'1px solid #FDE68A',borderRadius:10,fontSize:12,fontWeight:600,cursor:'pointer'}}>Got it</button>
                 </div>
               </div>
             </div>
