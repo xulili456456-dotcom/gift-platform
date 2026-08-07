@@ -112,27 +112,25 @@ export default function StoreFundsPage() {
                 <div style={{flex:1}}>
                   <div style={{fontSize:14,fontWeight:700,color:'#92400E',marginBottom:6}}>Cannot Withdraw Deposit</div>
                   <div style={{fontSize:12,color:'#92400E',lineHeight:1.7}}>
-                    You have <strong>{holdings.length} active orders</strong> currently being traded. Your deposit acts as collateral while orders are open.
+                    You have <strong>{withdrawError.activeOrders || holdings.length} active orders</strong>. Your deposit is locked as collateral while orders are being traded.
                   </div>
                   <div style={{fontSize:12,color:'#92400E',lineHeight:1.7,marginTop:4}}>
-                    Your largest order requires <strong>${withdrawError.maxHoldingCost?.toFixed(2) || '0'}</strong> in deposit. If you withdraw now, your deposit will drop below that amount and your orders may be affected.
+                    Your deposit is fully locked while orders are active. Once all {withdrawError.activeOrders || holdings.length} orders complete, you can withdraw the full amount.
                   </div>
 
-                  {withdrawError.maxHoldingCost && (
-                    <div style={{display:'flex',gap:16,marginTop:14,paddingTop:14,borderTop:'1px solid #FDE68A'}}>
-                      <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
-                        <div style={{fontSize:9,color:'#999',marginBottom:2}}>Your Deposit</div>
-                        <div style={{fontSize:16,fontWeight:700,color:'#F59E0B'}}>${(withdrawError.currentDeposit||0).toFixed(0)}</div>
-                      </div>
-                      <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
-                        <div style={{fontSize:9,color:'#999',marginBottom:2}}>Required Minimum</div>
-                        <div style={{fontSize:16,fontWeight:700,color:'#EF4444'}}>${withdrawError.maxHoldingCost.toFixed(0)}</div>
-                      </div>
+                  <div style={{display:'flex',gap:12,marginTop:14,paddingTop:14,borderTop:'1px solid #FDE68A'}}>
+                    <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
+                      <div style={{fontSize:9,color:'#999',marginBottom:2}}>Your Deposit</div>
+                      <div style={{fontSize:16,fontWeight:700,color:'#0f0f0f'}}>${(withdrawError.currentDeposit||0).toFixed(0)}</div>
                     </div>
-                  )}
+                    <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
+                      <div style={{fontSize:9,color:'#999',marginBottom:2}}>Active Orders</div>
+                      <div style={{fontSize:16,fontWeight:700,color:'#EF4444'}}>{withdrawError.activeOrders || holdings.length}</div>
+                    </div>
+                  </div>
 
                   <div style={{fontSize:11,color:'#92400E',marginTop:12,padding:'10px 14px',background:'#FEF3C7',borderRadius:10,lineHeight:1.6}}>
-                    <strong>Why:</strong> Your deposit must stay above the largest active order amount. As long as there are open orders requiring margin, you cannot reduce your deposit below the minimum. <strong>Wait for all margin orders to complete (6-30 hours), then withdraw.</strong>
+                    <strong>Why:</strong> Deposit cannot be withdrawn while orders are active. Wait for all orders to complete (6-30 hours), then withdraw the full amount.
                   </div>
 
                   <button onClick={() => setWithdrawError(null)} style={{marginTop:12,padding:'8px 18px',background:'#fff',color:'#92400E',border:'1px solid #FDE68A',borderRadius:10,fontSize:12,fontWeight:600,cursor:'pointer'}}>Got it</button>

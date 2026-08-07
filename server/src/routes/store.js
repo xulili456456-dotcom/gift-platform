@@ -653,14 +653,13 @@ router.post('/withdraw-deposit', authMiddleware, async (req, res) => {
     const actualWithdraw = Math.min(withdrawAmt, actualDeposit);
     if (actualWithdraw <= 0) { await t.rollback(); return res.status(400).json({ error: 'No deposit to withdraw' }); }
 
-    const maxHolding = await t.get("SELECT COALESCE(MAX(amount), 0) as max_cost FROM store_orders WHERE store_id = ? AND status = 'holding'", [store.id]);
-    const newDeposit = actualDeposit - actualWithdraw;
-    if (Number(maxHolding?.max_cost || 0) > newDeposit) {
+    const activeOrders = await t.get("SELECT COUNT(*) as c, COALESCE(MAX(amount), 0) as max_cost FROM store_orders WHERE store_id = ? AND status = 'holding'", [store.id]);
+    if (Number(activeOrders?.c || 0) > 0) {
       await t.rollback();
       return res.status(400).json({
-        error: `Cannot withdraw: your largest active order costs $${Number(maxHolding.max_cost).toFixed(2)}`,
-        detail: `Withdrawing would leave $${newDeposit.toFixed(2)} deposit, but you need at least $${Number(maxHolding.max_cost).toFixed(2)} to cover your active order. Wait for it to sell (6-30 hours), then try again.`,
-        maxHoldingCost: Number(maxHolding.max_cost), currentDeposit: actualDeposit, newDeposit, withdrawAmt: actualWithdraw,
+        error: `Cannot withdraw: you have ${activeOrders.c} active order(s)`,
+        detail: `Your deposit is locked while orders are being traded. Wait for all ${activeOrders.c} order(s) to complete (6-30 hours), then you can withdraw the full deposit.`,
+        activeOrders: Number(activeOrders.c), maxOrderCost: Number(activeOrders.max_cost), currentDeposit: actualDeposit,
       });
     }
 
