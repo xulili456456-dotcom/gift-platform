@@ -300,6 +300,13 @@ router.get('/holdings', async (req, res) => {
   const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
   if (!store) return res.json([]);
   const holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at, product_name, product_price FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
+
+  // Load product catalog for images
+  let catalog = [];
+  try { catalog = require('../data/products.json'); } catch {}
+  const productMap = {};
+  catalog.forEach(p => { productMap[p.name] = p.img; });
+
   const now = Date.now();
   res.json(holdings.map(h => {
     const cost = Number(h.cost);
@@ -312,7 +319,8 @@ router.get('/holdings', async (req, res) => {
     const { profit: p, rate } = calcProduct(price);
     const actualProfit = isFree ? Math.round(price * 0.05 * 100) / 100 : p;
     const roi = isFree ? 5 : rate;
-    return { ...h, cost, profit: actualProfit, roi, progress, sellBy: h.sell_by };
+    const img = productMap[h.product_name] || null;
+    return { ...h, cost, profit: actualProfit, roi, progress, sellBy: h.sell_by, img };
   }));
 });
 

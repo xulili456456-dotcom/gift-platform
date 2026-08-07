@@ -352,7 +352,13 @@ export default function HomePage() {
                 <div onClick={() => setExpandedHolding(expandedHolding === h.id ? null : h.id)}
                   style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < holdings.length - 1 ? '1px solid #f0f0f5' : 'none', cursor: 'pointer', transition: 'all .15s' }}>
                   <div style={{ width: 56, height: 42, borderRadius: 7, overflow: 'hidden', flexShrink: 0, background: '#f5f5f7' }}>
-                    <img src={h.product_name ? `https://gift-platform-h6um.onrender.com/products/${h.id % 60 || 1}.jpg` : ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {h.img ? (
+                      <img src={h.img.startsWith('http') ? h.img : `https://gift-platform-h6um.onrender.com${h.img}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#E8F8F0' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                      </div>
+                    )}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.product_name || 'Product'}</div>
