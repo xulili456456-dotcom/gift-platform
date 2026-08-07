@@ -203,7 +203,7 @@ export default function HomePage() {
         {/* Stat Cards */}
         <div style={{ display: 'flex', gap: 8 }}>
           {/* Balance */}
-          <div onClick={() => navigate('/mine/transactions')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 12, padding: '10px 8px', cursor: 'pointer', position: 'relative', overflow: 'hidden', minWidth: 0, transition: 'all .2s' }}>
+          <div onClick={() => navigate('/mine/withdraw')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 12, padding: '10px 8px', cursor: 'pointer', position: 'relative', overflow: 'hidden', minWidth: 0, transition: 'all .2s' }}>
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,80,0,.3),transparent)', animationDelay: '0s' }} />
             <div className="count-in glow-text-pri" style={{ fontSize: 15, fontWeight: 700, color: 'var(--pri)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>${balance.toFixed(2)}</div>
             <div style={{ fontSize: 9, color: 'rgba(255,255,255,.35)', marginTop: 3, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>Balance <span style={{ color: 'var(--green)' }}>{netProfit > 0 ? `↑${Math.round(netProfit/balance*100)}%` : '↑0%'}</span></div>
