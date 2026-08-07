@@ -203,27 +203,27 @@ export default function HomePage() {
         {/* Stat Cards */}
         <div style={{ display: 'flex', gap: 8 }}>
           {/* Balance */}
-          <div onClick={() => navigate('/mine/withdraw')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 12, padding: '10px 8px', cursor: 'pointer', position: 'relative', overflow: 'hidden', minWidth: 0, transition: 'all .2s' }}>
+          <div onClick={() => navigate('/mine/withdraw')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 12, padding: '10px 8px', cursor: 'pointer', position: 'relative', overflow: 'hidden', transition: 'all .2s' }}>
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,80,0,.3),transparent)', animationDelay: '0s' }} />
-            <div className="count-in glow-text-pri" style={{ fontSize: 15, fontWeight: 700, color: 'var(--pri)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>${balance.toFixed(2)}</div>
+            <div className="count-in glow-text-pri" style={{ fontSize: 13, fontWeight: 700, color: 'var(--pri)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>${balance.toFixed(2)}</div>
             <div style={{ fontSize: 9, color: 'rgba(255,255,255,.35)', marginTop: 3, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>Balance <span style={{ color: 'var(--green)' }}>{netProfit > 0 ? `↑${Math.round(netProfit/balance*100)}%` : '↑0%'}</span></div>
           </div>
           {/* Today's Profit */}
-          <div onClick={() => navigate('/mine/transactions')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 12, padding: '10px 8px', cursor: 'pointer', position: 'relative', overflow: 'hidden', minWidth: 0, transition: 'all .2s' }}>
+          <div onClick={() => navigate('/mine/transactions')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 12, padding: '10px 8px', cursor: 'pointer', position: 'relative', overflow: 'hidden', transition: 'all .2s' }}>
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(0,168,107,.3),transparent)', animationDelay: '.5s' }} />
-            <div className="count-in glow-text-grn" style={{ fontSize: 15, fontWeight: 700, color: 'var(--green)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', animationDelay: '.1s' }}>+${todayProfit.toFixed(2)}</div>
+            <div className="count-in glow-text-grn" style={{ fontSize: 13, fontWeight: 700, color: 'var(--green)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.1s' }}>+${todayProfit.toFixed(2)}</div>
             <div style={{ fontSize: 9, color: 'rgba(255,255,255,.35)', marginTop: 3, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>Today's Profit</div>
           </div>
           {/* Active Orders */}
-          <div onClick={() => navigate('/store/funds')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 12, padding: '10px 8px', cursor: 'pointer', position: 'relative', overflow: 'hidden', minWidth: 0, transition: 'all .2s' }}>
+          <div onClick={() => navigate('/store/funds')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 12, padding: '10px 8px', cursor: 'pointer', position: 'relative', overflow: 'hidden', transition: 'all .2s' }}>
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(76,110,245,.3),transparent)', animationDelay: '1s' }} />
-            <div className="count-in glow-text-blu" style={{ fontSize: 15, fontWeight: 700, color: 'var(--blue)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', animationDelay: '.2s' }}>{activeOrders}</div>
+            <div className="count-in glow-text-blu" style={{ fontSize: 13, fontWeight: 700, color: 'var(--blue)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.2s' }}>{activeOrders}</div>
             <div style={{ fontSize: 9, color: 'rgba(255,255,255,.35)', marginTop: 3, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>Active Orders</div>
           </div>
           {/* Free Margin */}
-          <div onClick={() => navigate('/mine/transactions')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 12, padding: '10px 8px', cursor: 'pointer', position: 'relative', overflow: 'hidden', minWidth: 0, transition: 'all .2s' }}>
+          <div onClick={() => navigate('/mine/transactions')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 12, padding: '10px 8px', cursor: 'pointer', position: 'relative', overflow: 'hidden', transition: 'all .2s' }}>
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(245,158,11,.3),transparent)', animationDelay: '1.5s' }} />
-            <div className="count-in glow-text-gld" style={{ fontSize: 15, fontWeight: 700, color: 'var(--gold)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', animationDelay: '.3s' }}>${freeMargin.toFixed(2)}</div>
+            <div className="count-in glow-text-gld" style={{ fontSize: 13, fontWeight: 700, color: 'var(--gold)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.3s' }}>${freeMargin.toFixed(2)}</div>
             <div style={{ fontSize: 9, color: 'rgba(255,255,255,.35)', marginTop: 3, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>Free Margin <span style={{ color: 'var(--gold)' }}>{marginPct}%</span></div>
           </div>
         </div>
@@ -360,7 +360,7 @@ export default function HomePage() {
                     <img src={h.product_name ? `https://gift-platform-h6um.onrender.com/products/${h.id % 60 || 1}.jpg` : ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.product_name || 'Product'}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 5, whiteSpace: 'nowrap' }}>{h.product_name || 'Product'}</div>
                     <div style={{ height: 4, background: '#e8e8ed', borderRadius: 2, overflow: 'hidden' }}>
                       <div className={h.progress >= 90 ? 'hold-fill-near' : ''} style={{ height: '100%', width: `${Math.min(100, h.progress || 0)}%`, background: h.progress >= 90 ? 'var(--gold)' : h.progress >= 50 ? 'var(--green)' : 'var(--blue)', borderRadius: 2, transition: 'width 1.5s cubic-bezier(.4,0,.2,1)' }} />
                     </div>
