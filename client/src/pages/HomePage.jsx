@@ -103,7 +103,6 @@ export default function HomePage() {
   const freeMargin = deposit;
   const freeAvailable = Math.max(0, deposit - lockedInHoldings);
   const marginPct = deposit > 0 ? Math.round((freeAvailable / deposit) * 100) : null;
-  const avatarChar = (user?.name || user?.email || '?')[0].toUpperCase();
 
   // Handlers
   const handleGrab = async (productId, productName) => {
@@ -191,9 +190,7 @@ export default function HomePage() {
       {/* ═══ HEADER ═══ */}
       <header style={{ background: 'linear-gradient(180deg,#0a0a0f,#1a1a24)', padding: '14px 16px 16px', color: '#fff', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-          <div onClick={() => navigate('/mine')} style={{ width: 32, height: 32, borderRadius: 9, background: 'var(--pri)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14, flexShrink: 0, cursor: 'pointer' }}>
-            {avatarChar}
-          </div>
+          <img onClick={() => navigate('/mine')} src="/uploads/lolg.jpg" alt="" style={{ width: 32, height: 32, borderRadius: 9, objectFit: 'cover', flexShrink: 0, cursor: 'pointer' }} />
           <div onClick={() => toast('Search products...')} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.04)', borderRadius: 10, padding: '9px 13px', cursor: 'pointer' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <span style={{ fontSize: 13, color: 'rgba(255,255,255,.3)' }}>Search products...</span>
