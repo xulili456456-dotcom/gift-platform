@@ -99,10 +99,6 @@ export default function HomePage() {
   const tierPct = tier.next ? Math.round((totalOrders - tier.threshold) / (tier.nextThreshold - tier.threshold) * 100) : 100;
   const ordersToNext = tier.next ? tier.nextThreshold - totalOrders : 0;
   const displayPct = Math.min(100, Math.max(0, tierPct));
-  const lockedInHoldings = holdings.reduce((s, h) => s + (h.cost || 0), 0);
-  const freeMargin = deposit;
-  const freeAvailable = Math.max(0, deposit - lockedInHoldings);
-  const marginPct = deposit > 0 ? Math.round((freeAvailable / deposit) * 100) : null;
 
   // Handlers
   const handleGrab = async (productId, productName) => {
@@ -215,11 +211,11 @@ export default function HomePage() {
             <div className="count-in glow-text-grn" style={{ fontSize: 18, fontWeight: 700, color: 'var(--green)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.1s' }}>+${todayProfit.toFixed(2)}</div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,.35)', marginTop: 4, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>Today's Profit</div>
           </div>
-          {/* Free Margin */}
+          {/* Deposit */}
           <div onClick={() => navigate('/store/funds')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 14, padding: '14px 12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }} className="home-stat-card">
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(245,158,11,.3),transparent)', animationDelay: '1s' }} />
-            <div className="count-in glow-text-gld" style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.2s' }}>${freeMargin.toFixed(2)}</div>
-            <div style={{ fontSize: 10, color: 'rgba(255,255,255,.35)', marginTop: 4, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>Deposit <span style={{ color: 'var(--gold)' }}>{marginPct !== null ? `· $${freeAvailable.toFixed(0)} free` : ''}</span></div>
+            <div className="count-in glow-text-gld" style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.2s' }}>${deposit.toFixed(2)}</div>
+            <div style={{ fontSize: 10, color: 'rgba(255,255,255,.35)', marginTop: 4, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>Deposit</div>
           </div>
         </div>
       </header>
