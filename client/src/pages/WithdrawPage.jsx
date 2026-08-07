@@ -97,45 +97,44 @@ export default function WithdrawPage() {
         {/* Balance Overview */}
         <div style={{background:'#fff',borderRadius:18,padding:20,marginBottom:14}}>
 
-          {/* Total Assets — big at top */}
           <div style={{textAlign:'center',marginBottom:18}}>
-            <div style={{fontSize:11,color:'#999',marginBottom:2,fontWeight:600}}>Total Assets</div>
+            <div style={{fontSize:10,color:'#999',marginBottom:2,fontWeight:600,textTransform:'uppercase'}}>Total Assets</div>
             <div style={{fontSize:34,fontWeight:800,color:'#0f0f0f'}}>${totalAssets.toFixed(2)}</div>
           </div>
 
-          {/* Two columns: Available | Deposit */}
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:16}}>
-            <div style={{background:'#E8F8F0',borderRadius:14,padding:14,textAlign:'center'}}>
-              <div style={{fontSize:10,color:'#666',marginBottom:4,fontWeight:600}}>Available</div>
-              <div style={{fontSize:20,fontWeight:800,color:'#00A86B'}}>${availableBalance.toFixed(2)}</div>
-              <div style={{fontSize:9,color:'#999',marginTop:2}}>Can withdraw</div>
-            </div>
-            <div style={{background:'#FFF8E1',borderRadius:14,padding:14,textAlign:'center'}}>
-              <div style={{fontSize:10,color:'#666',marginBottom:4,fontWeight:600}}>Deposit</div>
-              <div style={{fontSize:20,fontWeight:800,color:'#F59E0B'}}>${storeDeposit.toFixed(2)}</div>
-              <div style={{fontSize:9,color:'#999',marginTop:2}}>In Trading {holdingsLocked > 0 ? `$${holdingsLocked.toFixed(0)}` : '$0'}</div>
-            </div>
+          {/* Available */}
+          <div style={{background:'#E8F8F0',borderRadius:14,padding:14,marginBottom:10}}>
+            <div style={{fontSize:11,color:'#666',marginBottom:2,fontWeight:600}}>Available to withdraw</div>
+            <div style={{fontSize:22,fontWeight:800,color:'#00A86B'}}>${availableBalance.toFixed(2)}</div>
           </div>
 
-          {/* Divider */}
-          <div style={{height:1,background:'#f0f0f5',marginBottom:12}} />
-
-          {/* Profit */}
-          <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
-            <span style={{fontSize:12,color:'#666'}}>Today's Profit</span>
-            <span style={{fontSize:13,fontWeight:600,color:'#00A86B'}}>+${todayProfit.toFixed(2)}</span>
-          </div>
-          <div style={{display:'flex',justifyContent:'space-between'}}>
-            <span style={{fontSize:12,color:'#666'}}>Total Net Profit</span>
-            <span style={{fontSize:13,fontWeight:600,color:'#00A86B'}}>+${totalProfit.toFixed(2)}</span>
-          </div>
-
-          {pendingBalance > 0 && (
-            <div style={{display:'flex',justifyContent:'space-between',marginTop:8,paddingTop:8,borderTop:'1px solid #f0f0f5'}}>
-              <span style={{fontSize:12,color:'#F59E0B'}}>Pending</span>
-              <span style={{fontSize:13,fontWeight:600,color:'#F59E0B'}}>${pendingBalance.toFixed(2)}</span>
+          {/* Unavailable */}
+          <div style={{background:'#FFF5F0',borderRadius:14,padding:14}}>
+            <div style={{fontSize:11,color:'#999',marginBottom:8,fontWeight:600}}>Unavailable</div>
+            {storeDeposit > 0 && (
+              <div style={{marginBottom:4,display:'flex',justifyContent:'space-between'}}>
+                <span style={{fontSize:12,color:'#666'}}>Store deposit (margin)</span>
+                <span style={{fontSize:13,fontWeight:600,color:'#F59E0B'}}>${storeDeposit.toFixed(2)}</span>
+              </div>
+            )}
+            {holdingsLocked > 0 && (
+              <div style={{marginBottom:4,display:'flex',justifyContent:'space-between'}}>
+                <span style={{fontSize:12,color:'#666'}}>Locked in {holdingsCount} active trades</span>
+                <span style={{fontSize:13,fontWeight:600,color:'#EF4444'}}>-${holdingsLocked.toFixed(2)}</span>
+              </div>
+            )}
+            <div style={{display:'flex',justifyContent:'space-between',paddingTop:4,borderTop:'1px solid rgba(0,0,0,.06)'}}>
+              <span style={{fontSize:12,fontWeight:600,color:'#0f0f0f'}}>Total unavailable</span>
+              <span style={{fontSize:14,fontWeight:700,color:'#0f0f0f'}}>${storeDeposit.toFixed(2)}</span>
             </div>
-          )}
+            <div style={{fontSize:10,color:'#999',marginTop:6}}>Deposit is locked in store. Withdraw deposit from Store Funds to free it up.</div>
+          </div>
+
+          {/* Profit summary */}
+          <div style={{display:'flex',justifyContent:'space-between',marginTop:12,paddingTop:12,borderTop:'1px solid #f0f0f5'}}>
+            <span style={{fontSize:11,color:'#999'}}>Today's Profit</span>
+            <span style={{fontSize:12,fontWeight:600,color:'#00A86B'}}>+${todayProfit.toFixed(2)}</span>
+          </div>
         </div>
 
         {/* Withdraw Form */}
