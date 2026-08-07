@@ -56,8 +56,7 @@ export default function WithdrawPage() {
   const availableBalance = taskBalance.available || 0;
   const pendingBalance = claims.filter(c => c.status === 'pending').reduce((s, c) => s + (Number(c.value) || 0), 0);
   const totalWithdrawn = withdrawals.filter(w => w.status === 'completed').reduce((s, w) => s + (Number(w.amount) || 0), 0);
-  const storeFree = Math.max(0, storeDeposit - holdingsLocked);
-  const totalAssets = availableBalance + storeDeposit;
+  const totalAssets = availableBalance + storeDeposit + holdingsLocked;
 
   const handleWithdraw = async () => {
     const amt = parseFloat(amount);
@@ -100,6 +99,7 @@ export default function WithdrawPage() {
           <div style={{textAlign:'center',marginBottom:18}}>
             <div style={{fontSize:10,color:'#999',marginBottom:2,fontWeight:600,textTransform:'uppercase'}}>Total Assets</div>
             <div style={{fontSize:34,fontWeight:800,color:'#0f0f0f'}}>${totalAssets.toFixed(2)}</div>
+            <div style={{fontSize:10,color:'#999',marginTop:2}}>Available ${availableBalance.toFixed(2)} + Deposit ${storeDeposit.toFixed(2)}{holdingsLocked > 0 ? ` + Trading $${holdingsLocked.toFixed(2)}` : ''}</div>
           </div>
 
           {/* Available */}
@@ -108,21 +108,21 @@ export default function WithdrawPage() {
             <div style={{fontSize:22,fontWeight:800,color:'#00A86B'}}>${availableBalance.toFixed(2)}</div>
           </div>
 
-          {/* Unavailable */}
-          <div style={{background:'#FFF5F0',borderRadius:14,padding:14}}>
-            <div style={{fontSize:11,color:'#999',marginBottom:8,fontWeight:600}}>Unavailable</div>
-            <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}>
-              <span style={{fontSize:12,color:'#666'}}>Store Deposit</span>
-              <span style={{fontSize:14,fontWeight:700,color:'#F59E0B'}}>${storeDeposit.toFixed(2)}</span>
-            </div>
-            {holdingsLocked > 0 && (
-              <div style={{display:'flex',justifyContent:'space-between'}}>
-                <span style={{fontSize:11,color:'#999'}}>In {holdingsCount} active trades</span>
-                <span style={{fontSize:12,fontWeight:600,color:'#666'}}>${holdingsLocked.toFixed(2)}</span>
-              </div>
-            )}
-            <div style={{fontSize:10,color:'#999',marginTop:6}}>Deposit is locked in store. Withdraw from Store Funds to access it.</div>
+          {/* Deposit */}
+          <div style={{background:'#FFF8E1',borderRadius:14,padding:14,marginBottom:10}}>
+            <div style={{fontSize:11,color:'#999',marginBottom:2,fontWeight:600}}>Deposit (Margin)</div>
+            <div style={{fontSize:22,fontWeight:800,color:'#F59E0B'}}>${storeDeposit.toFixed(2)}</div>
+            <div style={{fontSize:10,color:'#999',marginTop:2}}>Cannot use for trading. Withdraw from Store Funds.</div>
           </div>
+
+          {/* In Trading */}
+          {holdingsLocked > 0 && (
+            <div style={{background:'#EEF2FF',borderRadius:14,padding:14}}>
+              <div style={{fontSize:11,color:'#999',marginBottom:2,fontWeight:600}}>In Trading</div>
+              <div style={{fontSize:22,fontWeight:800,color:'#4C6EF5'}}>${holdingsLocked.toFixed(2)}</div>
+              <div style={{fontSize:10,color:'#999',marginTop:2}}>Locked in {holdingsCount} active orders</div>
+            </div>
+          )}
 
           {/* Profit summary */}
           <div style={{display:'flex',justifyContent:'space-between',marginTop:12,paddingTop:12,borderTop:'1px solid #f0f0f5'}}>
