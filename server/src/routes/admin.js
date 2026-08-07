@@ -9,21 +9,28 @@ const settingsModel = require('../models/settings');
 const { get, all, run, insert, tx } = require('../db/database');
 const { notify } = require('./notifications');
 
+const http = require('http');
 const countryCache = new Map();
-async function ipToCountry(ip) {
-  if (!ip || ip === 'unknown') return null;
-  if (countryCache.has(ip)) return countryCache.get(ip);
-  try {
-    const res = await fetch('http://ip-api.com/json/' + encodeURIComponent(ip) + '?fields=countryCode');
-    const data = await res.json();
-    if (data && data.countryCode) {
-      const flag = String.fromCodePoint(...[...data.countryCode].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
-      const text = flag + ' ' + data.countryCode;
-      countryCache.set(ip, text);
-      return text;
-    }
-  } catch (e) {}
-  return null;
+function ipToCountry(ip) {
+  return new Promise((resolve) => {
+    if (!ip || ip.length < 7) return resolve(null);
+    if (countryCache.has(ip)) return resolve(countryCache.get(ip));
+    http.get('http://ip-api.com/json/' + encodeURIComponent(ip) + '?fields=countryCode', { timeout: 5000 }, (res) => {
+      let data = '';
+      res.on('data', c => data += c);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          if (json && json.countryCode) {
+            const flag = String.fromCodePoint(...[...json.countryCode].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+            const text = flag + ' ' + json.countryCode;
+            countryCache.set(ip, text);
+            resolve(text);
+          } else { resolve(null); }
+        } catch (e) { resolve(null); }
+      });
+    }).on('error', () => resolve(null)).on('timeout', () => resolve(null));
+  });
 }
 
 const router = Router();
