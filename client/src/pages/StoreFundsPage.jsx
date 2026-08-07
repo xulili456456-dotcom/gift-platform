@@ -121,22 +121,18 @@ export default function StoreFundsPage() {
                   {withdrawError.maxHoldingCost && (
                     <div style={{display:'flex',gap:16,marginTop:14,paddingTop:14,borderTop:'1px solid #FDE68A'}}>
                       <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
-                        <div style={{fontSize:9,color:'#999',marginBottom:2}}>Current Deposit</div>
+                        <div style={{fontSize:9,color:'#999',marginBottom:2}}>Your Deposit</div>
                         <div style={{fontSize:16,fontWeight:700,color:'#F59E0B'}}>${(withdrawError.currentDeposit||0).toFixed(0)}</div>
                       </div>
                       <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
-                        <div style={{fontSize:9,color:'#999',marginBottom:2}}>Minimum Required</div>
-                        <div style={{fontSize:16,fontWeight:700,color:'#0f0f0f'}}>${withdrawError.maxHoldingCost.toFixed(0)}</div>
-                      </div>
-                      <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
-                        <div style={{fontSize:9,color:'#999',marginBottom:2}}>Can Withdraw</div>
-                        <div style={{fontSize:16,fontWeight:700,color:'#00A86B'}}>${Math.max(0, (withdrawError.currentDeposit||0) - withdrawError.maxHoldingCost).toFixed(0)}</div>
+                        <div style={{fontSize:9,color:'#999',marginBottom:2}}>Required Minimum</div>
+                        <div style={{fontSize:16,fontWeight:700,color:'#EF4444'}}>${withdrawError.maxHoldingCost.toFixed(0)}</div>
                       </div>
                     </div>
                   )}
 
                   <div style={{fontSize:11,color:'#92400E',marginTop:12,padding:'10px 14px',background:'#FEF3C7',borderRadius:10,lineHeight:1.6}}>
-                    <strong>What to do:</strong> Wait for your orders to complete (6-30 hours). Once an order is done, the locked funds are released and you can withdraw that portion of your deposit. You don't need to wait for all orders to finish — each completed order frees up part of your deposit.
+                    <strong>Why:</strong> Your deposit must stay above the largest active order amount. As long as there are open orders requiring margin, you cannot reduce your deposit below the minimum. <strong>Wait for all margin orders to complete (6-30 hours), then withdraw.</strong>
                   </div>
 
                   <button onClick={() => setWithdrawError(null)} style={{marginTop:12,padding:'8px 18px',background:'#fff',color:'#92400E',border:'1px solid #FDE68A',borderRadius:10,fontSize:12,fontWeight:600,cursor:'pointer'}}>Got it</button>
