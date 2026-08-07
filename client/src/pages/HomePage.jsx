@@ -19,6 +19,7 @@ export default function HomePage() {
   const [todayEarned, setTodayEarned] = useState(0);
   const [activeOrders, setActiveOrders] = useState(0);
   const [holdings, setHoldings] = useState([]);
+  const [shareLink, setShareLink] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { loadAll(); const t = setInterval(loadBalance, 15000); const s = setInterval(checkSell, 60000); return () => { clearInterval(t); clearInterval(s); }; }, []);
@@ -48,8 +49,9 @@ export default function HomePage() {
       setNetProfit(b.data?.netProfit || 0);
       setTodayEarned(b.data?.todayProfit || 0);
       setActiveOrders(b.data?.activeOrders || 0);
-      // Holdings
+      // Holdings + Share link
       client.get('/store/holdings').then(({data}) => setHoldings(data||[])).catch(()=>{});
+      referralApi.getCode().then(({data}) => setShareLink(data?.share_link||'')).catch(()=>{});
     } catch { toast.error('Failed to load'); }
     finally { setLoading(false); }
   };
@@ -203,6 +205,7 @@ export default function HomePage() {
               <div style={{fontSize:18,fontWeight:800,letterSpacing:2}}>{referralCode}</div>
             </div>
             <button onClick={copyCode} style={{padding:'6px 14px',background:'rgba(255,255,255,.2)',color:'#fff',border:'none',borderRadius:8,fontSize:11,fontWeight:600,cursor:'pointer'}}>Copy Code</button>
+              <button onClick={() => { navigator.clipboard.writeText(shareLink); toast.success('Link copied!'); }} style={{padding:'6px 14px',background:'rgba(255,255,255,.2)',color:'#fff',border:'none',borderRadius:8,fontSize:11,fontWeight:600,cursor:'pointer'}}>Copy Link</button>
           </div>
         </div>
 
