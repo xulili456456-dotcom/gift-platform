@@ -24,6 +24,7 @@ export default function StoreFundsPage() {
   const [holdings, setHoldings] = useState([]);
   const [earnings, setEarnings] = useState({ todayProfit: 0, totalProfit: 0 });
   const [depositAmount, setDepositAmount] = useState('');
+  const [withdrawAmount, setWithdrawAmount] = useState('');
   const [depositMsg, setDepositMsg] = useState('');
   const [orderHistory, setOrderHistory] = useState(null);
   const [expandedOrder, setExpandedOrder] = useState(null);
@@ -48,7 +49,10 @@ export default function StoreFundsPage() {
     catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };
   const handleWithdrawDeposit = async () => {
-    try { await client.post('/store/withdraw-deposit', {}); toast.success('Deposit returned to balance'); loadStatus(); loadEarnings(); }
+    const amt = parseFloat(withdrawAmount);
+    if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
+    if (amt > (s.deposit || 0)) { toast.error('Insufficient deposit'); return; }
+    try { await client.post('/store/withdraw-deposit', { amount: amt }); toast.success(`$${amt} returned to balance`); setWithdrawAmount(''); loadStatus(); loadEarnings(); }
     catch (err) { toast.error(err.response?.data?.detail || err.response?.data?.error || 'Failed'); }
   };
 
@@ -88,9 +92,14 @@ export default function StoreFundsPage() {
           </div>
           {depositMsg && <p style={{fontSize:11,color:'#00A86B',fontWeight:600,marginBottom:8}}>{depositMsg}</p>}
           {(s.deposit||0) > 0 && (
-            <button onClick={handleWithdrawDeposit} style={{width:'100%',padding:10,background:'none',color:'#CC0C39',border:'1px solid #FFCDD2',borderRadius:12,fontSize:12,fontWeight:600,cursor:'pointer'}}>
-              Withdraw ${(s.deposit||0).toFixed(0)} to Balance
-            </button>
+            <div style={{marginBottom:8}}>
+              <div style={{fontSize:11,color:'#999',marginBottom:4}}>Withdraw amount (max ${(s.deposit||0).toFixed(0)})</div>
+              <div style={{display:'flex',gap:8}}>
+                <input type="number" value={withdrawAmount} onChange={e => setWithdrawAmount(e.target.value)} placeholder="Amount" style={{flex:1,padding:'10px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:14,outline:'none'}} />
+                <button onClick={() => setWithdrawAmount(String(s.deposit||0))} style={{padding:'10px 12px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:11,fontWeight:600,color:'#666',cursor:'pointer'}}>Max</button>
+                <button onClick={handleWithdrawDeposit} style={{padding:'10px 18px',background:'#FF5000',color:'#fff',border:'none',borderRadius:12,fontSize:12,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap'}}>Withdraw</button>
+              </div>
+            </div>
           )}
         </div>
 
