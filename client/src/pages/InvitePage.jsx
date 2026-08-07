@@ -51,13 +51,7 @@ export default function InvitePage() {
         <button onClick={() => copyToClipboard(inviteData?.share_link, t('invite.linkCopied'))} className="w-full py-3 bg-gradient-to-r from-primary to-primary-dark text-white font-semibold rounded-xl shadow-lg shadow-primary/20 active:scale-[0.98] transition-all text-sm">📋 {t('invite.copyLink')}</button>
       </div>
 
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-center">
-        <h3 className="font-semibold text-text-primary text-sm mb-3">📱 {t('invite.qrCode')}</h3>
-        {inviteData?.qr_code ? <div className="inline-block bg-white rounded-xl p-3 shadow-sm border border-gray-100"><img src={inviteData.qr_code} alt="QR" className="w-52 h-52" /></div> : <p className="text-text-muted text-sm py-8">{t('invite.qrGenerating')}</p>}
-        <p className="text-xs text-text-muted mt-3">{t('invite.qrHint')}</p>
-      </div>
-
-      <div className="bg-gold-light/50 rounded-2xl p-5 border border-gold/30">
+<div className="bg-gold-light/50 rounded-2xl p-5 border border-gold/30">
         <h3 className="font-semibold text-text-primary text-sm mb-3">💡 {t('invite.shareTips')}</h3>
         <div className="space-y-2 text-xs text-text-secondary">
           {[1,2,3,4].map(i => (
