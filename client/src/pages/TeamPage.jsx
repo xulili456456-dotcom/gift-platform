@@ -13,10 +13,12 @@ export default function TeamPage() {
   const [loading, setLoading] = useState(true);
   const [filterLevel, setFilterLevel] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [shareLink, setShareLink] = useState('');
   const [page, setPage] = useState(1);
 
   useEffect(() => {
     referralApi.getStats().then(({ data }) => setStats(data)).catch(() => toast.error('Failed to load team stats')).finally(() => setLoading(false));
+    referralApi.getCode().then(({ data }) => setShareLink(data?.share_link || '')).catch(() => {});
   }, []);
 
   if (loading) return <div className="min-h-screen bg-gray-50 p-4"><div className="skeleton h-40 rounded-2xl" /></div>;
@@ -130,7 +132,7 @@ export default function TeamPage() {
           <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Your Invite Code</div>
           <div style={{fontSize:28,fontWeight:800,color:'#FF5000',letterSpacing:2,marginBottom:8}}>{referralCode||'------'}</div>
           <button onClick={copyCode} style={{width:'100%',padding:10,background:'#FF5000',color:'#fff',border:'none',borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer'}}>Copy Invite Code</button>
-          <button onClick={() => navigate('/invite')} style={{width:'100%',padding:10,marginTop:8,background:'#fff',color:'#FF5000',border:'1px solid #FF5000',borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer'}}>📎 Share Invite Link</button>
+          <button onClick={() => { navigator.clipboard.writeText(shareLink); toast.success('Link copied!'); }} style={{width:'100%',padding:10,marginTop:8,background:'#fff',color:'#FF5000',border:'1px solid #FF5000',borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer'}}>📎 Copy Share Link</button>
         </div>
       </div>
     </div>
