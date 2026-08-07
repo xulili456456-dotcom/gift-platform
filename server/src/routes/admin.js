@@ -10,6 +10,7 @@ const { get, all, run, insert, tx } = require('../db/database');
 const { notify } = require('./notifications');
 
 const http = require('http');
+const CN_NAMES = { US:'美国', DE:'德国', AR:'阿根廷', IT:'意大利', PK:'巴基斯坦', GB:'英国', FR:'法国', ES:'西班牙', BR:'巴西', MX:'墨西哥', CA:'加拿大', AU:'澳大利亚', JP:'日本', KR:'韩国', IN:'印度', ID:'印度尼西亚', MY:'马来西亚', PH:'菲律宾', SG:'新加坡', TH:'泰国', VN:'越南', NG:'尼日利亚', ZA:'南非', EG:'埃及', SA:'沙特阿拉伯', AE:'阿联酋', TR:'土耳其', RU:'俄罗斯', UA:'乌克兰', PL:'波兰', NL:'荷兰', BE:'比利时', SE:'瑞典', NO:'挪威', DK:'丹麦', FI:'芬兰', PT:'葡萄牙', GR:'希腊', AT:'奥地利', CH:'瑞士', IL:'以色列', CL:'智利', CO:'哥伦比亚', PE:'秘鲁', BD:'孟加拉', LK:'斯里兰卡', NP:'尼泊尔', KE:'肯尼亚', GH:'加纳', CN:'中国', HK:'香港', TW:'台湾', MO:'澳门' };
 const countryCache = new Map();
 function ipToCountry(ip) {
   return new Promise((resolve) => {
@@ -22,8 +23,10 @@ function ipToCountry(ip) {
         try {
           const json = JSON.parse(data);
           if (json && json.countryCode) {
-            const flag = String.fromCodePoint(...[...json.countryCode].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
-            const text = flag + ' ' + json.countryCode;
+            const code = json.countryCode;
+            const flag = String.fromCodePoint(...[...code].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
+            const name = CN_NAMES[code] || code;
+            const text = flag + ' ' + name;
             countryCache.set(ip, text);
             resolve(text);
           } else { resolve(null); }
