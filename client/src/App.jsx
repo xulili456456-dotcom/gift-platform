@@ -34,6 +34,7 @@ const SupportPage = lazy(() => import('./pages/SupportPage'));
 const DepositPage = lazy(() => import('./pages/DepositPage'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
 const GiftDetailPage = lazy(() => import('./pages/GiftDetailPage'));
+const InvitePage = lazy(() => import('./pages/InvitePage'));
 
 const PageLoader = () => (
   <div className="min-h-screen bg-bg flex items-center justify-center">
@@ -136,7 +137,7 @@ export default function App() {
 
           <Route path="/gift/:id" element={<Lazy Comp={GiftDetailPage} />} />
           <Route path="/gifts" element={<Navigate to="/home" replace />} />
-          <Route path="/invite" element={<Navigate to="/tasks" replace />} />
+          <Route path="/invite" element={<Lazy Comp={InvitePage} />} />
           <Route path="/rewards" element={<Navigate to="/mine" replace />} />
         </Route>
 
