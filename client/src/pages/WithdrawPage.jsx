@@ -104,7 +104,7 @@ export default function WithdrawPage() {
 
           {/* Available */}
           <div style={{background:'#E8F8F0',borderRadius:14,padding:14,marginBottom:10}}>
-            <div style={{fontSize:11,color:'#666',marginBottom:2,fontWeight:600}}>Available to withdraw</div>
+            <div style={{fontSize:11,color:'#666',marginBottom:2,fontWeight:600}}>Available Balance</div>
             <div style={{fontSize:22,fontWeight:800,color:'#00A86B'}}>${availableBalance.toFixed(2)}</div>
           </div>
 
