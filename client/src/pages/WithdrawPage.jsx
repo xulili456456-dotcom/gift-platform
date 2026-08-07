@@ -48,7 +48,8 @@ export default function WithdrawPage() {
   const availableBalance = taskBalance.available || 0;
   const pendingBalance = claims.filter(c => c.status === 'pending').reduce((s, c) => s + (Number(c.value) || 0), 0);
   const totalWithdrawn = withdrawals.filter(w => w.status === 'completed').reduce((s, w) => s + (Number(w.amount) || 0), 0);
-  const totalLocked = storeDeposit + holdingsLocked;
+  const storeFree = Math.max(0, storeDeposit - holdingsLocked);
+  const totalAssets = availableBalance + storeDeposit;
 
   const handleWithdraw = async () => {
     const amt = parseFloat(amount);
@@ -117,28 +118,30 @@ export default function WithdrawPage() {
               <span style={{fontSize:13,fontWeight:600,color:'#F59E0B'}}>${storeDeposit.toFixed(2)}</span>
             </div>
 
-            {/* Active Holdings */}
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-              <div style={{display:'flex',alignItems:'center',gap:8}}>
-                <div style={{width:6,height:6,borderRadius:3,background:'#4C6EF5'}} />
-                <span style={{fontSize:12,color:'#666'}}>In Trading <span style={{fontSize:10,color:'#999'}}>({holdingsCount} active)</span></span>
+            {/* In Trading (locked within deposit) */}
+            {holdingsLocked > 0 && (
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingLeft:14}}>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <div style={{width:4,height:4,borderRadius:2,background:'#4C6EF5'}} />
+                  <span style={{fontSize:11,color:'#999'}}>In Trading <span style={{fontSize:10}}>({holdingsCount} active)</span></span>
+                </div>
+                <span style={{fontSize:12,fontWeight:600,color:'#4C6EF5'}}>-${holdingsLocked.toFixed(2)}</span>
               </div>
-              <span style={{fontSize:13,fontWeight:600,color:'#4C6EF5'}}>${holdingsLocked.toFixed(2)}</span>
-            </div>
+            )}
 
-            {/* Total Locked */}
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            {/* Free in store */}
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingLeft:14}}>
               <div style={{display:'flex',alignItems:'center',gap:8}}>
-                <div style={{width:6,height:6,borderRadius:3,background:'#ccc'}} />
-                <span style={{fontSize:12,color:'#666'}}>Unavailable Funds</span>
+                <div style={{width:4,height:4,borderRadius:2,background:'#ccc'}} />
+                <span style={{fontSize:11,color:'#999'}}>Available in Store</span>
               </div>
-              <span style={{fontSize:13,fontWeight:600,color:'#999'}}>${totalLocked.toFixed(2)}</span>
+              <span style={{fontSize:12,fontWeight:600,color:'#999'}}>${storeFree.toFixed(2)}</span>
             </div>
 
             {/* Total */}
             <div style={{borderTop:'1px solid #f0f0f5',paddingTop:10,marginTop:2,display:'flex',alignItems:'center',justifyContent:'space-between'}}>
               <span style={{fontSize:13,fontWeight:700,color:'#0f0f0f'}}>Total Assets</span>
-              <span style={{fontSize:16,fontWeight:800,color:'#0f0f0f'}}>${(availableBalance + totalLocked).toFixed(2)}</span>
+              <span style={{fontSize:16,fontWeight:800,color:'#0f0f0f'}}>${totalAssets.toFixed(2)}</span>
             </div>
 
             {pendingBalance > 0 && (
