@@ -394,6 +394,7 @@ router.get('/earnings-stats', async (req, res) => {
     [req.user.id]
   );
   const bal = Number(balance?.total || 0);
+  const deposit = Number((await get("SELECT COALESCE(deposit, 0) as deposit FROM stores WHERE user_id = ? AND status = ?", [req.user.id, 'active']))?.deposit || 0);
   const tomorrowEstimate = Math.round(bal * 1.15 * 100) / 100;
 
   res.json({
@@ -403,6 +404,7 @@ router.get('/earnings-stats', async (req, res) => {
     totalOrders: Number(totalOrders?.c || 0),
     activeOrders: Number(activeOrders?.c || 0),
     balance: bal,
+    deposit,
     tomorrowEstimate,
     dailyGoal: 20,
     breakdown: breakdown.map(r => ({ type: r.type, total: Number(r.total) })),

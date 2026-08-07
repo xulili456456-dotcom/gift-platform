@@ -20,6 +20,7 @@ export default function HomePage() {
   // Data states
   const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState(0);
+  const [deposit, setDeposit] = useState(0);
   const [todayProfit, setTodayProfit] = useState(0);
   const [netProfit, setNetProfit] = useState(0);
   const [activeOrders, setActiveOrders] = useState(0);
@@ -49,6 +50,7 @@ export default function HomePage() {
 
       const e = earnRes.data || {};
       setBalance(e.balance || 0);
+      setDeposit(e.deposit || 0);
       setTodayProfit(e.todayProfit || 0);
       setNetProfit(e.netProfit || 0);
       setActiveOrders(e.activeOrders || 0);
@@ -82,7 +84,7 @@ export default function HomePage() {
   useEffect(() => {
     const t1 = setInterval(() => {
       client.get('/store/earnings-stats').then(({ data }) => {
-        if (data) { setBalance(data.balance || 0); setTodayProfit(data.todayProfit || 0); setActiveOrders(data.activeOrders || 0); }
+        if (data) { setBalance(data.balance || 0); setDeposit(data.deposit || 0); setTodayProfit(data.todayProfit || 0); setActiveOrders(data.activeOrders || 0); }
       }).catch(() => {});
     }, 15000);
     const t2 = setInterval(() => {
@@ -98,8 +100,8 @@ export default function HomePage() {
   const ordersToNext = tier.next ? tier.nextThreshold - totalOrders : 0;
   const displayPct = Math.min(100, Math.max(0, tierPct));
   const lockedInHoldings = holdings.reduce((s, h) => s + (h.cost || 0), 0);
-  const freeMargin = Math.max(0, balance - lockedInHoldings);
-  const marginPct = balance > 0 ? Math.round((freeMargin / balance) * 100) : null;
+  const freeMargin = Math.max(0, deposit - lockedInHoldings);
+  const marginPct = deposit > 0 ? Math.round((freeMargin / deposit) * 100) : null;
   const avatarChar = (user?.name || user?.email || '?')[0].toUpperCase();
 
   // Handlers
