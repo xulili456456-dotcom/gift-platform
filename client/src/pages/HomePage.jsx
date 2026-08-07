@@ -358,7 +358,7 @@ export default function HomePage() {
                     <img src={h.product_name ? `https://gift-platform-h6um.onrender.com/products/${h.id % 60 || 1}.jpg` : ''} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 5, whiteSpace: 'nowrap' }}>{h.product_name || 'Product'}</div>
+                    <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{h.product_name || 'Product'}</div>
                     <div style={{ height: 4, background: '#e8e8ed', borderRadius: 2, overflow: 'hidden' }}>
                       <div className={h.progress >= 90 ? 'hold-fill-near' : ''} style={{ height: '100%', width: `${Math.min(100, h.progress || 0)}%`, background: h.progress >= 90 ? 'var(--gold)' : h.progress >= 50 ? 'var(--green)' : 'var(--blue)', borderRadius: 2, transition: 'width 1.5s cubic-bezier(.4,0,.2,1)' }} />
                     </div>
