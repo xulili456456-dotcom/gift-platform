@@ -130,6 +130,7 @@ export default function TeamPage() {
           <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Your Invite Code</div>
           <div style={{fontSize:28,fontWeight:800,color:'#FF5000',letterSpacing:2,marginBottom:8}}>{referralCode||'------'}</div>
           <button onClick={copyCode} style={{width:'100%',padding:10,background:'#FF5000',color:'#fff',border:'none',borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer'}}>Copy Invite Code</button>
+          <button onClick={() => navigate('/invite')} style={{width:'100%',padding:10,marginTop:8,background:'#fff',color:'#FF5000',border:'1px solid #FF5000',borderRadius:12,fontSize:13,fontWeight:600,cursor:'pointer'}}>📎 Share Invite Link</button>
         </div>
       </div>
     </div>
