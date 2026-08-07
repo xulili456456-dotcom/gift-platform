@@ -26,6 +26,7 @@ export default function StoreFundsPage() {
   const [depositAmount, setDepositAmount] = useState('');
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [depositMsg, setDepositMsg] = useState('');
+  const [withdrawError, setWithdrawError] = useState(null);
   const [orderHistory, setOrderHistory] = useState(null);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [expandedHolding, setExpandedHolding] = useState(null);
@@ -49,11 +50,12 @@ export default function StoreFundsPage() {
     catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };
   const handleWithdrawDeposit = async () => {
+    setWithdrawError(null);
     const amt = parseFloat(withdrawAmount);
     if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
     if (amt > (s.deposit || 0)) { toast.error('Insufficient deposit'); return; }
     try { await client.post('/store/withdraw-deposit', { amount: amt }); toast.success(`$${amt} returned to balance`); setWithdrawAmount(''); loadStatus(); loadEarnings(); }
-    catch (err) { toast.error(err.response?.data?.detail || err.response?.data?.error || 'Failed'); }
+    catch (err) { setWithdrawError(err.response?.data || { error: 'Failed' }); }
   };
 
   if (!status) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="w-8 h-8 border-3 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>;
@@ -98,6 +100,27 @@ export default function StoreFundsPage() {
                 <input type="number" value={withdrawAmount} onChange={e => setWithdrawAmount(e.target.value)} placeholder="Amount" style={{flex:1,padding:'10px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:14,outline:'none'}} />
                 <button onClick={() => setWithdrawAmount(String(s.deposit||0))} style={{padding:'10px 12px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:11,fontWeight:600,color:'#666',cursor:'pointer'}}>Max</button>
                 <button onClick={handleWithdrawDeposit} style={{padding:'10px 18px',background:'#FF5000',color:'#fff',border:'none',borderRadius:12,fontSize:12,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap'}}>Withdraw</button>
+              </div>
+            </div>
+          )}
+          {withdrawError && (
+            <div style={{background:'#FFF5F5',border:'1px solid #FFCDD2',borderRadius:14,padding:16,marginTop:12}}>
+              <div style={{display:'flex',alignItems:'flex-start',gap:10}}>
+                <div style={{width:32,height:32,borderRadius:16,background:'#FFCDD2',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#CC0C39" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:13,fontWeight:700,color:'#CC0C39',marginBottom:4}}>Cannot withdraw right now</div>
+                  <div style={{fontSize:12,color:'#666',lineHeight:1.5}}>{withdrawError.detail || withdrawError.error}</div>
+                  {withdrawError.maxHoldingCost && (
+                    <div style={{display:'flex',gap:16,marginTop:10,paddingTop:10,borderTop:'1px solid #FFCDD2'}}>
+                      <div><div style={{fontSize:9,color:'#999'}}>Max Order</div><div style={{fontSize:14,fontWeight:700,color:'#0f0f0f'}}>${withdrawError.maxHoldingCost.toFixed(2)}</div></div>
+                      <div><div style={{fontSize:9,color:'#999'}}>Your Deposit</div><div style={{fontSize:14,fontWeight:700,color:'#F59E0B'}}>${(withdrawError.currentDeposit||0).toFixed(2)}</div></div>
+                      <div><div style={{fontSize:9,color:'#999'}}>After Withdraw</div><div style={{fontSize:14,fontWeight:700,color:'#EF4444'}}>${(withdrawError.newDeposit||0).toFixed(2)}</div></div>
+                    </div>
+                  )}
+                  <button onClick={() => setWithdrawError(null)} style={{marginTop:10,padding:'6px 14px',background:'#fff',color:'#666',border:'1px solid #ddd',borderRadius:8,fontSize:11,fontWeight:600,cursor:'pointer'}}>Dismiss</button>
+                </div>
               </div>
             </div>
           )}
