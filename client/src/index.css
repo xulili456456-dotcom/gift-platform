@@ -574,3 +574,118 @@ body.dark .bg-success\/5 { background: #0d2418 !important; }
 .hero-gradient-anim { background-size: 200% 200%; animation: heroGradient 3s ease infinite; }
 .hold-ha-glow { animation: profitGlow 3s ease-in-out infinite; }
 .invite-glow-btn { animation: inviteGlow 2.5s ease-in-out infinite; }
+
+/* === INTERACTIVE HOVER / ACTIVE EFFECTS === */
+.home-stat-card {
+  transition: transform .2s, background .2s, border-color .2s, box-shadow .2s;
+}
+.home-stat-card:hover {
+  transform: translateY(-1px);
+  background: rgba(255,255,255,.07);
+}
+.home-stat-card:active {
+  transform: scale(.97);
+}
+
+.home-action-item {
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.home-action-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.1);
+  border-color: #FF5000;
+}
+.home-action-item:active {
+  transform: scale(.94);
+}
+.home-action-item .home-action-icon {
+  transition: transform .25s;
+}
+.home-action-item:hover .home-action-icon {
+  transform: scale(1.15);
+}
+
+.home-free-card {
+  transition: transform .2s, box-shadow .2s, border-color .2s;
+  cursor: pointer;
+}
+.home-free-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.08);
+  border-color: #00A86B;
+}
+.home-free-card:active {
+  transform: scale(.95);
+}
+.home-free-card img {
+  transition: transform .3s;
+}
+.home-free-card:hover img {
+  transform: scale(1.05);
+}
+
+.home-hold-row {
+  transition: background .15s;
+}
+.home-hold-row:hover {
+  background: rgba(0,0,0,.01);
+}
+
+.home-tier-card {
+  transition: transform .2s, box-shadow .2s;
+  cursor: pointer;
+}
+.home-tier-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0,0,0,.08);
+}
+.home-tier-card:active {
+  transform: scale(.98);
+}
+
+.home-btm-card {
+  transition: transform .2s, box-shadow .2s;
+  cursor: pointer;
+}
+.home-btm-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,.06);
+}
+
+.home-invite-btn {
+  transition: transform .15s, box-shadow .15s;
+}
+.home-invite-btn:hover {
+  transform: scale(1.05);
+}
+.home-copy-btn {
+  transition: transform .15s;
+}
+.home-copy-btn:hover {
+  transform: scale(1.03);
+}
+
+.home-hero-btn {
+  transition: transform .2s, box-shadow .2s;
+  display: inline-flex;
+  cursor: pointer;
+}
+.home-hero-btn:hover {
+  transform: scale(1.04);
+  box-shadow: 0 8px 30px rgba(0,0,0,.15);
+}
+.home-hero-btn:active {
+  transform: scale(.96);
+}
+
+.home-grab-btn {
+  transition: transform .15s, background .15s;
+  cursor: pointer;
+}
+.home-grab-btn:hover {
+  transform: scale(1.08);
+  background: #008f59 !important;
+}
+.home-grab-btn:active {
+  transform: scale(.95);
+}

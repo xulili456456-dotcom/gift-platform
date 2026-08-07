@@ -204,19 +204,19 @@ export default function HomePage() {
         {/* Stat Cards — 3 key metrics */}
         <div style={{ display: 'flex', gap: 10 }}>
           {/* Balance */}
-          <div onClick={() => navigate('/mine/withdraw')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 14, padding: '14px 12px', cursor: 'pointer', position: 'relative', overflow: 'hidden', transition: 'all .2s' }}>
+          <div onClick={() => navigate('/mine/withdraw')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 14, padding: '14px 12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }} className="home-stat-card">
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,80,0,.3),transparent)', animationDelay: '0s' }} />
             <div className="count-in glow-text-pri" style={{ fontSize: 18, fontWeight: 700, color: 'var(--pri)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>${balance.toFixed(2)}</div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,.35)', marginTop: 4, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>Balance <span style={{ color: 'var(--green)' }}>{netProfit > 0 ? `↑${Math.round(netProfit/balance*100)}%` : '↑0%'}</span></div>
           </div>
           {/* Today's Profit */}
-          <div onClick={() => navigate('/mine/transactions')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 14, padding: '14px 12px', cursor: 'pointer', position: 'relative', overflow: 'hidden', transition: 'all .2s' }}>
+          <div onClick={() => navigate('/mine/transactions')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 14, padding: '14px 12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }} className="home-stat-card">
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(0,168,107,.3),transparent)', animationDelay: '.5s' }} />
             <div className="count-in glow-text-grn" style={{ fontSize: 18, fontWeight: 700, color: 'var(--green)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.1s' }}>+${todayProfit.toFixed(2)}</div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,.35)', marginTop: 4, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>Today's Profit</div>
           </div>
           {/* Free Margin */}
-          <div onClick={() => navigate('/mine/transactions')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 14, padding: '14px 12px', cursor: 'pointer', position: 'relative', overflow: 'hidden', transition: 'all .2s' }}>
+          <div onClick={() => navigate('/mine/transactions')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 14, padding: '14px 12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }} className="home-stat-card">
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(245,158,11,.3),transparent)', animationDelay: '1s' }} />
             <div className="count-in glow-text-gld" style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.2s' }}>${freeMargin.toFixed(2)}</div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,.35)', marginTop: 4, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>Free Margin <span style={{ color: 'var(--gold)' }}>{marginPct !== null ? `${marginPct}%` : '--'}</span></div>
@@ -242,7 +242,7 @@ export default function HomePage() {
           <div style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%', animation: 'breathe 1.5s ease-in-out infinite' }} />
           {freeRemaining} grabs available today · {tier.name}
         </div>
-        <span onClick={(e) => { e.stopPropagation(); navigate('/store'); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: 'var(--pri)', padding: '10px 22px', borderRadius: 10, fontSize: 13, fontWeight: 600, position: 'relative', zIndex: 1, cursor: 'pointer' }}>
+        <span onClick={(e) => { e.stopPropagation(); navigate('/store'); }} className="home-hero-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: 'var(--pri)', padding: '10px 22px', borderRadius: 10, fontSize: 13, fontWeight: 600, position: 'relative', zIndex: 1 }}>
           Grab Now →
         </span>
       </div>
@@ -255,8 +255,8 @@ export default function HomePage() {
           { label: 'My Store', color: '#1d1d1f', icon: 'store', onClick: () => navigate('/store') },
           { label: 'My Team', color: 'var(--blue)', icon: 'team', onClick: () => navigate('/mine/team') },
         ].map((act) => (
-          <div key={act.label} onClick={act.onClick} style={{ background: '#fff', border: '1px solid #e8e8ed', borderRadius: 14, padding: '14px 6px', textAlign: 'center', cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,.02)', transition: 'all .2s' }}>
-            <div style={{ marginBottom: 6 }}>
+          <div key={act.label} onClick={act.onClick} className="home-action-item" style={{ background: '#fff', border: '1px solid #e8e8ed', borderRadius: 14, padding: '14px 6px', textAlign: 'center', cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,.02)' }}>
+            <div className="home-action-icon" style={{ marginBottom: 6 }}>
               {act.icon === 'deposit' && (
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={act.color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="1" x2="12" y2="3"/><polyline points="8 10 12 14 16 10"/>
@@ -304,6 +304,7 @@ export default function HomePage() {
               const imgUrl = p.img ? (p.img.startsWith('http') ? p.img : `https://gift-platform-h6um.onrender.com${p.img}`) : '';
               return (
                 <div key={p.id} onClick={() => !claimed && handleGrab(p.id, p.name)}
+                  className="home-free-card"
                   style={{
                     minWidth: 134, maxWidth: 134, background: '#fff', border: `1px solid ${claimed ? 'var(--green)' : '#e8e8ed'}`,
                     borderRadius: 13, padding: 10, textAlign: 'center', cursor: claimed ? 'default' : 'pointer',
@@ -318,7 +319,7 @@ export default function HomePage() {
                   <img src={imgUrl} alt={p.name} style={{ width: 58, height: 58, borderRadius: 10, objectFit: 'cover', marginBottom: 6 }} />
                   <div style={{ fontSize: 10, fontWeight: 600, marginBottom: 2, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.name}</div>
                   <div className="hold-ha-glow" style={{ fontSize: 11, fontWeight: 700, color: 'var(--green)', marginBottom: 6 }}>+${profit.toFixed(2)}</div>
-                  <span style={{ display: 'inline-block', padding: '5px 18px', background: claimed ? '#999' : 'var(--green)', color: '#fff', borderRadius: 7, fontSize: 10, fontWeight: 700, animation: claimed ? 'none' : 'grabBounce 2s ease-in-out infinite' }}>
+                  <span className={claimed ? '' : 'home-grab-btn'} style={{ display: 'inline-block', padding: '5px 18px', background: claimed ? '#999' : 'var(--green)', color: '#fff', borderRadius: 7, fontSize: 10, fontWeight: 700, animation: claimed ? 'none' : 'grabBounce 2s ease-in-out infinite' }}>
                     {claimed ? 'Claimed' : 'Grab'}
                   </span>
                 </div>
@@ -350,7 +351,8 @@ export default function HomePage() {
             holdings.map((h, i) => (
               <div key={h.id}>
                 <div onClick={() => setExpandedHolding(expandedHolding === h.id ? null : h.id)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < holdings.length - 1 ? '1px solid #f0f0f5' : 'none', cursor: 'pointer', transition: 'all .15s' }}>
+                  className="home-hold-row"
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < holdings.length - 1 ? '1px solid #f0f0f5' : 'none', cursor: 'pointer' }}>
                   <div style={{ width: 56, height: 42, borderRadius: 7, overflow: 'hidden', flexShrink: 0, background: '#f5f5f7' }}>
                     {h.img ? (
                       <img src={h.img.startsWith('http') ? h.img : `https://gift-platform-h6um.onrender.com${h.img}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -389,7 +391,7 @@ export default function HomePage() {
 
       {/* ═══ STORE TIER ═══ */}
       <div style={{ padding: '0 16px', marginBottom: 16 }}>
-        <div onClick={() => toast(ordersToNext > 0 ? `${ordersToNext} orders to ${tier.next} Store` : 'Max tier reached!')} style={{ overflow: 'hidden', borderRadius: 14, background: '#fff', border: '1px solid #e8e8ed', boxShadow: '0 1px 4px rgba(0,0,0,.03)', cursor: 'pointer' }}>
+        <div onClick={() => toast(ordersToNext > 0 ? `${ordersToNext} orders to ${tier.next} Store` : 'Max tier reached!')} className="home-tier-card" style={{ overflow: 'hidden', borderRadius: 14, background: '#fff', border: '1px solid #e8e8ed', boxShadow: '0 1px 4px rgba(0,0,0,.03)' }}>
           <div style={{ background: 'linear-gradient(135deg,#14142a,#252545)', padding: '14px 16px', color: '#fff', display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ padding: '4px 10px', background: 'rgba(245,158,11,.15)', border: '1px solid rgba(245,158,11,.2)', color: 'var(--gold)', borderRadius: 6, fontSize: 10, fontWeight: 700 }}>Lv.1</span>
             <span style={{ fontSize: 14, fontWeight: 700 }}>{tier.name}</span>
@@ -420,14 +422,14 @@ export default function HomePage() {
                 <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 2 }}>Invite Friends · Earn Commission</div>
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,.5)' }}>1.0% / 0.5% / 0.25% on every order</div>
               </div>
-              <button onClick={(e) => { e.stopPropagation(); navigate('/mine/team'); }} className="invite-glow-btn" style={{ padding: '10px 18px', background: 'var(--pri)', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>Invite ›</button>
+              <button onClick={(e) => { e.stopPropagation(); navigate('/mine/team'); }} className="invite-glow-btn home-invite-btn" style={{ padding: '10px 18px', background: 'var(--pri)', color: '#fff', border: 'none', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>Invite ›</button>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <button onClick={(e) => { e.stopPropagation(); copyCode(); }} style={{ flex: 1, padding: 10, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 10, color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', position: 'relative', overflow: 'hidden' }}>
+              <button onClick={(e) => { e.stopPropagation(); copyCode(); }} className="home-copy-btn" style={{ flex: 1, padding: 10, background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.08)', borderRadius: 10, color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', position: 'relative', overflow: 'hidden' }}>
                 Code: {referralCode}
                 <span style={{ position: 'absolute', top: 0, left: 0, width: 40, height: '100%', background: 'linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent)', animation: 'codeShimmer 2.5s ease-in-out infinite' }} />
               </button>
-              <button onClick={(e) => { e.stopPropagation(); copyLink(); }} style={{ padding: '10px 20px', background: 'rgba(255,255,255,.12)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+              <button onClick={(e) => { e.stopPropagation(); copyLink(); }} className="home-copy-btn" style={{ padding: '10px 20px', background: 'rgba(255,255,255,.12)', border: '1px solid rgba(255,255,255,.1)', borderRadius: 10, color: '#fff', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 4, verticalAlign: -2 }}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 Copy Link
               </button>
@@ -439,12 +441,12 @@ export default function HomePage() {
       {/* ═══ BOTTOM CARDS ═══ */}
       <div style={{ padding: '0 16px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          <div onClick={() => navigate('/mine/team')} style={{ background: '#fff', border: '1px solid #e8e8ed', borderRadius: 14, padding: 14, cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,.03)' }}>
+          <div onClick={() => navigate('/mine/team')} className="home-btm-card" style={{ background: '#fff', border: '1px solid #e8e8ed', borderRadius: 14, padding: 14, boxShadow: '0 1px 4px rgba(0,0,0,.03)' }}>
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: 6 }}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4-4v-2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <div style={{ fontSize: 12, fontWeight: 700 }}>My Team</div>
             <div style={{ fontSize: 10, color: '#aeaeb2', marginTop: 2 }}>{totalInvites} members</div>
           </div>
-          <div onClick={() => navigate('/mine/verify')} style={{ background: '#fff', border: '1px solid #e8e8ed', borderRadius: 14, padding: 14, cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,.03)' }}>
+          <div onClick={() => navigate('/mine/verify')} className="home-btm-card" style={{ background: '#fff', border: '1px solid #e8e8ed', borderRadius: 14, padding: 14, boxShadow: '0 1px 4px rgba(0,0,0,.03)' }}>
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: 6 }}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             <div style={{ fontSize: 12, fontWeight: 700 }}>Verifications</div>
             <div style={{ fontSize: 10, color: '#aeaeb2', marginTop: 2 }}>{claimsCount} proofs</div>
