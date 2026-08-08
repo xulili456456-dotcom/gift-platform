@@ -612,14 +612,26 @@ router.get('/orders', async (req, res) => {
      ${where} ORDER BY o.created_at DESC LIMIT ? OFFSET ?`,
     [...params, limit, offset]
   );
-  // Calculate profit for free orders (cost=0 but still have profit from product price)
+  // Calculate profit for free orders
+  let catalog = [];
+  try { catalog = require('../data/products.json'); } catch {}
   const today = new Date().toISOString().slice(0, 10);
   const daySeed = today.split('-').reduce((s, x) => s + parseInt(x), 0);
   res.json({ orders: rows.map(o => {
-    const price = Number(o.product_price) || (Number(o.amount) > 0 ? Math.round(Number(o.amount) / 0.85 * 100) / 100 : 0);
-    let profit = Number(o.amount || 0); // paid orders: profit = amount (cost)
-    if (Number(o.amount) === 0 && price > 0) {
-      // Free order: calculate actual profit from product price
+    // Get product price: first from order, then from catalog by name
+    let price = Number(o.product_price) || 0;
+    if (price === 0 && o.product_name && catalog.length) {
+      const match = catalog.find(p => p.name === o.product_name);
+      if (match) price = match.price;
+    }
+    // Fallback for paid orders
+    if (price === 0 && Number(o.amount) > 0) price = Math.round(Number(o.amount) / 0.85 * 100) / 100;
+
+    let profit = 0;
+    if (Number(o.amount || 0) > 0) {
+      profit = Number(o.amount); // paid orders show cost
+    } else if (price > 0) {
+      // Free order: calculate profit from product price
       const shift = ((daySeed * 7 + 13) % 100 - 50) / 500;
       const rng = (() => { const x = Math.sin(price * 31 + daySeed) * 49297; return x - Math.floor(x); })();
       let base;
@@ -648,12 +660,21 @@ router.get('/holdings', async (req, res) => {
     params
   );
   // Calculate profit for free orders
-  const today = new Date().toISOString().slice(0, 10);
-  const daySeed2 = today.split('-').reduce((s, x) => s + parseInt(x), 0);
+  let catalog2 = [];
+  try { catalog2 = require('../data/products.json'); } catch {}
+  const today2 = new Date().toISOString().slice(0, 10);
+  const daySeed2 = today2.split('-').reduce((s, x) => s + parseInt(x), 0);
   res.json({ holdings: rows.map(o => {
-    const price = Number(o.product_price) || (Number(o.amount) > 0 ? Math.round(Number(o.amount) / 0.85 * 100) / 100 : 0);
-    let profit = Number(o.amount || 0);
-    if (Number(o.amount) === 0 && price > 0) {
+    let price = Number(o.product_price) || 0;
+    if (price === 0 && o.product_name && catalog2.length) {
+      const match = catalog2.find(p => p.name === o.product_name);
+      if (match) price = match.price;
+    }
+    if (price === 0 && Number(o.amount) > 0) price = Math.round(Number(o.amount) / 0.85 * 100) / 100;
+    let profit = 0;
+    if (Number(o.amount || 0) > 0) {
+      profit = Number(o.amount);
+    } else if (price > 0) {
       const shift = ((daySeed2 * 7 + 13) % 100 - 50) / 500;
       const rng = (() => { const x = Math.sin(price * 31 + daySeed2) * 49297; return x - Math.floor(x); })();
       let base;
