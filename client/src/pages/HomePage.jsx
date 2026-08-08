@@ -37,7 +37,7 @@ export default function HomePage() {
   const [totalInvites, setTotalInvites] = useState(0);
   const [claimsCount, setClaimsCount] = useState(0);
   const [grabbedCards, setGrabbedCards] = useState(new Set());
-  const [hideBalance, setHideBalance] = useState(false);
+  const [hiddenCards, setHiddenCards] = useState(new Set());
 
   const loadAll = useCallback(async () => {
     try {
@@ -194,13 +194,6 @@ export default function HomePage() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <span style={{ fontSize: 13, color: 'rgba(255,255,255,.3)' }}>{t('home.searchPlaceholder')}</span>
           </div>
-          <button onClick={() => setHideBalance(!hideBalance)} style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(255,255,255,.04)', border: 'none', color: 'rgba(255,255,255,.6)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {hideBalance ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            )}
-          </button>
           <button onClick={(e) => { burstParticles(e); navigate('/mine/notifications'); }} style={{ width: 32, height: 32, borderRadius: 9, background: 'rgba(255,255,255,.04)', border: 'none', color: 'rgba(255,255,255,.6)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
             <span style={{ position: 'absolute', top: 3, right: 3, width: 7, height: 7, background: 'var(--pri)', borderRadius: '50%', boxShadow: '0 0 8px rgba(255,80,0,.5)', animation: 'glowPulseRing 2s ease-in-out infinite' }} />
@@ -212,19 +205,19 @@ export default function HomePage() {
           {/* Balance */}
           <div onClick={() => navigate('/mine/withdraw')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 14, padding: '14px 12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }} className="home-stat-card">
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,80,0,.3),transparent)', animationDelay: '0s' }} />
-            <div className="count-in glow-text-pri" style={{ fontSize: 18, fontWeight: 700, color: 'var(--pri)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>{hideBalance ? '***' : `$${balance.toFixed(2)}`}</div>
+            <div onClick={(e) => { e.stopPropagation(); setHiddenCards(prev => { const s = new Set(prev); if (s.has('balance')) s.delete('balance'); else s.add('balance'); return s; }); }} className="count-in glow-text-pri" style={{ fontSize: 18, fontWeight: 700, color: 'var(--pri)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', cursor: 'pointer' }}>{hiddenCards.has('balance') ? '***' : `$${balance.toFixed(2)}`}</div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,.35)', marginTop: 4, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>{t('home.balance')}</div>
           </div>
           {/* Today's Profit */}
           <div onClick={() => navigate('/mine/transactions')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 14, padding: '14px 12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }} className="home-stat-card">
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(0,168,107,.3),transparent)', animationDelay: '.5s' }} />
-            <div className="count-in glow-text-grn" style={{ fontSize: 18, fontWeight: 700, color: 'var(--green)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.1s' }}>{hideBalance ? '***' : `+$${todayProfit.toFixed(2)}`}</div>
+            <div onClick={(e) => { e.stopPropagation(); setHiddenCards(prev => { const s = new Set(prev); if (s.has('profit')) s.delete('profit'); else s.add('profit'); return s; }); }} className="count-in glow-text-grn" style={{ fontSize: 18, fontWeight: 700, color: 'var(--green)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.1s', cursor: 'pointer' }}>{hiddenCards.has('profit') ? '***' : `+$${todayProfit.toFixed(2)}`}</div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,.35)', marginTop: 4, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>{t('home.todayProfit')}</div>
           </div>
           {/* Deposit */}
           <div onClick={() => navigate('/store/funds')} style={{ flex: 1, background: 'rgba(255,255,255,.04)', border: '1px solid rgba(255,255,255,.06)', borderRadius: 14, padding: '14px 12px', cursor: 'pointer', position: 'relative', overflow: 'hidden' }} className="home-stat-card">
             <div className="glow-orb-pulse" style={{ position: 'absolute', top: -20, right: -20, width: 40, height: 40, borderRadius: '50%', background: 'radial-gradient(circle,rgba(245,158,11,.3),transparent)', animationDelay: '1s' }} />
-            <div className="count-in glow-text-gld" style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.2s' }}>{hideBalance ? '***' : `$${deposit.toFixed(2)}`}</div>
+            <div onClick={(e) => { e.stopPropagation(); setHiddenCards(prev => { const s = new Set(prev); if (s.has('deposit')) s.delete('deposit'); else s.add('deposit'); return s; }); }} className="count-in glow-text-gld" style={{ fontSize: 18, fontWeight: 700, color: 'var(--gold)', position: 'relative', zIndex: 1, whiteSpace: 'nowrap', animationDelay: '.2s', cursor: 'pointer' }}>{hiddenCards.has('deposit') ? '***' : `$${deposit.toFixed(2)}`}</div>
             <div style={{ fontSize: 10, color: 'rgba(255,255,255,.35)', marginTop: 4, fontWeight: 500, position: 'relative', zIndex: 1, whiteSpace: 'nowrap' }}>{t('home.deposit')}</div>
           </div>
         </div>
