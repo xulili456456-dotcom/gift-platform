@@ -14,6 +14,7 @@ const langs = [
   { code: 'es', label: 'Español', flag: '🇪🇸' },
   { code: 'ja', label: '日本語', flag: '🇯🇵' },
   { code: 'ms', label: 'Bahasa Melayu', flag: '🇲🇾' },
+  { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
 ];
 
 export default function MinePage() {
