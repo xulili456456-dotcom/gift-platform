@@ -642,7 +642,7 @@ router.get('/orders', async (req, res) => {
       const rate = Math.round(Math.max(0.05, Math.min(0.25, base + shift)) * 100) / 100;
       profit = Math.round(price * rate * 100) / 100;
     }
-    return { ...o, profit, product_price: price };
+    return { ...o, cost: Number(o.amount || 0), profit, product_price: price };
   }), total: Number(total?.c || 0), page, limit });
 });
 
@@ -685,7 +685,7 @@ router.get('/holdings', async (req, res) => {
       const rate = Math.round(Math.max(0.05, Math.min(0.25, base + shift)) * 100) / 100;
       profit = Math.round(price * rate * 100) / 100;
     }
-    return { ...o, profit, product_price: price };
+    return { ...o, cost: Number(o.amount || 0), profit, product_price: price };
   }) });
 });
 
