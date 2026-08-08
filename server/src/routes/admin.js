@@ -617,7 +617,7 @@ router.get('/orders', async (req, res) => {
   try { catalog = require('../data/products.json'); } catch {}
   const today = new Date().toISOString().slice(0, 10);
   const daySeed = today.split('-').reduce((s, x) => s + parseInt(x), 0);
-  res.json({ orders: rows.map(o => {
+  res.json({ _ver: 'v3', orders: rows.map(o => {
     // Get product price: first from order, then from catalog by name
     let price = Number(o.product_price) || 0;
     if (price === 0 && o.product_name && catalog.length) {
