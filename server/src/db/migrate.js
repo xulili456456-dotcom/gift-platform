@@ -162,6 +162,8 @@ CREATE TABLE IF NOT EXISTS withdrawals (
 );
 CREATE INDEX IF NOT EXISTS idx_withdrawals_user ON withdrawals(user_id);
 CREATE INDEX IF NOT EXISTS idx_withdrawals_status ON withdrawals(status);
+ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW();
+ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP DEFAULT NULL;
 
 -- Store (simulated e-commerce)
 CREATE TABLE IF NOT EXISTS stores (
