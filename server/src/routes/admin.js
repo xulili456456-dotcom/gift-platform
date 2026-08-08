@@ -633,7 +633,7 @@ router.get('/orders', async (req, res) => {
     } else if (price > 0) {
       // Free order: calculate profit from product price
       const shift = ((daySeed * 7 + 13) % 100 - 50) / 500;
-      const rng = (() => { const x = Math.sin(price * 31 + daySeed) * 49297; return x - Math.floor(x); })();
+      const rng = (() => { const seed = price * 31 + daySeed; const x = Math.sin(seed * 9301 + 49297) * 49297; return x - Math.floor(x); })();
       let base;
       if (price < 20) base = 0.05 + 0.04 * rng;
       else if (price < 100) base = 0.06 + 0.09 * rng;
@@ -676,7 +676,7 @@ router.get('/holdings', async (req, res) => {
       profit = Number(o.amount);
     } else if (price > 0) {
       const shift = ((daySeed2 * 7 + 13) % 100 - 50) / 500;
-      const rng = (() => { const x = Math.sin(price * 31 + daySeed2) * 49297; return x - Math.floor(x); })();
+      const rng = (() => { const seed = price * 31 + daySeed2; const x = Math.sin(seed * 9301 + 49297) * 49297; return x - Math.floor(x); })();
       let base;
       if (price < 20) base = 0.05 + 0.04 * rng;
       else if (price < 100) base = 0.06 + 0.09 * rng;
