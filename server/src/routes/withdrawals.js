@@ -14,7 +14,7 @@ router.post('/', async (req, res) => {
   if (!network || !wallet_address) return res.status(400).json({ error: 'Please provide the network and wallet address' });
 
   // KYC check
-  const kyc = await get('SELECT status FROM kyc_submissions WHERE user_id = ? ORDER BY created_at DESC LIMIT 1', [req.user.id]);
+  const kyc = await get('SELECT status FROM kyc_submissions WHERE user_id = ? ORDER BY submitted_at DESC LIMIT 1', [req.user.id]);
   if (!kyc || kyc.status !== 'approved') {
     return res.status(400).json({ error: '请先完成实名认证 (KYC) 后才能提现。Go to Mine > KYC Verification to submit.' });
   }
