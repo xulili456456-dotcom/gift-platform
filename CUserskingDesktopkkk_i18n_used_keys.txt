@@ -1,0 +1,535 @@
+
+-
+!showCt
+(
+(a, b
+(a,b
+(claimsRes.data || []
+,
+./pages/DepositPage
+./pages/GiftDetailPage
+./pages/InvitePage
+./pages/KycPage
+./pages/LegalPage
+./pages/MessagesPage
+./pages/NotificationsPage
+./pages/SecurityPage
+./pages/StakingPage
+./pages/SupportPage
+./pages/TeamPage
+./pages/TransactionsPage
+./pages/VerifyPage
+./pages/VipPage
+./pages/WalletPage
+./pages/WithdrawPage
+/admin/audit-log, { params }
+/admin/claims, { params }
+/admin/enhanced-stats
+/admin/gifts
+/admin/gifts, data
+/admin/holdings, { params }
+/admin/ip-duplicates
+/admin/ip-geo, { params: { ips: ips.join(,
+/admin/notifications
+/admin/notifications, data
+/admin/orders, { params }
+/admin/settings
+/admin/settings, data
+/admin/stats
+/admin/stores, { params }
+/admin/user-ips, { params }
+/admin/users, { params }
+/admin/users/batch, data
+/admin/users-enhanced, { params }
+/admin/withdrawals, { params }
+/auth/login, { email, password }
+/auth/logout
+/auth/me
+/auth/refresh, { refresh_token }
+/auth/register, { email, phone, phone_prefix, password, name, referral_code }
+/auth/reset-password, form
+/claims
+/claims, { gift_id }
+/commissions/buy/ + pid
+/commissions/claim, { productId: product.id, productPrice: product.price, productName: product.name, productImg: product.img }
+/deposits
+/deposits, { network, amount: amt, tx_hash: manual-review }
+/deposits/addresses
+/deposits/all, { params: { page: currentPage, limit: 20 } }
+/gifts
+/gifts/eligible
+/kyc
+/kyc, { doc_type: form.docType, real_name: form.name, id_number: form.idNumber, front_image: form.frontImg, back_image: form.backImg }
+/kyc/admin/list, { params: { page: currentPage, limit: 20 } }
+/notifications
+/notifications/ + n.id + /read
+/notifications/read-all
+/proofs
+/proofs, { image: reader.result }
+/referral/code
+/referral/stats
+/staking
+/staking, { plan_id: plan.id, amount: plan.amount }
+/staking/unlock
+/store/analytics
+/store/check-sell
+/store/close
+/store/deposit, { amount: amt }
+/store/earnings-stats
+/store/free-products
+/store/holdings
+/store/open
+/store/orders/process, { productPrice: buyConfirm.price, productName: buyConfirm.name }
+/store/orders-history?period=all
+/store/status
+/store/withdraw-deposit, { amount: amt }
+/store/withdraw-deposit, {}
+/tasks
+/tasks/balance
+/tasks/checkin
+/tasks/send-notification, payload
+/users/me/contact, { email: ctForm.email, phone: ctForm.phone, password: ctForm.password }
+/users/me/password, { oldPassword: pwForm.oldPassword, newPassword: pwForm.newPassword }
+/users/me/tx-pin, { old_pin: txForm.oldPin, new_pin: newPin }
+/users/me/tx-pin, { pin: newPin }
+/wallet
+/wallet, { address: form.address.trim(
+/withdrawals
+/withdrawals, { amount: amt, network: network, wallet_address: walletAddress }
+[...prev, productName]
+\n
+`/admin/claims/${id}`, data
+`/admin/deposits/${id}/confirm`, { note: note ||  }
+`/admin/deposits/${id}/reject`, { note: note ||  }
+`/admin/gifts/${id}`, data
+`/admin/users/${id}/balance`, data
+`/admin/users/${id}/finance`
+`/admin/users/${id}/freeze`
+`/admin/users/${id}/login-as`
+`/admin/users/${id}/reset-password`
+`/admin/users/${id}/tree`
+`/admin/users/${id}`
+`/admin/users/${id}`, data
+`/admin/withdrawals/${id}`, data
+`/commissions/public-product/${pid}${imgQuery}`
+`/gifts/${id}`
+`/store/claim-free/${productId}`
+`/store/orders-history?period=${orderPeriod}`
+`/tasks/${taskType}/claim`
+`/tasks/definitions/${editingTask.id}`, { reward: val }
+`/tasks/definitions/${task.id}`, { active: !task.active }
+`/transactions?page=${p}&limit=30${typeFilter ? &type= + typeFilter : }`
+`gifts.${step.key}`
+`legal.${key}Content`, { returnObjects: true }
+`tasks.level${level}`
+{ ...product, shareUrl: data.shareUrl, commission: data.commission }
+{ address: data.address, network: data.network }
+{ children }
+{ data }
+{ data, labelKey, valueKey, maxValue, color = #FF5000 }
+{ from: bot, text: answer, time: new Date(
+{ isLoading: false, isAuthenticated: false }
+{ need: d.need, have: d.have, shortage: d.shortage, balance: d.balance, deposit: d.deposit }
+{ need: d.need, have: d.have, shortage: d.shortage, isDeposit: true, balance: d.balance }
+{ user, isAuthenticated: !!user }
+{ user: data, isAuthenticated: true, isLoading: false }
+{ user: data.user, isAuthenticated: true, isLoading: false }
+{ user: null, isAuthenticated: false }
+{ user: null, isAuthenticated: false, isLoading: false }
+{ value, onChange, placeholder, className = , ...props }
+0
+135deg, #FF5000, #FF8C42
+135deg,#0088CC,#00B2FF
+135deg,#14142a,#252545
+135deg,#25D366,#128C7E
+135deg,#f0faf4,#e8f5e9
+135deg,#FF5000,#E04500
+135deg,#FF5000,#FF6B35,#E04500
+180deg,#0a0a0f,#1a1a24
+180deg,#f5f3ef 0%,#f8f6f3 100%
+2, 1fr
+3, 1fr
+4,1fr
+40
+7,1fr
+90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%
+90deg,#FF5000,#E04500
+90deg,#FF5000,#FF8A50
+90deg,transparent,rgba(255,255,255,.15
+a.c.replace(+,
+active
+admin.all
+admin.approve
+admin.claimMgmt
+admin.close
+admin.giftForm.type
+admin.nextPage
+admin.noData
+admin.prevPage
+admin.reject
+admin.search
+admin.searchPlaceholder
+admin.userMgmt
+all
+amount
+amount||0
+app.loading
+app.name
+auth.accountCreated
+auth.completeProfile
+auth.continueBtn
+auth.email
+auth.fillRequired
+auth.forgotPassword
+auth.goLogin
+auth.hasAccount
+auth.justDetails
+auth.loggingIn
+auth.loginBtn
+auth.loginLink
+auth.loginTitle
+auth.name
+auth.newPassword
+auth.noAccount
+auth.passMinLength
+auth.phone
+auth.placeholderEmail
+auth.placeholderName
+auth.placeholderNewPass
+auth.placeholderPass
+auth.placeholderPassHint
+auth.placeholderPhone
+auth.placeholderReferral
+auth.referralCode
+auth.registerBtn
+auth.registering
+auth.registerLink
+auth.registerTitle
+auth.resetBtn
+auth.resetDesc
+auth.resetDone
+auth.resetDoneDesc
+auth.resetFailed
+auth.resetTitle
+auth.startEarning
+auth.validEmail
+auth.validEmailPass
+auth.welcomeBack
+auto-fit, minmax(180px, 1fr
+b.c.replace(+,
+balanceAmount
+best.aKey
+c
+circle,rgba(0,168,107,.3
+circle,rgba(245,158,11,.3
+circle,rgba(255,255,255,.06
+circle,rgba(255,255,255,.12
+circle,rgba(255,80,0,.15
+circle,rgba(255,80,0,.3
+claim.available
+claim.delivered
+claim.effectiveCount
+claim.pending
+claim.submitFail
+claim.submitOk
+code
+common.back
+common.cancel
+common.close
+common.language
+common.loadingFailed
+common.operationFailed
+common.people
+common.submit
+currentAddress
+currentTier.key
+data
+data.deposit || 0
+data.length
+data.todayProfit || 0
+data.unread||0
+depositAmount
+depositAmount||0
+div
+document.getElementById(root
+e, i
+e.deposit || 0
+e.netProfit || 0
+e.target.value
+e.todayProfit || 0
+earn.data.deposit || 0
+earn.data.netProfit || 0
+earn.data.todayProfit || 0
+editingGift.id, form
+editReward
+error
+false
+finance.balance || finance.current_balance
+finance.commission || finance.commission_earned
+finance.total_deposits || finance.deposits
+finance.total_earnings || finance.earnings
+finance.total_withdrawals || finance.withdrawals
+form
+form.email
+g.data
+gift
+gift.id
+gift.id, { is_active: newStatus }
+gift.required_invites
+gift.sort_order
+gift.stock
+gift.value
+gifts.allDone
+gifts.cantClaim
+gifts.cash
+gifts.claimable
+gifts.claiming
+gifts.claimNow
+gifts.close
+gifts.copies
+gifts.detail.currentInvites
+gifts.detail.progress
+gifts.detail.requiredInvites
+gifts.effectiveInvites
+gifts.kycEffectiveInvites
+gifts.kycNotice
+gifts.kycNoticeDesc
+gifts.kycStepsTitle
+gifts.needInvite
+gifts.needMore
+gifts.nextGoal
+gifts.people
+gifts.peopleToGet
+gifts.physical
+gifts.remaining
+gifts.title
+gifts.virtual
+h.length
+id
+id, data
+img
+imgParam
+invite.copy
+ips
+item.aKey
+item.qKey
+key
+kyc.backGeneric
+kyc.docType
+kyc.driverLicense
+kyc.frontGeneric
+kyc.licenseNumber
+kyc.licensePlaceholder
+kyc.passport
+kyc.passportBack
+kyc.passportFront
+kyc.passportNumber
+kyc.passportPlaceholder
+kyc.pending
+kyc.pendingDesc
+kyc.privacy
+kyc.realName
+kyc.submittedInfo
+kyc.submitting
+kyc.title
+kyc.unverified
+kyc.unverifiedDesc
+kyc.uploadBoth
+kyc.uploadHint
+kyc.verified
+legal.about
+legal.contact
+legal.lastUpdated
+legal.platform
+legal.privacy
+legal.terms
+legal.title
+legal.version
+loginToken
+Math.min(diff * 0.5, 80
+messages.contact
+messages.faq
+messages.guide
+messages.welcome, { name: t(app.name
+messages.welcomeBody
+mine.adminDesc
+mine.adminPanel
+mine.directInvites
+mine.effectiveInvites
+mine.logoutConfirm
+mine.messages
+mine.myStore
+mine.myStoreDesc
+mine.myTeam
+mine.myTeamDesc
+mine.myWallet
+mine.totalEarned
+new CustomEvent(showContactSupport
+new Event(notifUpdate
+new Event(showContactSupport
+nextTier.key
+notifications.empty
+notifications.markAllRead
+notifications.title
+null
+o.amount || o.value
+o.cost
+o.profit
+ordersToNext > 0 ? `${ordersToNext} orders to ${tier.next} Store` : Max tier reached!
+originalRequest
+pid
+plan.giftKeys[i]
+pw
+q
+r, 1000
+ref
+referralCode
+refreshError
+rewards.claimRecords
+rewards.claimTime
+rewards.noRecords
+rewards.noRecordsHint
+rewards.status.claimed
+rewards.status.delivered
+rewards.status.pending
+rewards.status.rejected
+rewards.title
+rewards.totalEarned
+Search products...
+security.subtitle
+security.title
+shareLink
+stake.active
+stake.availableBalance
+stake.boostInfo,{bonus:plan.bonus}
+stake.choosePlan
+stake.confirm
+stake.confirmDesc,{amount:showConfirm.amount,days:30,bonus:showConfirm.bonus||1.5,profit:(showConfirm.amount*0.15
+stake.confirmTitle
+stake.customAmount
+stake.customDesc
+stake.customPlaceholder
+stake.customTitle
+stake.days
+stake.daysLeft
+stake.estimatedProfit
+stake.forceUnstake
+stake.forceUnstakeConfirm,{amount:stake.amount,penalty}
+stake.howItWorks
+stake.insufficientBalance
+stake.lockedAmount
+stake.multiplier
+stake.plan+plan.id
+stake.premiumGifts
+stake.profit
+stake.readyToUnlock
+stake.stakeNow
+stake.step1
+stake.step2
+stake.step3
+stake.step4
+stake.success
+stake.title
+stake.unlocksIn,{days:daysLeft}
+stake.unstake
+stake.unstakeConfirm
+stake.unstaked
+stake.unstakedPenalty,{penalty}
+stats?.active_orders
+stats?.active_stores
+stats?.new_users_today
+stats?.pending_deposits
+stats?.pending_kyc
+stats?.pending_withdrawals
+stats?.total_orders
+stats?.total_users
+stats?.total_volume
+step.bodyKey
+step.titleKey
+store.balance
+store.closed
+store.closeStore
+store.confirmClose
+store.depositRequired
+store.itemsSold, { n: data.settled.length }
+store.linkCopiedMsg
+store.noMatch
+store.noProducts
+store.openFree
+store.openSuccess
+store.shareCommission
+store.shareEarn
+store.shareFailed
+store.shareGenerated
+store.shareHint
+store.shareRate
+store.subtitle
+store.title
+store.todayProfit
+String(Math.floor(availableBalance
+String(s.deposit||0
+String(v
+support.online
+support.placeholder
+support.title
+support.welcome
+tab.key
+Task creation coming soon, { icon: 🔧 }
+text
+tier.key
+titleKey[key]
+true
+u.invites || u.total_invites
+url
+verify.howTo
+verify.title
+verify.uploaded
+vip.allTiers
+vip.b1
+vip.b1desc
+vip.b2
+vip.b2desc
+vip.b3
+vip.b3desc
+vip.b4
+vip.b4desc
+vip.benefits
+vip.current
+vip.effectiveInvites
+vip.maxLevel
+vip.needMore, { count: nextTier.min - effective }
+vip.title
+wallet.address
+wallet.bindBtn
+wallet.bound
+wallet.boundLabel
+wallet.boundSuccess
+wallet.changeBtn
+wallet.crypto
+wallet.cryptoDesc
+wallet.deliveredLabel
+wallet.enterAddress
+wallet.enterAddress, { chain: NETWORKS.find(n => n.id === form.network
+wallet.noTransactions
+wallet.pendingLabel
+wallet.rejectedLabel
+wallet.replaceWallet
+wallet.saveChange
+wallet.selectNetwork
+wallet.transactions
+wallet.unbind
+wallet.unbindConfirm
+wallet.unbound
+wallet.warning
+withdraw.balance
+withdraw.cancelConfirm
+withdraw.cancelled
+withdraw.done
+withdraw.failed
+withdraw.insufficient
+withdraw.minAmount
+withdraw.pending
+withdraw.success
+withdraw.title
+withdrawAmount
+x

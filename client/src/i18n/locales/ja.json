@@ -11,7 +11,8 @@
     "invite": "招待",
     "rewards": "報酬",
     "mine": "マイページ",
-    "admin": "管理"
+    "admin": "管理",
+    "store": "Store"
   },
   "auth": {
     "login": "ログイン",
@@ -63,7 +64,6 @@
     "resetDesc": "メールアドレスと電話番号を確認して新しいパスワードを設定",
     "newPassword": "新しいパスワード",
     "placeholderNewPass": "新しいパスワードを入力（8文字以上）",
-    "forgotPassword": "パスワードをお忘れですか？",
     "resetBtn": "パスワードをリセット",
     "resetDone": "パスワードリセット完了",
     "resetDoneDesc": "新しいパスワードでログインしてください",
@@ -96,11 +96,17 @@
     "claiming": "受取中...",
     "cantClaim": "あと",
     "close": "閉じる",
-    "detail": {
-      "requiredInvites": "必要招待数",
-      "currentInvites": "現在の有効招待",
-      "progress": "進捗"
-    }
+    "detail": "Details",
+    "required": "Required Invites",
+    "value": "Value",
+    "claimed": "Claimed",
+    "available": "Available",
+    "status": "Status",
+    "claimDetail": "Claim Details",
+    "claimTime": "Claim Time",
+    "deliverTime": "Delivery Time",
+    "adminNote": "Admin Note",
+    "giftType": "Gift Type"
   },
   "tasks": {
     "title": "タスクセンター",
@@ -125,7 +131,12 @@
     "recentInvitees": "最近の招待者",
     "noInvitees": "まだ招待者がいません",
     "noInviteesHint": "招待リンクを共有して始めましょう！",
-    "level": "Lv"
+    "level": "Lv",
+    "day": "Day",
+    "days": "Days",
+    "reward": "Reward",
+    "remaining": "Remaining",
+    "done": "Done"
   },
   "invite": {
     "invitedCount": "招待済み",
@@ -145,7 +156,17 @@
     "tip4": "招待した友達がさらに招待するとあなたもボーナス獲得！",
     "copied": "コピーしました！",
     "codeCopied": "招待コードをコピーしました！",
-    "linkCopied": "共有リンクをコピーしました！"
+    "linkCopied": "共有リンクをコピーしました！",
+    "title": "Invite Friends",
+    "shareTitle": "Share Your Link",
+    "shareDesc": "Share this link with friends",
+    "copySuccess": "Copied!",
+    "referralLink": "Referral Link",
+    "scanToJoin": "Scan to Join",
+    "howItWorks": "How It Works",
+    "step1": "Share your link",
+    "step2": "Friends register",
+    "step3": "Earn commissions"
   },
   "rewards": {
     "title": "受取履歴",
@@ -154,12 +175,11 @@
     "noRecords": "まだ受取履歴がありません",
     "noRecordsHint": "友達を招待して、しきい値に達したら現金報酬を受取りましょう！",
     "claimTime": "受取日時",
-    "status": {
-      "pending": "審査中",
-      "claimed": "受取済み",
-      "delivered": "送金済み",
-      "rejected": "却下"
-    }
+    "status": "[Status]",
+    "pendingRewards": "Pending",
+    "claimedRewards": "Claimed",
+    "noRewards": "No rewards yet",
+    "historyTitle": "History"
   },
   "admin": {
     "title": "管理パネル",
@@ -191,15 +211,24 @@
     "detail": "詳細",
     "close": "閉じる",
     "noData": "データなし",
-    "giftForm": {
-      "name": "名前",
-      "desc": "説明",
-      "type": "タイプ",
-      "value": "金額 ($)",
-      "requiredInvites": "必要招待数",
-      "stock": "在庫 (-1=無制限)",
-      "sort": "表示順"
-    }
+    "giftForm": "[Gift Form]",
+    "users": "Users",
+    "gifts": "Gifts",
+    "claims": "Claims",
+    "withdrawals": "Withdrawals",
+    "kyc": "KYC",
+    "proofs": "Proofs",
+    "notifications": "Notifications",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "confirmApprove": "Confirm?",
+    "confirmReject": "Reject?",
+    "note": "Note",
+    "totalGifts": "Total Gifts",
+    "totalClaims": "Total Claims",
+    "totalWithdrawals": "Total Withdrawals"
   },
   "giftData": {
     "新人红包": {
@@ -275,7 +304,24 @@
     "noWalletHint": "報酬を受け取るためにアカウントを追加",
     "bindAccount": "アカウント追加",
     "help": "ヘルプ",
-    "helpBody": "友達を招待 → しきい値達成 → 現金を受取！友達がさらに招待するとあなたも追加ボーナスを獲得。質問があればサポートまで。"
+    "helpBody": "友達を招待 → しきい値達成 → 現金を受取！友達がさらに招待するとあなたも追加ボーナスを獲得。質問があればサポートまで。",
+    "title": "My Profile",
+    "security": "Security",
+    "notifications": "Notifications",
+    "darkMode": "Dark Mode",
+    "darkModeHint": "Switch theme",
+    "vipCenter": "VIP Center",
+    "staking": "Staking",
+    "withdraw": "Withdraw",
+    "verify": "Verify",
+    "support": "Support",
+    "kyc": "KYC",
+    "legal": "Legal",
+    "profile": "Profile",
+    "balance": "Balance",
+    "withdrawable": "Withdrawable",
+    "locked": "Locked",
+    "available": "Available"
   },
   "team": {
     "title": "マルチレベル招待の仕組み",
@@ -285,7 +331,17 @@
     "formula": "= {{l1}}×1.0 + {{l2}}×0.5 + {{l3}}×0.25",
     "tree": "招待ツリー",
     "joinedOn": "参加日",
-    "showRecent": "{{shown}} / {{total}} 人を表示中"
+    "showRecent": "{{shown}} / {{total}} 人を表示中",
+    "totalMembers": "Total Members",
+    "directInvites": "Direct Invites",
+    "searchPlaceholder": "Search members...",
+    "noMembers": "No members yet",
+    "filterAll": "All",
+    "filterLevel1": "Level 1",
+    "filterLevel2": "Level 2",
+    "filterLevel3": "Level 3",
+    "joined": "Joined",
+    "commission": "Commission"
   },
   "wallet": {
     "crypto": "暗号資産ウォレット",
@@ -308,7 +364,15 @@
     "warning": "アドレスをよく確認してください - 誤ったアドレスに送金された報酬は取り戻せません",
     "bindBtn": "ウォレットを紐付",
     "saveChange": "変更を保存",
-    "replaceWallet": "ウォレット変更"
+    "replaceWallet": "ウォレット変更",
+    "title": "Wallet",
+    "network": "Network",
+    "bind": "Bind Wallet",
+    "noWallet": "No wallet",
+    "bindFirst": "Bind a wallet first",
+    "totalDelivered": "Total Received",
+    "totalPending": "Total Pending",
+    "totalEarned": "Total Earned"
   },
   "messages": {
     "welcome": "{{name}}へようこそ！",
@@ -337,7 +401,14 @@
     "faq4q": "報酬はいつ届きますか？",
     "faq4a": "受取後、管理者が審査・承認します。承認後、USDTが紐付ウォレットに送金されます。",
     "faq5q": "招待コードはどこにありますか？",
-    "faq5a": "マイページで招待コードを確認するか、タスクページから共有リンクをコピーできます。"
+    "faq5a": "マイページで招待コードを確認するか、タスクページから共有リンクをコピーできます。",
+    "title": "Messages",
+    "welcomeMsg": "Welcome!",
+    "quickQuestions": "Quick Questions",
+    "typePlaceholder": "Type a message...",
+    "send": "Send",
+    "online": "Online",
+    "offline": "Offline"
   },
   "stake": {
     "title": "ステーキングプラン",
@@ -389,7 +460,22 @@
     "step1": "プランを選んでデポジットをロック",
     "step2": "ロック期間中、招待倍率がx1.5-3.0にアップ",
     "step3": "より低いしきい値で限定プレミアムギフトを解放",
-    "step4": "ロック期間後、デポジットが全額返金されます"
+    "step4": "ロック期間後、デポジットが全額返金されます",
+    "myStake": "My Stake",
+    "stakingPlans": "Plans",
+    "basic": "Basic",
+    "pro": "Pro",
+    "max": "Max",
+    "confirmBtn": "Confirm",
+    "stakedSuccess": "Staked!",
+    "unstakedSuccess": "Unstaked!",
+    "locked": "Locked",
+    "unlockDate": "Unlock Date",
+    "bonus": "Bonus",
+    "estimatedReturn": "Est. Return",
+    "penalty": "Penalty",
+    "noActiveStake": "No active stake",
+    "activeStake": "Active Stake"
   },
   "withdraw": {
     "title": "出金",
@@ -414,7 +500,12 @@
     "cancelled": "出金をキャンセルしました",
     "history": "出金履歴",
     "done": "完了",
-    "failed": "失敗"
+    "failed": "失敗",
+    "submitWithdraw": "Submit",
+    "network": "Network",
+    "address": "Address",
+    "time": "Time",
+    "status": "[Status]"
   },
   "vip": {
     "title": "メンバーシップ",
@@ -437,7 +528,11 @@
     "b1desc": "招待ボーナス倍率が tier とともに上昇",
     "b2desc": "ゴールド以上で優先審査",
     "b3desc": "プラチナ以上でVIPサポートチャネル",
-    "b4desc": "シルバー以上で出金手数料無料"
+    "b4desc": "シルバー以上で出金手数料無料",
+    "currentTier": "Current Tier",
+    "inviteCount": "Invite Count",
+    "tier5": "Diamond",
+    "upgradeTo": "Upgrade to"
   },
   "charts": {
     "earningsTrend": "収益トレンド",
@@ -463,7 +558,8 @@
     "dropHere": "タップして招待スクリーンショットをアップロード",
     "dropHint": "JPG、PNG対応、最大10MB",
     "uploadedList": "アップロード済みスクリーンショット",
-    "uploaded": "スクリーンショットを審査用にアップロードしました"
+    "uploaded": "スクリーンショットを審査用にアップロードしました",
+    "rejected": "Rejected"
   },
   "support": {
     "q1": "友達を招待するには？",
@@ -478,7 +574,12 @@
     "online": "オンライン · 即時",
     "welcome": "こんにちは！サポートアシスタントです 🤖 どのようなご用件ですか？下のクイック質問をタップするか、質問を入力してください。",
     "notFound": "申し訳ありません、回答が見つかりませんでした。別のキーワードをお試しいただくか、Telegram @Shopping_Operations or email support@shopee-ops.com までお問い合わせください",
-    "placeholder": "質問を入力..."
+    "placeholder": "質問を入力...",
+    "faq": "FAQ",
+    "contactUs": "Contact Us",
+    "chatTitle": "Support Chat",
+    "typeMessage": "Type your message...",
+    "typing": "Typing..."
   },
   "kyc": {
     "title": "本人確認",
@@ -512,7 +613,15 @@
     "idCard": "IDカード",
     "driverLicense": "運転免許証",
     "passport": "パスポート",
-    "uploadBoth": "両面をアップロード"
+    "uploadBoth": "両面をアップロード",
+    "frontPhoto": "Front Photo",
+    "backPhoto": "Back Photo",
+    "uploadFront": "Upload Front",
+    "uploadBack": "Upload Back",
+    "submit": "Submit",
+    "approved": "[Approved]",
+    "rejected": "[Rejected]",
+    "approvedDesc": "KYC approved"
   },
   "legal": {
     "title": "法務・情報",
@@ -521,105 +630,20 @@
     "liability": "免責事項",
     "about": "私たちについて",
     "termsTitle": "利用規約",
-    "termsContent": [
-      {
-        "title": "1. 総則",
-        "body": "ギフトヘイブンへようこそ。登録することにより、お客様とプラットフォーム運営者間の本契約の全条項に同意したことになります。同意いただけない場合は、登録を行わないでください。"
-      },
-      {
-        "title": "2. アカウント登録",
-        "body": "登録時には、メールアドレスや電話番号を含む、真実かつ正確で完全な情報を提供する必要があります。アカウントの機密性を維持する責任はお客様にあります。各ユーザーにつき1アカウントのみ許可されます。"
-      },
-      {
-        "title": "3. 招待と報酬",
-        "body": "プラットフォームはマルチレベル招待システムを採用しています。有効招待数は レベル1×1.0 + レベル2×0.5 + レベル3×0.25 で計算されます。報酬の受取にはプラットフォームの審査が必要です。"
-      },
-      {
-        "title": "4. 禁止行為",
-        "body": "自動スクリプト、偽アカウント、大量登録、詐欺、または強要による招待獲得は固く禁止されています。違反した場合、アカウント停止および報酬没収の対象となります。"
-      },
-      {
-        "title": "5. 契約変更",
-        "body": "プラットフォームは本契約をいつでも変更する権利を留保します。更新された条件は掲載と同時に発効します。継続利用は承諾とみなされます。"
-      },
-      {
-        "title": "6. 終了",
-        "body": "お客様はいつでもプラットフォームの利用を中止できます。プラットフォームは違反、法的要件、または事業変更によりサービスを終了する場合があります。"
-      }
-    ],
+    "termsContent": "[Terms Content]",
     "privacyTitle": "プライバシーポリシー",
-    "privacyContent": [
-      {
-        "title": "1. 情報収集",
-        "body": "当社が収集する情報：(1)登録データ：メールアドレス、電話番号、ニックネーム；(2)利用データ：招待記録、受取履歴、ログインログ；(3)デバイスデータ：ブラウザ種別、OS、IPアドレス。"
-      },
-      {
-        "title": "2. 情報利用",
-        "body": "お客様のデータは以下に使用されます：本人確認、招待追跡、報酬分配、サービス改善、セキュリティ。同意なく他の目的に使用することはありません。"
-      },
-      {
-        "title": "3. データ保存とセキュリティ",
-        "body": "データは暗号化サーバーに保存され、SSL/TLS暗号化通信、暗号化データベース保存、アクセス制御を実施しています。100%安全なシステムは存在しません。"
-      },
-      {
-        "title": "4. 情報共有",
-        "body": "法律で要求される場合やプラットフォームの権利を保護する場合を除き、同意なくお客様の個人情報を第三者に販売、取引、または譲渡することはありません。"
-      },
-      {
-        "title": "5. お客様の権利",
-        "body": "お客様には以下の権利があります：データへのアクセス、不正確な情報の訂正、アカウントとデータの削除、データのエクスポート、同意の撤回。これらの権利を行使するにはサポートまでお問い合わせください。"
-      },
-      {
-        "title": "6. Cookie",
-        "body": "ログイン状態の保持と利用分析のためCookieを使用しています。ブラウザ設定でCookie設定を管理できます。"
-      }
-    ],
+    "privacyContent": "[Privacy Content]",
     "liabilityTitle": "免責事項",
-    "liabilityContent": [
-      {
-        "title": "1. サービスリスク",
-        "body": "お客様は、プラットフォームの利用に固有のリスクが伴うことを理解し同意するものとします。サービスは現状有姿で提供され、適時性、安全性、正確性について明示的または黙示的な保証はありません。"
-      },
-      {
-        "title": "2. 報酬調整",
-        "body": "報酬メカニズムは運営上の必要に応じて調整される場合があります。プラットフォームは報酬ルールの最終解釈権を留保します。"
-      },
-      {
-        "title": "3. 第三者リンク",
-        "body": "プラットフォームには第三者サイトへのリンクが含まれる場合があります。当社は第三者のコンテンツや慣行について責任を負いません。"
-      },
-      {
-        "title": "4. 不可抗力",
-        "body": "自然災害、戦争、政府行為、サイバー攻撃、またはシステム障害による中断について、プラットフォームは責任を負いません。"
-      },
-      {
-        "title": "5. ユーザー間紛争",
-        "body": "ユーザー間の紛争は当事者間で解決してください。プラットフォームは支援することがありますが、責任は負いません。"
-      }
-    ],
+    "liabilityContent": "[Liability Content]",
     "aboutTitle": "ギフトヘイブンについて",
-    "aboutContent": [
-      {
-        "title": "プラットフォーム概要",
-        "body": "ギフトヘイブンは革新的な招待型報酬プラットフォームです。ユーザーは招待リンクを共有し、有効招待を蓄積して、各しきい値で現金報酬を受取ります。マルチレベルボーナスシステムにより収益を最大化します。"
-      },
-      {
-        "title": "主な特徴",
-        "body": "マルチレベル招待：3段階の重み付け計算。豊富な報酬：初回ボーナスから大賞まで。透明性のある追跡：リアルタイムの進捗、収益、チーム構造。安全性と信頼性：KYC確認、暗号化、審査プロセス。"
-      },
-      {
-        "title": "私たちのミッション",
-        "body": "すべての共有に価値を。私たちは、誰もがソーシャルな影響力に価値があると信じています。ギフトヘイブンはあなたのネットワークを実際の収益に変えると同時に、ブランドに効率的なソーシャル配信を提供します。"
-      },
-      {
-        "title": "お問い合わせ",
-        "body": "ご質問、ご提案、パートナーシップについて：Telegram @Shopping_Operations or email support@shopee-ops.com。24時間以内に返信いたします。"
-      }
-    ],
+    "aboutContent": "[About Content]",
     "version": "バージョン",
     "platform": "プラットフォーム",
     "contact": "お問い合わせ",
-    "lastUpdated": "最終更新日"
+    "lastUpdated": "最終更新日",
+    "disclaimer": "Disclaimer",
+    "termsBody": "Terms body",
+    "privacyBody": "Privacy body"
   },
   "sec": {
     "fillAll": "すべての項目を入力してください",
@@ -627,7 +651,17 @@
     "passMismatch": "パスワードが一致しません",
     "passChanged": "パスワードが変更されました",
     "enterPass": "現在のパスワードを入力",
-    "contactUpdated": "連絡先が更新されました"
+    "contactUpdated": "連絡先が更新されました",
+    "title": "Security",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "passUpdated": "Password updated",
+    "changeContact": "Change Contact",
+    "newEmail": "New Email",
+    "newPhone": "New Phone",
+    "currentInfo": "Current Info"
   },
   "security": {
     "title": "セキュリティ",
@@ -641,7 +675,14 @@
     "changeContact": "メール/電話を更新",
     "changeContactHint": "連絡先情報を更新",
     "verifyPassword": "現在のパスワードを入力して確認",
-    "enterCurrentPassword": "現在のパスワードを入力"
+    "enterCurrentPassword": "現在のパスワードを入力",
+    "currentPassword": "Current Password",
+    "updatePassword": "Update Password",
+    "passwordUpdated": "Password updated",
+    "updateContact": "Update Contact",
+    "newEmail": "New Email",
+    "newPhone": "New Phone",
+    "contactUpdated": "Contact updated"
   },
   "claim": {
     "submitOk": "受取申請を審査に送信しました",
@@ -656,7 +697,11 @@
     "arrivedAt": "到着日時",
     "confirmHint": "この報酬を受取りますか？ {{count}}人のしきい値に到達",
     "willSendTo": "報酬はウォレットに送金されます",
-    "noClaimable": "まだ受取可能な報酬はありません"
+    "noClaimable": "まだ受取可能な報酬はありません",
+    "title": "[Title]",
+    "rejected": "Rejected",
+    "claimDetail": "Details",
+    "noClaims": "No claims yet"
   },
   "onboard": {
     "slide1Title": "ギフトヘイブンへようこそ",
@@ -666,7 +711,15 @@
     "slide3Title": "しきい値達成で受取",
     "slide3Body": "招待数がしきい値に達したら、該当する現金報酬を受取",
     "slide4Title": "マルチレベルでさらに獲得",
-    "slide4Body": "友達がさらに招待すると、レベル2とレベル3のボーナスも獲得"
+    "slide4Body": "友達がさらに招待すると、レベル2とレベル3のボーナスも獲得",
+    "slide1Desc": "Invite friends, earn rewards",
+    "slide2Desc": "Share your referral link",
+    "slide3Desc": "Reach thresholds, claim rewards",
+    "slide4Desc": "Multi-level earnings",
+    "skip": "[Skip]",
+    "getStarted": "[Get Started]",
+    "next": "[Next]",
+    "finish": "[Finish]"
   },
   "badges": {
     "title": "実績",
@@ -679,7 +732,15 @@
     "effective-50": "成長エンジン",
     "level3": "三代",
     "first-claim": "初報酬",
-    "earn-100": "100ドル達成"
+    "earn-100": "100ドル達成",
+    "firstInvite": "First Invite",
+    "invite5": "5 Invites",
+    "invite15": "15 Invites",
+    "invite50": "50 Invites",
+    "effective10": "10 Effective",
+    "effective50": "50 Effective",
+    "firstClaim": "First Claim",
+    "earn100": "Earn $100"
   },
   "common": {
     "darkMode": "ダークモード",
@@ -700,7 +761,15 @@
     "networkError": "ネットワークエラー",
     "ok": "OK",
     "copySuccess": "コピーしました！",
-    "submit": "送信しました"
+    "submit": "送信しました",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "noData": "No data",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "comingSoon": "Coming Soon"
   },
   "store": {
     "title": "Eコマース",

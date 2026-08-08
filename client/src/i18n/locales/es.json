@@ -11,7 +11,8 @@
     "invite": "Invitar",
     "rewards": "Ganancias",
     "mine": "Yo",
-    "admin": "Admin"
+    "admin": "Admin",
+    "store": "Store"
   },
   "auth": {
     "login": "Iniciar sesión",
@@ -63,7 +64,6 @@
     "resetDesc": "Verifica tu correo y teléfono para establecer una nueva contraseña",
     "newPassword": "Nueva contraseña",
     "placeholderNewPass": "Ingresa nueva contraseña (mín 8 caracteres)",
-    "forgotPassword": "¿Olvidaste tu contraseña?",
     "resetBtn": "Restablecer contraseña",
     "resetDone": "Contraseña restablecida con éxito",
     "resetDoneDesc": "Inicia sesión con tu nueva contraseña",
@@ -96,11 +96,17 @@
     "claiming": "Reclamando...",
     "cantClaim": "Faltan",
     "close": "Cerrar",
-    "detail": {
-      "requiredInvites": "Invitaciones requeridas",
-      "currentInvites": "Invitaciones efectivas",
-      "progress": "Progreso"
-    }
+    "detail": "Details",
+    "required": "Required Invites",
+    "value": "Value",
+    "claimed": "Claimed",
+    "available": "Available",
+    "status": "Status",
+    "claimDetail": "Claim Details",
+    "claimTime": "Claim Time",
+    "deliverTime": "Delivery Time",
+    "adminNote": "Admin Note",
+    "giftType": "Gift Type"
   },
   "tasks": {
     "title": "Estadísticas",
@@ -125,7 +131,12 @@
     "adReward": "Ad reward received",
     "adDone": "All ads completed today",
     "milestones": "Invite Milestones",
-    "inviteProgress": "Invite Progress"
+    "inviteProgress": "Invite Progress",
+    "day": "Day",
+    "days": "Days",
+    "reward": "Reward",
+    "remaining": "Remaining",
+    "done": "Done"
   },
   "invite": {
     "invitedCount": "Invitados",
@@ -145,7 +156,17 @@
     "tip4": "¡También ganas cuando tus invitados inviten a otros!",
     "copied": "¡Copiado!",
     "codeCopied": "¡Código copiado!",
-    "linkCopied": "¡Enlace copiado!"
+    "linkCopied": "¡Enlace copiado!",
+    "title": "Invite Friends",
+    "shareTitle": "Share Your Link",
+    "shareDesc": "Share this link with friends",
+    "copySuccess": "Copied!",
+    "referralLink": "Referral Link",
+    "scanToJoin": "Scan to Join",
+    "howItWorks": "How It Works",
+    "step1": "Share your link",
+    "step2": "Friends register",
+    "step3": "Earn commissions"
   },
   "rewards": {
     "title": "Historial",
@@ -154,12 +175,11 @@
     "noRecords": "Sin reclamos aún",
     "noRecordsHint": "¡Invita amigos y reclama tus recompensas!",
     "claimTime": "Fecha",
-    "status": {
-      "pending": "Pendiente",
-      "claimed": "Reclamado",
-      "delivered": "Entregado",
-      "rejected": "Rechazado"
-    }
+    "status": "[Status]",
+    "pendingRewards": "Pending",
+    "claimedRewards": "Claimed",
+    "noRewards": "No rewards yet",
+    "historyTitle": "History"
   },
   "admin": {
     "title": "Panel de administración",
@@ -191,15 +211,24 @@
     "detail": "Detalles",
     "close": "Cerrar",
     "noData": "Sin datos",
-    "giftForm": {
-      "name": "Nombre",
-      "desc": "Descripción",
-      "type": "Tipo",
-      "value": "Valor ($)",
-      "requiredInvites": "Invitaciones requeridas",
-      "stock": "Stock (-1=ilimitado)",
-      "sort": "Orden"
-    }
+    "giftForm": "[Gift Form]",
+    "users": "Users",
+    "gifts": "Gifts",
+    "claims": "Claims",
+    "withdrawals": "Withdrawals",
+    "kyc": "KYC",
+    "proofs": "Proofs",
+    "notifications": "Notifications",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "completed": "Completed",
+    "confirmApprove": "Confirm?",
+    "confirmReject": "Reject?",
+    "note": "Note",
+    "totalGifts": "Total Gifts",
+    "totalClaims": "Total Claims",
+    "totalWithdrawals": "Total Withdrawals"
   },
   "giftData": {
     "新人红包": {
@@ -275,7 +304,24 @@
     "noWalletHint": "Agrega una cuenta para recibir",
     "bindAccount": "Agregar",
     "help": "Ayuda",
-    "helpBody": "Invita amigos →?alcanza el umbral →?¡reclama! Tus amigos invitan a otros y tú también ganas."
+    "helpBody": "Invita amigos →?alcanza el umbral →?¡reclama! Tus amigos invitan a otros y tú también ganas.",
+    "title": "My Profile",
+    "security": "Security",
+    "notifications": "Notifications",
+    "darkMode": "Dark Mode",
+    "darkModeHint": "Switch theme",
+    "vipCenter": "VIP Center",
+    "staking": "Staking",
+    "withdraw": "Withdraw",
+    "verify": "Verify",
+    "support": "Support",
+    "kyc": "KYC",
+    "legal": "Legal",
+    "profile": "Profile",
+    "balance": "Balance",
+    "withdrawable": "Withdrawable",
+    "locked": "Locked",
+    "available": "Available"
   },
   "team": {
     "title": "¿Cómo funcionan las invitaciones multinivel?",
@@ -285,7 +331,17 @@
     "formula": "= {{l1}}×1.0 + {{l2}}×0.5 + {{l3}}×0.25",
     "tree": "脕rbol de invitados",
     "joinedOn": "Se unió",
-    "showRecent": "Mostrando {{shown}} de {{total}}"
+    "showRecent": "Mostrando {{shown}} de {{total}}",
+    "totalMembers": "Total Members",
+    "directInvites": "Direct Invites",
+    "searchPlaceholder": "Search members...",
+    "noMembers": "No members yet",
+    "filterAll": "All",
+    "filterLevel1": "Level 1",
+    "filterLevel2": "Level 2",
+    "filterLevel3": "Level 3",
+    "joined": "Joined",
+    "commission": "Commission"
   },
   "wallet": {
     "crypto": "Billetera Cripto",
@@ -308,7 +364,15 @@
     "warning": "Verifica la dirección –?no se puede recuperar si es incorrecta",
     "bindBtn": "Vincular Billetera",
     "saveChange": "Guardar Cambios",
-    "replaceWallet": "Cambiar Billetera"
+    "replaceWallet": "Cambiar Billetera",
+    "title": "Wallet",
+    "network": "Network",
+    "bind": "Bind Wallet",
+    "noWallet": "No wallet",
+    "bindFirst": "Bind a wallet first",
+    "totalDelivered": "Total Received",
+    "totalPending": "Total Pending",
+    "totalEarned": "Total Earned"
   },
   "messages": {
     "welcome": "¡Bienvenido a {{name}}!",
@@ -337,7 +401,14 @@
     "faq4q": "¿Cuándo recibo mi recompensa?",
     "faq4a": "Después de reclamar, un admin revisa y aprueba. Luego se envía USDT.",
     "faq5q": "¿Dónde está mi código?",
-    "faq5a": "En la página Yo, o copia el enlace desde Tareas."
+    "faq5a": "En la página Yo, o copia el enlace desde Tareas.",
+    "title": "Messages",
+    "welcomeMsg": "Welcome!",
+    "quickQuestions": "Quick Questions",
+    "typePlaceholder": "Type a message...",
+    "send": "Send",
+    "online": "Online",
+    "offline": "Offline"
   },
   "stake": {
     "title": "Planes de Staking",
@@ -389,7 +460,22 @@
     "step1": "Elige un plan y bloquea tu depósito",
     "step2": "Multiplicador de invitación aumenta a x1.5-3.0",
     "step3": "Desbloquea regalos premium exclusivos",
-    "step4": "Tu depósito completo es devuelto al final"
+    "step4": "Tu depósito completo es devuelto al final",
+    "myStake": "My Stake",
+    "stakingPlans": "Plans",
+    "basic": "Basic",
+    "pro": "Pro",
+    "max": "Max",
+    "confirmBtn": "Confirm",
+    "stakedSuccess": "Staked!",
+    "unstakedSuccess": "Unstaked!",
+    "locked": "Locked",
+    "unlockDate": "Unlock Date",
+    "bonus": "Bonus",
+    "estimatedReturn": "Est. Return",
+    "penalty": "Penalty",
+    "noActiveStake": "No active stake",
+    "activeStake": "Active Stake"
   },
   "withdraw": {
     "title": "Retirar",
@@ -414,7 +500,12 @@
     "done": "Completado",
     "failed": "Fallido",
     "minAmount": "Retiro mínimo: $20",
-    "minPlaceholder": "Min $20"
+    "minPlaceholder": "Min $20",
+    "submitWithdraw": "Submit",
+    "network": "Network",
+    "address": "Address",
+    "time": "Time",
+    "status": "[Status]"
   },
   "vip": {
     "title": "Membresía",
@@ -437,7 +528,11 @@
     "b1desc": "El bonus de invitación aumenta con el nivel",
     "b2desc": "Oro y superior tienen revisión prioritaria",
     "b3desc": "Platino y superior tienen soporte VIP",
-    "b4desc": "Plata y superior tienen retiro gratis"
+    "b4desc": "Plata y superior tienen retiro gratis",
+    "currentTier": "Current Tier",
+    "inviteCount": "Invite Count",
+    "tier5": "Diamond",
+    "upgradeTo": "Upgrade to"
   },
   "charts": {
     "earningsTrend": "Tendencia",
@@ -456,7 +551,12 @@
     "q5": "How long does review take?",
     "q6": "How to change password?",
     "q7": "How to upgrade tier?",
-    "q8": "What is staking?"
+    "q8": "What is staking?",
+    "faq": "FAQ",
+    "contactUs": "Contact Us",
+    "chatTitle": "Support Chat",
+    "typeMessage": "Type your message...",
+    "typing": "Typing..."
   },
   "kyc": {
     "title": "Verificación",
@@ -490,7 +590,15 @@
     "idCard": "DNI",
     "driverLicense": "Carnet",
     "passport": "Pasaporte",
-    "uploadBoth": "Subir ambos lados"
+    "uploadBoth": "Subir ambos lados",
+    "frontPhoto": "Front Photo",
+    "backPhoto": "Back Photo",
+    "uploadFront": "Upload Front",
+    "uploadBack": "Upload Back",
+    "submit": "Submit",
+    "approved": "[Approved]",
+    "rejected": "[Rejected]",
+    "approvedDesc": "KYC approved"
   },
   "legal": {
     "title": "Legal e Info",
@@ -499,93 +607,20 @@
     "liability": "Legal",
     "about": "Nosotros",
     "termsTitle": "Términos de Servicio",
-    "termsContent": [
-      {
-        "title": "1. General",
-        "body": "Bienvenido. Al registrarte aceptas todos los términos de este acuerdo entre tú y el operador de la plataforma."
-      },
-      {
-        "title": "2. Cuenta",
-        "body": "Debes proporcionar información veraz y completa. Cada usuario está limitado a una cuenta. La información falsa resultará en suspensión."
-      },
-      {
-        "title": "3. Invitaciones",
-        "body": "Las invitaciones efectivas se calculan: Nivel 1×1.0 + Nivel 2×0.5 + Nivel 3×0.25. Las recompensas requieren revisión."
-      },
-      {
-        "title": "4. Conducta Prohibida",
-        "body": "Scripts, cuentas falsas, fraude o coerción están prohibidos. Las violaciones resultan en suspensión y pérdida de recompensas."
-      },
-      {
-        "title": "5. Cambios",
-        "body": "Podemos modificar este acuerdo en cualquier momento. El uso continuado constituye aceptación."
-      }
-    ],
+    "termsContent": "[Terms Content]",
     "privacyTitle": "Política de Privacidad",
-    "privacyContent": [
-      {
-        "title": "1. Recopilación",
-        "body": "Recopilamos: email, teléfono, nombre, registros de invitación, historial de reclamos y datos del dispositivo."
-      },
-      {
-        "title": "2. Uso",
-        "body": "Tus datos se usan para verificación, seguimiento de invitaciones, distribución de recompensas y seguridad."
-      },
-      {
-        "title": "3. Seguridad",
-        "body": "Usamos cifrado SSL/TLS y almacenamiento encriptado. Ningún sistema es 100% seguro."
-      },
-      {
-        "title": "4. Compartición",
-        "body": "No vendemos ni compartimos tu información con terceros sin consentimiento, excepto por ley."
-      },
-      {
-        "title": "5. Tus Derechos",
-        "body": "Puedes acceder, corregir, eliminar y exportar tus datos. Contacta al soporte."
-      }
-    ],
+    "privacyContent": "[Privacy Content]",
     "liabilityTitle": "Descargo",
-    "liabilityContent": [
-      {
-        "title": "1. Riesgo",
-        "body": "El servicio se proporciona tal cual, sin garantías de puntualidad, seguridad o precisión."
-      },
-      {
-        "title": "2. Ajustes",
-        "body": "Las recompensas pueden ajustarse según necesidades operativas."
-      },
-      {
-        "title": "3. Terceros",
-        "body": "No somos responsables por contenido o prácticas de sitios de terceros."
-      },
-      {
-        "title": "4. Fuerza Mayor",
-        "body": "No somos responsables por interrupciones debido a desastres naturales, guerra o fallos del sistema."
-      }
-    ],
+    "liabilityContent": "[Liability Content]",
     "aboutTitle": "Acerca de",
-    "aboutContent": [
-      {
-        "title": "Visión General",
-        "body": "Regalo Fácil es una plataforma de recompensas por invitación con sistema multinivel."
-      },
-      {
-        "title": "Características",
-        "body": "Invitaciones en 3 niveles, recompensas variadas, seguimiento en tiempo real, verificación KYC."
-      },
-      {
-        "title": "Misión",
-        "body": "Hacer que cada compartir sea gratificante. Convierte tu red social en ganancias reales."
-      },
-      {
-        "title": "Contacto",
-        "body": "¿Preguntas? Telegram @Shopping_Operations or email support@shopee-ops.com. Respondemos en 24 horas."
-      }
-    ],
+    "aboutContent": "[About Content]",
     "version": "Versión",
     "platform": "Plataforma",
     "contact": "Contacto",
-    "lastUpdated": "Actualizado"
+    "lastUpdated": "Actualizado",
+    "disclaimer": "Disclaimer",
+    "termsBody": "Terms body",
+    "privacyBody": "Privacy body"
   },
   "sec": {
     "fillAll": "Completa todos los campos",
@@ -593,7 +628,17 @@
     "passMismatch": "Las contraseñas no coinciden",
     "passChanged": "Contraseña cambiada",
     "enterPass": "Ingresa tu contraseña",
-    "contactUpdated": "Contacto actualizado"
+    "contactUpdated": "Contacto actualizado",
+    "title": "Security",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "passUpdated": "Password updated",
+    "changeContact": "Change Contact",
+    "newEmail": "New Email",
+    "newPhone": "New Phone",
+    "currentInfo": "Current Info"
   },
   "security": {
     "title": "Seguridad",
@@ -607,7 +652,14 @@
     "changeContact": "Actualizar email / teléfono",
     "changeContactHint": "Actualiza tu información de contacto",
     "verifyPassword": "Ingresa tu contraseña para verificar",
-    "enterCurrentPassword": "Contraseña actual"
+    "enterCurrentPassword": "Contraseña actual",
+    "currentPassword": "Current Password",
+    "updatePassword": "Update Password",
+    "passwordUpdated": "Password updated",
+    "updateContact": "Update Contact",
+    "newEmail": "New Email",
+    "newPhone": "New Phone",
+    "contactUpdated": "Contact updated"
   },
   "claim": {
     "submitOk": "Reclamo enviado para revisión",
@@ -622,7 +674,11 @@
     "willSendTo": "Se enviará a tu billetera",
     "noClaimable": "Sin recompensas aún",
     "withdrawn": "Withdrawn",
-    "withdrawnAt": "Withdrawn"
+    "withdrawnAt": "Withdrawn",
+    "title": "[Title]",
+    "rejected": "Rejected",
+    "claimDetail": "Details",
+    "noClaims": "No claims yet"
   },
   "onboard": {
     "slide1Title": "Bienvenido a Regalo Fácil",
@@ -632,7 +688,15 @@
     "slide3Title": "Alcanza el umbral",
     "slide3Body": "Cuando tus invitaciones lleguen al umbral, reclama tu recompensa",
     "slide4Title": "Multinivel = Más ganancias",
-    "slide4Body": "Tus amigos invitan a otros y tú ganas bonos de nivel 2 y 3"
+    "slide4Body": "Tus amigos invitan a otros y tú ganas bonos de nivel 2 y 3",
+    "slide1Desc": "Invite friends, earn rewards",
+    "slide2Desc": "Share your referral link",
+    "slide3Desc": "Reach thresholds, claim rewards",
+    "slide4Desc": "Multi-level earnings",
+    "skip": "[Skip]",
+    "getStarted": "[Get Started]",
+    "next": "[Next]",
+    "finish": "[Finish]"
   },
   "badges": {
     "title": "Logros",
@@ -645,7 +709,15 @@
     "effective-50": "Motor",
     "level3": "Tres Gen",
     "first-claim": "Primera Cosecha",
-    "earn-100": "Centurión"
+    "earn-100": "Centurión",
+    "firstInvite": "First Invite",
+    "invite5": "5 Invites",
+    "invite15": "15 Invites",
+    "invite50": "50 Invites",
+    "effective10": "10 Effective",
+    "effective50": "50 Effective",
+    "firstClaim": "First Claim",
+    "earn100": "Earn $100"
   },
   "common": {
     "darkMode": "Modo Oscuro",
@@ -666,7 +738,15 @@
     "days": " days",
     "ok": "OK",
     "copySuccess": "¡Copiado!",
-    "submit": "Enviado"
+    "submit": "Enviado",
+    "edit": "Edit",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "noData": "No data",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "comingSoon": "Coming Soon"
   },
   "verify": {
     "title": "Verification",
@@ -688,7 +768,8 @@
     "dropHere": "Tap to upload invite screenshot",
     "dropHint": "JPG, PNG supported, max 10MB",
     "uploadedList": "Uploaded Screenshots",
-    "uploaded": "Screenshot uploaded for review"
+    "uploaded": "Screenshot uploaded for review",
+    "rejected": "Rejected"
   },
   "store": {
     "title": "E-Commerce",
