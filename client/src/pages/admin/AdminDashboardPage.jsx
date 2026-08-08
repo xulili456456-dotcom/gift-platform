@@ -188,7 +188,7 @@ export default function AdminDashboardPage() {
                       <tr key={o.id || i} style={{ background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
                         <td style={{ padding: '10px 10px', color: '#333', fontSize: 12, whiteSpace: 'nowrap' }}>{o.user_email || o.user_name || '-'}</td>
                         <td style={{ padding: '10px 10px', color: '#333', fontSize: 12, whiteSpace: 'nowrap', maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis' }}>{o.product_name || o.gift_name || '-'}</td>
-                        <td style={{ padding: '10px 10px', color: '#333', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>${fmt(o.amount || o.value)}</td>
+                        <td style={{ padding: '10px 10px', color: '#333', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>${fmt(o.profit || o.amount || o.value)}</td>
                         <td style={{ padding: '10px 10px', whiteSpace: 'nowrap' }}>
                           <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600, background: st.bg, color: st.color }}>{st.label}</span>
                         </td>

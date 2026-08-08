@@ -450,7 +450,7 @@ function OrdersTab({ orders }) {
                     {o.product_name || o.gift_name || o.name || '-'}
                   </td>
                   <td style={{ padding: '10px 10px', color: '#333', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap' }}>
-                    ${fmt(o.amount || o.value)}
+                    ${fmt(o.profit || o.amount || o.value)}
                   </td>
                   <td style={{ padding: '10px 10px', whiteSpace: 'nowrap' }}>
                     <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 10, fontSize: 11, fontWeight: 600, background: st.bg, color: st.color }}>
