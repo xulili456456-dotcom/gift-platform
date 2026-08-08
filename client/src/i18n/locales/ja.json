@@ -553,7 +553,8 @@
     "currentTier": "現在",
     "inviteCount": "招待数",
     "tier5": "ダイヤ",
-    "upgradeTo": "アップ"
+    "upgradeTo": "アップ",
+    "status": "Status"
   },
   "charts": {
     "earningsTrend": "収益トレンド",

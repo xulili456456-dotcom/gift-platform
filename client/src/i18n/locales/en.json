@@ -553,7 +553,8 @@
     "currentTier": "Current Tier",
     "inviteCount": "Invite Count",
     "tier5": "Diamond",
-    "upgradeTo": "Upgrade to"
+    "upgradeTo": "Upgrade to",
+    "status": "Status"
   },
   "charts": {
     "earningsTrend": "Earnings Trend",

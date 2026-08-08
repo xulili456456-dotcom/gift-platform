@@ -482,7 +482,8 @@
     "b1desc": "Dapatkan bonus jemputan 1.0x",
     "b2desc": "Tuntutan anda disemak dengan keutamaan",
     "b3desc": "Akses sokongan VIP eksklusif",
-    "b4desc": "Nikmati pengeluaran percuma"
+    "b4desc": "Nikmati pengeluaran percuma",
+    "status": "Status"
   },
   "charts": {
     "earningsTrend": "Trend Pendapatan",
