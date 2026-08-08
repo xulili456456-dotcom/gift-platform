@@ -189,7 +189,17 @@ router.post('/reset-password', resetLimiter, async (req, res) => {
     if (newPassword.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
     if (!/[a-zA-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) return res.status(400).json({ error: 'Password must contain both letters and numbers' });
     const user = await userModel.findByEmail(email);
-    if (!user || user.phone !== phone) return res.status(400).json({ error: 'Email or phone number does not match' });
+    if (!user) return res.status(400).json({ error: 'Email not found' });
+    // Normalize phone comparison — strip non-digits, compare last 10 digits
+    const cleanInput = phone.replace(/\D/g, '');
+    const cleanStored = (user.phone || '').replace(/\D/g, '');
+    if (cleanInput.length >= 7 && cleanStored.length >= 7) {
+      const matchInput = cleanInput.slice(-10);
+      const matchStored = cleanStored.slice(-10);
+      if (matchInput !== matchStored) return res.status(400).json({ error: 'Phone number does not match' });
+    } else if (cleanInput !== cleanStored) {
+      return res.status(400).json({ error: 'Phone number does not match' });
+    }
     const newHash = await hashPassword(newPassword);
     const { run } = require('../db/database');
     await run("UPDATE users SET password_hash = ?, updated_at = NOW() WHERE id = ?", [newHash, user.id]);
