@@ -439,11 +439,9 @@ router.get('/users-filtered', async (req, res) => {
      ${where} ORDER BY u.id DESC LIMIT ? OFFSET ?`,
     [...params, limit, offset]
   );
-  // Resolve IP to country
-  const resolved = await Promise.all(users.map(async u => ({
-    ...u, balance: Number(u.balance), store_deposit: Number(u.store_deposit || 0),
-    country: u.ip_address ? await ipToCountry(u.ip_address) : null
-  })));
+  const resolved = users.map(u => ({
+    ...u, balance: Number(u.balance), store_deposit: Number(u.store_deposit || 0)
+  }));
   res.json({ users: resolved, total: Number(total?.c || 0), page, limit });
 });
 
