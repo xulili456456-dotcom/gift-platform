@@ -28,15 +28,15 @@ export default function WithdrawPage() {
 
   const loadData = () => {
     Promise.all([
-      claimsApi.list(),
-      client.get('/tasks/balance'),
+      claimsApi.list().catch(() => ({ data: [] })),
+      client.get('/tasks/balance').catch(() => ({ data: { available: 0, total: 0 } })),
       client.get('/withdrawals').catch(() => ({ data: [] })),
       client.get('/store/earnings-stats').catch(() => ({ data: null })),
       client.get('/store/holdings').catch(() => ({ data: [] })),
     ])
       .then(([c, b, w, earn, hold]) => {
-        setClaims(c.data);
-        setTaskBalance(b.data);
+        setClaims(c.data || []);
+        setTaskBalance(b.data || { available: 0, total: 0 });
         setWithdrawals(w.data || []);
         if (earn.data) {
           setStoreDeposit(earn.data.deposit || 0);
