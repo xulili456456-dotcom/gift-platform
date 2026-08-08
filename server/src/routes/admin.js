@@ -602,7 +602,14 @@ router.get('/orders', async (req, res) => {
   const offset = (page - 1) * limit;
   let where = 'WHERE 1=1';
   const params = [];
-  if (user_id) { where += ' AND o.user_id = ?'; params.push(user_id); }
+  if (user_id) {
+    // Support searching by user ID, name, or email
+    if (/^\d+$/.test(user_id)) {
+      where += ' AND o.user_id = ?'; params.push(parseInt(user_id));
+    } else {
+      where += ' AND (u.name ILIKE ? OR u.email ILIKE ?)'; params.push('%'+user_id+'%', '%'+user_id+'%');
+    }
+  }
   if (status) { where += ' AND o.status = ?'; params.push(status); }
 
   const total = await get(`SELECT COUNT(*) as c FROM store_orders o ${where}`, params);
