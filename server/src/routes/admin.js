@@ -439,7 +439,15 @@ router.get('/users-filtered', async (req, res) => {
      ${where} ORDER BY u.id DESC LIMIT ? OFFSET ?`,
     [...params, limit, offset]
   );
-  const resolved = users.map(u => ({
+  // Resolve IPs with 2s timeout — if cached, returns instantly
+  const withCountries = await Promise.race([
+    Promise.all(users.map(async u => ({
+      ...u, balance: Number(u.balance), store_deposit: Number(u.store_deposit || 0),
+      country: u.ip_address ? await ipToCountry(u.ip_address) : null
+    }))),
+    new Promise(r => setTimeout(() => r(null), 2000))
+  ]);
+  const resolved = withCountries || users.map(u => ({
     ...u, balance: Number(u.balance), store_deposit: Number(u.store_deposit || 0)
   }));
   res.json({ users: resolved, total: Number(total?.c || 0), page, limit });
