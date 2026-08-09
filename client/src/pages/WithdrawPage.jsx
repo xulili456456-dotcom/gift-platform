@@ -18,6 +18,7 @@ export default function WithdrawPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [expandedW, setExpandedW] = useState(new Set());
+  const [showDetail, setShowDetail] = useState(null);
 
   // Store data for margin breakdown
   const [storeDeposit, setStoreDeposit] = useState(0);
@@ -104,24 +105,66 @@ export default function WithdrawPage() {
           </div>
 
           {/* Available */}
-          <div style={{background:'#E8F8F0',borderRadius:14,padding:14,marginBottom:10}}>
-            <div style={{fontSize:11,color:'#666',marginBottom:2,fontWeight:600}}>Available Balance</div>
-            <div style={{fontSize:22,fontWeight:800,color:'#00A86B'}}>${availableBalance.toFixed(2)}</div>
+          <div onClick={() => setShowDetail(showDetail==='available'?null:'available')} style={{background:'#E8F8F0',borderRadius:14,padding:14,marginBottom:10,cursor:'pointer'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div>
+                <div style={{fontSize:11,color:'#666',marginBottom:2,fontWeight:600}}>Available Balance</div>
+                <div style={{fontSize:22,fontWeight:800,color:'#00A86B'}}>${availableBalance.toFixed(2)}</div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" style={{transform:showDetail==='available'?'rotate(180deg)':'rotate(0)',transition:'transform .2s'}}><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            {showDetail==='available' && (
+              <div style={{marginTop:10,paddingTop:10,borderTop:'1px solid rgba(0,0,0,.06)'}}>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:11}}><span style={{color:'#999'}}>Task Earnings</span><span style={{fontWeight:600}}>${availableBalance.toFixed(2)}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:11}}><span style={{color:'#999'}}>Today's Profit</span><span style={{fontWeight:600,color:'#00A86B'}}>+${todayProfit.toFixed(2)}</span></div>
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:11}}><span style={{color:'#999'}}>Total Net Profit</span><span style={{fontWeight:600,color:'#00A86B'}}>+${totalProfit.toFixed(2)}</span></div>
+                <div style={{fontSize:10,color:'#999',marginTop:6}}>Available balance can be withdrawn or used for trading. Profits from completed orders accumulate here.</div>
+              </div>
+            )}
           </div>
 
           {/* Deposit */}
-          <div style={{background:'#FFF8E1',borderRadius:14,padding:14,marginBottom:10}}>
-            <div style={{fontSize:11,color:'#999',marginBottom:2,fontWeight:600}}>Deposit (Margin)</div>
-            <div style={{fontSize:22,fontWeight:800,color:'#F59E0B'}}>${storeDeposit.toFixed(2)}</div>
-            <div style={{fontSize:10,color:'#999',marginTop:2}}>Cannot use for trading. Withdraw from Store Funds.</div>
+          <div onClick={() => setShowDetail(showDetail==='deposit'?null:'deposit')} style={{background:'#FFF8E1',borderRadius:14,padding:14,marginBottom:10,cursor:'pointer'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div>
+                <div style={{fontSize:11,color:'#999',marginBottom:2,fontWeight:600}}>Deposit (Margin)</div>
+                <div style={{fontSize:22,fontWeight:800,color:'#F59E0B'}}>${storeDeposit.toFixed(2)}</div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" style={{transform:showDetail==='deposit'?'rotate(180deg)':'rotate(0)',transition:'transform .2s'}}><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            {showDetail==='deposit' && (
+              <div style={{marginTop:10,paddingTop:10,borderTop:'1px solid rgba(0,0,0,.06)'}}>
+                <div style={{fontSize:11,color:'#666',lineHeight:1.6}}>Deposit is locked in your store as collateral. It determines your maximum trade amount. Cannot be withdrawn while orders are active.</div>
+                <div style={{marginTop:6,padding:'8px 12px',background:'#fff',borderRadius:8,fontSize:11}}>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:2}}><span style={{color:'#999'}}>Store Deposit</span><span style={{fontWeight:600}}>${storeDeposit.toFixed(2)}</span></div>
+                  <div style={{display:'flex',justifyContent:'space-between',marginBottom:2}}><span style={{color:'#999'}}>Max Trade Limit</span><span style={{fontWeight:600}}>${storeDeposit.toFixed(2)}</span></div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* In Trading */}
           {holdingsLocked > 0 && (
-            <div style={{background:'#EEF2FF',borderRadius:14,padding:14}}>
-              <div style={{fontSize:11,color:'#999',marginBottom:2,fontWeight:600}}>In Trading</div>
-              <div style={{fontSize:22,fontWeight:800,color:'#4C6EF5'}}>${holdingsLocked.toFixed(2)}</div>
-              <div style={{fontSize:10,color:'#999',marginTop:2}}>Locked in {holdingsCount} active orders</div>
+            <div onClick={() => setShowDetail(showDetail==='trading'?null:'trading')} style={{background:'#EEF2FF',borderRadius:14,padding:14,cursor:'pointer'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <div>
+                  <div style={{fontSize:11,color:'#999',marginBottom:2,fontWeight:600}}>In Trading</div>
+                  <div style={{fontSize:22,fontWeight:800,color:'#4C6EF5'}}>${holdingsLocked.toFixed(2)}</div>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" style={{transform:showDetail==='trading'?'rotate(180deg)':'rotate(0)',transition:'transform .2s'}}><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+              <div style={{fontSize:10,color:'#999',marginTop:2}}>{holdingsCount} active orders</div>
+              {showDetail==='trading' && (
+                <div style={{marginTop:10,paddingTop:10,borderTop:'1px solid rgba(0,0,0,.06)'}}>
+                  {holdings.slice(0,5).map((h,i) => (
+                    <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:i<Math.min(holdings.length,5)-1?'1px solid rgba(0,0,0,.05)':'none',fontSize:11}}>
+                      <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',color:'#666'}}>{h.product_name||'Product'}</span>
+                      <span style={{fontWeight:600,marginLeft:8,flexShrink:0}}>${(h.cost||0).toFixed(2)}</span>
+                    </div>
+                  ))}
+                  {holdings.length > 5 && <div style={{fontSize:10,color:'#999',marginTop:4}}>+{holdings.length-5} more</div>}
+                </div>
+              )}
             </div>
           )}
 
