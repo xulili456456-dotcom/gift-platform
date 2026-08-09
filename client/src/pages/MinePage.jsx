@@ -90,6 +90,7 @@ export default function MinePage() {
       <div style={{margin:'0 16px 8px',background:'#fff',borderRadius:14,overflow:'hidden'}}>
         <MenuRow icon={<ArrowUpRight size={17} color="#00A86B"/>} iconBg="#E8F5E9" label={t('withdraw.title')} desc={`${t('withdraw.balance')}: $${totalEarned.toFixed(2)}`} onClick={()=>navigate('/mine/withdraw')}/>
         <MenuRow icon={<CreditCard size={17} color="#FF5000"/>} iconBg="#FFF5F0" label="Deposit" desc="Deposit USDT to your account" onClick={()=>navigate('/mine/deposit')}/>
+        <MenuRow icon={<span style={{fontSize:18}}>🧧</span>} iconBg="#FFF0F0" label="Red Envelope" desc="$1000 Lucky Red Envelope" onClick={()=>navigate('/red-envelope')}/>
       </div>
 
       {/* Business Group */}

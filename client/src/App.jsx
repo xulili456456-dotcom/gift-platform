@@ -9,6 +9,7 @@ import ProtectedRoute from './components/shared/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
+import RedEnvelopePage from './pages/RedEnvelopePage';
 import TasksPage from './pages/TasksPage';
 import MinePage from './pages/MinePage';
 import StorePage from './pages/StorePage';
@@ -116,6 +117,7 @@ export default function App() {
 
         <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
           <Route path="/home" element={<HomePage />} />
+          <Route path="/red-envelope" element={<RedEnvelopePage />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/store/funds" element={<StoreFundsPage />} />
           <Route path="/store" element={<StorePage />} />

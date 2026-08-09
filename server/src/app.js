@@ -84,7 +84,8 @@ async function start() {
   app.use('/api/kyc', require('./routes/kyc'));
   app.use('/api/proofs', require('./routes/proofs'));
   app.use('/api/staking', require('./routes/staking'));
-  app.use('/api/notifications', require('./routes/notifications').router);
+  app.use('/api/red-envelope', require('./routes/redEnvelope'));
+app.use('/api/notifications', require('./routes/notifications').router);
   app.use('/api/withdrawals', require('./routes/withdrawals'));
   app.use('/api/store', require('./routes/store'));
 app.use('/api/deposits', require('./routes/deposits'));

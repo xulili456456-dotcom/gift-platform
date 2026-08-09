@@ -440,4 +440,38 @@ if (require.main === module) {
   });
 }
 
+  // Red Envelope
+  try {
+    await exec(`CREATE TABLE IF NOT EXISTS red_envelopes (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL UNIQUE,
+      current_amount NUMERIC(10,2) NOT NULL DEFAULT 998.00,
+      target_amount NUMERIC(10,2) NOT NULL DEFAULT 1000.00,
+      coin_count INTEGER NOT NULL DEFAULT 0,
+      phase TEXT NOT NULL DEFAULT 'cash',
+      help_count INTEGER NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'claimed')),
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      claimed_at TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`);
+    await exec(`CREATE TABLE IF NOT EXISTS red_envelope_helps (
+      id SERIAL PRIMARY KEY,
+      envelope_id INTEGER NOT NULL,
+      helper_user_id INTEGER NOT NULL,
+      amount_added NUMERIC(10,2) NOT NULL DEFAULT 0,
+      coins_added INTEGER NOT NULL DEFAULT 0,
+      helper_ip VARCHAR(45) DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'confirmed', 'rejected')),
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      FOREIGN KEY (envelope_id) REFERENCES red_envelopes(id) ON DELETE CASCADE,
+      FOREIGN KEY (helper_user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`);
+    await exec(`CREATE INDEX IF NOT EXISTS idx_helps_envelope ON red_envelope_helps(envelope_id)`);
+    await exec(`CREATE INDEX IF NOT EXISTS idx_helps_helper ON red_envelope_helps(helper_user_id)`);
+    console.log('Red envelope tables ready.');
+  } catch(e) { console.log('Red envelope migration skipped:', e.message); }
+
+}
+
 module.exports = migrate;

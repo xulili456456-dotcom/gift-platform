@@ -65,6 +65,8 @@ router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res) => {
   res.json({ ok: true });
   if (status === 'approved') {
     updateTaskProgress(kyc.user_id, 'kyc_complete', 1).catch(()=>{});
+    // Auto-confirm pending red envelope helps
+    try { await require('./redEnvelope').confirmPendingHelps(kyc.user_id); } catch(e) { console.log('HELP confirm skipped:', e.message); }
   }
 });
 

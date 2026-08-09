@@ -6,6 +6,7 @@ import { referralApi } from '../api/referral';
 import { claimsApi } from '../api/claims';
 import client from '../api/client';
 import toast from 'react-hot-toast';
+import RedEnvelopeTeaser from './RedEnvelopeTeaser';
 
 const TIER_INFO = {
   small:  { name: 'Small Store', dailyOrders: 10, threshold: 0,   next: 'Medium', nextThreshold: 50 },
@@ -222,6 +223,9 @@ export default function HomePage() {
           </div>
         </div>
       </header>
+
+      {/* ═══ RED ENVELOPE TEASER ═══ */}
+      <RedEnvelopeTeaser />
 
       {/* ═══ HERO BANNER ═══ */}
       <div className="hero-gradient-anim" style={{ margin: '14px 16px 0', background: 'linear-gradient(135deg,#FF5000,#FF6B35,#E04500)', borderRadius: 18, padding: '24px 18px', color: '#fff', position: 'relative', overflow: 'hidden', cursor: 'pointer' }} onClick={() => navigate('/store')}>
