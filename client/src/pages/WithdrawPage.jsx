@@ -178,7 +178,7 @@ export default function WithdrawPage() {
                 <div onClick={() => setExpandedW(isOpen ? null : w.id)} style={{display:'flex',justifyContent:'space-between',padding:'10px 0',fontSize:11,cursor:'pointer'}}>
                   <div>
                     <div style={{fontWeight:600}}>${Number(w.amount||0).toFixed(2)}</div>
-                    <div style={{color:'#999',fontSize:9}}>{w.network?.toUpperCase()} &middot; {String(w.wallet_address||'').slice(0,15)}...</div>
+                    <div style={{color:'#999',fontSize:9}}>{w.network?.toUpperCase()} &middot; {String(w.wallet_address||'')}</div>
                   </div>
                   <div style={{textAlign:'right',display:'flex',alignItems:'center',gap:6}}>
                     <span style={{fontSize:10,color:w.status==='completed'?'#00A86B':w.status==='pending'?'#F59E0B':'#EF4444',fontWeight:600}}>{w.status==='completed'?t('withdraw.done'):w.status==='pending'?t('withdraw.pending'):t('withdraw.failed')}</span>
