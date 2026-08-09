@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuthStore from '../store/authStore';
@@ -10,7 +10,20 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const login = useAuthStore((s) => s.login);
+  const loadUser = useAuthStore((s) => s.loadUser);
   const navigate = useNavigate();
+
+  // Handle impersonate token from admin panel
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith('#token=')) {
+      const token = hash.slice(7);
+      localStorage.setItem('access_token', token);
+      localStorage.removeItem('refresh_token');
+      window.location.hash = '';
+      loadUser().then(() => navigate('/home', { replace: true })).catch(() => {});
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
