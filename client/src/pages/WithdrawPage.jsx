@@ -17,7 +17,7 @@ export default function WithdrawPage() {
   const [walletAddress, setWalletAddress] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [expandedW, setExpandedW] = useState(null);
+  const [expandedW, setExpandedW] = useState(new Set());
 
   // Store data for margin breakdown
   const [storeDeposit, setStoreDeposit] = useState(0);
@@ -172,10 +172,10 @@ export default function WithdrawPage() {
         {withdrawals.length > 0 && (<div style={{background:'#fff',borderRadius:20,padding:16}}>
           <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Recent Withdrawals</div>
           {withdrawals.slice(0,10).map(w => {
-            const isOpen = expandedW === w.id;
+            const isOpen = expandedW.has(w.id);
             return (
               <div key={w.id} style={{borderBottom:'1px solid #f5f5f5'}}>
-                <div onClick={() => setExpandedW(isOpen ? null : w.id)} style={{display:'flex',justifyContent:'space-between',padding:'10px 0',fontSize:11,cursor:'pointer'}}>
+                <div onClick={() => setExpandedW(prev => { const s = new Set(prev); if (s.has(w.id)) s.delete(w.id); else s.add(w.id); return s; })} style={{display:'flex',justifyContent:'space-between',padding:'10px 0',fontSize:11,cursor:'pointer'}}>
                   <div>
                     <div style={{fontWeight:600}}>${Number(w.amount||0).toFixed(2)}</div>
                     <div style={{color:'#999',fontSize:9}}>{w.network?.toUpperCase()} &middot; {String(w.wallet_address||'')}</div>
