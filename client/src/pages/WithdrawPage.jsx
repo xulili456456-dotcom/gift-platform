@@ -51,7 +51,7 @@ export default function WithdrawPage() {
         setHoldingsLocked(h.reduce((s, h) => s + (h.cost || 0), 0));
         setHoldingsCount(h.length);
       })
-      .catch(() => {})
+      .catch((e) => { console.error('WithdrawPage loadData failed', e); })
       .finally(() => setLoading(false));
   };
   useEffect(() => { loadData(); window.addEventListener('taskEarning', loadData); const t = setInterval(loadData, 15000); return () => { window.removeEventListener('taskEarning', loadData); clearInterval(t); }; }, []);
