@@ -17,6 +17,7 @@ export default function WithdrawPage() {
   const [walletAddress, setWalletAddress] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [expandedW, setExpandedW] = useState(null);
 
   // Store data for margin breakdown
   const [storeDeposit, setStoreDeposit] = useState(0);
@@ -170,13 +171,35 @@ export default function WithdrawPage() {
         {/* History */}
         {withdrawals.length > 0 && (<div style={{background:'#fff',borderRadius:20,padding:16}}>
           <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Recent Withdrawals</div>
-          {withdrawals.slice(0,10).map(w=>(<div key={w.id} style={{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom:'1px solid #f5f5f5',fontSize:11}}>
-            <div><div style={{fontWeight:600}}>${Number(w.amount||0).toFixed(2)}</div><div style={{color:'#999',fontSize:9}}>{w.network?.toUpperCase()} &middot; {String(w.wallet_address||'')}</div></div>
-            <div style={{textAlign:'right'}}>
-              <span style={{fontSize:10,color:w.status==='completed'?'#00A86B':w.status==='pending'?'#F59E0B':'#EF4444',fontWeight:600}}>{w.status==='completed'?t('withdraw.done'):w.status==='pending'?t('withdraw.pending'):t('withdraw.failed')}</span>
-              {w.status==='pending'&&<button onClick={async()=>{if(confirm(t('withdraw.cancelConfirm'))){try{await client.delete('/withdrawals/'+w.id);loadData();toast.success(t('withdraw.cancelled'))}catch{toast.error(t('common.operationFailed'))}}}} style={{display:'block',fontSize:9,color:'#EF4444',background:'none',border:'none',cursor:'pointer',marginTop:2}}>{t('common.cancel')}</button>}
-            </div>
-          </div>))}
+          {withdrawals.slice(0,10).map(w => {
+            const isOpen = expandedW === w.id;
+            return (
+              <div key={w.id} style={{borderBottom:'1px solid #f5f5f5'}}>
+                <div onClick={() => setExpandedW(isOpen ? null : w.id)} style={{display:'flex',justifyContent:'space-between',padding:'10px 0',fontSize:11,cursor:'pointer'}}>
+                  <div>
+                    <div style={{fontWeight:600}}>${Number(w.amount||0).toFixed(2)}</div>
+                    <div style={{color:'#999',fontSize:9}}>{w.network?.toUpperCase()} &middot; {String(w.wallet_address||'').slice(0,15)}...</div>
+                  </div>
+                  <div style={{textAlign:'right',display:'flex',alignItems:'center',gap:6}}>
+                    <span style={{fontSize:10,color:w.status==='completed'?'#00A86B':w.status==='pending'?'#F59E0B':'#EF4444',fontWeight:600}}>{w.status==='completed'?t('withdraw.done'):w.status==='pending'?t('withdraw.pending'):t('withdraw.failed')}</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="2" style={{transform:isOpen?'rotate(180deg)':'rotate(0)',transition:'transform .2s'}}><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+                {isOpen && (
+                  <div style={{background:'#f8f8f8',borderRadius:10,padding:12,marginBottom:8,fontSize:11}}>
+                    <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Amount</span><span style={{fontWeight:600}}>${Number(w.amount||0).toFixed(2)}</span></div>
+                    <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Network</span><span style={{fontWeight:600}}>{w.network?.toUpperCase()}</span></div>
+                    <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Address</span><span style={{fontWeight:600,fontSize:10,wordBreak:'break-all'}}>{String(w.wallet_address||'')}</span></div>
+                    <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Status</span><span style={{fontWeight:600,color:w.status==='completed'?'#00A86B':w.status==='pending'?'#F59E0B':'#EF4444'}}>{w.status}</span></div>
+                    <div style={{display:'flex',justifyContent:'space-between',marginBottom:4}}><span style={{color:'#999'}}>Time</span><span style={{fontWeight:600,fontSize:10}}>{w.created_at ? new Date(w.created_at).toLocaleString() : '-'}</span></div>
+                    {w.status==='pending' && (
+                      <button onClick={async()=>{if(confirm(t('withdraw.cancelConfirm'))){try{await client.delete('/withdrawals/'+w.id);loadData();toast.success(t('withdraw.cancelled'))}catch{toast.error(t('common.operationFailed'))}}}} style={{marginTop:8,padding:'6px 14px',background:'#EF4444',color:'#fff',border:'none',borderRadius:8,fontSize:11,fontWeight:600,cursor:'pointer'}}>{t('common.cancel')}</button>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>)}
       </div>
 
