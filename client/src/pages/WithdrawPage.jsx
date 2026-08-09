@@ -22,6 +22,7 @@ export default function WithdrawPage() {
 
   // Store data for margin breakdown
   const [storeDeposit, setStoreDeposit] = useState(0);
+  const [holdings, setHoldings] = useState([]);
   const [holdingsLocked, setHoldingsLocked] = useState(0);
   const [holdingsCount, setHoldingsCount] = useState(0);
   const [todayProfit, setTodayProfit] = useState(0);
