@@ -161,7 +161,10 @@ export default function WithdrawPage() {
                   {holdings.slice(0,5).map((h,i) => (
                     <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:i<Math.min(holdings.length,5)-1?'1px solid rgba(0,0,0,.05)':'none',fontSize:11}}>
                       <span style={{flex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',color:'#666'}}>{h.product_name||'Product'}</span>
-                      <span style={{fontWeight:600,marginLeft:8,flexShrink:0}}>${(h.cost||0).toFixed(2)}</span>
+                      <span style={{fontWeight:600,marginLeft:8,flexShrink:0}}>
+                        ${(h.cost||0).toFixed(2)}
+                        {(h.profit||0) > 0 && <span style={{color:'#00A86B',marginLeft:4}}>+${(h.profit||0).toFixed(2)}</span>}
+                      </span>
                     </div>
                   ))}
                   {holdings.length > 5 && <div style={{fontSize:10,color:'#999',marginTop:4}}>+{holdings.length-5} more</div>}
