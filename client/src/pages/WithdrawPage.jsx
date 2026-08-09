@@ -47,6 +47,7 @@ export default function WithdrawPage() {
           setEarningsBalance(earn.data.balance || 0);
         }
         const h = hold.data || [];
+        setHoldings(h);
         setHoldingsLocked(h.reduce((s, h) => s + (h.cost || 0), 0));
         setHoldingsCount(h.length);
       })
@@ -154,7 +155,7 @@ export default function WithdrawPage() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" style={{transform:showDetail==='trading'?'rotate(180deg)':'rotate(0)',transition:'transform .2s'}}><polyline points="6 9 12 15 18 9"/></svg>
               </div>
               <div style={{fontSize:10,color:'#999',marginTop:2}}>{holdingsCount} active orders</div>
-              {showDetail==='trading' && (
+              {showDetail==='trading' && holdings.length > 0 && (
                 <div style={{marginTop:10,paddingTop:10,borderTop:'1px solid rgba(0,0,0,.06)'}}>
                   {holdings.slice(0,5).map((h,i) => (
                     <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'6px 0',borderBottom:i<Math.min(holdings.length,5)-1?'1px solid rgba(0,0,0,.05)':'none',fontSize:11}}>
