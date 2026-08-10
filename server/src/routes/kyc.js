@@ -17,6 +17,10 @@ router.get('/', authMiddleware, async (req, res) => {
 router.post('/', authMiddleware, async (req, res) => {
   const { doc_type, real_name, id_number, front_image, back_image } = req.body;
   if (!real_name || !id_number) return res.status(400).json({ error: 'name and id required' });
+  // Limit image size to prevent DB bloat — max ~1MB base64
+  if ((front_image || '').length > 1400000 || (back_image || '').length > 1400000) {
+    return res.status(400).json({ error: 'Image too large. Please compress or use a smaller file.' });
+  }
 
   const existing = await get('SELECT id, status FROM kyc_submissions WHERE user_id = ?', [req.user.id]);
   if (existing) {
