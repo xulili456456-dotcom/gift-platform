@@ -67,10 +67,14 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'Insufficient balance, withdrawal failed' });
     }
 
+    // Calculate fee: 1% of amount
+    const fee = Math.round(amount * 0.01 * 100) / 100;
+    const netAmount = Math.round((amount - fee) * 100) / 100;
+
     // Store deducted + fragment IDs separately for safe cancellation
     const result = await t.insert(
-      'INSERT INTO withdrawals (user_id, amount, network, wallet_address, status, deducted_ids) VALUES (?, ?, ?, ?, ?, ?)',
-      [req.user.id, amount, network, addr, 'pending', JSON.stringify({ deducted: deductedIds, fragments: fragmentIds })]
+      'INSERT INTO withdrawals (user_id, amount, fee, net_amount, network, wallet_address, status, deducted_ids) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [req.user.id, amount, fee, netAmount, network, addr, 'pending', JSON.stringify({ deducted: deductedIds, fragments: fragmentIds })]
     );
 
     await t.commit();

@@ -440,6 +440,10 @@ if (require.main === module) {
   });
 }
 
+  // Withdrawal fee columns
+  try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS fee NUMERIC(10,2) DEFAULT 0`); } catch(e) {}
+  try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS net_amount NUMERIC(10,2) DEFAULT 0`); } catch(e) {}
+
   // Red Envelope
   try {
     await exec(`CREATE TABLE IF NOT EXISTS red_envelopes (
