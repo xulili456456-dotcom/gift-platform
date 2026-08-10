@@ -14,7 +14,7 @@ export default function RedEnvelopePage() {
   const [helpers, setHelpers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showSpin, setShowSpin] = useState(false);
-  const [spinUsed, setSpinUsed] = useState(false);
+  const [spinUsed, setSpinUsed] = useState(0);
   const spinWheelRef = useRef(null);
   const wheelAngle = useRef(0);
   const spinning = useRef(false);
@@ -130,7 +130,7 @@ export default function RedEnvelopePage() {
     const prize = prizes[winIdx];
     setTimeout(() => {
       spinning.current = false;
-      setSpinUsed(true);
+      setSpinUsed(s => s + 1);
       toast.success(`You won ${prize} coins!`);
       loadData();
     }, 2700);
@@ -226,9 +226,11 @@ export default function RedEnvelopePage() {
             <button onClick={() => { dropCoins(); handleInvite(); }} style={{ display: 'block', width: '100%', margin: '8px 0 0', padding: 15, textAlign: 'center', background: 'linear-gradient(135deg, #FF2D55, #E0254D)', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
               Invite New Users to Help →
             </button>
-            <button onClick={() => setShowSpin(true)} disabled={spinUsed} style={{ display: 'block', width: '100%', margin: '5px 0 0', padding: 10, textAlign: 'center', background: spinUsed ? '#f5f5f5' : '#fff', color: spinUsed ? '#ccc' : '#FF2D55', border: `1.5px solid ${spinUsed ? '#e0e0e0' : '#FF2D55'}`, borderRadius: 14, fontSize: 13, fontWeight: 600, cursor: spinUsed ? 'default' : 'pointer' }}>
-              {spinUsed ? '🎰 Lucky Spin — Already Used' : '🎰 Lucky Spin — Win Extra Coins!'}
+            {(() => { const left = Math.max(0, helps - spinUsed); return (
+            <button onClick={() => setShowSpin(true)} disabled={left <= 0} style={{ display: 'block', width: '100%', margin: '5px 0 0', padding: 10, textAlign: 'center', background: left > 0 ? '#fff' : '#f5f5f5', color: left > 0 ? '#FF2D55' : '#ccc', border: `1.5px solid ${left > 0 ? '#FF2D55' : '#e0e0e0'}`, borderRadius: 14, fontSize: 13, fontWeight: 600, cursor: left > 0 ? 'pointer' : 'default' }}>
+              🎰 Lucky Spin · {left} spin{left !== 1 ? 's' : ''} left
             </button>
+            ); })()}
             <button onClick={() => { dropCoins(); startRain(); }} style={{ display: 'block', width: '100%', margin: '5px 0 0', padding: 10, textAlign: 'center', background: '#fff', color: '#FF2D55', border: '1.5px solid #FF2D55', borderRadius: 14, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
               🧧 Share to Social — Trigger Red Envelope Rain!
             </button>
