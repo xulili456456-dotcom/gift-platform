@@ -232,8 +232,8 @@ export default function WithdrawPage() {
             </label>
           </div>
 
-          <button onClick={()=>{if(!contactAgreed){toast.error('Please contact support and check the box above first');return};if(parseFloat(amount)<20){toast.error(t('withdraw.minAmount'));return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0}
-            style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:(!amount||availableBalance<=0)?0.4:1,marginTop:10}}>Submit Withdrawal</button>
+          <button onClick={()=>{if(parseFloat(amount)<20){toast.error(t('withdraw.minAmount'));return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0||!contactAgreed}
+            style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:(!amount||availableBalance<=0||!contactAgreed)?0.4:1,marginTop:10}}>Submit Withdrawal</button>
         </div>
 
         {/* History */}
