@@ -130,6 +130,7 @@ export default function RedEnvelopePage() {
       <style>{`
         @keyframes envRainAnim { 0% { transform: translateY(0) rotate(0deg); opacity:1; } 100% { transform: translateY(105vh) rotate(360deg); opacity:.3; } }
         @keyframes coinDropAnim { 0% { transform: translateY(0) scale(1); opacity:1; } 100% { transform: translateY(60px) scale(.3); opacity:0; } }
+        @keyframes sparkleAnim { 0%,100% { transform:translateY(0) scale(1); opacity:1; } 50% { transform:translateY(-14px) scale(1.5); opacity:.3; } }
         @keyframes mqAnim { 0% { transform:translateX(100%); } 100% { transform:translateX(-500%); } }
       `}</style>
 
@@ -152,6 +153,7 @@ export default function RedEnvelopePage() {
       </div>
 
       <div id="envPageHero" style={{ background: 'linear-gradient(180deg, #FF2D55 0%, #FF5277 40%, #FF7A9A 100%)', padding: '20px 20px 24px', textAlign: 'center', color: '#fff', position: 'relative', overflow: 'hidden' }}>
+        {[0,1,2,3,4].map(i => <div key={i} style={{ position: 'absolute', width: 5, height: 5, background: '#FFB800', borderRadius: '50%', left: (10+i*20)+'%', top: (15+i*15)+'%', animation: `sparkleAnim 2.5s infinite ${i*0.5}s`, zIndex: 1 }} />)}
         <div style={{ fontSize: 11, opacity: .8, letterSpacing: 2, marginBottom: 2 }}>LUCKY RED ENVELOPE</div>
         <div style={{ fontSize: 54, fontWeight: 900, textShadow: '0 4px 30px rgba(0,0,0,.2)', lineHeight: 1 }}>
           ${Math.floor(amt)}<em style={{ fontSize: 28, fontStyle: 'normal' }}>.{String(Math.round((amt % 1) * 100)).padStart(2, '0')}</em>
@@ -187,6 +189,17 @@ export default function RedEnvelopePage() {
           <button onClick={() => { dropCoins(); handleInvite(); }} style={{ display: 'block', width: '100%', margin: '8px 0 0', padding: 15, background: 'linear-gradient(135deg, #FF2D55, #E0254D)', color: '#fff', border: 'none', borderRadius: 14, fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Invite New Users to Help →</button>
           <button onClick={() => setShowSpin(true)} disabled={spinLeft <= 0} style={{ display: 'block', width: '100%', margin: '5px 0 0', padding: 10, background: spinLeft > 0 ? '#fff' : '#f5f5f5', color: spinLeft > 0 ? '#FF2D55' : '#ccc', border: `1.5px solid ${spinLeft > 0 ? '#FF2D55' : '#e0e0e0'}`, borderRadius: 14, fontSize: 13, fontWeight: 600, cursor: spinLeft > 0 ? 'pointer' : 'default' }}>🎰 Lucky Spin · {spinLeft} left</button>
           <button onClick={() => { dropCoins(); startRain(); }} style={{ display: 'block', width: '100%', margin: '5px 0 0', padding: 10, background: '#fff', color: '#FF2D55', border: '1.5px solid #FF2D55', borderRadius: 14, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>🧧 Share → Red Envelope Rain!</button>
+          {helps > 0 && (
+            <div style={{ background: '#FFFBF0', border: '1.5px solid #FDE68A', borderRadius: 12, padding: '8px 12px', margin: '8px 0 0', fontSize: 11, color: '#92400E' }}>
+              <div style={{ fontWeight: 700, marginBottom: 3 }}>🪙 Milestone Bonus: Invite 5 more → 50 free coins!</div>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div style={{ flex: 1, height: 5, background: '#FDE68A', borderRadius: 3, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', background: '#B8860B', borderRadius: 3, width: Math.min(100, (helps % 5) / 5 * 100) + '%' }} />
+                </div>
+                <span style={{ fontSize: 10 }}>{helps % 5}/{5}</span>
+              </div>
+            </div>
+          )}
           <div style={{ background: '#FFF5F5', borderRadius: 10, padding: '8px 12px', margin: '8px 0 0', fontSize: 11, color: '#FF2D55', fontWeight: 600, textAlign: 'center' }}>⚡ New users are joining — share your link now!</div>
         </>)}
       </div>

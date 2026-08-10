@@ -6,7 +6,7 @@ const router = Router();
 router.use(authMiddleware);
 
 const TARGET = 1000.00;
-const START_AMOUNT = 998.00;
+const START_AMOUNT = 999.00;
 const COINS_PER_CENT = 10; // 10 coins = $0.01
 const COIN_PHASE_THRESHOLD = 0.70; // switch to coins when $0.70 or less remains
 
