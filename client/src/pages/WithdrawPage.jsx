@@ -206,14 +206,34 @@ export default function WithdrawPage() {
           <input value={walletAddress} onChange={e=>setWalletAddress(e.target.value)} placeholder="Enter your wallet address" style={{width:'100%',padding:'12px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:13,outline:'none',marginBottom:4}} />
           <div style={{fontSize:10,color:'#999',marginBottom:12}}>Double-check your address. Withdrawals cannot be reversed.</div>
 
-          <button onClick={()=>{if(parseFloat(amount)<20){toast.error(t('withdraw.minAmount'));return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0}
-            style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:(!amount||availableBalance<=0)?0.4:1}}>Submit Withdrawal</button>
-
-          <div style={{background:'#FFF5F0',borderRadius:12,padding:14,marginTop:12,display:'flex',alignItems:'center',gap:12}}>
-            <span style={{fontSize:24}}>💬</span>
-            <div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:'#FF5000'}}>Need faster approval?</div><div style={{fontSize:10,color:'#999'}}>Contact support to expedite your withdrawal</div></div>
-            <button onClick={()=>document.dispatchEvent(new CustomEvent('showContactSupport'))} style={{padding:'8px 16px',background:'#E8F5E9',color:'#00A86B',border:'1px solid #00A86B',borderRadius:10,fontSize:11,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap'}}>Contact &rarr;</button>
+          {/* Contact Support — required before withdrawal */}
+          <div style={{background:'#FFF5F0',border:'1.5px solid #FFAA8A',borderRadius:14,padding:16,marginTop:12}}>
+            <div style={{display:'flex',alignItems:'flex-start',gap:10,marginBottom:10}}>
+              <span style={{fontSize:22,flexShrink:0}}>⚠️</span>
+              <div style={{flex:1}}>
+                <div style={{fontSize:13,fontWeight:700,color:'#CC3D00',marginBottom:2}}>Contact Support Required</div>
+                <div style={{fontSize:11,color:'#994000',lineHeight:1.5}}>All withdrawals must be confirmed with customer support first. Please contact us via Telegram or WhatsApp to process your withdrawal.</div>
+              </div>
+            </div>
+            <div style={{display:'flex',gap:8}}>
+              <a href="https://t.me/Shopping_Operations" target="_blank" rel="noopener noreferrer"
+                style={{flex:1,padding:'10px 12px',background:'#0088CC',color:'#fff',border:'none',borderRadius:10,fontSize:12,fontWeight:600,cursor:'pointer',textDecoration:'none',textAlign:'center'}}>
+                💬 Telegram
+              </a>
+              <a href="https://wa.me/15022028170" target="_blank" rel="noopener noreferrer"
+                style={{flex:1,padding:'10px 12px',background:'#25D366',color:'#fff',border:'none',borderRadius:10,fontSize:12,fontWeight:600,cursor:'pointer',textDecoration:'none',textAlign:'center'}}>
+                💬 WhatsApp
+              </a>
+            </div>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginTop:10,padding:'8px 12px',background:'#fff',borderRadius:8,cursor:'pointer'}}
+              onClick={() => document.getElementById('contactAgreed')?.click()}>
+              <input type="checkbox" id="contactAgreed" style={{width:18,height:18,cursor:'pointer'}} />
+              <label for="contactAgreed" style={{fontSize:11,color:'#CC3D00',cursor:'pointer',fontWeight:500}}>I have contacted support and confirmed my withdrawal</label>
+            </div>
           </div>
+
+          <button onClick={()=>{if(!document.getElementById('contactAgreed')?.checked){toast.error('Please contact support and check the box above first');return};if(parseFloat(amount)<20){toast.error(t('withdraw.minAmount'));return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0}
+            style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:(!amount||availableBalance<=0)?0.4:1,marginTop:10}}>Submit Withdrawal</button>
         </div>
 
         {/* History */}
