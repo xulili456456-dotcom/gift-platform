@@ -19,6 +19,7 @@ export default function WithdrawPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [expandedW, setExpandedW] = useState(new Set());
   const [showDetail, setShowDetail] = useState(null);
+  const [contactAgreed, setContactAgreed] = useState(false);
 
   // Store data for margin breakdown
   const [storeDeposit, setStoreDeposit] = useState(0);
@@ -226,12 +227,12 @@ export default function WithdrawPage() {
               </a>
             </div>
             <label style={{display:'flex',alignItems:'center',gap:8,marginTop:10,padding:'8px 12px',background:'#fff',borderRadius:8,cursor:'pointer'}}>
-              <input type="checkbox" id="contactAgreed" style={{width:18,height:18,cursor:'pointer'}} />
+              <input type="checkbox" checked={contactAgreed} onChange={e => setContactAgreed(e.target.checked)} style={{width:18,height:18,cursor:'pointer'}} />
               <span style={{fontSize:11,color:'#CC3D00',fontWeight:500}}>I have contacted support and confirmed my withdrawal</span>
             </label>
           </div>
 
-          <button onClick={()=>{if(!document.getElementById('contactAgreed')?.checked){toast.error('Please contact support and check the box above first');return};if(parseFloat(amount)<20){toast.error(t('withdraw.minAmount'));return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0}
+          <button onClick={()=>{if(!contactAgreed){toast.error('Please contact support and check the box above first');return};if(parseFloat(amount)<20){toast.error(t('withdraw.minAmount'));return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0}
             style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:(!amount||availableBalance<=0)?0.4:1,marginTop:10}}>Submit Withdrawal</button>
         </div>
 
