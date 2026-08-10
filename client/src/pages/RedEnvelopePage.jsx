@@ -221,9 +221,14 @@ export default function RedEnvelopePage() {
               </div>
             </div>
           </div>
-          <a href="https://t.me/Shopping_Operations" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 16px', background: '#0088CC', color: '#fff', borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}>
-            💬 Contact Support on Telegram
-          </a>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <a href="https://t.me/Shopping_Operations" target="_blank" rel="noopener noreferrer" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 14px', background: '#0088CC', color: '#fff', borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}>
+              💬 Telegram
+            </a>
+            <a href="https://wa.me/15022028170" target="_blank" rel="noopener noreferrer" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 14px', background: '#25D366', color: '#fff', borderRadius: 10, fontSize: 12, fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}>
+              💬 WhatsApp
+            </a>
+          </div>
         </div>
       </div>
 
