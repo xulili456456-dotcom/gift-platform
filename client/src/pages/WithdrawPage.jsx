@@ -225,11 +225,10 @@ export default function WithdrawPage() {
                 💬 WhatsApp
               </a>
             </div>
-            <div style={{display:'flex',alignItems:'center',gap:8,marginTop:10,padding:'8px 12px',background:'#fff',borderRadius:8,cursor:'pointer'}}
-              onClick={() => document.getElementById('contactAgreed')?.click()}>
+            <label style={{display:'flex',alignItems:'center',gap:8,marginTop:10,padding:'8px 12px',background:'#fff',borderRadius:8,cursor:'pointer'}}>
               <input type="checkbox" id="contactAgreed" style={{width:18,height:18,cursor:'pointer'}} />
-              <label for="contactAgreed" style={{fontSize:11,color:'#CC3D00',cursor:'pointer',fontWeight:500}}>I have contacted support and confirmed my withdrawal</label>
-            </div>
+              <span style={{fontSize:11,color:'#CC3D00',fontWeight:500}}>I have contacted support and confirmed my withdrawal</span>
+            </label>
           </div>
 
           <button onClick={()=>{if(!document.getElementById('contactAgreed')?.checked){toast.error('Please contact support and check the box above first');return};if(parseFloat(amount)<20){toast.error(t('withdraw.minAmount'));return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0}
