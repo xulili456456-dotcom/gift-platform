@@ -204,9 +204,26 @@ export default function RedEnvelopePage() {
         </>)}
       </div>
 
-      <div style={{ background: '#fff', borderRadius: 16, margin: '0 16px 12px', padding: 14, boxShadow: '0 2px 12px rgba(0,0,0,.05)' }}>
-        <div style={{ background: 'linear-gradient(135deg,#FFF8E1,#FFFBF0)', border: '1.5px solid #FDE68A', borderRadius: 12, padding: '10px 14px', fontSize: 11, color: '#92400E', lineHeight: 1.8 }}>
-          <b>⚠ Important:</b><br />1. KYC required for help to count.<br />2. Group Bonus: Create Telegram/WhatsApp group → contact support → <b>2x-3x coins</b>.
+      <div style={{ background: '#fff', borderRadius: 16, margin: '0 16px 12px', padding: 16, boxShadow: '0 2px 12px rgba(0,0,0,.05)' }}>
+        <div style={{ background: 'linear-gradient(135deg,#FFF8E1,#FFFBF0)', border: '2px solid #FDE68A', borderRadius: 14, padding: '14px 16px', fontSize: 12, color: '#92400E', lineHeight: 2 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
+            <span style={{ fontSize: 24, flexShrink: 0 }}>⚠️</span>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#92400E', marginBottom: 2 }}>Important Rules</div>
+              <div style={{ borderBottom: '1px solid #FDE68A', marginBottom: 8 }} />
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
+                <span style={{ background: '#FDE68A', color: '#92400E', borderRadius: 10, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>1</span>
+                <span><b>KYC Required:</b> Invited users must complete identity verification for help to count. Pending KYC = help not counted.</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+                <span style={{ background: '#FDE68A', color: '#92400E', borderRadius: 10, padding: '2px 8px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>2</span>
+                <span><b>Group Bonus:</b> Create a WhatsApp or Telegram group, add your invited users, then contact support to register your group. Group members' helps give <b style={{ color: '#FF2D55', fontSize: 13 }}>2x-3x coins</b> — fill your envelope much faster!</span>
+              </div>
+            </div>
+          </div>
+          <a href="https://t.me/Shopping_Operations" target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 16px', background: '#0088CC', color: '#fff', borderRadius: 10, fontSize: 13, fontWeight: 600, textDecoration: 'none', textAlign: 'center' }}>
+            💬 Contact Support on Telegram
+          </a>
         </div>
       </div>
 
