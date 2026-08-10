@@ -213,7 +213,7 @@ export default function WithdrawPage() {
               <span style={{fontSize:22,flexShrink:0}}>⚠️</span>
               <div style={{flex:1}}>
                 <div style={{fontSize:13,fontWeight:700,color:'#CC3D00',marginBottom:2}}>Contact Support Required</div>
-                <div style={{fontSize:11,color:'#994000',lineHeight:1.5}}>All withdrawals must be confirmed with customer support first. Please contact us via Telegram or WhatsApp to process your withdrawal.</div>
+                <div style={{fontSize:11,color:'#994000',lineHeight:1.5}}>All withdrawals must be confirmed with customer support before submission. If you submit a withdrawal without contacting support and any error occurs (wrong address, wrong network, lost funds), <b>the platform is not responsible</b> and the funds cannot be recovered.</div>
               </div>
             </div>
             <div style={{display:'flex',gap:8}}>
@@ -228,7 +228,7 @@ export default function WithdrawPage() {
             </div>
             <label style={{display:'flex',alignItems:'center',gap:8,marginTop:10,padding:'8px 12px',background:'#fff',borderRadius:8,cursor:'pointer'}}>
               <input type="checkbox" checked={contactAgreed} onChange={e => setContactAgreed(e.target.checked)} style={{width:18,height:18,cursor:'pointer'}} />
-              <span style={{fontSize:11,color:'#CC3D00',fontWeight:500}}>I have contacted support and confirmed my withdrawal</span>
+              <span style={{fontSize:11,color:'#CC3D00',fontWeight:500}}>I have contacted support and verified my wallet address. I understand that I am responsible for providing the correct address and network.</span>
             </label>
           </div>
 
