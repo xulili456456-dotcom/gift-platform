@@ -425,26 +425,7 @@ async function migrate() {
   try {
     await exec(`INSERT INTO admin_settings (key, value) VALUES ('ip_fix_deployed_at', '2026-07-30T12:20:00Z') ON CONFLICT (key) DO NOTHING`);
   } catch (e) { console.log('IP fix timestamp skipped:', e.message); }
-  console.log('Migrations complete.');
-}
-
-// Run directly
-if (require.main === module) {
-  migrate().then(() => {
-    closeDb().then(() => {
-      console.log('Done.');
-    });
-  }).catch(err => {
-    console.error('Migration failed:', err);
-    process.exit(1);
-  });
-}
-
-  // Withdrawal fee columns
-  try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS fee NUMERIC(10,2) DEFAULT 0`); } catch(e) {}
-  try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS net_amount NUMERIC(10,2) DEFAULT 0`); } catch(e) {}
-
-  // Red Envelope
+  // Red Envelope tables
   try {
     await exec(`CREATE TABLE IF NOT EXISTS red_envelopes (
       id SERIAL PRIMARY KEY,
@@ -476,6 +457,23 @@ if (require.main === module) {
     console.log('Red envelope tables ready.');
   } catch(e) { console.log('Red envelope migration skipped:', e.message); }
 
+  // Withdrawal fee columns
+  try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS fee NUMERIC(10,2) DEFAULT 0`); } catch(e) {}
+  try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS net_amount NUMERIC(10,2) DEFAULT 0`); } catch(e) {}
+
+  console.log('Migrations complete.');
+}
+
+// Run directly
+if (require.main === module) {
+  migrate().then(() => {
+    closeDb().then(() => {
+      console.log('Done.');
+    });
+  }).catch(err => {
+    console.error('Migration failed:', err);
+    process.exit(1);
+  });
 }
 
 module.exports = migrate;
