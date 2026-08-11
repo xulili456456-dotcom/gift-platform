@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
 import { ChevronLeft } from 'lucide-react';
+import LanguageSwitcher from '../components/shared/LanguageSwitcher';
 
 export default function RegisterPage() {
   const { t } = useTranslation();
@@ -39,6 +40,7 @@ export default function RegisterPage() {
         {step === 2 && <button onClick={() => setStep(1)} style={{position:'absolute',left:16,top:50,background:'none',border:'none',cursor:'pointer',color:'#fff'}}><ChevronLeft size={22} /></button>}
         <img src="/logo.jpg" alt={t('app.name')} style={{width:48,height:48,borderRadius:12,objectFit:'cover',marginBottom:10}} />
         <div style={{fontSize:14,fontWeight:700,color:'#fff'}}>{t('app.name')}</div>
+        <div style={{position:'absolute',right:12,top:12}}><LanguageSwitcher /></div>
       </div>
 
       {/* Form */}

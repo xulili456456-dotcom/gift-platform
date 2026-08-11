@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
+import LanguageSwitcher from '../components/shared/LanguageSwitcher';
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -44,6 +45,7 @@ export default function LoginPage() {
       <div style={{background:'#0f0f0f',padding:'50px 28px 36px',textAlign:'center'}}>
         <img src="/logo.jpg" alt={t('app.name')} style={{width:48,height:48,borderRadius:12,objectFit:'cover',marginBottom:10}} />
         <div style={{fontSize:14,fontWeight:700,color:'#fff'}}>{t('app.name')}</div>
+        <div style={{position:'absolute',right:12,top:12}}><LanguageSwitcher /></div>
       </div>
 
       {/* Form */}
