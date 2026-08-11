@@ -421,11 +421,11 @@ export default function StorePage() {
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
     let list = genProducts(status.store.tier, CAT_VALUES[catIdx], search, daySeed);
-    // Override free products with actual free-order rates (5% profit, $0 cost)
+    // Override free products with actual free-order rates (3% profit, $0 cost)
     const freeNames = freeProducts.map(fp => fp.name);
     list = list.map(p => {
       if (!freeNames.includes(p.name)) return p;
-      const freeProfit = Math.round(p.price * 0.05 * 100) / 100;
+      const freeProfit = Math.round(p.price * 0.03 * 100) / 100;
       return { ...p, costPrice: 0, profit: freeProfit, roi: 5 };
     });
     if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => fp.name === p.name));

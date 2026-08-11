@@ -303,7 +303,7 @@ export default function HomePage() {
           <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
             {freeProducts.map((p) => {
               const claimed = freeClaimed.includes(p.name) || grabbedCards.has(p.name);
-              const profit = Math.round(p.price * 0.05 * 100) / 100;
+              const profit = Math.round(p.price * 0.03 * 100) / 100;
               const imgUrl = p.img ? (p.img.startsWith('http') ? p.img : `https://gift-platform-h6um.onrender.com${p.img}`) : '';
               return (
                 <div key={p.id} onClick={() => !claimed && handleGrab(p.id, p.name)}

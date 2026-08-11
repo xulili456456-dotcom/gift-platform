@@ -15,7 +15,7 @@ const TIERS = {
 };
 
 // Product profit formula — deterministic per product per day (no Math.random)
-const FREE_PROFIT_RATE = 0.05;
+const FREE_PROFIT_RATE = 0.03;
 
 function seededRand(seed) {
   var x = Math.sin(seed * 9301 + 49297) * 49297;
@@ -317,7 +317,7 @@ router.get('/holdings', async (req, res) => {
     const price = Number(h.product_price) || (cost > 0 ? Math.round(cost / 0.85 * 100) / 100 : 0);
     const isFree = cost === 0 && price > 0;
     const { profit: p, rate } = calcProduct(price);
-    const actualProfit = isFree ? Math.round(price * 0.05 * 100) / 100 : p;
+    const actualProfit = isFree ? Math.round(price * 0.03 * 100) / 100 : p;
     const roi = isFree ? 5 : rate;
     const img = productMap[h.product_name] || null;
     return { ...h, cost, profit: actualProfit, roi, progress, sellBy: h.sell_by, img };
@@ -572,7 +572,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   if (!store) return res.status(400).json({ error: 'Please open a store first' });
 
   const cost = Math.round(product.price * (1 - FREE_PROFIT_RATE) * 100) / 100;
-  const profit = Math.round(product.price * 0.05 * 100) / 100;
+  const profit = Math.round(product.price * 0.03 * 100) / 100;
   const totalReturn = Math.round((cost + profit) * 100) / 100;
 
   // Transaction: atomic free-slot check + create holding
