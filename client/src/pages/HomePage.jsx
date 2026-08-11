@@ -294,7 +294,7 @@ export default function HomePage() {
             <span style={{ animation: 'urgencyPulse 1s ease-in-out infinite', color: 'var(--green)' }}>{t('home.freeOrders')}</span>
           </h3>
           <span style={{ fontSize: 10, background: 'rgba(0,168,107,.08)', color: 'var(--green)', padding: '3px 8px', borderRadius: 4, fontWeight: 600, animation: 'urgencyPulse 1s ease-in-out infinite' }}>
-            {t('home.freeLeft', { n: freeRemaining })}
+            {t('home.freeLeft', { n: freeRemaining })}/10 lifetime
           </span>
         </div>
         {freeProducts.length === 0 ? (

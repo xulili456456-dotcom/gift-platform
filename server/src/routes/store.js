@@ -130,7 +130,7 @@ router.get('/status', async (req, res) => {
       balance: Number(taskBal?.total || 0),
       deposit: Number(store.deposit || 0),
       maxTrade: Number(store.deposit || 0),
-      freeRemaining: Math.max(0, 5 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_used_' + req.user.id + '_' + today]))?.value || 0)),
+      freeRemaining: Math.max(0, 10 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_lifetime_' + req.user.id]))?.value || 0)),
       // Include free product names and claimed list so frontend has them immediately
       freeProductNames: (await getFreeProductNames(req.user.id, today)),
       claimedFreeNames: (await getClaimedFreeNames(req.user.id, today)),
@@ -185,11 +185,11 @@ router.post('/orders/process', async (req, res) => {
   const tier = TIERS[store.tier];
   const today = new Date().toISOString().slice(0, 10);
 
-  // Free daily orders: 5 slots/day per user, each product max 1 free order/day
-  const FREE_SLOTS = 5;
+  // Free lifetime orders: 10 total per user, each product max 1 free order
+  const FREE_SLOTS = 10;
   const FREE_MAX_COST = 50;
-  const freeKey = 'free_used_' + req.user.id + '_' + today;
-  const freeProductKey = 'free_prod_' + req.user.id + '_' + today + '_' + pName;
+  const freeKey = 'free_lifetime_' + req.user.id;
+  const freeProductKey = 'free_prod_' + req.user.id + '_' + pName;
 
   let { cost, profit, totalReturn } = calcProduct(productPrice);
   const couldBeFree = cost <= FREE_MAX_COST;
@@ -227,21 +227,21 @@ router.post('/orders/process', async (req, res) => {
     const freeUsedCount = Number(freeUsed?.value || 0);
     const freeProductCount = Number(freeProductUsed?.value || 0);
     const freeRemaining = FREE_SLOTS - freeUsedCount;
-    const isFreeOrder = couldBeFree && freeRemaining > 0 && freeProductCount < 1;
+    const productAlreadyClaimed = freeProductCount >= 1;
+    const isFreeOrder = couldBeFree && freeRemaining > 0 && !productAlreadyClaimed;
 
     if (isFreeOrder) {
       profit = Math.round(productPrice * FREE_PROFIT_RATE * 100) / 100;
       totalReturn = Math.round((cost + profit) * 100) / 100;
-    } else if (couldBeFree && freeProductCount >= 1) {
+    } else if (couldBeFree && productAlreadyClaimed) {
       await t.rollback();
-      return res.status(400).json({ error: 'You already claimed this product for free today', productAlreadyClaimed: true });
-    } else if (couldBeFree && freeRemaining <= 0) {
-      await t.rollback();
-      return res.status(400).json({ error: 'All 5 free orders used today. This product requires deposit.', freeSlotsExhausted: true });
+      return res.status(400).json({ error: 'You already claimed this product for free', productAlreadyClaimed: true });
     }
+    // If free slots exhausted but cost <= $50, allow without deposit (freeTierNoDeposit)
+    const freeTierNoDeposit = couldBeFree && freeRemaining <= 0;
 
     // Validate: non-free orders need deposit + balance
-    if (!isFreeOrder) {
+    if (!isFreeOrder && !freeTierNoDeposit) {
       if (cost > deposit) {
         await t.rollback();
         return res.status(400).json({ error: 'Insufficient deposit', need: cost, have: deposit, shortage: Math.round((cost - deposit) * 100) / 100, depositRequired: true, freeRemaining });
@@ -501,11 +501,11 @@ router.get('/orders-history', async (req, res) => {
   });
 });
 
-// GET /api/store/free-products — daily random free products (≤$100, no deposit)
+// GET /api/store/free-products — lifetime free products (10 total per user, then no deposit needed)
 router.get('/free-products', authMiddleware, async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
   const key = 'free_products_v4_' + today;
-  const countKey = 'free_used_' + req.user.id + '_' + today;
+  const countKey = 'free_lifetime_' + req.user.id;
 
   let data = await get("SELECT value FROM admin_settings WHERE key = ?", [key]);
   let products = [];
@@ -539,24 +539,24 @@ router.get('/free-products', authMiddleware, async (req, res) => {
   }
 
   const count = await get("SELECT value FROM admin_settings WHERE key = ?", [countKey]);
-  const remaining = Math.max(0, 5 - Number(count?.value || 0));
+  const remaining = Math.max(0, 10 - Number(count?.value || 0));
 
-  // Get already-claimed free product names for today
+  // Get already-claimed free product names (lifetime)
   const claimedRows = await all(
     "SELECT key FROM admin_settings WHERE key LIKE ? AND value = '1'",
-    ['free_prod_' + req.user.id + '_' + today + '_%']
+    ['free_prod_' + req.user.id + '_%']
   );
-  const prefix = 'free_prod_' + req.user.id + '_' + today + '_';
+  const prefix = 'free_prod_' + req.user.id + '_';
   const claimedNames = claimedRows.map(r => r.key.replace(prefix, ''));
 
-  res.json({ products, remaining, claimedNames });
+  res.json({ products, remaining, totalFree: 10, claimedNames, freeExhausted: remaining <= 0 });
 });
 
 // POST /api/store/claim-free/:productId — claim AND buy a free product
 router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
   const key = 'free_products_v4_' + today;
-  const countKey = 'free_used_' + req.user.id + '_' + today;
+  const countKey = 'free_lifetime_' + req.user.id;
   const productId = parseInt(req.params.productId);
 
   const data = await get("SELECT value FROM admin_settings WHERE key = ?", [key]);
@@ -577,7 +577,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
 
   // Transaction: atomic free-slot check + create holding
   const lockKey = parseInt(req.user.id) + 1000000;
-  const productKey = 'free_prod_' + req.user.id + '_' + today + '_' + productId;
+  const productKey = 'free_prod_' + req.user.id + '_' + productId;
   const t = await tx();
   try {
     await t.run("SELECT pg_advisory_xact_lock($1)", [lockKey]);
@@ -587,7 +587,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
     const count = await t.get("SELECT value FROM admin_settings WHERE key = $1", [countKey]);
     const prodCount = await t.get("SELECT value FROM admin_settings WHERE key = $1", [productKey]);
     const used = Number(count?.value || 0);
-    if (used >= 5) { await t.rollback(); return res.status(400).json({ error: 'All free orders claimed for today' }); }
+    if (used >= 10) { await t.rollback(); return res.status(400).json({ error: 'All 10 free orders used' }); }
     if (Number(prodCount?.value || 0) >= 1) { await t.rollback(); return res.status(400).json({ error: 'You already claimed this product today' }); }
 
     const sellHours = 6 + Math.random() * 24;
@@ -598,7 +598,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
     await t.run("UPDATE admin_settings SET value = '1' WHERE key = $1", [productKey]);
     await t.commit();
     try { require('./notifications').notify(req.user.id, '🔥 Free Order Grabbed!', `${product.name} - Profit $${profit}`, 'success'); } catch {}
-    res.json({ id: result.id, cost: 0, profit, totalReturn, sellBy, status: 'holding', isFreeOrder: true, remaining: Math.max(0, 5 - used - 1) });
+    res.json({ id: result.id, cost: 0, profit, totalReturn, sellBy, status: 'holding', isFreeOrder: true, remaining: Math.max(0, 10 - used - 1) });
   } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 
