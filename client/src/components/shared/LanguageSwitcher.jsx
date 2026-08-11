@@ -8,6 +8,7 @@ const langs = [
   { code: 'ja', label: '日本語', flag: '🇯🇵' },
   { code: 'ms', label: 'Bahasa Melayu', flag: '🇲🇾' },
   { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
+  { code: 'it', label: 'Italiano', flag: '🇮🇹' },
 ];
 
 export default function LanguageSwitcher() {
