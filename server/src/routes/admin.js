@@ -198,7 +198,7 @@ router.put('/claims/:id', async (req, res) => {
       const validKyc = Number(kycCount?.cnt) || 0;
       if (validKyc < gift.required_invites) {
         return res.status(400).json({
-          error: `下级实名不足：需要${gift.required_invites}人完成KYC，当前仅${validKyc}人`
+          error: `Insufficient verified downlines: need ${gift.required_invites} to complete KYC, currently only ${validKyc}`
         });
       }
     }
@@ -208,14 +208,14 @@ router.put('/claims/:id', async (req, res) => {
 
   // Send notification
   if (status === 'delivered') {
-    await notify(claim.user_id, '礼物已发放', '您申请的礼物已通过审批并发放！奖励已到账。', 'success');
+    await notify(claim.user_id, 'Gift Delivered', 'Your gift claim has been approved and delivered! The reward has been credited.', 'success');
     const giftValue = claim.value || 0;
     if (giftValue > 0) {
       await insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [claim.user_id, giftValue, 'task_reward', 'delivered']);
     }
   } else if (status === 'rejected') {
-    const reason = admin_note ? '原因：' + admin_note : '请确保邀请的好友已完成实名认证';
-    await notify(claim.user_id, '领取申请未通过', '您的礼物领取申请已被拒绝。' + reason, 'error');
+    const reason = admin_note ? 'Reason: ' + admin_note : 'Please ensure your invited friends have completed KYC';
+    await notify(claim.user_id, 'Gift Claim Rejected', 'Your gift claim was rejected. ' + reason, 'error');
   }
   res.json(updated);
 });

@@ -67,7 +67,7 @@ router.post('/', async (req, res) => {
         const validKyc = Number(kycCnt?.cnt) || 0;
 
         if (validKyc >= gift.required_invites) {
-          await userGiftModel.updateStatus(result.id, 'delivered', '系统自动审核通过');
+          await userGiftModel.updateStatus(result.id, 'delivered', 'Auto-approved by system');
           if (gift.value > 0) {
             await require('../db/database').run(
               'INSERT INTO task_earnings (user_id, amount, type, status) VALUES ($1, $2, $3, $4)',
@@ -76,7 +76,7 @@ router.post('/', async (req, res) => {
           require('./notifications').notify(req.user.id, '🎁 Claim Approved', `Your ${gift.name} claim was auto-approved! $${gift.value} credited.`, 'success');
           return res.status(201).json({ id: result.id, gift_id: gift.id, status: 'delivered', auto: true });
         } else {
-          await userGiftModel.updateStatus(result.id, 'rejected', '下级KYC实名不足');
+          await userGiftModel.updateStatus(result.id, 'rejected', 'Insufficient downline KYC');
           if (gift.stock >= 0) {
             await require('../db/database').run('UPDATE gifts SET stock = stock + 1 WHERE id = $1 AND stock >= 0', [gift.id]);
           }

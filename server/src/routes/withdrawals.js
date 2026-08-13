@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
   // KYC check
   const kyc = await get('SELECT status FROM kyc_submissions WHERE user_id = ? ORDER BY submitted_at DESC LIMIT 1', [req.user.id]);
   if (!kyc || kyc.status !== 'approved') {
-    return res.status(400).json({ error: '请先完成实名认证 (KYC) 后才能提现。Go to Mine > KYC Verification to submit.' });
+    return res.status(400).json({ error: 'Please complete KYC verification before withdrawing. Go to Mine > KYC Verification to submit.' });
   }
 
   // Wallet address format validation

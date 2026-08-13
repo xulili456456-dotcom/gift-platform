@@ -17,6 +17,8 @@ router.get('/', authMiddleware, async (req, res) => {
 router.post('/', authMiddleware, async (req, res) => {
   const { doc_type, real_name, id_number, front_image, back_image } = req.body;
   if (!real_name || !id_number) return res.status(400).json({ error: 'name and id required' });
+  if (!front_image || !back_image) return res.status(400).json({ error: 'Please upload both front and back images' });
+  if (doc_type && !['driver_license', 'passport'].includes(doc_type)) return res.status(400).json({ error: 'Invalid document type' });
   // Limit image size to prevent DB bloat — max ~1MB base64
   if ((front_image || '').length > 1400000 || (back_image || '').length > 1400000) {
     return res.status(400).json({ error: 'Image too large. Please compress or use a smaller file.' });
@@ -59,15 +61,15 @@ router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const kyc = await get('SELECT user_id, real_name FROM kyc_submissions WHERE id = ?', [req.params.id]);
   if (kyc) {
     if (status === 'approved') {
-      await notify(kyc.user_id, '实名认证已通过', '恭喜，您的实名认证审核已通过！（姓名：' + (kyc.real_name || '') + '）', 'success');
+      await notify(kyc.user_id, 'KYC Approved', 'Congratulations, your identity verification has been approved! (Name: ' + (kyc.real_name || '') + ')', 'success');
     } else if (status === 'rejected') {
-      const reason = admin_note ? '原因：' + admin_note : '请重新提交真实有效的身份信息';
-      await notify(kyc.user_id, '实名认证未通过', '您的实名认证审核未通过。' + reason, 'error');
+      const reason = admin_note ? 'Reason: ' + admin_note : 'Please resubmit valid identification information';
+      await notify(kyc.user_id, 'KYC Rejected', 'Your identity verification was not approved. ' + reason, 'error');
     }
   }
 
   res.json({ ok: true });
-  if (status === 'approved') {
+  if (status === 'approved' && kyc) {
     updateTaskProgress(kyc.user_id, 'kyc_complete', 1).catch(()=>{});
     // Auto-confirm pending red envelope helps
     try { await require('./redEnvelope').confirmPendingHelps(kyc.user_id); } catch(e) { console.log('HELP confirm skipped:', e.message); }
