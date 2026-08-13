@@ -65,7 +65,7 @@ export default function WithdrawPage() {
 
   const handleWithdraw = async () => {
     const amt = parseFloat(amount);
-    if (!amt || amt < 20) { toast.error(t('withdraw.minAmount')); return; }
+    if (!amt || amt < 10) { toast.error(t('withdraw.minAmount')); return; }
     if (amt > availableBalance) { toast.error(t('withdraw.insufficient')); return; }
     if (!walletAddress) { toast.error('Please enter wallet address'); return; }
     setSubmitting(true);
@@ -184,7 +184,7 @@ export default function WithdrawPage() {
         {/* Withdraw Form */}
         <div style={{background:'#fff',borderRadius:20,padding:20,marginBottom:14}}>
           <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Amount</div>
-          <div style={{fontSize:10,color:'#999',marginBottom:6}}>Min $20 · Fee 1%</div>
+          <div style={{fontSize:10,color:'#999',marginBottom:6}}>Min $10 · Fee 1%</div>
           <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="Enter amount" style={{width:'100%',padding:'12px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:24,fontWeight:700,outline:'none',marginBottom:12}} />
           <div style={{display:'flex',gap:8,marginBottom:14}}>
             {[100,500,1000].map(v=><button key={v} onClick={()=>setAmount(String(v))} style={{flex:1,padding:8,background:'#f5f5f5',border:'none',borderRadius:10,fontSize:12,fontWeight:600,color:'#666',cursor:'pointer'}}>${v}</button>)}
@@ -232,7 +232,7 @@ export default function WithdrawPage() {
             </label>
           </div>
 
-          <button onClick={()=>{if(parseFloat(amount)<20){toast.error(t('withdraw.minAmount'));return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0||!contactAgreed}
+          <button onClick={()=>{if(parseFloat(amount)<10){toast.error(t('withdraw.minAmount'));return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0||!contactAgreed}
             style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:(!amount||availableBalance<=0||!contactAgreed)?0.4:1,marginTop:10}}>Submit Withdrawal</button>
         </div>
 
