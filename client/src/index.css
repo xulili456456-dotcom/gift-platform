@@ -689,3 +689,13 @@ body.dark .bg-success\/5 { background: #0d2418 !important; }
 .home-grab-btn:active {
   transform: scale(.95);
 }
+
+/* KYC declaration flash highlight */
+@keyframes kycFlash {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,80,0,0); border: 1.5px solid #FF5000; }
+  50% { box-shadow: 0 0 0 6px rgba(255,80,0,.3); border: 1.5px solid #FF5000; }
+}
+.kyc-decl-flash {
+  animation: kycFlash 0.9s ease-in-out 2;
+  border: 1.5px solid #FF5000;
+}

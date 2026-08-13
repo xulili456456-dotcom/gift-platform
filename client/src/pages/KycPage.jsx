@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import client from '../api/client';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +13,8 @@ export default function KycPage() {
   const [form, setForm] = useState({ docType: 'driver_license', name: '', idNumber: '', frontImg: null, backImg: null });
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const declRef = useRef(null);
+  const [declFlash, setDeclFlash] = useState(false);
 
   useEffect(() => {
     client.get('/kyc').then(({ data }) => { setKyc(data); setKycLoading(false); }).catch(() => setKycLoading(false));
@@ -57,7 +59,13 @@ export default function KycPage() {
   };
 
   const submitKyc = () => {
-    if (!agreed) { toast.error('Please agree to the declaration first'); return; }
+    if (!agreed) {
+      toast.error('Please agree to the declaration first');
+      declRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setDeclFlash(true);
+      setTimeout(() => setDeclFlash(false), 2000);
+      return;
+    }
     if (!form.name.trim() || !form.idNumber.trim()) { toast.error(t('auth.fillRequired')); return; }
     if (!form.frontImg || !form.backImg) { toast.error(t('kyc.uploadBoth')); return; }
     setSubmitting(true);
@@ -169,9 +177,9 @@ export default function KycPage() {
       </div>
 
       {/* Declaration */}
-      <div style={{
+      <div ref={declRef} className={declFlash ? 'kyc-decl-flash' : ''} style={{
         background:'#FFF5F0',borderRadius:12,padding:12,marginBottom:14,
-        display:'flex',alignItems:'flex-start',gap:10
+        display:'flex',alignItems:'flex-start',gap:10,transition:'box-shadow .3s'
       }}>
         <div onClick={() => setAgreed(!agreed)} style={{
           width:44,height:26,borderRadius:13,position:'relative',cursor:'pointer',flexShrink:0,marginTop:1,
