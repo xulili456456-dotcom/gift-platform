@@ -593,7 +593,7 @@ export default function StorePage() {
           const isFreeEligible = freeProductNames.includes(buyConfirm.name);
           const canBeFree = isFreeEligible && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name);
           const displayCost = canBeFree ? 0 : buyConfirm.costPrice;
-          const displayProfit = canBeFree ? Math.round(buyConfirm.price * 0.05 * 100) / 100 : buyConfirm.profit;
+          const displayProfit = canBeFree ? Math.round(buyConfirm.price * 0.03 * 100) / 100 : buyConfirm.profit;
           return (
           <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={() => setBuyConfirm(null)}>
             <div style={{background:'#fff',borderRadius:16,padding:24,width:'100%',maxWidth:340}} onClick={e => e.stopPropagation()}>
@@ -1006,7 +1006,7 @@ export default function StorePage() {
         const isFreeEligible2 = freeProductNames.includes(buyConfirm.name);
         const canBeFree2 = isFreeEligible2 && freeRemaining > 0 && !claimedNames.includes(buyConfirm.name);
         const dCost = canBeFree2 ? 0 : buyConfirm.costPrice;
-        const dProfit = canBeFree2 ? Math.round(buyConfirm.price * 0.05 * 100) / 100 : buyConfirm.profit;
+        const dProfit = canBeFree2 ? Math.round(buyConfirm.price * 0.03 * 100) / 100 : buyConfirm.profit;
         return (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.4)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={() => setBuyConfirm(null)}>
           <div style={{background:'#fff',borderRadius:16,padding:24,width:'100%',maxWidth:340}} onClick={e => e.stopPropagation()}>

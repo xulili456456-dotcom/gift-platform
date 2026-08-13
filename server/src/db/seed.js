@@ -15,7 +15,7 @@ async function seed() {
 
   // Create admin user
   const adminHash = await hashPassword('admin888');
-  const adminCode = generateReferralCode();
+  const adminCode = await generateReferralCode();
   await run(
     'INSERT INTO users (email, phone, password_hash, name, referral_code, is_admin) VALUES (?, ?, ?, ?, ?, ?)',
     ['admin@gift.com', '13800000000', adminHash, 'Admin', adminCode, true]
