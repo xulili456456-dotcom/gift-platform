@@ -71,7 +71,7 @@ export default function TasksPage() {
   const filtered = tab === 'All' ? tasks : tasks.filter(t => t.category === tab.toLowerCase());
 
   const tradingTasks = filtered.filter(t => t.category === 'trading' && t.reset_period !== 'one_time');
-  const oneTimeTasks = filtered.filter(t => t.reset_period === 'one_time');
+  const oneTimeTasks = filtered.filter(t => t.category === 'trading' && t.reset_period === 'one_time');
   const depositTasks = filtered.filter(t => t.category === 'deposit');
   const referralTasks = filtered.filter(t => t.category === 'referral');
   const achievementTasks = filtered.filter(t => t.category === 'trading' && t.reset_period === 'one_time');
