@@ -237,11 +237,8 @@ router.post('/orders/process', async (req, res) => {
       await t.rollback();
       return res.status(400).json({ error: 'You already claimed this product for free', productAlreadyClaimed: true });
     }
-    // If free slots exhausted but cost <= $50, allow without deposit (freeTierNoDeposit)
-    const freeTierNoDeposit = couldBeFree && freeRemaining <= 0;
-
-    // Validate: non-free orders need deposit + balance
-    if (!isFreeOrder && !freeTierNoDeposit) {
+    // Validate: all non-free orders need deposit + balance
+    if (!isFreeOrder) {
       if (cost > deposit) {
         await t.rollback();
         return res.status(400).json({ error: 'Insufficient deposit', need: cost, have: deposit, shortage: Math.round((cost - deposit) * 100) / 100, depositRequired: true, freeRemaining });
@@ -501,7 +498,7 @@ router.get('/orders-history', async (req, res) => {
   });
 });
 
-// GET /api/store/free-products — lifetime free products (10 total per user, then no deposit needed)
+// GET /api/store/free-products — lifetime free products (10 total per user)
 router.get('/free-products', authMiddleware, async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
   const key = 'free_products_v4_' + today;
