@@ -71,6 +71,11 @@ router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res) => {
   res.json({ ok: true });
   if (status === 'approved' && kyc) {
     updateTaskProgress(kyc.user_id, 'kyc_complete', 1).catch(()=>{});
+    // Reward inviter's "invite 3 friends" (now requires KYC, not just registration)
+    const kycUser = await get('SELECT parent_id FROM users WHERE id = ?', [kyc.user_id]);
+    if (kycUser?.parent_id) {
+      updateTaskProgress(kycUser.parent_id, 'invite_3_weekly', 1).catch(()=>{});
+    }
     // Auto-confirm pending red envelope helps
     try { await require('./redEnvelope').confirmPendingHelps(kyc.user_id); } catch(e) { console.log('HELP confirm skipped:', e.message); }
   }

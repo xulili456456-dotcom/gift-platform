@@ -339,7 +339,7 @@ async function migrate() {
         ['first_deposit','deposit','First Deposit Bonus','Make your first deposit of $50+','🎉','#E8F5E9',1,0,5.00,'#00A86B','one_time',10],
         ['deposit_500','deposit','Deposit Milestone: $500','Reach $500 total deposits','🏦','#FFF5F0',0,500,3.00,'#FF5000','milestone',11],
         ['first_withdrawal','deposit','First Withdrawal','Complete KYC and make your first withdrawal','💸','#FFF0F0',1,0,2.00,'#E04500','one_time',12],
-        ['invite_3_weekly','referral','Invite 3 Friends This Week','Get 3 new people to register with your code','👥','#FFF5F0',3,0,3.00,'#FF5000','weekly',13],
+        ['invite_3_weekly','referral','Invite 3 Friends This Week','Get 3 new people to complete KYC with your code','👥','#FFF5F0',3,0,3.00,'#FF5000','weekly',13],
         ['referral_trade','referral','Referral Makes First Trade','Have a referred friend complete their first order','💰','#E8F5E9',1,0,2.00,'#00A86B','milestone',14],
         ['first_order','trading','Complete First Trade','Finish your very first trading order','🎓','#FFF0F0',1,0,3.00,'#00A86B','one_time',15],
         ['kyc_complete','trading','Complete KYC Verification','Verify your identity to unlock full features','🛡️','#E8F5E9',1,0,2.00,'#FF5000','one_time',16]

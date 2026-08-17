@@ -97,11 +97,8 @@ router.post('/register', registerLimiter, async (req, res) => {
       access_token: accessToken,
       refresh_token: refreshToken,
     });
-    // Track invite progress for the inviter
+    // Auto-help inviter's red envelope
     if (parentId) {
-      updateTaskProgress(parentId, 'invite_3_weekly', 1).catch(()=>{});
-      updateTaskProgress(parentId, 'referral_trade', 1).catch(()=>{});
-      // Auto-help inviter's red envelope
       try { await require('./redEnvelope').recordHelp(parentId, user.id, getClientIp(req)); } catch(e) {}
     }
   } catch (err) {
