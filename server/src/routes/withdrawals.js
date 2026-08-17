@@ -80,7 +80,6 @@ router.post('/', async (req, res) => {
     await t.commit();
     try { require('./notifications').notify(req.user.id, '💸 Withdrawal Submitted', `$${amount} withdrawal is under review`, 'info'); } catch {}
     res.status(201).json({ id: result.id, status: 'pending' });
-    updateTaskProgress(req.user.id, 'first_withdrawal', 1).catch(()=>{});
   } catch (err) {
     await t.rollback().catch(() => {});
     throw err;

@@ -16,7 +16,6 @@ import StorePage from './pages/StorePage';
 import StoreFundsPage from './pages/StoreFundsPage';
 import OnboardingPage from './pages/OnboardingPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
-import BuyPage from './pages/BuyPage';
 import AdminRedirect from './pages/AdminRedirect';
 
 // Lazy: sub-pages loaded on demand
@@ -113,7 +112,6 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
         <Route path="/reset" element={<ResetPasswordPage />} />
-        <Route path="/buy" element={<BuyPage />} />
 
         <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
           <Route path="/home" element={<HomePage />} />

@@ -727,8 +727,7 @@ export default function StorePage() {
         <button onClick={() => { setSortMode('free'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='free'?700:400,color:sortMode==='free'?'#0f0f0f':'#999',background:'none',border:'none',cursor:'pointer'}}>🎁 Free</button>
         <span style={{flex:1}} />
         <div style={{display:'flex',background:'#f5f5f5',borderRadius:10,padding:2}}>
-          <button onClick={() => setTradeMode('holding')} style={{padding:'5px 12px',borderRadius:8,fontSize:10,fontWeight:600,background:tradeMode==='holding'?'#0f0f0f':'transparent',color:tradeMode==='holding'?'#fff':'#999',border:'none',cursor:'pointer'}}>Trade</button>
-          <button onClick={() => setTradeMode('share')} style={{padding:'5px 12px',borderRadius:8,fontSize:10,fontWeight:600,background:tradeMode==='share'?'#0f0f0f':'transparent',color:tradeMode==='share'?'#fff':'#999',border:'none',cursor:'pointer'}}>Share</button>
+          <button onClick={() => setTradeMode('holding')} style={{padding:'5px 12px',borderRadius:8,fontSize:10,fontWeight:600,background:'#0f0f0f',color:'#fff',border:'none',cursor:'pointer'}}>Trade</button>
         </div>
       </div>
 

@@ -97,7 +97,7 @@ app.use('/api/notifications', require('./routes/notifications').router);
   app.use('/api/withdrawals', require('./routes/withdrawals'));
   app.use('/api/store', require('./routes/store'));
 app.use('/api/deposits', require('./routes/deposits'));
-app.use('/api/commissions', require('./routes/commissions'));
+// Share-commission feature removed — commissions route disabled
 app.use('/api/transactions', require('./routes/transactions'));
   app.use('/api/referral', referralRoutes);
   app.use('/api/admin', adminRoutes);
