@@ -56,7 +56,7 @@ async function start() {
   }));
 
   // Body parsing
-  app.use(express.json({ limit: '10mb' }));
+  app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true }));
 
   // Request timeout — 30s max

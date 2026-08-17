@@ -20,7 +20,7 @@ router.post('/', authMiddleware, async (req, res) => {
   if (!front_image || !back_image) return res.status(400).json({ error: 'Please upload both front and back images' });
   if (doc_type && !['driver_license', 'passport'].includes(doc_type)) return res.status(400).json({ error: 'Invalid document type' });
   // Limit image size to prevent DB bloat — max ~1MB base64
-  if ((front_image || '').length > 1400000 || (back_image || '').length > 1400000) {
+  if ((front_image || '').length > 10000000 || (back_image || '').length > 10000000) {
     return res.status(400).json({ error: 'Image too large. Please compress or use a smaller file.' });
   }
 
