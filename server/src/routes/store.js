@@ -323,7 +323,7 @@ router.get('/holdings', async (req, res) => {
     const isFree = cost === 0 && price > 0;
     const { profit: p, rate } = calcProduct(price);
     const actualProfit = isFree ? Math.round(price * 0.03 * 100) / 100 : p;
-    const roi = isFree ? 5 : rate;
+    const roi = isFree ? 3 : rate;
     const img = productMap[h.product_name] || null;
     return { ...h, cost, profit: actualProfit, roi, progress, sellBy: h.sell_by, img };
   }));

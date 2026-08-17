@@ -426,7 +426,7 @@ export default function StorePage() {
     list = list.map(p => {
       if (!freeNames.includes(p.name)) return p;
       const freeProfit = Math.round(p.price * 0.03 * 100) / 100;
-      return { ...p, costPrice: 0, profit: freeProfit, roi: 5 };
+      return { ...p, costPrice: 0, profit: freeProfit, roi: 3 };
     });
     if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => fp.name === p.name));
     else if (affordableOnly) list = list.filter(p => p.costPrice <= (status.store.balance || 0));
