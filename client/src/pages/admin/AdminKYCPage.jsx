@@ -38,20 +38,29 @@ export default function AdminKYCPage() {
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
   const [actionModal, setActionModal] = useState(null); // { id, status }
+  const [images, setImages] = useState({}); // { [id]: { front_image, back_image } }
 
   useEffect(() => { loadData(); }, [page, filterStatus]);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const { data } = await client.get('/kyc/admin/list', { params: { page: currentPage, limit: 20 } });
-      setRecords(data.kycs || data.records || []);
+      const { data } = await client.get('/kyc/admin/list', { params: { page, limit: 20 } });
+      setRecords(data.kycs || data.records || data || []);
       setTotal(data.total || 0);
     } catch {
       toast.error('Failed to load KYC records');
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadImages = async (id) => {
+    if (images[id]) return;
+    try {
+      const { data } = await client.get(`/kyc/admin/${id}/images`);
+      setImages((prev) => ({ ...prev, [id]: data }));
+    } catch {}
   };
 
   const handleAction = async () => {
@@ -143,7 +152,10 @@ export default function AdminKYCPage() {
                 <>
                   <tr
                     key={r.id}
-                    onClick={() => setExpandedId(expandedId === r.id ? null : r.id)}
+                    onClick={() => {
+                      if (expandedId === r.id) { setExpandedId(null); }
+                      else { setExpandedId(r.id); loadImages(r.id); }
+                    }}
                     style={{
                       borderBottom: '1px solid #F2F2F7',
                       cursor: 'pointer',
@@ -158,9 +170,9 @@ export default function AdminKYCPage() {
                       {r.user_email && <div style={{ fontSize: '11px', color: '#8E8E93', marginTop: 2 }}>{r.user_email}</div>}
                     </td>
                     <td style={{ padding: '12px 12px', color: '#3C3C43', textTransform: 'capitalize' }}>{r.doc_type || '-'}</td>
-                    <td style={{ padding: '12px 12px', color: '#0f0f0f', fontWeight: 500 }}>{r.full_name || '-'}</td>
+                    <td style={{ padding: '12px 12px', color: '#0f0f0f', fontWeight: 500 }}>{r.real_name || '-'}</td>
                     <td style={{ padding: '12px 12px', color: '#3C3C43', fontFamily: 'monospace', fontSize: '12px' }}>{maskIdNumber(r.id_number)}</td>
-                    <td style={{ padding: '12px 12px', color: '#8E8E93', fontSize: '12px' }}>{(r.created_at || '').slice(0, 16).replace('T', ' ')}</td>
+                    <td style={{ padding: '12px 12px', color: '#8E8E93', fontSize: '12px' }}>{(r.submitted_at || '').slice(0, 16).replace('T', ' ')}</td>
                     <td style={{ padding: '12px 12px' }}>
                       <span style={{
                         display: 'inline-block',
@@ -220,27 +232,30 @@ export default function AdminKYCPage() {
                     <tr key={`${r.id}-expanded`}>
                       <td colSpan={7} style={{ padding: '16px 12px', background: '#FFF8F5', borderBottom: '1px solid #E5E5EA' }}>
                         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                          {r.doc_front && (
+                          {!images[r.id] && (
+                            <p style={{ color: '#8E8E93', fontSize: '13px' }}>Loading images...</p>
+                          )}
+                          {images[r.id]?.front_image && (
                             <div style={{ flex: '1 1 200px', maxWidth: 320 }}>
                               <p style={{ fontSize: '12px', fontWeight: 600, color: '#0f0f0f', marginBottom: 8 }}>Front Side</p>
                               <img
-                                src={r.doc_front}
+                                src={images[r.id].front_image}
                                 alt="Document front"
                                 style={{ width: '100%', maxHeight: 280, objectFit: 'contain', borderRadius: 12, border: '1px solid #E5E5EA', background: '#F2F2F7' }}
                               />
                             </div>
                           )}
-                          {r.doc_back && (
+                          {images[r.id]?.back_image && (
                             <div style={{ flex: '1 1 200px', maxWidth: 320 }}>
                               <p style={{ fontSize: '12px', fontWeight: 600, color: '#0f0f0f', marginBottom: 8 }}>Back Side</p>
                               <img
-                                src={r.doc_back}
+                                src={images[r.id].back_image}
                                 alt="Document back"
                                 style={{ width: '100%', maxHeight: 280, objectFit: 'contain', borderRadius: 12, border: '1px solid #E5E5EA', background: '#F2F2F7' }}
                               />
                             </div>
                           )}
-                          {!r.doc_front && !r.doc_back && (
+                          {images[r.id] && !images[r.id].front_image && !images[r.id].back_image && (
                             <p style={{ color: '#8E8E93', fontSize: '13px' }}>No document images available</p>
                           )}
                         </div>

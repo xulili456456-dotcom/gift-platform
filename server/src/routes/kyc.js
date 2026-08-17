@@ -42,12 +42,18 @@ router.post('/', authMiddleware, async (req, res) => {
 
 // === Admin routes ===
 
-// GET /api/kyc/admin/list
+// GET /api/kyc/admin/list — metadata only (exclude images to avoid huge response)
 router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
   const rows = await all(
-    'SELECT k.*, u.name as user_name, u.email as user_email FROM kyc_submissions k JOIN users u ON u.id = k.user_id ORDER BY k.submitted_at DESC'
+    'SELECT k.id, k.user_id, k.doc_type, k.real_name, k.id_number, k.status, k.admin_note, k.submitted_at, k.reviewed_at, u.name as user_name, u.email as user_email FROM kyc_submissions k JOIN users u ON u.id = k.user_id ORDER BY k.submitted_at DESC'
   );
   res.json(rows);
+});
+
+// GET /api/kyc/admin/:id/images — fetch document images on-demand
+router.get('/admin/:id/images', authMiddleware, adminMiddleware, async (req, res) => {
+  const row = await get('SELECT front_image, back_image FROM kyc_submissions WHERE id = ?', [req.params.id]);
+  res.json(row || { front_image: null, back_image: null });
 });
 
 // PUT /api/kyc/admin/:id
