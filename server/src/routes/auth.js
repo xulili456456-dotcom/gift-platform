@@ -17,7 +17,7 @@ const registerLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, standardHe
 const resetLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 3, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many password reset attempts, please try again in 1 hour' } });
 
 // POST /api/auth/register
-router.post('/register', registerLimiter, async (req, res) => {
+router.post('/register', async (req, res) => {
   try {
     const email = (req.body.email || '').trim().toLowerCase();
     const phone = (req.body.phone || '').trim();
