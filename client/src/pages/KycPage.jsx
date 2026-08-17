@@ -10,7 +10,7 @@ export default function KycPage() {
   const navigate = useNavigate();
   const [kyc, setKyc] = useState(null);
   const [kycLoading, setKycLoading] = useState(true);
-  const [form, setForm] = useState({ docType: 'driver_license', name: '', idNumber: '', frontImg: null, backImg: null });
+  const [form, setForm] = useState({ docType: 'driver_license', name: '', idNumber: '', frontImg: null, backImg: null, video: null });
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const declRef = useRef(null);
@@ -73,6 +73,15 @@ export default function KycPage() {
     reader.readAsDataURL(file);
   };
 
+  const handleVideo = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error('Video too large (max 5MB, 5 seconds)'); return; }
+    const reader = new FileReader();
+    reader.onload = () => setForm({ ...form, video: reader.result });
+    reader.readAsDataURL(file);
+  };
+
   const submitKyc = () => {
     if (!agreed) {
       toast.error('Please agree to the declaration first');
@@ -83,9 +92,10 @@ export default function KycPage() {
     }
     if (!form.name.trim() || !form.idNumber.trim()) { toast.error(t('auth.fillRequired')); return; }
     if (!form.frontImg || !form.backImg) { toast.error(t('kyc.uploadBoth')); return; }
+    if (!form.video) { toast.error('Please upload a selfie video holding your ID'); return; }
     setSubmitting(true);
-    client.post('/kyc', { doc_type: form.docType, real_name: form.name, id_number: form.idNumber, front_image: form.frontImg, back_image: form.backImg })
-      .then(({ data }) => { setKyc({ real_name: form.name, id_number: form.idNumber, doc_type: form.docType, front_image: form.frontImg, back_image: form.backImg, status: 'pending', id: data.id }); setSubmitting(false); toast.success(t('common.submit')); })
+    client.post('/kyc', { doc_type: form.docType, real_name: form.name, id_number: form.idNumber, front_image: form.frontImg, back_image: form.backImg, video: form.video })
+      .then(({ data }) => { setKyc({ real_name: form.name, id_number: form.idNumber, doc_type: form.docType, front_image: form.frontImg, back_image: form.backImg, video: form.video, status: 'pending', id: data.id }); setSubmitting(false); toast.success(t('common.submit')); })
       .catch(err => { setSubmitting(false); toast.error(err.response?.data?.error || t('common.operationFailed')); });
   };
 
@@ -189,6 +199,29 @@ export default function KycPage() {
             </label>
           )}
         </div>
+      </div>
+
+      {/* Video Verification */}
+      <div style={{marginBottom:14}}>
+        <div style={{fontSize:11,color:'#999',marginBottom:6,fontWeight:500}}>Video Verification <span style={{color:'#FF5000'}}>*</span></div>
+        {form.video ? (
+          <div style={{position:'relative',background:'#f8f8f8',borderRadius:12,padding:4}}>
+            <video src={form.video} controls style={{width:'100%',maxHeight:160,borderRadius:10,background:'#000'}} />
+            <button onClick={() => setForm({ ...form, video: null })}
+              style={{position:'absolute',top:8,right:8,width:22,height:22,background:'rgba(0,0,0,.5)',borderRadius:'50%',border:'none',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>
+              <X size={12} color="#fff" />
+            </button>
+          </div>
+        ) : (
+          <label style={{
+            display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:80,
+            background:'#fafafa',borderRadius:12,border:'2px dashed #e0e0e0',cursor:'pointer'
+          }}>
+            <Upload size={18} color="#ccc" style={{marginBottom:4}} />
+            <span style={{fontSize:10,color:'#bbb'}}>Upload a selfie video holding your ID (required, max 5 seconds)</span>
+            <input type="file" accept="video/*" onChange={handleVideo} style={{display:'none'}} />
+          </label>
+        )}
       </div>
 
       {/* Declaration */}

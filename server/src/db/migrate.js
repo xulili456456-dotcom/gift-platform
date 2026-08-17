@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS kyc_submissions (
     id_number       TEXT NOT NULL,
     front_image     TEXT,
     back_image      TEXT,
+    video           TEXT DEFAULT NULL,
     status          TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'approved', 'rejected')),
     admin_note      TEXT DEFAULT '',
     submitted_at    TIMESTAMP NOT NULL DEFAULT NOW(),

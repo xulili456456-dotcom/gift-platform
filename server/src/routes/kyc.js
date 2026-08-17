@@ -15,27 +15,31 @@ router.get('/', authMiddleware, async (req, res) => {
 
 // POST /api/kyc - submit KYC
 router.post('/', authMiddleware, async (req, res) => {
-  const { doc_type, real_name, id_number, front_image, back_image } = req.body;
+  const { doc_type, real_name, id_number, front_image, back_image, video } = req.body;
   if (!real_name || !id_number) return res.status(400).json({ error: 'name and id required' });
   if (!front_image || !back_image) return res.status(400).json({ error: 'Please upload both front and back images' });
   if (doc_type && !['driver_license', 'passport'].includes(doc_type)) return res.status(400).json({ error: 'Invalid document type' });
-  // Limit image size to prevent DB bloat — max ~1MB base64
+  // Limit image size to prevent DB bloat
   if ((front_image || '').length > 10000000 || (back_image || '').length > 10000000) {
     return res.status(400).json({ error: 'Image too large. Please compress or use a smaller file.' });
+  }
+  if (!video) return res.status(400).json({ error: 'Please upload a selfie video holding your ID' });
+  if ((video || '').length > 7000000) {
+    return res.status(400).json({ error: 'Video too large. Please upload a shorter video (max 5 seconds).' });
   }
 
   const existing = await get('SELECT id, status FROM kyc_submissions WHERE user_id = ?', [req.user.id]);
   if (existing) {
     if (existing.status !== 'rejected') return res.status(400).json({ error: 'already submitted' });
     // Rejected — allow resubmit by updating the existing record
-    await run('UPDATE kyc_submissions SET doc_type = ?, real_name = ?, id_number = ?, front_image = ?, back_image = ?, status = ?, submitted_at = NOW(), reviewed_at = NULL, admin_note = NULL WHERE id = ?',
-      [doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', 'pending', existing.id]);
+    await run('UPDATE kyc_submissions SET doc_type = ?, real_name = ?, id_number = ?, front_image = ?, back_image = ?, video = ?, status = ?, submitted_at = NOW(), reviewed_at = NULL, admin_note = NULL WHERE id = ?',
+      [doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', video || null, 'pending', existing.id]);
     return res.json({ id: existing.id, status: 'pending', message: 'Resubmitted for review' });
   }
 
   const result = await insert(
-    'INSERT INTO kyc_submissions (user_id, doc_type, real_name, id_number, front_image, back_image) VALUES (?, ?, ?, ?, ?, ?)',
-    [req.user.id, doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '']
+    'INSERT INTO kyc_submissions (user_id, doc_type, real_name, id_number, front_image, back_image, video) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    [req.user.id, doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', video || null]
   );
   res.status(201).json({ id: result.id, status: 'pending' });
 });
@@ -52,8 +56,8 @@ router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
 
 // GET /api/kyc/admin/:id/images — fetch document images on-demand
 router.get('/admin/:id/images', authMiddleware, adminMiddleware, async (req, res) => {
-  const row = await get('SELECT front_image, back_image FROM kyc_submissions WHERE id = ?', [req.params.id]);
-  res.json(row || { front_image: null, back_image: null });
+  const row = await get('SELECT front_image, back_image, video FROM kyc_submissions WHERE id = ?', [req.params.id]);
+  res.json(row || { front_image: null, back_image: null, video: null });
 });
 
 // PUT /api/kyc/admin/:id
