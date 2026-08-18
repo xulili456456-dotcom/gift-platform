@@ -28,7 +28,7 @@ export default function TasksPage() {
       setBalance(bRes.data);
     } catch { setData({ tasks: [], rewards: [], summary: { completed: 0, total: 0 } }); toast.error('Failed to load tasks'); } finally { setLoading(false); }
   };
-  useEffect(() => { loadAll(); const t = setInterval(loadAll, 30000); return () => clearInterval(t); }, []);
+  useEffect(() => { loadAll(); const t = setInterval(loadAll, 180000); return () => clearInterval(t); }, []);
 
   const tasks = data?.tasks || [];
   const rewards = data?.rewards || [];

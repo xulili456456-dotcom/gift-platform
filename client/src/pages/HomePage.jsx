@@ -90,11 +90,11 @@ export default function HomePage() {
       client.get('/store/earnings-stats').then(({ data }) => {
         if (data) { setBalance(data.balance || 0); setDeposit(data.deposit || 0); setTodayProfit(data.todayProfit || 0); setActiveOrders(data.activeOrders || 0); }
       }).catch(() => {});
-    }, 15000);
+    }, 180000);
     const t2 = setInterval(() => {
       client.post('/store/check-sell').catch(() => {});
       client.get('/store/holdings').then(({ data }) => { if (data) setHoldings(data); }).catch(() => {});
-    }, 60000);
+    }, 180000);
     return () => { clearInterval(t1); clearInterval(t2); };
   }, []);
 

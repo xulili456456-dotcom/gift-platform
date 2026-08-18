@@ -56,7 +56,7 @@ export default function WithdrawPage() {
       .catch((e) => { console.error('WithdrawPage loadData failed', e); })
       .finally(() => setLoading(false));
   };
-  useEffect(() => { loadData(); window.addEventListener('taskEarning', loadData); const t = setInterval(loadData, 15000); return () => { window.removeEventListener('taskEarning', loadData); clearInterval(t); }; }, []);
+  useEffect(() => { loadData(); window.addEventListener('taskEarning', loadData); const t = setInterval(loadData, 180000); return () => { window.removeEventListener('taskEarning', loadData); clearInterval(t); }; }, []);
 
   const availableBalance = taskBalance.available || 0;
   const pendingBalance = claims.filter(c => c.status === 'pending').reduce((s, c) => s + (Number(c.value) || 0), 0);

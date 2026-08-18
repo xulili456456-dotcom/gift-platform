@@ -53,7 +53,7 @@ export default function TransactionsPage() {
   useEffect(() => {
     const t = setInterval(async () => {
       try { const { data } = await client.get('/store/earnings-stats'); setSummary({ balance: data.balance || 0, netProfit: data.netProfit || 0 }); } catch {}
-    }, 15000);
+    }, 180000);
     return () => clearInterval(t);
   }, []);
 

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>实名认证 - 视频验证预览</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;background:#e5e5ea;display:flex;justify-content:center;-webkit-font-smoothing:antialiased}
+.app{width:100%;max-width:430px;min-height:100vh;background:#f2f2f7;padding-bottom:40px}
+.hdr{background:#0f0f0f;padding:12px 16px;color:#fff;display:flex;align-items:center;gap:12px}
+.hdr .back{font-size:20px;cursor:pointer}
+.hdr .title{font-size:14px;font-weight:700}
+.wrap{padding:16px}
+.card{background:#fff;border-radius:20px;padding:18px;margin-bottom:12px}
+.card .hd{font-size:12px;font-weight:700;color:#0f0f0f;margin-bottom:14px}
+.label{font-size:11px;color:#999;margin-bottom:6px;font-weight:500}
+.input{width:100%;padding:12px;background:#f5f5f5;border:none;border-radius:12px;font-size:13px;outline:none;color:#333;margin-bottom:14px}
+.doctype{display:flex;gap:8px;margin-bottom:14px}
+.doctype button{flex:1;padding:12px;border-radius:12px;border:2px solid #e8e8e8;background:#fff;font-size:12px;font-weight:500;color:#999;cursor:pointer}
+.doctype button.on{border-color:#FF5000;background:#FFF5F0;color:#FF5000;font-weight:600}
+.imgs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.upload{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100px;background:#fafafa;border-radius:12px;border:2px dashed #e0e0e0;cursor:pointer;text-align:center;padding:8px}
+.upload .ic{font-size:18px;margin-bottom:2px}
+.upload .tx{font-size:10px;color:#bbb}
+/* 视频验证区块 */
+.video-sec{margin-bottom:14px}
+.video-upload{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100px;background:#fafafa;border-radius:12px;border:2px dashed #e0e0e0;cursor:pointer;text-align:center;padding:8px}
+.video-upload .ic{font-size:22px;margin-bottom:4px}
+.video-upload .tx{font-size:10px;color:#bbb;line-height:1.4}
+.video-preview{position:relative;background:#f8f8f8;border-radius:12px;padding:4px}
+.video-preview video{width:100%;max-height:180px;border-radius:10px;background:#000}
+.video-preview .del{position:absolute;top:10px;right:10px;width:24px;height:24px;background:rgba(0,0,0,.5);border-radius:50%;border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.decl{background:#FFF5F0;border-radius:12px;padding:12px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px}
+.toggle{width:44px;height:26px;border-radius:13px;position:relative;cursor:pointer;flex-shrink:0;margin-top:1px;background:#e0e0e0;transition:background .2s}
+.toggle .knob{width:22px;height:22px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle.on{background:#FF5000}
+.toggle.on .knob{left:20px}
+.decl .txt{font-size:11px;color:#CC3D00;line-height:1.5}
+.submit{width:100%;padding:13px;background:#FF5000;color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer}
+.badge{display:inline-block;font-size:10px;background:#FF5000;color:#fff;border-radius:8px;padding:2px 8px;font-weight:700;margin-left:6px;vertical-align:1px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <span class="back">←</span>
+    <span class="title">实名认证</span>
+  </div>
+  <div class="wrap">
+    <div class="card">
+      <div class="hd">Submit Verification</div>
+
+      <div class="label">证件类型</div>
+      <div class="doctype">
+        <button class="on">🪪 驾驶证</button>
+        <button>🌐 护照</button>
+      </div>
+
+      <div class="label">真实姓名</div>
+      <input class="input" placeholder="As shown on your ID">
+
+      <div class="label">证件号码</div>
+      <input class="input" placeholder="Enter your ID number">
+
+      <div class="label">上传证件照片</div>
+      <div class="imgs">
+        <div class="upload"><span class="ic">📷</span><span class="tx">正面</span></div>
+        <div class="upload"><span class="ic">📷</span><span class="tx">反面</span></div>
+      </div>
+
+      <!-- ═══ 新增：视频验证 ═══ -->
+      <div class="video-sec">
+        <div class="label">视频验证 <span class="badge" style="background:#C62828">必填</span></div>
+        <div class="video-upload" onclick="toggleVideo()">
+          <span class="ic">🎥</span>
+          <span class="tx">上传手持身份证的自拍视频<br>（必填，最长5秒，≤5MB）</span>
+        </div>
+        <div class="video-preview" id="videoPreview" style="display:none">
+          <video id="videoEl" controls></video>
+          <button class="del" onclick="removeVideo()">✕</button>
+        </div>
+      </div>
+
+      <div class="decl">
+        <div class="toggle" id="toggle" onclick="toggleAgree()"><div class="knob"></div></div>
+        <div class="txt">I declare that all information provided is true and accurate. I understand that submitting false documents may result in <b>permanent account suspension</b> and forfeiture of all earnings.</div>
+      </div>
+
+      <button class="submit">提交认证</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 预览演示：点击视频上传框，模拟选中一段视频（用示例视频流）
+function toggleVideo(){
+  var p=document.getElementById('videoPreview');
+  var v=document.getElementById('videoEl');
+  p.style.display='block';
+  // 用一个示例视频（公开测试视频）
+  v.src='https://www.w3schools.com/html/mov_bbb.mp4';
+  v.play().catch(function(){});
+}
+function removeVideo(){
+  document.getElementById('videoPreview').style.display='none';
+  document.getElementById('videoEl').src='';
+}
+function toggleAgree(){
+  document.getElementById('toggle').classList.toggle('on');
+}
+</script>
+</body>
+</html>
