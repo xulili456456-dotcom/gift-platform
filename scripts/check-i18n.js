@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const LOCALES_DIR = path.join(__dirname, '..', 'client', 'src', 'i18n', 'locales');
-const LANGUAGES = ['en', 'es', 'ja', 'ms', 'tr', 'it'];
+const LANGUAGES = ['en', 'es', 'ja', 'ms', 'tr', 'it', 'id'];
 const EN_FILE = 'en.json';
 
 function allKeys(obj, prefix = '') {
