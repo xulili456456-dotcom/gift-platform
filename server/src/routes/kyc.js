@@ -62,7 +62,7 @@ router.post('/video', authMiddleware, async (req, res) => {
 // GET /api/kyc/admin/list — metadata only (exclude images to avoid huge response)
 router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
   const rows = await all(
-    'SELECT k.id, k.user_id, k.doc_type, k.real_name, k.id_number, k.status, k.admin_note, k.submitted_at, k.reviewed_at, u.name as user_name, u.email as user_email FROM kyc_submissions k JOIN users u ON u.id = k.user_id ORDER BY k.submitted_at DESC'
+    'SELECT k.id, k.user_id, k.doc_type, k.real_name, k.id_number, k.status, k.admin_note, k.submitted_at, k.reviewed_at, u.name as user_name, u.email as user_email, u.frozen as frozen FROM kyc_submissions k JOIN users u ON u.id = k.user_id ORDER BY k.submitted_at DESC'
   );
   res.json(rows);
 });
@@ -102,6 +102,34 @@ router.put('/admin/:id', authMiddleware, adminMiddleware, async (req, res) => {
     // Auto-confirm pending red envelope helps
     try { await require('./redEnvelope').confirmPendingHelps(kyc.user_id); } catch(e) { console.log('HELP confirm skipped:', e.message); }
   }
+});
+
+// PUT /api/kyc/admin/:id/freeze — freeze account (suspected fake identity)
+router.put('/admin/:id/freeze', authMiddleware, adminMiddleware, async (req, res) => {
+  const { admin_note } = req.body;
+  const kyc = await get('SELECT user_id, status FROM kyc_submissions WHERE id = ?', [req.params.id]);
+  if (!kyc) return res.status(404).json({ error: 'KYC record not found' });
+
+  // Freeze the user account
+  await run('UPDATE users SET frozen = TRUE WHERE id = ?', [kyc.user_id]);
+
+  // If KYC is still pending, mark it rejected so it leaves the pending queue
+  if (kyc.status === 'pending') {
+    await run("UPDATE kyc_submissions SET status = 'rejected', admin_note = ?, reviewed_at = NOW() WHERE id = ?",
+      [admin_note || 'Suspected fake identity', req.params.id]);
+  }
+
+  // Audit log
+  try {
+    await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)',
+      [req.user.id, 'freeze', kyc.user_id, 'KYC suspected fake: ' + (admin_note || '')]);
+  } catch (e) { console.error('Audit log failed:', e.message); }
+
+  // Notify user
+  await notify(kyc.user_id, 'Account Suspended',
+    'Your account has been suspended due to suspected fraudulent identity verification. Please contact support.', 'error');
+
+  res.json({ ok: true, frozen: true });
 });
 
 module.exports = router;

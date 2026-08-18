@@ -123,6 +123,9 @@ router.post('/login', loginLimiter, async (req, res) => {
     if (!valid) {
       return res.status(401).json({ error: 'Incorrect email or password' });
     }
+    if (user.frozen) {
+      return res.status(403).json({ error: 'Your account has been suspended. Contact support for details.', code: 'ACCOUNT_FROZEN' });
+    }
     const tokenPayload = { id: user.id, email: user.email, is_admin: user.is_admin };
     const accessToken = signAccessToken(tokenPayload);
     const refreshToken = signRefreshToken(tokenPayload);
