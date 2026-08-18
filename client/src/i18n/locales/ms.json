@@ -370,7 +370,7 @@
     "customTitle": "Jumlah Tersuai",
     "customDesc": "Masukkan jumlah pertaruhan anda sendiri",
     "customAmount": "Jumlah Tersuai",
-    "customPlaceholder": "Min $10",
+    "customPlaceholder": "Min $25",
     "estimatedProfit": "Anggaran Keuntungan",
     "stakeNow": "Pertaruh Sekarang",
     "confirmTitle": "Sahkan Pertaruhan",
@@ -430,7 +430,7 @@
   "withdraw": {
     "title": "Pengeluaran",
     "balance": "Baki",
-    "minAmount": "Pengeluaran minimum ialah $10",
+    "minAmount": "Pengeluaran minimum ialah $25",
     "minPlaceholder": "Min $1",
     "insufficient": "Baki tidak mencukupi",
     "noWallet": "Sila ikat dompet dahulu",
