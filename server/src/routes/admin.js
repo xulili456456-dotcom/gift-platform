@@ -276,6 +276,26 @@ router.put('/withdrawals/:id', async (req, res) => {
       'UPDATE withdrawals SET status = ?, admin_note = ?, completed_at = ? WHERE id = ?',
       [status, admin_note || '', completedAt, id]
     );
+
+    // If rejected, refund the deducted funds back to the user's balance
+    if (status === 'rejected' && w.deducted_ids) {
+      let parsed;
+      try { parsed = JSON.parse(w.deducted_ids); } catch { parsed = null; }
+      if (parsed && parsed.deducted) {
+        for (const did of parsed.deducted) {
+          await t.run("UPDATE task_earnings SET status = 'delivered' WHERE id = ? AND status = 'withdrawn'", [parseInt(did)]);
+        }
+        for (const fid of (parsed.fragments || [])) {
+          await t.run('DELETE FROM task_earnings WHERE id = ?', [parseInt(fid)]);
+        }
+      } else {
+        const ids = Array.isArray(parsed) ? parsed : String(w.deducted_ids).split(',').map(Number).filter(Boolean);
+        for (const did of ids) {
+          await t.run("UPDATE task_earnings SET status = 'delivered' WHERE id = ? AND status = 'withdrawn'", [parseInt(did)]);
+        }
+      }
+    }
+
     await t.commit();
     res.json({ ok: true });
   } catch (err) {
