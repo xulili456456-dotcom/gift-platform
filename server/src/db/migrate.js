@@ -353,6 +353,15 @@ async function migrate() {
     await run("UPDATE task_definitions SET reset_period = 'one_time' WHERE task_type != 'daily_checkin'");
     console.log('All non-checkin tasks set to one_time.');
   } catch (e) { console.log('Task seed skipped:', e.message); }
+  // Configure the 5 active one-time tasks (targets/rewards)
+  try {
+    await run("UPDATE task_definitions SET target_count = 10, title = 'Complete 10 Orders', description = 'Finish any 10 product purchases' WHERE task_type = 'daily_order_5'");
+    await run("UPDATE task_definitions SET target_count = 5, title = 'Invite 5 Friends This Week', description = 'Get 5 new people to complete KYC with your code' WHERE task_type = 'invite_3_weekly'");
+    await run("UPDATE task_definitions SET task_type = 'referral_first_deposit', title = 'Referral Makes First Deposit', description = 'Have a referred friend make their first deposit', reward = 5 WHERE task_type = 'referral_trade'");
+    await run("UPDATE task_definitions SET reward = 2 WHERE task_type = 'first_order'");
+    await run("UPDATE task_definitions SET active = FALSE WHERE task_type IN ('first_deposit', 'deposit_500')");
+    console.log('Task definitions configured.');
+  } catch (e) { console.log('Task config skipped:', e.message); }
   // Admin audit log
   try {
     await exec(`CREATE TABLE IF NOT EXISTS admin_audit_log (

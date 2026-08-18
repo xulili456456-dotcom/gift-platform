@@ -283,14 +283,6 @@ router.post('/orders/process', async (req, res) => {
     const uid = req.user.id;
     updateTaskProgress(uid, 'daily_order_5', 1).catch(()=>{});
     updateTaskProgress(uid, 'first_order', 1).catch(()=>{});
-    // Reward inviter's "referral makes first trade" on the user's first order
-    const orderCount = await get("SELECT COUNT(*)::int as c FROM store_orders WHERE user_id = ?", [uid]);
-    if (Number(orderCount?.c || 0) === 1) {
-      const parentRow = await get('SELECT parent_id FROM users WHERE id = ?', [uid]);
-      if (parentRow?.parent_id) {
-        updateTaskProgress(parentRow.parent_id, 'referral_trade', 1).catch(()=>{});
-      }
-    }
     if (productPrice >= 100) updateTaskProgress(uid, 'high_value_order', 1, productPrice).catch(()=>{});
     if (profit > 0) updateTaskProgress(uid, 'profit_streak', 1).catch(()=>{});
   } catch (err) {

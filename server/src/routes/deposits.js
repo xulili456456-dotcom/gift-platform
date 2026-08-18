@@ -62,6 +62,14 @@ router.put('/:id/confirm', authMiddleware, adminMiddleware, async (req, res) => 
     res.json({ ok: true, message: 'Deposit confirmed' });
     updateTaskProgress(d.user_id, 'first_deposit', 1).catch(()=>{});
     updateTaskProgress(d.user_id, 'deposit_500', 0, Number(d.amount)).catch(()=>{});
+    // Reward inviter's "referral makes first deposit" on the user's first deposit
+    const depCount = await get("SELECT COUNT(*)::int as c FROM deposits WHERE user_id = ? AND status = 'confirmed'", [d.user_id]);
+    if (Number(depCount?.c || 0) === 1) {
+      const parentRow = await get('SELECT parent_id FROM users WHERE id = ?', [d.user_id]);
+      if (parentRow?.parent_id) {
+        updateTaskProgress(parentRow.parent_id, 'referral_first_deposit', 1).catch(()=>{});
+      }
+    }
   } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 
