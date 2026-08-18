@@ -512,7 +512,7 @@
     "hint": "24 saatte islenir",
     "noWallet": "Cuzdan bagla",
     "bindFirst": "Cekim icin cuzdan baglamalisin",
-    "minAmount": "Min $25",
+    "minAmount": "Min $10",
     "minPlaceholder": "Min 20",
     "invalidAmount": "Gecerli miktar gir",
     "insufficient": "Yetersiz bakiye",

@@ -22,6 +22,9 @@ const ALLOWED_ORIGINS = [
   'https://gifthaven-shopee.surge.sh',
   'http://localhost:5173',
   'http://localhost:3001',
+  // Capacitor Android WebView origin (no port)
+  'http://localhost',
+  'https://localhost',
 ];
 
 function getAllowedOrigins() {

@@ -1,7 +1,11 @@
 import axios from 'axios';
 
+// Native (Capacitor) app runs on capacitor://localhost, so it must hit the API
+// by absolute URL — there is no /api proxy inside the WebView.
+const isNativeApp = typeof window !== 'undefined' && !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+
 const client = axios.create({
-  baseURL: window.location.hostname === 'www.shopeetrade.com' ? 'https://gift-platform-h6um.onrender.com/api' : '/api',
+  baseURL: isNativeApp || window.location.hostname === 'www.shopeetrade.com' ? 'https://gift-platform-h6um.onrender.com/api' : '/api',
   timeout: 60000,
   headers: { 'Content-Type': 'application/json' },
 });
