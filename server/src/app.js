@@ -82,6 +82,11 @@ async function start() {
     try { res.json(require('./data/products.json')); } catch { res.json([]); }
   });
 
+  // App version / update check (public, no auth)
+  app.get('/api/app/version', (req, res) => {
+    res.json({ version: config.APP_VERSION, apkUrl: config.APP_APK_URL });
+  });
+
   // API Routes
   app.use('/api/auth', authRoutes);
   app.use('/api/users', userRoutes);

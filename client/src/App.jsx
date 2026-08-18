@@ -17,6 +17,7 @@ import StoreFundsPage from './pages/StoreFundsPage';
 import OnboardingPage from './pages/OnboardingPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import AdminRedirect from './pages/AdminRedirect';
+import UpdateChecker from './components/UpdateChecker';
 
 // Lazy: sub-pages loaded on demand
 const TeamPage = lazy(() => import('./pages/TeamPage'));
@@ -81,6 +82,8 @@ export default function App() {
         duration: 2500,
         style: { background: '#2D2D2D', color: '#FFF', borderRadius: '12px', fontSize: '14px', padding: '10px 16px' },
       }} />
+
+      <UpdateChecker />
 
       {/* Contact Support Modal */}
       {showContact && (

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Shopee</string>
-    <string name="title_activity_main">Shopee</string>
-    <string name="package_name">com.shopeetrade.app</string>
-    <string name="custom_url_scheme">com.shopeetrade.app</string>
+    <string name="app_name">Shopping</string>
+    <string name="title_activity_main">Shopping</string>
+    <string name="package_name">com.shopping.app</string>
+    <string name="custom_url_scheme">com.shopping.app</string>
 </resources>

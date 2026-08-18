@@ -1,4 +1,4 @@
-package com.shopeetrade.app;
+package com.shopping.app;
 
 import com.getcapacitor.BridgeActivity;
 

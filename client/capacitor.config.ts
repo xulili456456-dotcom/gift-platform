@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.shopeetrade.app',
-  appName: 'Shopee',
+  appId: 'com.shopping.app',
+  appName: 'Shopping',
   webDir: 'dist',
 };
 
