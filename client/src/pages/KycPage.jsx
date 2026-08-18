@@ -15,6 +15,8 @@ export default function KycPage() {
   const [submitting, setSubmitting] = useState(false);
   const declRef = useRef(null);
   const [declFlash, setDeclFlash] = useState(false);
+  const [extraVideo, setExtraVideo] = useState(null);
+  const [uploadingVideo, setUploadingVideo] = useState(false);
 
   useEffect(() => {
     client.get('/kyc').then(({ data }) => { setKyc(data); setKycLoading(false); }).catch(() => setKycLoading(false));
@@ -80,6 +82,31 @@ export default function KycPage() {
     const reader = new FileReader();
     reader.onload = () => setForm({ ...form, video: reader.result });
     reader.readAsDataURL(file);
+  };
+
+  const handleExtraVideo = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error('Video too large (max 5MB, 5 seconds)'); return; }
+    const reader = new FileReader();
+    reader.onload = () => setExtraVideo(reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  const uploadExtraVideo = async () => {
+    if (!extraVideo) { toast.error('Please select a video first'); return; }
+    setUploadingVideo(true);
+    try {
+      await client.post('/kyc/video', { video: extraVideo });
+      toast.success('Selfie video uploaded');
+      setExtraVideo(null);
+      const { data } = await client.get('/kyc');
+      setKyc(data);
+    } catch (err) {
+      toast.error(err.response?.data?.error || t('common.operationFailed'));
+    } finally {
+      setUploadingVideo(false);
+    }
   };
 
   const submitKyc = () => {
@@ -315,6 +342,28 @@ export default function KycPage() {
     const maskId = (id) => id ? id.replace(/(\w{1,4})(\w+)(\w{4})/, '$1******$3') : '---';
     return (
       <>
+        {/* Missing selfie video prompt */}
+        {!kyc?.video && (
+          <div style={{background:'#FFF8E1',borderRadius:16,padding:16,marginBottom:12,border:'1px solid #FDE68A'}}>
+            <div style={{fontSize:13,fontWeight:700,color:'#B45309',marginBottom:6}}>⚠️ 请上传自拍视频以完成认证</div>
+            <div style={{fontSize:11,color:'#92400E',marginBottom:12,lineHeight:1.5}}>请上传一段手持身份证的自拍视频（5秒内）。未上传视频将无法提现。</div>
+            {extraVideo ? (
+              <div style={{position:'relative',background:'#f8f8f8',borderRadius:12,padding:4,marginBottom:10}}>
+                <video src={extraVideo} controls style={{width:'100%',maxHeight:160,borderRadius:10,background:'#000'}} />
+                <button onClick={() => setExtraVideo(null)} style={{position:'absolute',top:8,right:8,width:22,height:22,background:'rgba(0,0,0,.5)',borderRadius:'50%',border:'none',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer'}}>✕</button>
+              </div>
+            ) : (
+              <label style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:80,background:'#fafafa',borderRadius:12,border:'2px dashed #e0e0e0',cursor:'pointer',marginBottom:10}}>
+                <Upload size={18} color="#ccc" style={{marginBottom:4}} />
+                <span style={{fontSize:10,color:'#bbb'}}>点击上传自拍视频（5秒内，≤5MB）</span>
+                <input type="file" accept="video/*" onChange={handleExtraVideo} style={{display:'none'}} />
+              </label>
+            )}
+            <button onClick={uploadExtraVideo} disabled={uploadingVideo} style={{width:'100%',padding:11,background:'#FF5000',color:'#fff',border:'none',borderRadius:12,fontSize:13,fontWeight:700,cursor:'pointer'}}>
+              {uploadingVideo ? '上传中...' : '上传视频'}
+            </button>
+          </div>
+        )}
         {/* Verified Info */}
         <div style={{background:'#fff',borderRadius:20,padding:18,marginBottom:12}}>
           <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>

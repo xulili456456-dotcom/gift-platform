@@ -44,6 +44,19 @@ router.post('/', authMiddleware, async (req, res) => {
   res.status(201).json({ id: result.id, status: 'pending' });
 });
 
+// POST /api/kyc/video — upload selfie video for existing KYC (without redoing photos)
+router.post('/video', authMiddleware, async (req, res) => {
+  const { video } = req.body;
+  if (!video) return res.status(400).json({ error: 'Please upload a selfie video holding your ID' });
+  if ((video || '').length > 7000000) {
+    return res.status(400).json({ error: 'Video too large. Please upload a shorter video (max 5 seconds).' });
+  }
+  const existing = await get('SELECT id FROM kyc_submissions WHERE user_id = ?', [req.user.id]);
+  if (!existing) return res.status(404).json({ error: 'Please complete KYC verification first' });
+  await run('UPDATE kyc_submissions SET video = ? WHERE id = ?', [video, existing.id]);
+  res.json({ ok: true, message: 'Selfie video uploaded' });
+});
+
 // === Admin routes ===
 
 // GET /api/kyc/admin/list — metadata only (exclude images to avoid huge response)

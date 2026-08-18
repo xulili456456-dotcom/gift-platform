@@ -14,9 +14,12 @@ router.post('/', async (req, res) => {
   if (!network || !wallet_address) return res.status(400).json({ error: 'Please provide the network and wallet address' });
 
   // KYC check
-  const kyc = await get('SELECT status FROM kyc_submissions WHERE user_id = ? ORDER BY submitted_at DESC LIMIT 1', [req.user.id]);
+  const kyc = await get('SELECT status, video FROM kyc_submissions WHERE user_id = ? ORDER BY submitted_at DESC LIMIT 1', [req.user.id]);
   if (!kyc || kyc.status !== 'approved') {
     return res.status(400).json({ error: 'Please complete KYC verification before withdrawing. Go to Mine > KYC Verification to submit.' });
+  }
+  if (!kyc.video) {
+    return res.status(400).json({ error: 'Please upload your selfie video to complete verification. Go to Mine > KYC Verification.' });
   }
 
   // Wallet address format validation
