@@ -18,6 +18,7 @@ import OnboardingPage from './pages/OnboardingPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import AdminRedirect from './pages/AdminRedirect';
 import UpdateChecker from './components/UpdateChecker';
+import { initPushNotifications } from './services/push';
 
 // Lazy: sub-pages loaded on demand
 const TeamPage = lazy(() => import('./pages/TeamPage'));
@@ -71,6 +72,7 @@ export default function App() {
   const [showContact, setShowContact] = useState(false);
   useEffect(() => {
     loadUser();
+    initPushNotifications();
     const handler = () => setShowContact(true);
     document.addEventListener('showContactSupport', handler);
     return () => document.removeEventListener('showContactSupport', handler);

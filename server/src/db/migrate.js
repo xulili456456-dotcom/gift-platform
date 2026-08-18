@@ -461,6 +461,20 @@ async function migrate() {
   try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS fee NUMERIC(10,2) DEFAULT 0`); } catch(e) {}
   try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS net_amount NUMERIC(10,2) DEFAULT 0`); } catch(e) {}
 
+  // Device tokens for push notifications
+  try {
+    await exec(`CREATE TABLE IF NOT EXISTS device_tokens (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      token TEXT NOT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`);
+    await exec(`CREATE INDEX IF NOT EXISTS idx_device_tokens_user ON device_tokens(user_id)`);
+    await exec(`CREATE INDEX IF NOT EXISTS idx_device_tokens_token ON device_tokens(token)`);
+    console.log('Device tokens table ready.');
+  } catch(e) { console.log('Device tokens migration skipped:', e.message); }
+
   console.log('Migrations complete.');
 }
 

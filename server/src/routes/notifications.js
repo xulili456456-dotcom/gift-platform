@@ -1,9 +1,19 @@
 const { Router } = require('express');
 const authMiddleware = require('../middleware/auth');
 const { get, all, run } = require('../db/database');
+const { sendPush } = require('../push');
 
 const router = Router();
 router.use(authMiddleware);
+
+// POST /api/notifications/device — register device token for push notifications
+router.post('/device', async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).json({ error: 'token required' });
+  await run('DELETE FROM device_tokens WHERE token = ?', [token]);
+  await run('INSERT INTO device_tokens (user_id, token) VALUES (?, ?)', [req.user.id, token]);
+  res.json({ ok: true });
+});
 
 // GET /api/notifications
 router.get('/', async (req, res) => {
@@ -34,6 +44,8 @@ router.put('/read-all', async (req, res) => {
 async function notify(userId, title, body, type = 'info') {
   await run('INSERT INTO notifications (user_id, title, body, type) VALUES (?, ?, ?, ?)',
     [userId, title, body, type]);
+  // Also push to the user's devices (no-op until FIREBASE_SERVICE_ACCOUNT is set)
+  sendPush(userId, title, body).catch(() => {});
 }
 
 module.exports = { router, notify };
