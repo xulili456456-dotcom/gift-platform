@@ -410,7 +410,7 @@ export default function KycPage() {
 
         {/* Re-verify button */}
         <button onClick={handleReverify} style={{width:'100%',padding:12,background:'#fff',color:'#FF5000',border:'1px solid #FF5000',borderRadius:14,fontSize:13,fontWeight:600,cursor:'pointer',marginTop:12}}>
-          重新验证证件
+          Re-verify Identity
         </button>
       </>
     );
