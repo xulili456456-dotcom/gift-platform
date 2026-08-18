@@ -353,8 +353,8 @@ export default function KycPage() {
         {/* Missing selfie video prompt */}
         {!kyc?.video && (
           <div style={{background:'#FFF8E1',borderRadius:16,padding:16,marginBottom:12,border:'1px solid #FDE68A'}}>
-            <div style={{fontSize:13,fontWeight:700,color:'#B45309',marginBottom:6}}>⚠️ 请上传自拍视频以完成认证</div>
-            <div style={{fontSize:11,color:'#92400E',marginBottom:12,lineHeight:1.5}}>请上传一段手持身份证的自拍视频（5秒内）。未上传视频将无法提现。</div>
+            <div style={{fontSize:13,fontWeight:700,color:'#B45309',marginBottom:6}}>⚠️ Please upload your selfie video to complete verification</div>
+            <div style={{fontSize:11,color:'#92400E',marginBottom:12,lineHeight:1.5}}>Please upload a short video holding your ID next to your face (within 5 seconds). You will not be able to withdraw until your video is uploaded.</div>
             {extraVideo ? (
               <div style={{position:'relative',background:'#f8f8f8',borderRadius:12,padding:4,marginBottom:10}}>
                 <video src={extraVideo} controls style={{width:'100%',maxHeight:160,borderRadius:10,background:'#000'}} />
@@ -363,12 +363,12 @@ export default function KycPage() {
             ) : (
               <label style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:80,background:'#fafafa',borderRadius:12,border:'2px dashed #e0e0e0',cursor:'pointer',marginBottom:10}}>
                 <Upload size={18} color="#ccc" style={{marginBottom:4}} />
-                <span style={{fontSize:10,color:'#bbb'}}>点击上传自拍视频（5秒内，≤5MB）</span>
+                <span style={{fontSize:10,color:'#bbb'}}>Click to upload selfie video (within 5 seconds, ≤5MB)</span>
                 <input type="file" accept="video/*" onChange={handleExtraVideo} style={{display:'none'}} />
               </label>
             )}
             <button onClick={uploadExtraVideo} disabled={uploadingVideo} style={{width:'100%',padding:11,background:'#FF5000',color:'#fff',border:'none',borderRadius:12,fontSize:13,fontWeight:700,cursor:'pointer'}}>
-              {uploadingVideo ? '上传中...' : '上传视频'}
+              {uploadingVideo ? 'Uploading...' : 'Upload Video'}
             </button>
           </div>
         )}
