@@ -41,5 +41,7 @@ export async function initPushNotifications() {
 // Safe to call repeatedly (e.g. after login); the server dedupes by user.
 export function sendToken() {
   if (!pendingToken) return;
+  // Only send when logged in — otherwise the 401 triggers a full-page reload loop
+  if (!localStorage.getItem('access_token')) return;
   client.post('/notifications/device', { token: pendingToken }).catch(() => {});
 }

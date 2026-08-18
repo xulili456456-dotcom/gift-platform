@@ -17,6 +17,7 @@ export default function KycPage() {
   const [declFlash, setDeclFlash] = useState(false);
   const [extraVideo, setExtraVideo] = useState(null);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [reverifying, setReverifying] = useState(false);
 
   useEffect(() => {
     client.get('/kyc').then(({ data }) => { setKyc(data); setKycLoading(false); }).catch(() => setKycLoading(false));
@@ -107,6 +108,13 @@ export default function KycPage() {
     } finally {
       setUploadingVideo(false);
     }
+  };
+
+  const handleReverify = () => {
+    if (kyc?.real_name) setForm(f => ({ ...f, name: kyc.real_name }));
+    if (kyc?.id_number) setForm(f => ({ ...f, idNumber: kyc.id_number }));
+    if (kyc?.doc_type) setForm(f => ({ ...f, docType: kyc.doc_type }));
+    setReverifying(true);
   };
 
   const submitKyc = () => {
@@ -399,6 +407,11 @@ export default function KycPage() {
             </div>
           </div>
         </div>
+
+        {/* Re-verify button */}
+        <button onClick={handleReverify} style={{width:'100%',padding:12,background:'#fff',color:'#FF5000',border:'1px solid #FF5000',borderRadius:14,fontSize:13,fontWeight:600,cursor:'pointer',marginTop:12}}>
+          重新验证证件
+        </button>
       </>
     );
   };
@@ -472,7 +485,8 @@ export default function KycPage() {
         {/* ===== Content by Status ===== */}
         {isUnverified && renderForm()}
         {isPending && renderPending()}
-        {isVerified && renderVerified()}
+        {isVerified && !reverifying && renderVerified()}
+        {isVerified && reverifying && renderForm()}
 
         {/* ===== Shared: Requirements + Rejection Reasons (only for unverified/rejected) ===== */}
         {isUnverified && (

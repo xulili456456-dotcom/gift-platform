@@ -30,11 +30,11 @@ router.post('/', authMiddleware, async (req, res) => {
 
   const existing = await get('SELECT id, status FROM kyc_submissions WHERE user_id = ?', [req.user.id]);
   if (existing) {
-    if (existing.status !== 'rejected') return res.status(400).json({ error: 'already submitted' });
-    // Rejected — allow resubmit by updating the existing record
+    if (existing.status === 'pending') return res.status(400).json({ error: 'Your verification is already under review' });
+    // Rejected or approved — allow re-submit / re-verify
     await run('UPDATE kyc_submissions SET doc_type = ?, real_name = ?, id_number = ?, front_image = ?, back_image = ?, video = ?, status = ?, submitted_at = NOW(), reviewed_at = NULL, admin_note = NULL WHERE id = ?',
       [doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', video || null, 'pending', existing.id]);
-    return res.json({ id: existing.id, status: 'pending', message: 'Resubmitted for review' });
+    return res.json({ id: existing.id, status: 'pending', message: 'Submitted for review' });
   }
 
   const result = await insert(
