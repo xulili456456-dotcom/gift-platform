@@ -16,6 +16,7 @@ const TIERS = {
 
 // Product profit formula — deterministic per product per day (no Math.random)
 const FREE_PROFIT_RATE = 0.03;
+const FREE_LIFETIME_SLOTS = 5; // permanent free orders per user (was 10)
 
 function seededRand(seed) {
   var x = Math.sin(seed * 9301 + 49297) * 49297;
@@ -186,7 +187,7 @@ router.post('/orders/process', async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
 
   // Free lifetime orders: 10 total per user, each product max 1 free order
-  const FREE_SLOTS = 10;
+  const FREE_SLOTS = FREE_LIFETIME_SLOTS;
   const FREE_MAX_COST = 50;
   const freeKey = 'free_lifetime_' + req.user.id;
   const freeProductKey = 'free_prod_' + req.user.id + '_' + pName;
@@ -536,7 +537,7 @@ router.get('/free-products', authMiddleware, async (req, res) => {
   }
 
   const count = await get("SELECT value FROM admin_settings WHERE key = ?", [countKey]);
-  const remaining = Math.max(0, 10 - Number(count?.value || 0));
+  const remaining = Math.max(0, FREE_LIFETIME_SLOTS - Number(count?.value || 0));
 
   // Get already-claimed free product names (lifetime)
   const claimedRows = await all(
@@ -546,7 +547,7 @@ router.get('/free-products', authMiddleware, async (req, res) => {
   const prefix = 'free_prod_' + req.user.id + '_';
   const claimedNames = claimedRows.map(r => r.key.replace(prefix, ''));
 
-  res.json({ products, remaining, totalFree: 10, claimedNames, freeExhausted: remaining <= 0 });
+  res.json({ products, remaining, totalFree: FREE_LIFETIME_SLOTS, claimedNames, freeExhausted: remaining <= 0 });
 });
 
 // POST /api/store/claim-free/:productId — claim AND buy a free product
@@ -584,7 +585,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
     const count = await t.get("SELECT value FROM admin_settings WHERE key = $1", [countKey]);
     const prodCount = await t.get("SELECT value FROM admin_settings WHERE key = $1", [productKey]);
     const used = Number(count?.value || 0);
-    if (used >= 10) { await t.rollback(); return res.status(400).json({ error: 'All 10 free orders used' }); }
+    if (used >= FREE_LIFETIME_SLOTS) { await t.rollback(); return res.status(400).json({ error: 'All ' + FREE_LIFETIME_SLOTS + ' free orders used' }); }
     if (Number(prodCount?.value || 0) >= 1) { await t.rollback(); return res.status(400).json({ error: 'You already claimed this product today' }); }
 
     const sellHours = 6 + Math.random() * 24;
@@ -595,7 +596,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
     await t.run("UPDATE admin_settings SET value = '1' WHERE key = $1", [productKey]);
     await t.commit();
     try { require('./notifications').notify(req.user.id, '🔥 Free Order Grabbed!', `${product.name} - Profit $${profit}`, 'success'); } catch {}
-    res.json({ id: result.id, cost: 0, profit, totalReturn, sellBy, status: 'holding', isFreeOrder: true, remaining: Math.max(0, 10 - used - 1) });
+    res.json({ id: result.id, cost: 0, profit, totalReturn, sellBy, status: 'holding', isFreeOrder: true, remaining: Math.max(0, FREE_LIFETIME_SLOTS - used - 1) });
   } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 

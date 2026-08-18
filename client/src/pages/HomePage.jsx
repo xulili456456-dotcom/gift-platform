@@ -243,7 +243,7 @@ export default function HomePage() {
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,.65)', marginBottom: 16, position: 'relative', zIndex: 1 }}>{t('home.grabSubtitle')}</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'rgba(255,255,255,.7)', marginBottom: 16, position: 'relative', zIndex: 1 }}>
           <div style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%', animation: 'breathe 1.5s ease-in-out infinite' }} />
-          {freeRemaining > 0 ? freeRemaining : 'All 10'} free grabs used · {tier.name}
+          {freeRemaining > 0 ? freeRemaining : 'All 5'} free grabs used · {tier.name}
         </div>
         <span onClick={(e) => { e.stopPropagation(); navigate('/store'); }} className="home-hero-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: 'var(--pri)', padding: '10px 22px', borderRadius: 10, fontSize: 13, fontWeight: 600, position: 'relative', zIndex: 1 }}>
           {t('home.grabNow')} →
@@ -294,7 +294,7 @@ export default function HomePage() {
             <span style={{ animation: 'urgencyPulse 1s ease-in-out infinite', color: 'var(--green)' }}>{t('home.freeOrders')}</span>
           </h3>
           <span style={{ fontSize: 10, background: 'rgba(0,168,107,.08)', color: 'var(--green)', padding: '3px 8px', borderRadius: 4, fontWeight: 600, animation: 'urgencyPulse 1s ease-in-out infinite' }}>
-            {t('home.freeLeft', { n: freeRemaining })}/10 lifetime
+            {t('home.freeLeft', { n: freeRemaining })}
           </span>
         </div>
         {freeProducts.length === 0 ? (

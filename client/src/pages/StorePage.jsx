@@ -696,7 +696,7 @@ export default function StorePage() {
       {/* Stats Strip */}
       <div style={{display:'flex',padding:'10px 16px',gap:0,borderBottom:'1px solid #f5f5f5',background:'#fff'}}>
         <div style={{flex:1,textAlign:'center'}}>
-          <div style={{fontSize:17,fontWeight:800,color:'#FF5000'}}>{s.freeRemaining||0}/10</div>
+          <div style={{fontSize:17,fontWeight:800,color:'#FF5000'}}>{s.freeRemaining||0}/5</div>
           <div style={{fontSize:9,color:'#999',marginTop:1}}>Free Orders</div>
         </div>
         <div style={{width:1,background:'#f0f0f0',margin:'4px 0'}} />
@@ -897,7 +897,7 @@ export default function StorePage() {
             </div>
             <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
               <p className="text-[9px] text-[#565959]">🔥 Free Orders</p>
-              <p className="text-sm font-bold text-[#0F1111]">{s.freeRemaining||0}/10</p>
+              <p className="text-sm font-bold text-[#0F1111]">{s.freeRemaining||0}/5</p>
             </div>
             <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
               <p className="text-[9px] text-[#565959]">📈 Today Earned</p>
