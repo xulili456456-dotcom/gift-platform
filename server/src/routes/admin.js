@@ -251,11 +251,21 @@ router.get('/withdrawals', async (req, res) => {
     [...params, limit, offset]
   );
   const countRow = await get('SELECT COUNT(*) as total FROM withdrawals w ' + where, params);
+  const summary = await all(
+    `SELECT created_at::date::text as d,
+            COALESCE(SUM(amount) FILTER (WHERE status = 'completed'), 0) as completed,
+            COALESCE(SUM(amount) FILTER (WHERE status = 'pending'), 0) as pending
+     FROM withdrawals
+     WHERE created_at::date >= CURRENT_DATE - INTERVAL '6 days'
+     GROUP BY created_at::date
+     ORDER BY d DESC`
+  );
   res.json({
     withdrawals: rows,
     total: countRow ? countRow.total : 0,
     page: parseInt(page),
     limit: parseInt(limit),
+    summary,
   });
 });
 
