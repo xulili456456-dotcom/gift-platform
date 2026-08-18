@@ -79,7 +79,7 @@ export default function KycPage() {
   const handleVideo = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { toast.error('Video too large (max 5MB, 5 seconds)'); return; }
+    if (file.size > 10 * 1024 * 1024) { toast.error('Video too large (max 10MB)'); return; }
     const reader = new FileReader();
     reader.onload = () => setForm({ ...form, video: reader.result });
     reader.readAsDataURL(file);
@@ -88,7 +88,7 @@ export default function KycPage() {
   const handleExtraVideo = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { toast.error('Video too large (max 5MB, 5 seconds)'); return; }
+    if (file.size > 10 * 1024 * 1024) { toast.error('Video too large (max 10MB)'); return; }
     const reader = new FileReader();
     reader.onload = () => setExtraVideo(reader.result);
     reader.readAsDataURL(file);
@@ -363,7 +363,7 @@ export default function KycPage() {
             ) : (
               <label style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:80,background:'#fafafa',borderRadius:12,border:'2px dashed #e0e0e0',cursor:'pointer',marginBottom:10}}>
                 <Upload size={18} color="#ccc" style={{marginBottom:4}} />
-                <span style={{fontSize:10,color:'#bbb'}}>Click to upload selfie video (within 5 seconds, ≤5MB)</span>
+                <span style={{fontSize:10,color:'#bbb'}}>Click to upload selfie video (within 5 seconds, ≤10MB)</span>
                 <input type="file" accept="video/*" onChange={handleExtraVideo} style={{display:'none'}} />
               </label>
             )}

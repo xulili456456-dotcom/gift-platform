@@ -41,11 +41,11 @@ router.put('/read-all', async (req, res) => {
 });
 
 // Helper: add notification
-async function notify(userId, title, body, type = 'info') {
+async function notify(userId, title, body, type = 'info', url = '/mine/notifications') {
   await run('INSERT INTO notifications (user_id, title, body, type) VALUES (?, ?, ?, ?)',
     [userId, title, body, type]);
   // Also push to the user's devices (no-op until FIREBASE_SERVICE_ACCOUNT is set)
-  sendPush(userId, title, body).catch(() => {});
+  sendPush(userId, title, body, url).catch(() => {});
 }
 
 module.exports = { router, notify };

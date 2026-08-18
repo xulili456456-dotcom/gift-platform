@@ -24,8 +24,8 @@ router.post('/', authMiddleware, async (req, res) => {
     return res.status(400).json({ error: 'Image too large. Please compress or use a smaller file.' });
   }
   if (!video) return res.status(400).json({ error: 'Please upload a selfie video holding your ID' });
-  if ((video || '').length > 7000000) {
-    return res.status(400).json({ error: 'Video too large. Please upload a shorter video (max 5 seconds).' });
+  if ((video || '').length > 10000000) {
+    return res.status(400).json({ error: 'Video too large. Please upload a shorter video (max 10MB).' });
   }
 
   const existing = await get('SELECT id, status FROM kyc_submissions WHERE user_id = ?', [req.user.id]);
@@ -48,8 +48,8 @@ router.post('/', authMiddleware, async (req, res) => {
 router.post('/video', authMiddleware, async (req, res) => {
   const { video } = req.body;
   if (!video) return res.status(400).json({ error: 'Please upload a selfie video holding your ID' });
-  if ((video || '').length > 7000000) {
-    return res.status(400).json({ error: 'Video too large. Please upload a shorter video (max 5 seconds).' });
+  if ((video || '').length > 10000000) {
+    return res.status(400).json({ error: 'Video too large. Please upload a shorter video (max 10MB).' });
   }
   const existing = await get('SELECT id FROM kyc_submissions WHERE user_id = ?', [req.user.id]);
   if (!existing) return res.status(404).json({ error: 'Please complete KYC verification first' });
@@ -130,6 +130,26 @@ router.put('/admin/:id/freeze', authMiddleware, adminMiddleware, async (req, res
     'Your account has been suspended due to suspected fraudulent identity verification. Please contact support.', 'error');
 
   res.json({ ok: true, frozen: true });
+});
+
+// PUT /api/kyc/admin/:id/reset — clear verification, force user to re-submit
+router.put('/admin/:id/reset', authMiddleware, adminMiddleware, async (req, res) => {
+  const { admin_note } = req.body;
+  const kyc = await get('SELECT user_id FROM kyc_submissions WHERE id = ?', [req.params.id]);
+  if (!kyc) return res.status(404).json({ error: 'KYC record not found' });
+
+  await run("UPDATE kyc_submissions SET status = 'rejected', admin_note = ?, reviewed_at = NOW() WHERE id = ?",
+    [admin_note || 'Please resubmit your identity verification', req.params.id]);
+
+  try {
+    await insert('INSERT INTO admin_audit_log (admin_id, action, target_user_id, detail) VALUES (?,?,?,?)',
+      [req.user.id, 'kyc_reset', kyc.user_id, admin_note || 'resubmit requested']);
+  } catch (e) { console.error('Audit log failed:', e.message); }
+
+  await notify(kyc.user_id, 'Verification Required',
+    'Please resubmit your identity verification for review. ' + (admin_note || ''), 'warning');
+
+  res.json({ ok: true });
 });
 
 module.exports = router;

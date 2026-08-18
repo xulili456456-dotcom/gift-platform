@@ -20,7 +20,7 @@ function getMessaging() {
   return messaging;
 }
 
-async function sendPush(userId, title, body) {
+async function sendPush(userId, title, body, url = '/mine/notifications') {
   const m = getMessaging();
   if (!m) return;
   const { all } = require('./db/database');
@@ -28,7 +28,11 @@ async function sendPush(userId, title, body) {
     const tokens = await all('SELECT token FROM device_tokens WHERE user_id = ?', [userId]);
     const list = (tokens || []).map((t) => t.token);
     if (!list.length) return;
-    await m.sendEachForMulticast({ tokens: list, notification: { title, body } });
+    await m.sendEachForMulticast({
+      tokens: list,
+      notification: { title, body },
+      data: { url },
+    });
   } catch (e) {
     console.error('Push send failed:', e.message);
   }

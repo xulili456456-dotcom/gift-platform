@@ -29,8 +29,10 @@ export async function initPushNotifications() {
       // Foreground push — data already arrives via the in-app notification system
     });
 
-    PushNotifications.addListener('pushNotificationActionPerformed', () => {
-      // User tapped a notification — Android opens the app by default
+    PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
+      // Navigate to the page the notification points at
+      const url = action?.notification?.data?.url;
+      if (url) window.location.href = url;
     });
   } catch (e) {
     // ignore

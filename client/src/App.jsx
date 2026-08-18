@@ -9,11 +9,8 @@ import ProtectedRoute from './components/shared/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
-import RedEnvelopePage from './pages/RedEnvelopePage';
 import TasksPage from './pages/TasksPage';
 import MinePage from './pages/MinePage';
-import StorePage from './pages/StorePage';
-import StoreFundsPage from './pages/StoreFundsPage';
 import OnboardingPage from './pages/OnboardingPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import AdminRedirect from './pages/AdminRedirect';
@@ -37,6 +34,9 @@ const DepositPage = lazy(() => import('./pages/DepositPage'));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
 const GiftDetailPage = lazy(() => import('./pages/GiftDetailPage'));
 const InvitePage = lazy(() => import('./pages/InvitePage'));
+const RedEnvelopePage = lazy(() => import('./pages/RedEnvelopePage'));
+const StorePage = lazy(() => import('./pages/StorePage'));
+const StoreFundsPage = lazy(() => import('./pages/StoreFundsPage'));
 
 const PageLoader = () => (
   <div className="min-h-screen bg-bg flex items-center justify-center">
@@ -120,10 +120,10 @@ export default function App() {
 
         <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
           <Route path="/home" element={<HomePage />} />
-          <Route path="/red-envelope" element={<RedEnvelopePage />} />
+          <Route path="/red-envelope" element={<Lazy Comp={RedEnvelopePage} />} />
           <Route path="/tasks" element={<TasksPage />} />
-          <Route path="/store/funds" element={<StoreFundsPage />} />
-          <Route path="/store" element={<StorePage />} />
+          <Route path="/store/funds" element={<Lazy Comp={StoreFundsPage} />} />
+          <Route path="/store" element={<Lazy Comp={StorePage} />} />
           <Route path="/mine" element={<MinePage />} />
           <Route path="/mine/team" element={<Lazy Comp={TeamPage} />} />
           <Route path="/mine/wallet" element={<Lazy Comp={WalletPage} />} />
