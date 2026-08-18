@@ -54,7 +54,7 @@ export default function LoginPage() {
         <div style={{fontSize:13,color:'#999',marginBottom:32}}>{t('auth.welcomeBack')}</div>
 
         <form onSubmit={handleSubmit}>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder={t('auth.placeholderEmail')} autoFocus
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder={t('auth.placeholderEmail')}
             style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:12,outline:'none'}} />
           <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder={t('auth.placeholderPass')}
             style={{width:'100%',padding:'14px 16px',border:'1.5px solid #eee',borderRadius:12,fontSize:14,marginBottom:8,outline:'none'}} />
