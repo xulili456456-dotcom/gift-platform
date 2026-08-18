@@ -14,6 +14,7 @@ const langs = [
   { code: 'es', label: 'Español', flag: '🇪🇸' },
   { code: 'ja', label: '日本語', flag: '🇯🇵' },
   { code: 'ms', label: 'Bahasa Melayu', flag: '🇲🇾' },
+  { code: 'id', label: 'Bahasa Indonesia', flag: '🇮🇩' },
   { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
   { code: 'it', label: 'Italiano', flag: '🇮🇹' },
 ];
