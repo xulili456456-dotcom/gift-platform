@@ -241,15 +241,47 @@ router.get('/definitions', require('../middleware/admin'), async (req, res) => {
   } catch (e) { res.status(500).json({ error: 'Failed' }); }
 });
 
-// Admin: PUT /api/tasks/definitions/:id
+// Admin: PUT /api/tasks/definitions/:id — update any fields
 router.put('/definitions/:id', require('../middleware/admin'), async (req, res) => {
   try {
-    const { active, reward } = req.body;
-    if (typeof active !== 'undefined') await run('UPDATE task_definitions SET active = ? WHERE id = ?', [active ? 1 : 0, req.params.id]);
-    if (typeof reward !== 'undefined') await run('UPDATE task_definitions SET reward = ? WHERE id = ?', [Number(reward), req.params.id]);
+    const allowed = ['task_type','category','title','description','icon','icon_bg','target_count','target_value','reward','reward_color','reset_period','sort_order','active'];
+    const sets = [];
+    const vals = [];
+    for (const f of allowed) {
+      if (req.body[f] !== undefined) {
+        sets.push(`${f} = ?`);
+        vals.push(f === 'active' ? (req.body[f] ? 1 : 0) : req.body[f]);
+      }
+    }
+    if (sets.length === 0) return res.status(400).json({ error: 'No fields to update' });
+    vals.push(req.params.id);
+    await run(`UPDATE task_definitions SET ${sets.join(', ')} WHERE id = ?`, vals);
     const updated = await get('SELECT * FROM task_definitions WHERE id = ?', [req.params.id]);
     res.json(updated);
   } catch (e) { res.status(500).json({ error: 'Update failed' }); }
+});
+
+// Admin: POST /api/tasks/definitions — create a task
+router.post('/definitions', require('../middleware/admin'), async (req, res) => {
+  try {
+    const { task_type, title, reward } = req.body;
+    if (!task_type || !title || reward === undefined) return res.status(400).json({ error: 'task_type, title and reward required' });
+    const result = await insert('INSERT INTO task_definitions (task_type, category, title, description, icon, icon_bg, target_count, target_value, reward, reward_color, reset_period, sort_order, active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
+      [task_type, req.body.category || 'trading', title, req.body.description || '', req.body.icon || '📦', req.body.icon_bg || '#FFF5F0',
+       req.body.target_count ? Number(req.body.target_count) : 0, req.body.target_value ? Number(req.body.target_value) : 0,
+       Number(reward), req.body.reward_color || '#FF5000', req.body.reset_period || 'one_time', req.body.sort_order ? Number(req.body.sort_order) : 0,
+       req.body.active === undefined ? 1 : (req.body.active ? 1 : 0)]);
+    const created = await get('SELECT * FROM task_definitions WHERE id = ?', [result.id]);
+    res.status(201).json(created);
+  } catch (e) { res.status(500).json({ error: 'Create failed: ' + e.message }); }
+});
+
+// Admin: DELETE /api/tasks/definitions/:id
+router.delete('/definitions/:id', require('../middleware/admin'), async (req, res) => {
+  try {
+    await run('DELETE FROM task_definitions WHERE id = ?', [req.params.id]);
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: 'Delete failed' }); }
 });
 
 // Admin: POST /api/admin/notifications/send

@@ -349,9 +349,6 @@ async function migrate() {
       }
       console.log('Seeded '+taskList.length+' default tasks.');
     }
-    // Convert all non-checkin tasks to one-time
-    await run("UPDATE task_definitions SET reset_period = 'one_time' WHERE task_type != 'daily_checkin'");
-    console.log('All non-checkin tasks set to one_time.');
   } catch (e) { console.log('Task seed skipped:', e.message); }
   // Configure the 5 active one-time tasks (targets/rewards)
   try {
