@@ -98,7 +98,7 @@ export default function KycPage() {
     setUploadingVideo(true);
     try {
       await client.post('/kyc/video', { video: extraVideo });
-      toast.success('Selfie video uploaded');
+      toast.success('Selfie video uploaded, pending review');
       setExtraVideo(null);
       const { data } = await client.get('/kyc');
       setKyc(data);

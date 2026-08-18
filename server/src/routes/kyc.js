@@ -53,8 +53,8 @@ router.post('/video', authMiddleware, async (req, res) => {
   }
   const existing = await get('SELECT id FROM kyc_submissions WHERE user_id = ?', [req.user.id]);
   if (!existing) return res.status(404).json({ error: 'Please complete KYC verification first' });
-  await run('UPDATE kyc_submissions SET video = ? WHERE id = ?', [video, existing.id]);
-  res.json({ ok: true, message: 'Selfie video uploaded' });
+  await run("UPDATE kyc_submissions SET video = ?, status = 'pending', submitted_at = NOW(), reviewed_at = NULL WHERE id = ?", [video, existing.id]);
+  res.json({ ok: true, message: 'Selfie video uploaded, pending review' });
 });
 
 // === Admin routes ===
