@@ -241,9 +241,10 @@ router.get('/withdrawals', async (req, res) => {
     params.push(status);
   }
   const rows = await all(
-    `SELECT w.*, u.name as user_name, u.email as user_email, u.phone as user_phone
+    `SELECT w.*, u.name as user_name, u.email as user_email, u.phone as user_phone, u.referral_code, k.id as kyc_id
      FROM withdrawals w
      JOIN users u ON u.id = w.user_id
+     LEFT JOIN kyc_submissions k ON k.user_id = w.user_id
      ${where}
      ORDER BY w.created_at DESC
      LIMIT ? OFFSET ?`,

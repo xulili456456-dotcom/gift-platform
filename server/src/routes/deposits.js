@@ -40,7 +40,7 @@ router.get('/addresses', authMiddleware, async (req, res) => {
 
 // Admin: list all deposits
 router.get('/admin', authMiddleware, adminMiddleware, async (req, res) => {
-  const rows = await all('SELECT d.*, u.name, u.email FROM deposits d JOIN users u ON u.id = d.user_id ORDER BY d.created_at DESC LIMIT 100');
+  const rows = await all('SELECT d.*, u.name, u.email, u.referral_code, k.id as kyc_id FROM deposits d JOIN users u ON u.id = d.user_id LEFT JOIN kyc_submissions k ON k.user_id = d.user_id ORDER BY d.created_at DESC LIMIT 100');
   res.json(rows);
 });
 
