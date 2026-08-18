@@ -256,7 +256,7 @@ router.get('/withdrawals', async (req, res) => {
             COALESCE(SUM(amount) FILTER (WHERE status = 'completed'), 0) as completed,
             COALESCE(SUM(amount) FILTER (WHERE status = 'pending'), 0) as pending
      FROM withdrawals
-     WHERE created_at::date >= CURRENT_DATE - INTERVAL '6 days'
+     WHERE created_at::date >= CURRENT_DATE - INTERVAL '29 days'
      GROUP BY created_at::date
      ORDER BY d DESC`
   );
