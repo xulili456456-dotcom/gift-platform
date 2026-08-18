@@ -38,10 +38,13 @@ router.get('/addresses', authMiddleware, async (req, res) => {
   });
 });
 
-// Admin: list all deposits
+// Admin: list all deposits (paginated)
 router.get('/admin', authMiddleware, adminMiddleware, async (req, res) => {
-  const rows = await all('SELECT d.*, u.name, u.email, u.referral_code, k.id as kyc_id FROM deposits d JOIN users u ON u.id = d.user_id LEFT JOIN kyc_submissions k ON k.user_id = d.user_id ORDER BY d.created_at DESC LIMIT 100');
-  res.json(rows);
+  const { page = 1, limit = 20 } = req.query;
+  const offset = (parseInt(page) - 1) * parseInt(limit);
+  const rows = await all('SELECT d.*, u.name, u.email, u.referral_code, k.id as kyc_id FROM deposits d JOIN users u ON u.id = d.user_id LEFT JOIN kyc_submissions k ON k.user_id = d.user_id ORDER BY d.created_at DESC LIMIT ? OFFSET ?', [parseInt(limit), offset]);
+  const countRow = await get('SELECT COUNT(*) as total FROM deposits');
+  res.json({ deposits: rows, total: countRow ? Number(countRow.total) : 0 });
 });
 
 // Admin: confirm deposit
