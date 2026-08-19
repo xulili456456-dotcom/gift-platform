@@ -7,7 +7,7 @@ const isNativeApp = Capacitor.isNativePlatform() ||
   (typeof window !== 'undefined' && window.location.origin === 'https://localhost');
 
 const client = axios.create({
-  baseURL: isNativeApp || window.location.hostname === 'www.shopeetrade.com' ? 'https://gift-platform-h6um.onrender.com/api' : '/api',
+  baseURL: isNativeApp || window.location.hostname === 'www.shopeetrade.com' ? 'https://amashopstore.com/api' : '/api',
   timeout: 60000,
   headers: { 'Content-Type': 'application/json' },
 });

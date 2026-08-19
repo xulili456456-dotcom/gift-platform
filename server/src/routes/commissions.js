@@ -23,7 +23,7 @@ router.post('/claim', authMiddleware, async (req, res) => {
 
   // Generate share link with tracking — include image path
   const user = await get('SELECT referral_code FROM users WHERE id = ?', [req.user.id]);
-  const baseUrl = process.env.BASE_URL || 'https://gift-platform-h6um.onrender.com';
+  const baseUrl = process.env.BASE_URL || 'https://amashopstore.com';
   const imgParam = encodeURIComponent(productImg || `/products/${productId || 1}.jpg`);
   const shareUrl = `${baseUrl}/buy?ref=${user.referral_code}&pid=${result.id}&img=${imgParam}`;
 

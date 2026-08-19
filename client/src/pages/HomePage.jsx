@@ -304,7 +304,7 @@ export default function HomePage() {
             {freeProducts.map((p) => {
               const claimed = freeClaimed.includes(p.name) || grabbedCards.has(p.name);
               const profit = Math.round(p.price * 0.03 * 100) / 100;
-              const imgUrl = p.img ? (p.img.startsWith('http') ? p.img : `https://gift-platform-h6um.onrender.com${p.img}`) : '';
+              const imgUrl = p.img ? (p.img.startsWith('http') ? p.img : `https://amashopstore.com${p.img}`) : '';
               return (
                 <div key={p.id} onClick={() => !claimed && handleGrab(p.id, p.name)}
                   className="home-free-card"
@@ -358,7 +358,7 @@ export default function HomePage() {
                   style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < holdings.length - 1 ? '1px solid #f0f0f5' : 'none', cursor: 'pointer' }}>
                   <div style={{ width: 56, height: 42, borderRadius: 7, overflow: 'hidden', flexShrink: 0, background: '#f5f5f7' }}>
                     {h.img ? (
-                      <img src={h.img.startsWith('http') ? h.img : `https://gift-platform-h6um.onrender.com${h.img}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={h.img.startsWith('http') ? h.img : `https://amashopstore.com${h.img}`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#E8F8F0' }}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
