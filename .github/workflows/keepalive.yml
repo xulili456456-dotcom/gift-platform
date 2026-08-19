@@ -1,0 +1,14 @@
+name: keepalive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake Render server
+        run: |
+          curl -sS -o /dev/null -w "keepalive HTTP %{http_code}\n" https://gift-platform-h6um.onrender.com || true
