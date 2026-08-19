@@ -180,7 +180,7 @@ export default function StorePage() {
             )}
 
             <div className="text-center mt-16">
-              <a href="https://gift-platform-h6um.onrender.com/" target="_blank" rel="noopener noreferrer" className="btn btn-outline no-underline">
+              <a href="https://amashopstore.com/" target="_blank" rel="noopener noreferrer" className="btn btn-outline no-underline">
                 <ExternalLink size={16} />
                 {t('store.viewApp')}
               </a>

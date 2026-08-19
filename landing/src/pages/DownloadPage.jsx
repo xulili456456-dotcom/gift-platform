@@ -41,7 +41,7 @@ export default function DownloadPage() {
         {/* CTA */}
         <div className="text-center">
           <a
-            href="https://gift-platform-h6um.onrender.com/register"
+            href="https://amashopstore.com/register"
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-accent btn-lg inline-flex items-center gap-2 text-lg no-underline"
