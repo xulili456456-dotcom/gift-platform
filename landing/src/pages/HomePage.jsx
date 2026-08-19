@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Star, TrendingUp, Package, Truck, Headphones, ShoppingCart, DollarSign, Shield, X, BadgeCheck, CreditCard, Lock, Wallet } from 'lucide-react'
+import { ArrowRight, Star, TrendingUp, Package, Truck, Headphones, ShoppingCart, DollarSign, Shield, X, BadgeCheck, CreditCard, Lock, Wallet, Download } from 'lucide-react'
 import SEO from '../components/SEO'
 
 // ═══════ Hooks ═══════
@@ -196,7 +196,10 @@ export default function HomePage() {
               </p>
 
               <div className="animate-fade-in-up flex flex-col sm:flex-row items-center justify-center gap-4" style={{ animationDelay: '0.2s' }}>
-                <a href="https://amashopstore.com/register" target="_blank" rel="noopener noreferrer" className="btn btn-accent btn-lg no-underline">
+                <a href="https://github.com/xulili456456-dotcom/gift-platform/releases/latest/download/Shopping-release.apk" className="btn btn-accent btn-lg no-underline">
+                  <Download size={18} />{t('download.downloadApk')}
+                </a>
+                <a href="https://amashopstore.com/register" target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-lg no-underline">
                   Get Started — It's Free<ArrowRight size={18} />
                 </a>
                 <Link to="/store" className="btn btn-outline btn-lg no-underline"><ShoppingCart size={18} />Browse Products</Link>
