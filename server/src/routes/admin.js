@@ -260,12 +260,30 @@ router.get('/withdrawals', async (req, res) => {
      GROUP BY created_at::date
      ORDER BY d DESC`
   );
+  const dupRows = await all(
+    `SELECT wallet_address,
+            COUNT(DISTINCT user_id) as user_count,
+            COUNT(*) as tx_count,
+            SUM(amount) as total_amount,
+            STRING_AGG(DISTINCT COALESCE(u.name, u.email) || ' (#' || u.id::text || ')', ', ') as users
+     FROM withdrawals w
+     JOIN users u ON u.id = w.user_id
+     WHERE w.wallet_address IS NOT NULL AND w.wallet_address != ''
+     GROUP BY w.wallet_address
+     HAVING COUNT(DISTINCT w.user_id) > 1
+     ORDER BY user_count DESC, total_amount DESC`
+  );
+  const dupSet = new Set((dupRows || []).map(r => r.wallet_address));
+  for (const r of rows) {
+    if (r.wallet_address && dupSet.has(r.wallet_address)) r.dup = true;
+  }
   res.json({
     withdrawals: rows,
     total: countRow ? countRow.total : 0,
     page: parseInt(page),
     limit: parseInt(limit),
     summary,
+    dupAddresses: dupRows,
   });
 });
 
