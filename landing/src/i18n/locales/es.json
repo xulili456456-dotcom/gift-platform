@@ -30,12 +30,36 @@
     "title": "Tus tareas provienen de pedidos reales en estas plataformas",
     "desc": "Integramos con 20+ APIs globales de e-commerce — Amazon, Shopee, Lazada, AliExpress, TikTok Shop y más. Cada tarea representa una transacción real. Tú ganas el margen, nosotros manejamos la cadena de suministro y logística.",
     "items": [
-      { "name": "Amazon", "desc": "El marketplace más grande del mundo, 300M+ clientes", "color": "#FF9900" },
-      { "name": "Shopee", "desc": "#1 en el Sudeste Asiático, 700M+ usuarios", "color": "#EE4D2D" },
-      { "name": "Lazada", "desc": "6 países en el Sudeste Asiático", "color": "#0F1470" },
-      { "name": "AliExpress", "desc": "Plataforma global de comercio transfronterizo", "color": "#E62E04" },
-      { "name": "TikTok Shop", "desc": "El comercio social de más rápido crecimiento", "color": "#000000" },
-      { "name": "eBay", "desc": "Gigante global del marketplace C2C", "color": "#0064D2" }
+      {
+        "name": "Amazon",
+        "desc": "El marketplace más grande del mundo, 300M+ clientes",
+        "color": "#FF9900"
+      },
+      {
+        "name": "Shopee",
+        "desc": "#1 en el Sudeste Asiático, 700M+ usuarios",
+        "color": "#EE4D2D"
+      },
+      {
+        "name": "Lazada",
+        "desc": "6 países en el Sudeste Asiático",
+        "color": "#0F1470"
+      },
+      {
+        "name": "AliExpress",
+        "desc": "Plataforma global de comercio transfronterizo",
+        "color": "#E62E04"
+      },
+      {
+        "name": "TikTok Shop",
+        "desc": "El comercio social de más rápido crecimiento",
+        "color": "#000000"
+      },
+      {
+        "name": "eBay",
+        "desc": "Gigante global del marketplace C2C",
+        "color": "#0064D2"
+      }
     ]
   },
   "value": {
@@ -43,10 +67,26 @@
     "title": "Gana beneficios de e-commerce sin ser vendedor",
     "desc": "El e-commerce tradicional implica abastecimiento, inventario, operaciones, soporte y envíos. Nosotros nos encargamos de todo. Tú solo eliges tareas y compartes enlaces — gana una comisión por cada venta.",
     "items": [
-      { "icon": "Package", "title": "Sin Inventario", "desc": "Sin stock, sin costos iniciales. Conexión directa a la cadena de suministro global — empieza con $0." },
-      { "icon": "Truck", "title": "Gestionamos la Logística", "desc": "Amazon FBA, Shopee Xpress y mensajería asociada cumplen cada pedido automáticamente." },
-      { "icon": "Headphones", "title": "Sin Atención al Cliente", "desc": "El servicio postventa lo gestionan las plataformas y marcas. Tú te enfocas solo en promocionar." },
-      { "icon": "TrendingUp", "title": "Márgenes Transparentes", "desc": "Precio de costo, precio de mercado, tu beneficio — todo visible por adelantado. Lo que ves es lo que ganas." }
+      {
+        "icon": "Package",
+        "title": "Sin Inventario",
+        "desc": "Sin stock, sin costos iniciales. Conexión directa a la cadena de suministro global — empieza con $0."
+      },
+      {
+        "icon": "Truck",
+        "title": "Gestionamos la Logística",
+        "desc": "Amazon FBA, Shopee Xpress y mensajería asociada cumplen cada pedido automáticamente."
+      },
+      {
+        "icon": "Headphones",
+        "title": "Sin Atención al Cliente",
+        "desc": "El servicio postventa lo gestionan las plataformas y marcas. Tú te enfocas solo en promocionar."
+      },
+      {
+        "icon": "TrendingUp",
+        "title": "Márgenes Transparentes",
+        "desc": "Precio de costo, precio de mercado, tu beneficio — todo visible por adelantado. Lo que ves es lo que ganas."
+      }
     ]
   },
   "how": {
@@ -125,16 +165,44 @@
     "size": "~15MB",
     "features_title": "Características",
     "features": [
-      { "icon": "Zap", "title": "Súper Rápido", "desc": "Experiencia nativa, más rápida que la web" },
-      { "icon": "Bell", "title": "Alertas en Vivo", "desc": "Notificaciones instantáneas de tareas y recompensas" },
-      { "icon": "Shield", "title": "Seguro", "desc": "Datos encriptados con seguridad bancaria" },
-      { "icon": "Smartphone", "title": "Sin Conexión", "desc": "Ve tareas y ganancias incluso sin internet" }
+      {
+        "icon": "Zap",
+        "title": "Súper Rápido",
+        "desc": "Experiencia nativa, más rápida que la web"
+      },
+      {
+        "icon": "Bell",
+        "title": "Alertas en Vivo",
+        "desc": "Notificaciones instantáneas de tareas y recompensas"
+      },
+      {
+        "icon": "Shield",
+        "title": "Seguro",
+        "desc": "Datos encriptados con seguridad bancaria"
+      },
+      {
+        "icon": "Smartphone",
+        "title": "Sin Conexión",
+        "desc": "Ve tareas y ganancias incluso sin internet"
+      }
     ],
     "install_title": "Guía de Instalación",
     "install_steps": [
-      { "step": "1", "title": "Descarga el APK", "desc": "Toca el botón de descarga para guardar el APK en tu dispositivo" },
-      { "step": "2", "title": "Permitir Instalación", "desc": "Activa 'Instalar de fuentes desconocidas' en ajustes" },
-      { "step": "3", "title": "Instalar y Abrir", "desc": "Abre el APK, instala, regístrate o inicia sesión" }
+      {
+        "step": "1",
+        "title": "Descarga el APK",
+        "desc": "Toca el botón de descarga para guardar el APK en tu dispositivo"
+      },
+      {
+        "step": "2",
+        "title": "Permitir Instalación",
+        "desc": "Activa 'Instalar de fuentes desconocidas' en ajustes"
+      },
+      {
+        "step": "3",
+        "title": "Instalar y Abrir",
+        "desc": "Abre el APK, instala, regístrate o inicia sesión"
+      }
     ],
     "heroTitle": "Empieza a Operar Ahora",
     "heroDesc": "Sin descarga necesaria — úsalo directamente en tu navegador. Móvil primero, funciona en todas partes.",
@@ -147,7 +215,8 @@
     "ctaBtn": "Abrir App — Empieza Gratis",
     "ctaNote": "Sin instalación. Sin APK. Solo abre y opera.",
     "coming_soon": "Próximamente",
-    "apk_placeholder": "El archivo APK se está preparando, estate atento..."
+    "apk_placeholder": "El archivo APK se está preparando, estate atento...",
+    "downloadApk": "Descargar APK de Android"
   },
   "about": {
     "label": "Sobre Nosotros",
@@ -159,9 +228,18 @@
     "vision": "Convertirnos en el puente líder entre marketplaces globales y revendedores individuales.",
     "values_title": "Valores Fundamentales",
     "values": [
-      { "title": "Transparencia", "desc": "Todos los márgenes y ganancias son visibles por adelantado — sin sorpresas." },
-      { "title": "Innovación", "desc": "Conectamos constantemente nuevas plataformas y optimizamos herramientas de promoción." },
-      { "title": "Comunidad", "desc": "Creemos en el poder de las personas para impulsar el comercio global." }
+      {
+        "title": "Transparencia",
+        "desc": "Todos los márgenes y ganancias son visibles por adelantado — sin sorpresas."
+      },
+      {
+        "title": "Innovación",
+        "desc": "Conectamos constantemente nuevas plataformas y optimizamos herramientas de promoción."
+      },
+      {
+        "title": "Comunidad",
+        "desc": "Creemos en el poder de las personas para impulsar el comercio global."
+      }
     ]
   },
   "faq": {
@@ -181,17 +259,61 @@
       "tech": "Técnico"
     },
     "items": [
-      { "q": "¿Qué es Shopee Shopping Operations?", "a": "Shopee Shopping Operations es una plataforma de tareas de e-commerce. Eliges productos de marketplaces globales como Amazon, Shopee y Lazada, compartes enlaces de promoción y ganas el margen de cada venta completada.", "cat": "platform" },
-      { "q": "¿Es gratis?", "a": "¡Completamente gratis! Registro y uso de la plataforma son gratuitos. Solo necesitas depositar un pequeño fondo de garantía para comenzar a operar (totalmente reembolsable).", "cat": "platform" },
-      { "q": "¿Cómo gano?", "a": "Principalmente: 1) Promocionando productos y ganando el margen de cada venta; 2) Invitando amigos con comisión de hasta 3 niveles; 3) Completando tareas diarias.", "cat": "earning" },
-      { "q": "¿Qué es el sistema de tienda?", "a": "Abres una tienda virtual y seleccionas productos para promocionar. Cada producto tiene un margen de beneficio definido. Cuando alguien compra a través de tu enlace, ganas ese margen automáticamente.", "cat": "earning" },
-      { "q": "¿Cuánto puedo ganar?", "a": "Depende de tu actividad. Usuarios regulares ganan $10-50/día. Los más activos con tiendas grandes y redes de referidos generan $1,000+/mes.", "cat": "earning" },
-      { "q": "¿Cómo retiro?", "a": "Ve a 'Mi Cuenta' → 'Billetera' → 'Retirar'. Retiro mínimo de $1, compatible con TRC20/ERC20/BEP20.", "cat": "withdraw" },
-      { "q": "¿Hay comisiones por retiro?", "a": "Se aplica una tarifa de red del 1% por retiro.", "cat": "withdraw" },
-      { "q": "¿Cómo funciona el programa de referidos?", "a": "Comparte tu código de invitación. Ganas comisiones de las personas que invitas (Nivel 1), de quienes ellos invitan (Nivel 2) y de los invitados de estos (Nivel 3).", "cat": "invite" },
-      { "q": "¿Hay límite de invitaciones?", "a": "¡Sin límites! Cuantos más invites, más ganas en comisiones.", "cat": "invite" },
-      { "q": "¿Qué dispositivos son compatibles?", "a": "Actualmente Android (app APK) y web (H5). Versión iOS en desarrollo.", "cat": "tech" },
-      { "q": "¿Están seguros mis datos?", "a": "Usamos encriptación de nivel bancario y autenticación de dos factores. Nunca venderemos tu información personal.", "cat": "tech" }
+      {
+        "q": "¿Qué es Shopee Shopping Operations?",
+        "a": "Shopee Shopping Operations es una plataforma de tareas de e-commerce. Eliges productos de marketplaces globales como Amazon, Shopee y Lazada, compartes enlaces de promoción y ganas el margen de cada venta completada.",
+        "cat": "platform"
+      },
+      {
+        "q": "¿Es gratis?",
+        "a": "¡Completamente gratis! Registro y uso de la plataforma son gratuitos. Solo necesitas depositar un pequeño fondo de garantía para comenzar a operar (totalmente reembolsable).",
+        "cat": "platform"
+      },
+      {
+        "q": "¿Cómo gano?",
+        "a": "Principalmente: 1) Promocionando productos y ganando el margen de cada venta; 2) Invitando amigos con comisión de hasta 3 niveles; 3) Completando tareas diarias.",
+        "cat": "earning"
+      },
+      {
+        "q": "¿Qué es el sistema de tienda?",
+        "a": "Abres una tienda virtual y seleccionas productos para promocionar. Cada producto tiene un margen de beneficio definido. Cuando alguien compra a través de tu enlace, ganas ese margen automáticamente.",
+        "cat": "earning"
+      },
+      {
+        "q": "¿Cuánto puedo ganar?",
+        "a": "Depende de tu actividad. Usuarios regulares ganan $10-50/día. Los más activos con tiendas grandes y redes de referidos generan $1,000+/mes.",
+        "cat": "earning"
+      },
+      {
+        "q": "¿Cómo retiro?",
+        "a": "Ve a 'Mi Cuenta' → 'Billetera' → 'Retirar'. Retiro mínimo de $1, compatible con TRC20/ERC20/BEP20.",
+        "cat": "withdraw"
+      },
+      {
+        "q": "¿Hay comisiones por retiro?",
+        "a": "Se aplica una tarifa de red del 1% por retiro.",
+        "cat": "withdraw"
+      },
+      {
+        "q": "¿Cómo funciona el programa de referidos?",
+        "a": "Comparte tu código de invitación. Ganas comisiones de las personas que invitas (Nivel 1), de quienes ellos invitan (Nivel 2) y de los invitados de estos (Nivel 3).",
+        "cat": "invite"
+      },
+      {
+        "q": "¿Hay límite de invitaciones?",
+        "a": "¡Sin límites! Cuantos más invites, más ganas en comisiones.",
+        "cat": "invite"
+      },
+      {
+        "q": "¿Qué dispositivos son compatibles?",
+        "a": "Actualmente Android (app APK) y web (H5). Versión iOS en desarrollo.",
+        "cat": "tech"
+      },
+      {
+        "q": "¿Están seguros mis datos?",
+        "a": "Usamos encriptación de nivel bancario y autenticación de dos factores. Nunca venderemos tu información personal.",
+        "cat": "tech"
+      }
     ]
   },
   "cta": {

@@ -30,12 +30,36 @@
     "title": "Your tasks come from real orders on these platforms",
     "desc": "We integrate with 20+ global e-commerce APIs — Amazon, Shopee, Lazada, AliExpress, TikTok Shop, and more. Every task represents a real transaction. You earn the margin, we handle supply chain and logistics.",
     "items": [
-      { "name": "Amazon", "desc": "World's largest marketplace, 300M+ customers", "color": "#FF9900" },
-      { "name": "Shopee", "desc": "#1 in Southeast Asia, 700M+ users", "color": "#EE4D2D" },
-      { "name": "Lazada", "desc": "6 countries across Southeast Asia", "color": "#0F1470" },
-      { "name": "AliExpress", "desc": "Global cross-border retail platform", "color": "#E62E04" },
-      { "name": "TikTok Shop", "desc": "Fastest-growing social commerce", "color": "#000000" },
-      { "name": "eBay", "desc": "Global C2C marketplace giant", "color": "#0064D2" }
+      {
+        "name": "Amazon",
+        "desc": "World's largest marketplace, 300M+ customers",
+        "color": "#FF9900"
+      },
+      {
+        "name": "Shopee",
+        "desc": "#1 in Southeast Asia, 700M+ users",
+        "color": "#EE4D2D"
+      },
+      {
+        "name": "Lazada",
+        "desc": "6 countries across Southeast Asia",
+        "color": "#0F1470"
+      },
+      {
+        "name": "AliExpress",
+        "desc": "Global cross-border retail platform",
+        "color": "#E62E04"
+      },
+      {
+        "name": "TikTok Shop",
+        "desc": "Fastest-growing social commerce",
+        "color": "#000000"
+      },
+      {
+        "name": "eBay",
+        "desc": "Global C2C marketplace giant",
+        "color": "#0064D2"
+      }
     ]
   },
   "value": {
@@ -43,10 +67,26 @@
     "title": "Earn e-commerce profits without being a seller",
     "desc": "Traditional e-commerce means sourcing, inventory, operations, support, and shipping. We handle all of that. You just pick tasks and share links — earn a cut from every sale.",
     "items": [
-      { "icon": "Package", "title": "Zero Inventory", "desc": "No stock, no upfront costs. Direct connection to global supply chain — start with $0." },
-      { "icon": "Truck", "title": "We Handle Logistics", "desc": "Amazon FBA, Shopee Xpress, and partner couriers fulfill every order automatically." },
-      { "icon": "Headphones", "title": "No Customer Support", "desc": "After-sales handled by platforms and brands. You focus purely on promotion." },
-      { "icon": "TrendingUp", "title": "Transparent Margins", "desc": "Cost price, market price, your profit — all visible upfront. What you see is what you earn." }
+      {
+        "icon": "Package",
+        "title": "Zero Inventory",
+        "desc": "No stock, no upfront costs. Direct connection to global supply chain — start with $0."
+      },
+      {
+        "icon": "Truck",
+        "title": "We Handle Logistics",
+        "desc": "Amazon FBA, Shopee Xpress, and partner couriers fulfill every order automatically."
+      },
+      {
+        "icon": "Headphones",
+        "title": "No Customer Support",
+        "desc": "After-sales handled by platforms and brands. You focus purely on promotion."
+      },
+      {
+        "icon": "TrendingUp",
+        "title": "Transparent Margins",
+        "desc": "Cost price, market price, your profit — all visible upfront. What you see is what you earn."
+      }
     ]
   },
   "how": {
@@ -125,16 +165,44 @@
     "size": "~15MB",
     "features_title": "App Features",
     "features": [
-      { "icon": "Zap", "title": "Lightning Fast", "desc": "Native experience — faster and smoother than mobile web" },
-      { "icon": "Bell", "title": "Real-time Alerts", "desc": "Instant push notifications for orders, commissions, and payouts" },
-      { "icon": "Shield", "title": "Bank-grade Security", "desc": "Encrypted transmission, secure wallet, multi-factor auth" },
-      { "icon": "Smartphone", "title": "Offline Mode", "desc": "Check tasks and earnings even without internet" }
+      {
+        "icon": "Zap",
+        "title": "Lightning Fast",
+        "desc": "Native experience — faster and smoother than mobile web"
+      },
+      {
+        "icon": "Bell",
+        "title": "Real-time Alerts",
+        "desc": "Instant push notifications for orders, commissions, and payouts"
+      },
+      {
+        "icon": "Shield",
+        "title": "Bank-grade Security",
+        "desc": "Encrypted transmission, secure wallet, multi-factor auth"
+      },
+      {
+        "icon": "Smartphone",
+        "title": "Offline Mode",
+        "desc": "Check tasks and earnings even without internet"
+      }
     ],
     "install_title": "Installation Guide",
     "install_steps": [
-      { "step": "1", "title": "Download APK", "desc": "Tap the download button above to save the APK file" },
-      { "step": "2", "title": "Allow Installation", "desc": "Enable 'Install from unknown sources' in your device settings" },
-      { "step": "3", "title": "Install & Launch", "desc": "Open the APK, install, then sign up or log in to start earning" }
+      {
+        "step": "1",
+        "title": "Download APK",
+        "desc": "Tap the download button above to save the APK file"
+      },
+      {
+        "step": "2",
+        "title": "Allow Installation",
+        "desc": "Enable 'Install from unknown sources' in your device settings"
+      },
+      {
+        "step": "3",
+        "title": "Install & Launch",
+        "desc": "Open the APK, install, then sign up or log in to start earning"
+      }
     ],
     "heroTitle": "Start Trading Now",
     "heroDesc": "No download needed — use directly in your browser. Mobile first, works everywhere.",
@@ -148,7 +216,8 @@
     "ctaNote": "No installation. No APK. Just open and trade.",
     "coming_soon": "Coming Soon",
     "apk_placeholder": "APK file coming soon — stay tuned!",
-    "scanQr": "Scan QR to download"
+    "scanQr": "Scan QR to download",
+    "downloadApk": "Download Android APK"
   },
   "about": {
     "label": "About Us",
@@ -160,9 +229,18 @@
     "vision": "Become the world's largest e-commerce task distribution platform, connecting 1 billion users to global marketplaces and redefining what it means to 'do e-commerce'.",
     "values_title": "Core Values",
     "values": [
-      { "title": "Transparent Margins", "desc": "Every product's cost and your profit are fully disclosed. We never take hidden cuts." },
-      { "title": "Zero Barrier", "desc": "No experience needed. No capital required. Just register and start." },
-      { "title": "Platform-Powered", "desc": "Supply chain, logistics, and support are all handled. You focus on what matters — promotion." }
+      {
+        "title": "Transparent Margins",
+        "desc": "Every product's cost and your profit are fully disclosed. We never take hidden cuts."
+      },
+      {
+        "title": "Zero Barrier",
+        "desc": "No experience needed. No capital required. Just register and start."
+      },
+      {
+        "title": "Platform-Powered",
+        "desc": "Supply chain, logistics, and support are all handled. You focus on what matters — promotion."
+      }
     ]
   },
   "faq": {
@@ -182,18 +260,66 @@
       "tech": "Technical"
     },
     "items": [
-      { "q": "How does Shopee Shopping Operations work with Amazon/Shopee?", "a": "We integrate with 20+ e-commerce platforms including Amazon, Shopee, Lazada, and AliExpress. Every task on Shopee Shopping Operations corresponds to a real product listing. You promote the product — when a sale happens, you earn the margin. The platform and brand handle fulfillment and support.", "cat": "platform" },
-      { "q": "Do I need to buy inventory?", "a": "Absolutely not. We operate on a zero-inventory model. Products ship directly from platforms and brands. You never touch inventory — just pick tasks and share links.", "cat": "platform" },
-      { "q": "Is Shopee Shopping Operations free?", "a": "100% free. Registration, tasks, and promotion all cost nothing. We only take a small platform fee from successful transactions — you only share when you earn.", "cat": "platform" },
-      { "q": "How do I earn?", "a": "Three ways: 1) Pick e-commerce tasks — promote Amazon/Shopee products and earn the price margin; 2) Complete daily check-ins and bonus tasks for points; 3) Invite friends and earn team commissions up to 3 tiers.", "cat": "earning" },
-      { "q": "How much can I earn per sale?", "a": "Varies by product. Electronics: $5-50 per sale. Home goods: $3-15. Beauty: $2-10. Our cost is 85% of market price — you keep the 15% margin on every order.", "cat": "earning" },
-      { "q": "When do I get paid?", "a": "Once the order is confirmed delivered (typically 3-7 days), your profit lands in your wallet instantly. Cash out anytime.", "cat": "earning" },
-      { "q": "How do I withdraw?", "a": "Go to 'My Account' → 'Wallet' → 'Withdraw'. We support bank transfers and digital wallets. Minimum withdrawal is $10, typically processed in 1-3 business days.", "cat": "withdraw" },
-      { "q": "Are there withdrawal fees?", "a": "Regular users pay 1%. VIP members enjoy fee-free withdrawals.", "cat": "withdraw" },
-      { "q": "How do I invite friends?", "a": "Go to the Tasks page, tap 'Invite Friends'. Share your referral link or QR code. You earn a percentage of their earnings up to 3 tiers deep.", "cat": "invite" },
-      { "q": "Is there a limit on invitations?", "a": "No limit. More invites = more team earnings.", "cat": "invite" },
-      { "q": "Which devices are supported?", "a": "Android app and web (H5) currently available. iOS version is in development.", "cat": "tech" },
-      { "q": "Is my data secure?", "a": "Bank-grade encryption. Immutable transaction records. We will never sell or compromise your personal information.", "cat": "tech" }
+      {
+        "q": "How does Shopee Shopping Operations work with Amazon/Shopee?",
+        "a": "We integrate with 20+ e-commerce platforms including Amazon, Shopee, Lazada, and AliExpress. Every task on Shopee Shopping Operations corresponds to a real product listing. You promote the product — when a sale happens, you earn the margin. The platform and brand handle fulfillment and support.",
+        "cat": "platform"
+      },
+      {
+        "q": "Do I need to buy inventory?",
+        "a": "Absolutely not. We operate on a zero-inventory model. Products ship directly from platforms and brands. You never touch inventory — just pick tasks and share links.",
+        "cat": "platform"
+      },
+      {
+        "q": "Is Shopee Shopping Operations free?",
+        "a": "100% free. Registration, tasks, and promotion all cost nothing. We only take a small platform fee from successful transactions — you only share when you earn.",
+        "cat": "platform"
+      },
+      {
+        "q": "How do I earn?",
+        "a": "Three ways: 1) Pick e-commerce tasks — promote Amazon/Shopee products and earn the price margin; 2) Complete daily check-ins and bonus tasks for points; 3) Invite friends and earn team commissions up to 3 tiers.",
+        "cat": "earning"
+      },
+      {
+        "q": "How much can I earn per sale?",
+        "a": "Varies by product. Electronics: $5-50 per sale. Home goods: $3-15. Beauty: $2-10. Our cost is 85% of market price — you keep the 15% margin on every order.",
+        "cat": "earning"
+      },
+      {
+        "q": "When do I get paid?",
+        "a": "Once the order is confirmed delivered (typically 3-7 days), your profit lands in your wallet instantly. Cash out anytime.",
+        "cat": "earning"
+      },
+      {
+        "q": "How do I withdraw?",
+        "a": "Go to 'My Account' → 'Wallet' → 'Withdraw'. We support bank transfers and digital wallets. Minimum withdrawal is $10, typically processed in 1-3 business days.",
+        "cat": "withdraw"
+      },
+      {
+        "q": "Are there withdrawal fees?",
+        "a": "Regular users pay 1%. VIP members enjoy fee-free withdrawals.",
+        "cat": "withdraw"
+      },
+      {
+        "q": "How do I invite friends?",
+        "a": "Go to the Tasks page, tap 'Invite Friends'. Share your referral link or QR code. You earn a percentage of their earnings up to 3 tiers deep.",
+        "cat": "invite"
+      },
+      {
+        "q": "Is there a limit on invitations?",
+        "a": "No limit. More invites = more team earnings.",
+        "cat": "invite"
+      },
+      {
+        "q": "Which devices are supported?",
+        "a": "Android app and web (H5) currently available. iOS version is in development.",
+        "cat": "tech"
+      },
+      {
+        "q": "Is my data secure?",
+        "a": "Bank-grade encryption. Immutable transaction records. We will never sell or compromise your personal information.",
+        "cat": "tech"
+      }
     ]
   },
   "cta": {

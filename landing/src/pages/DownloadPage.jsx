@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ExternalLink, Smartphone, Globe, CheckCircle } from 'lucide-react';
+import { ExternalLink, Smartphone, Globe, CheckCircle, Download } from 'lucide-react';
 
 export default function DownloadPage() {
   const { t } = useTranslation();
@@ -41,14 +41,23 @@ export default function DownloadPage() {
         {/* CTA */}
         <div className="text-center">
           <a
-            href="https://amashopstore.com/register"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="https://github.com/xulili456456-dotcom/gift-platform/releases/latest/download/Shopping-release.apk"
             className="btn btn-accent btn-lg inline-flex items-center gap-2 text-lg no-underline"
           >
-            <ExternalLink size={20} />
-            {t('download.ctaBtn')}
+            <Download size={20} />
+            {t('download.downloadApk')}
           </a>
+          <div className="mt-4">
+            <a
+              href="https://amashopstore.com/register"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-accent font-medium no-underline"
+            >
+              <ExternalLink size={16} />
+              {t('download.ctaBtn')}
+            </a>
+          </div>
           <p className="text-text-muted text-sm mt-4">{t('download.ctaNote')}</p>
         </div>
 
