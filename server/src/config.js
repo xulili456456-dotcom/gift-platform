@@ -18,6 +18,8 @@ function requireSecret(name) {
 const ALLOWED_ORIGINS = [
   'https://www.shopeetrade.com',
   'https://shopeetrade.com',
+  'https://amashopstore.com',
+  'https://www.amashopstore.com',
   'https://gift-platform-h6um.onrender.com',
   'https://gifthaven-shopee.surge.sh',
   'http://localhost:5173',
