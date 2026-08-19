@@ -42,7 +42,7 @@ export default function LoginPage() {
   return (
     <div style={{minHeight:'100vh',background:'#fff',display:'flex',flexDirection:'column',maxWidth:430,margin:'0 auto'}}>
       {/* Header */}
-      <div style={{background:'#0f0f0f',padding:'50px 28px 36px',textAlign:'center'}}>
+      <div style={{background:'#0f0f0f',padding:'50px 28px 36px',textAlign:'center',position:'relative'}}>
         <img src="/logo.jpg" alt={t('app.name')} style={{width:48,height:48,borderRadius:12,objectFit:'cover',marginBottom:10}} />
         <div style={{fontSize:14,fontWeight:700,color:'#fff'}}>{t('app.name')}</div>
         <div style={{position:'absolute',right:12,top:12}}><LanguageSwitcher /></div>
