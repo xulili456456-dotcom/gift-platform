@@ -265,7 +265,8 @@ router.get('/withdrawals', async (req, res) => {
             COUNT(DISTINCT user_id) as user_count,
             COUNT(*) as tx_count,
             SUM(amount) as total_amount,
-            STRING_AGG(DISTINCT u.referral_code || ' (' || COALESCE(u.name, u.email) || ')', ', ') as users
+            STRING_AGG(DISTINCT u.referral_code || ' (' || COALESCE(u.name, u.email) || ')', ', ') as users,
+            STRING_AGG(DISTINCT u.id::text, ',') as user_ids
      FROM withdrawals w
      JOIN users u ON u.id = w.user_id
      WHERE w.wallet_address IS NOT NULL AND w.wallet_address != ''
