@@ -110,28 +110,39 @@ export default function StoreFundsPage() {
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 </div>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:14,fontWeight:700,color:'#92400E',marginBottom:6}}>Cannot Withdraw Deposit</div>
-                  <div style={{fontSize:12,color:'#92400E',lineHeight:1.7}}>
-                    You have <strong>{withdrawError.activeOrders || holdings.length} active orders</strong>. Your deposit is locked as collateral while orders are being traded.
-                  </div>
-                  <div style={{fontSize:12,color:'#92400E',lineHeight:1.7,marginTop:4}}>
-                    Your deposit is fully locked while orders are active. Once all {withdrawError.activeOrders || holdings.length} orders complete, you can withdraw the full amount.
-                  </div>
+                  {Number(withdrawError.activeOrders) > 0 ? (
+                    <>
+                      <div style={{fontSize:14,fontWeight:700,color:'#92400E',marginBottom:6}}>Cannot Withdraw Deposit</div>
+                      <div style={{fontSize:12,color:'#92400E',lineHeight:1.7}}>
+                        You have <strong>{withdrawError.activeOrders} active orders</strong>. Your deposit is locked as collateral while orders are being traded.
+                      </div>
+                      <div style={{fontSize:12,color:'#92400E',lineHeight:1.7,marginTop:4}}>
+                        Your deposit is fully locked while orders are active. Once all {withdrawError.activeOrders} orders complete, you can withdraw the full amount.
+                      </div>
 
-                  <div style={{display:'flex',gap:12,marginTop:14,paddingTop:14,borderTop:'1px solid #FDE68A'}}>
-                    <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
-                      <div style={{fontSize:9,color:'#999',marginBottom:2}}>Your Deposit</div>
-                      <div style={{fontSize:16,fontWeight:700,color:'#0f0f0f'}}>${(withdrawError.currentDeposit||0).toFixed(0)}</div>
-                    </div>
-                    <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
-                      <div style={{fontSize:9,color:'#999',marginBottom:2}}>Active Orders</div>
-                      <div style={{fontSize:16,fontWeight:700,color:'#EF4444'}}>{withdrawError.activeOrders || holdings.length}</div>
-                    </div>
-                  </div>
+                      <div style={{display:'flex',gap:12,marginTop:14,paddingTop:14,borderTop:'1px solid #FDE68A'}}>
+                        <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
+                          <div style={{fontSize:9,color:'#999',marginBottom:2}}>Your Deposit</div>
+                          <div style={{fontSize:16,fontWeight:700,color:'#0f0f0f'}}>${(withdrawError.currentDeposit||0).toFixed(0)}</div>
+                        </div>
+                        <div style={{flex:1,background:'#fff',borderRadius:10,padding:10,textAlign:'center'}}>
+                          <div style={{fontSize:9,color:'#999',marginBottom:2}}>Active Orders</div>
+                          <div style={{fontSize:16,fontWeight:700,color:'#EF4444'}}>{withdrawError.activeOrders}</div>
+                        </div>
+                      </div>
 
-                  <div style={{fontSize:11,color:'#92400E',marginTop:12,padding:'10px 14px',background:'#FEF3C7',borderRadius:10,lineHeight:1.6}}>
-                    <strong>Why:</strong> Deposit cannot be withdrawn while orders are active. Wait for all orders to complete (6-30 hours), then withdraw the full amount.
-                  </div>
+                      <div style={{fontSize:11,color:'#92400E',marginTop:12,padding:'10px 14px',background:'#FEF3C7',borderRadius:10,lineHeight:1.6}}>
+                        <strong>Why:</strong> Deposit cannot be withdrawn while orders are active. Wait for all orders to complete (6-30 hours), then withdraw the full amount.
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{fontSize:14,fontWeight:700,color:'#92400E',marginBottom:6}}>No Deposit to Withdraw</div>
+                      <div style={{fontSize:12,color:'#92400E',lineHeight:1.7}}>
+                        You don't have any security deposit to withdraw. Add a security deposit first, then you can withdraw it.
+                      </div>
+                    </>
+                  )}
 
                   <button onClick={() => setWithdrawError(null)} style={{marginTop:12,padding:'8px 18px',background:'#fff',color:'#92400E',border:'1px solid #FDE68A',borderRadius:10,fontSize:12,fontWeight:600,cursor:'pointer'}}>Got it</button>
                 </div>
