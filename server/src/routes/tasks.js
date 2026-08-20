@@ -307,4 +307,14 @@ router.post('/send-notification', require('../middleware/admin'), async (req, re
   } catch (e) { console.error('Notification send error:', e.message); res.status(500).json({ error: 'Send failed: ' + e.message }); }
 });
 
+// Admin: POST /api/tasks/admin/trigger — manually trigger a task for a user (e.g. deposit handled manually)
+router.post('/admin/trigger', require('../middleware/admin'), async (req, res) => {
+  try {
+    const { userId, taskType } = req.body;
+    if (!userId || !taskType) return res.status(400).json({ error: 'userId and taskType required' });
+    await updateTaskProgress(parseInt(userId), taskType, 1);
+    res.json({ ok: true, message: `Triggered ${taskType} for user ${userId}` });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = { router, updateTaskProgress };
