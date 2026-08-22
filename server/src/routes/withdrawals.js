@@ -2,6 +2,7 @@ const { Router } = require('express');
 const authMiddleware = require('../middleware/auth');
 const { insert, all, get, run, tx } = require('../db/database');
 const { updateTaskProgress } = require('./tasks');
+const { transcodeVideo } = require('../utils/transcode');
 
 const router = Router();
 router.use(authMiddleware);
@@ -35,6 +36,7 @@ router.post('/', async (req, res) => {
   if (!verify_code) return res.status(400).json({ error: 'Verification code is required. Please get a code and record a video reading it.' });
   if (!verify_video) return res.status(400).json({ error: 'Please record a video reading your verification code.' });
   if ((verify_video || '').length > 10000000) return res.status(400).json({ error: 'Video too large (max 10MB)' });
+  const verifyVideoToStore = await transcodeVideo(verify_video);
   const codeStr = String(verify_code).trim();
   const codeRow = await get('SELECT id FROM withdrawal_codes WHERE user_id = ? AND code = ? AND used_at IS NULL AND expires_at > NOW()', [req.user.id, codeStr]);
   if (!codeRow) return res.status(400).json({ error: 'Verification code is invalid or expired. Please generate a new one.' });
@@ -94,7 +96,7 @@ router.post('/', async (req, res) => {
     // Store deducted + fragment IDs separately for safe cancellation
     const result = await t.insert(
       'INSERT INTO withdrawals (user_id, amount, fee, net_amount, network, wallet_address, verify_code, verify_video, status, deducted_ids) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [req.user.id, amount, fee, netAmount, network, addr, codeStr, verify_video, 'pending', JSON.stringify({ deducted: deductedIds, fragments: fragmentIds })]
+      [req.user.id, amount, fee, netAmount, network, addr, codeStr, verifyVideoToStore, 'pending', JSON.stringify({ deducted: deductedIds, fragments: fragmentIds })]
     );
     await t.run('UPDATE withdrawal_codes SET used_at = NOW() WHERE id = ?', [codeRow.id]);
 

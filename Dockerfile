@@ -10,7 +10,7 @@ RUN npm run build
 
 # Stage 2: Production server
 FROM node:24-alpine
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash ffmpeg
 
 WORKDIR /app/server
 
