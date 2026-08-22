@@ -125,7 +125,29 @@ router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
     const nm = String(r.real_name || '').trim();
     if (nm && dupNames[nm] && dupNames[nm].size > 1) r.dup_name = true;
   }
-  res.json(rows);
+  // Build duplicate groups: which referral codes share the same ID / photo / name
+  const groupMap = {};
+  const addToGroup = (type, key, r) => {
+    const gk = type + '|' + key;
+    if (!groupMap[gk]) groupMap[gk] = { type, key, accounts: [] };
+    if (!groupMap[gk].accounts.some(a => a.user_id === r.user_id)) {
+      groupMap[gk].accounts.push({ user_id: r.user_id, referral_code: r.referral_code || '-', name: r.real_name || r.user_name || r.email, status: r.status });
+    }
+  };
+  for (const r of rows) {
+    const idn = String(r.id_number || '').trim();
+    if (idn && dupUsers[idn] && dupUsers[idn].size > 1) addToGroup('id', idn, r);
+  }
+  for (const r of rows) {
+    if (r.front_hash && dupPhotos['f:' + r.front_hash] && dupPhotos['f:' + r.front_hash].size > 1) addToGroup('photo', r.front_hash, r);
+    if (r.back_hash && dupPhotos['b:' + r.back_hash] && dupPhotos['b:' + r.back_hash].size > 1) addToGroup('photo', r.back_hash, r);
+  }
+  for (const r of rows) {
+    const nm = String(r.real_name || '').trim();
+    if (nm && dupNames[nm] && dupNames[nm].size > 1) addToGroup('name', nm, r);
+  }
+  const dupGroups = Object.values(groupMap).filter(g => g.accounts.length > 1);
+  res.json({ rows, dupGroups });
 });
 
 // GET /api/kyc/admin/:id/images — fetch document images on-demand
