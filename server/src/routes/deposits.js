@@ -12,7 +12,7 @@ router.post('/', authMiddleware, async (req, res) => {
   const amt = parseFloat(amount);
   if (!amt || amt < 1) return res.status(400).json({ error: 'Minimum deposit is $1' });
   if (!network) return res.status(400).json({ error: 'Network is required' });
-  if (!['trc20','erc20','bep20'].includes(network)) return res.status(400).json({ error: 'Invalid network' });
+  if (!['trc20','erc20'].includes(network)) return res.status(400).json({ error: 'Invalid network' });
 
   const txHash = (tx_hash || '').trim();
   const imageData = (image || '').trim();

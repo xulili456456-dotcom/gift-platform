@@ -6,7 +6,6 @@ import toast from 'react-hot-toast';
 const NETWORKS = [
   { id: 'trc20', name: 'TRC20', color: '#FF5000', desc: 'TRON Network · Low fee', emoji: '🔵' },
   { id: 'erc20', name: 'ERC20', color: '#8B5CF6', desc: 'Ethereum Network', emoji: '🟣' },
-  { id: 'bep20', name: 'BEP20', color: '#F59E0B', desc: 'BSC Network', emoji: '🟡' },
 ];
 
 export default function DepositPage() {
