@@ -48,6 +48,6 @@ module.exports = {
   CORS_ORIGIN: getAllowedOrigins(),
   NODE_ENV: process.env.NODE_ENV || 'development',
   // Latest app version + APK download URL (for in-app auto-update)
-  APP_VERSION: '1.1.0',
-  APP_APK_URL: 'https://github.com/xulili456456-dotcom/gift-platform/releases/download/v1.1.0/Shopping-release.apk',
+  APP_VERSION: '1.1.1',
+  APP_APK_URL: 'https://github.com/xulili456456-dotcom/gift-platform/releases/download/v1.1.1/Shopping-release.apk',
 };
