@@ -86,7 +86,7 @@ router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
   const dupUsers = {};
   for (const r of rows) {
     const idn = String(r.id_number || '').trim();
-    if (idn && r.status !== 'rejected') {
+    if (idn) {
       if (!dupUsers[idn]) dupUsers[idn] = new Set();
       dupUsers[idn].add(r.user_id);
     }
@@ -98,7 +98,6 @@ router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
   // Detect duplicate ID photos across accounts
   const dupPhotos = {};
   for (const r of rows) {
-    if (r.status === 'rejected') continue;
     if (r.front_hash) {
       if (!dupPhotos['f:' + r.front_hash]) dupPhotos['f:' + r.front_hash] = new Set();
       dupPhotos['f:' + r.front_hash].add(r.user_id);
