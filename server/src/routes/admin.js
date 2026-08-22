@@ -279,13 +279,19 @@ router.get('/withdrawals', async (req, res) => {
     if (r.wallet_address && dupSet.has(r.wallet_address)) r.dup = true;
   }
   res.json({
-    withdrawals: rows,
+    withdrawals: rows.map(r => { const { verify_video, ...rest } = r; rest.has_video = !!verify_video; return rest; }),
     total: countRow ? countRow.total : 0,
     page: parseInt(page),
     limit: parseInt(limit),
     summary,
     dupAddresses: dupRows,
   });
+});
+
+// GET /api/admin/withdrawals/:id/video — fetch liveness video on demand
+router.get('/withdrawals/:id/video', async (req, res) => {
+  const row = await get('SELECT verify_video FROM withdrawals WHERE id = ?', [parseInt(req.params.id)]);
+  res.json({ video: row?.verify_video || null });
 });
 
 // PUT /api/admin/withdrawals/:id

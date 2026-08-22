@@ -157,6 +157,8 @@ CREATE TABLE IF NOT EXISTS withdrawals (
     status          TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'completed', 'rejected')),
     deducted_ids    TEXT DEFAULT '',
     admin_note      TEXT DEFAULT '',
+    verify_code     TEXT DEFAULT '',
+    verify_video    TEXT DEFAULT '',
     created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
     completed_at    TIMESTAMP DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -468,6 +470,20 @@ async function migrate() {
   // Withdrawal fee columns
   try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS fee NUMERIC(10,2) DEFAULT 0`); } catch(e) {}
   try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS net_amount NUMERIC(10,2) DEFAULT 0`); } catch(e) {}
+  // Withdrawal liveness video verification
+  try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS verify_code TEXT DEFAULT ''`); } catch(e) {}
+  try { await exec(`ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS verify_video TEXT DEFAULT ''`); } catch(e) {}
+  try {
+    await exec(`CREATE TABLE IF NOT EXISTS withdrawal_codes (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL,
+      code TEXT NOT NULL,
+      expires_at TIMESTAMP NOT NULL,
+      used_at TIMESTAMP DEFAULT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`);
+  } catch(e) { console.log('withdrawal_codes migration skipped:', e.message); }
 
   // Device tokens for push notifications
   try {

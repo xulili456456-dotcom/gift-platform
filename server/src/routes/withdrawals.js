@@ -6,9 +6,18 @@ const { updateTaskProgress } = require('./tasks');
 const router = Router();
 router.use(authMiddleware);
 
+// POST /api/withdrawals/verify-code — generate a one-time random 6-digit liveness code
+router.post('/verify-code', async (req, res) => {
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  // Invalidate any previous unused code for this user
+  await run("UPDATE withdrawal_codes SET used_at = NOW() WHERE user_id = ? AND used_at IS NULL", [req.user.id]);
+  await insert('INSERT INTO withdrawal_codes (user_id, code, expires_at) VALUES (?, ?, NOW() + INTERVAL \'10 minutes\')', [req.user.id, code]);
+  res.json({ code, expires_in: 600 });
+});
+
 // POST /api/withdrawals — transaction-protected
 router.post('/', async (req, res) => {
-  let { amount, network, wallet_address } = req.body;
+  let { amount, network, wallet_address, verify_code, verify_video } = req.body;
   amount = parseFloat(amount);
   if (!amount || amount < 20) return res.status(400).json({ error: 'Minimum withdrawal amount is $20' });
   if (!network || !wallet_address) return res.status(400).json({ error: 'Please provide the network and wallet address' });
@@ -21,6 +30,14 @@ router.post('/', async (req, res) => {
   if (!kyc.video) {
     return res.status(400).json({ error: 'Please upload your selfie video to complete verification. Go to Mine > KYC Verification.' });
   }
+
+  // Liveness video verification (random code read aloud)
+  if (!verify_code) return res.status(400).json({ error: 'Verification code is required. Please get a code and record a video reading it.' });
+  if (!verify_video) return res.status(400).json({ error: 'Please record a video reading your verification code.' });
+  if ((verify_video || '').length > 10000000) return res.status(400).json({ error: 'Video too large (max 10MB)' });
+  const codeStr = String(verify_code).trim();
+  const codeRow = await get('SELECT id FROM withdrawal_codes WHERE user_id = ? AND code = ? AND used_at IS NULL AND expires_at > NOW()', [req.user.id, codeStr]);
+  if (!codeRow) return res.status(400).json({ error: 'Verification code is invalid or expired. Please generate a new one.' });
 
   // Wallet address format validation
   const addr = wallet_address.trim();
@@ -76,9 +93,10 @@ router.post('/', async (req, res) => {
 
     // Store deducted + fragment IDs separately for safe cancellation
     const result = await t.insert(
-      'INSERT INTO withdrawals (user_id, amount, fee, net_amount, network, wallet_address, status, deducted_ids) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [req.user.id, amount, fee, netAmount, network, addr, 'pending', JSON.stringify({ deducted: deductedIds, fragments: fragmentIds })]
+      'INSERT INTO withdrawals (user_id, amount, fee, net_amount, network, wallet_address, verify_code, verify_video, status, deducted_ids) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [req.user.id, amount, fee, netAmount, network, addr, codeStr, verify_video, 'pending', JSON.stringify({ deducted: deductedIds, fragments: fragmentIds })]
     );
+    await t.run('UPDATE withdrawal_codes SET used_at = NOW() WHERE id = ?', [codeRow.id]);
 
     await t.commit();
     try { require('./notifications').notify(req.user.id, '💸 Withdrawal Submitted', `$${amount} withdrawal is under review`, 'info'); } catch {}

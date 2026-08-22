@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { claimsApi } from '../api/claims';
@@ -20,6 +20,10 @@ export default function WithdrawPage() {
   const [expandedW, setExpandedW] = useState(new Set());
   const [showDetail, setShowDetail] = useState(null);
   const [contactAgreed, setContactAgreed] = useState(false);
+  const [verifyCode, setVerifyCode] = useState('');
+  const [verifyVideo, setVerifyVideo] = useState('');
+  const [gettingCode, setGettingCode] = useState(false);
+  const videoRef = useRef(null);
 
   // Store data for margin breakdown
   const [storeDeposit, setStoreDeposit] = useState(0);
@@ -63,15 +67,37 @@ export default function WithdrawPage() {
   const totalWithdrawn = withdrawals.filter(w => w.status === 'completed').reduce((s, w) => s + (Number(w.amount) || 0), 0);
   const totalAssets = availableBalance + storeDeposit + holdingsLocked;
 
+  const handleGetCode = async () => {
+    setGettingCode(true);
+    try {
+      const { data } = await client.post('/withdrawals/verify-code');
+      setVerifyCode(data.code);
+      setVerifyVideo('');
+      toast.success('Verification code generated. Record a video reading it.');
+    } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
+    finally { setGettingCode(false); }
+  };
+  const handleVideo = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { toast.error('Video too large (max 10MB)'); return; }
+    const reader = new FileReader();
+    reader.onload = () => setVerifyVideo(reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
   const handleWithdraw = async () => {
     const amt = parseFloat(amount);
     if (!amt || amt < 20) { toast.error(t('withdraw.minAmount')); return; }
     if (amt > availableBalance) { toast.error(t('withdraw.insufficient')); return; }
     if (!walletAddress) { toast.error('Please enter wallet address'); return; }
+    if (!verifyCode || !verifyVideo) { toast.error('Please complete video verification first'); return; }
     setSubmitting(true);
     try {
-      await client.post('/withdrawals', { amount: amt, network: network, wallet_address: walletAddress });
+      await client.post('/withdrawals', { amount: amt, network, wallet_address: walletAddress, verify_code: verifyCode, verify_video: verifyVideo });
       setAmount('');
+      setVerifyCode('');
+      setVerifyVideo('');
       toast.success(t('withdraw.success'));
       loadData();
     } catch (err) {
@@ -207,6 +233,31 @@ export default function WithdrawPage() {
           <input value={walletAddress} onChange={e=>setWalletAddress(e.target.value)} placeholder="Enter your wallet address" style={{width:'100%',padding:'12px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:13,outline:'none',marginBottom:4}} />
           <div style={{fontSize:10,color:'#999',marginBottom:12}}>Double-check your address. Withdrawals cannot be reversed.</div>
 
+          {/* Video Verification (liveness) */}
+          <div style={{border:'1.5px solid #eee',borderRadius:14,padding:16,marginTop:12,marginBottom:12}}>
+            <div style={{fontSize:13,fontWeight:700,color:'#0f0f0f',marginBottom:8}}>🎥 Video Verification</div>
+            <div style={{fontSize:11,color:'#999',lineHeight:1.5,marginBottom:10}}>For your account security, get a verification code and record a short video reading it aloud (e.g. "my code is 123456"). Each code is valid for 10 minutes.</div>
+            <button onClick={handleGetCode} disabled={gettingCode} style={{width:'100%',padding:10,background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:13,fontWeight:700,cursor:'pointer',marginBottom:10}}>{gettingCode?'Generating...':verifyCode?'Get New Code':'Get Verification Code'}</button>
+            {verifyCode && (
+              <div style={{textAlign:'center',padding:'12px',background:'#FFF5F0',borderRadius:10,marginBottom:10}}>
+                <div style={{fontSize:10,color:'#999',marginBottom:4}}>Please read this code aloud in your video</div>
+                <div style={{fontSize:30,fontWeight:800,color:'#FF5000',letterSpacing:6}}>{verifyCode}</div>
+              </div>
+            )}
+            <input ref={videoRef} type="file" accept="video/*" onChange={handleVideo} style={{display:'none'}} />
+            {verifyVideo ? (
+              <div style={{position:'relative',marginBottom:4}}>
+                <video src={verifyVideo} controls style={{width:'100%',maxHeight:160,borderRadius:10,background:'#000'}} />
+                <button onClick={()=>setVerifyVideo('')} style={{position:'absolute',top:6,right:6,background:'rgba(0,0,0,.6)',color:'#fff',border:'none',borderRadius:20,width:26,height:26,fontSize:13,cursor:'pointer',lineHeight:1}}>✕</button>
+              </div>
+            ) : (
+              <button onClick={()=>videoRef.current?.click()} type="button" style={{width:'100%',padding:'14px',background:'#f8f8f8',border:'2px dashed #ddd',borderRadius:10,textAlign:'center',cursor:'pointer'}}>
+                <div style={{fontSize:24,marginBottom:4,opacity:.5}}>🎬</div>
+                <div style={{fontSize:12,fontWeight:600,color:'#666'}}>Upload Video Reading the Code</div>
+              </button>
+            )}
+          </div>
+
           {/* Contact Support — required before withdrawal */}
           <div style={{background:'#FFF5F0',border:'1.5px solid #FFAA8A',borderRadius:14,padding:16,marginTop:12}}>
             <div style={{display:'flex',alignItems:'flex-start',gap:10,marginBottom:10}}>
@@ -232,8 +283,8 @@ export default function WithdrawPage() {
             </label>
           </div>
 
-          <button onClick={()=>{if(parseFloat(amount)<10){toast.error(t('withdraw.minAmount'));return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0||!contactAgreed}
-            style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:(!amount||availableBalance<=0||!contactAgreed)?0.4:1,marginTop:10}}>Submit Withdrawal</button>
+          <button onClick={()=>{if(parseFloat(amount)<10){toast.error(t('withdraw.minAmount'));return};if(parseFloat(amount)>availableBalance){toast.error(t('withdraw.insufficient'));return};if(!verifyCode||!verifyVideo){toast.error('Please complete video verification first');return};setShowConfirm(true)}} disabled={!amount||availableBalance<=0||!contactAgreed||!verifyCode||!verifyVideo}
+            style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:(!amount||availableBalance<=0||!contactAgreed||!verifyCode||!verifyVideo)?0.4:1,marginTop:10}}>Submit Withdrawal</button>
         </div>
 
         {/* History */}
