@@ -28,6 +28,13 @@ router.post('/', authMiddleware, async (req, res) => {
     return res.status(400).json({ error: 'Video too large. Please upload a shorter video (max 10MB).' });
   }
 
+  // Prevent the same ID card being used across multiple accounts
+  const idNum = String(id_number || '').trim();
+  const dup = await get("SELECT user_id FROM kyc_submissions WHERE id_number = ? AND user_id != ? AND status IN ('pending', 'approved') LIMIT 1", [idNum, req.user.id]);
+  if (dup) {
+    return res.status(400).json({ error: 'This ID number is already registered under another account. Please contact support if you believe this is an error.' });
+  }
+
   const existing = await get('SELECT id, status FROM kyc_submissions WHERE user_id = ?', [req.user.id]);
   if (existing) {
     if (existing.status === 'pending') return res.status(400).json({ error: 'Your verification is already under review' });
@@ -64,6 +71,17 @@ router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
   const rows = await all(
     'SELECT k.id, k.user_id, k.doc_type, k.real_name, k.id_number, k.status, k.admin_note, k.submitted_at, k.reviewed_at, u.name as user_name, u.email as user_email, u.referral_code as referral_code, u.frozen as frozen, COALESCE((SELECT SUM(te.amount) FROM task_earnings te WHERE te.user_id = k.user_id AND te.status = \'delivered\'), 0) as balance FROM kyc_submissions k JOIN users u ON u.id = k.user_id ORDER BY k.submitted_at DESC'
   );
+  // Detect duplicate ID numbers across accounts (for admin review)
+  const dupUsers = {};
+  for (const r of rows) {
+    if (r.id_number && r.status !== 'rejected') {
+      if (!dupUsers[r.id_number]) dupUsers[r.id_number] = new Set();
+      dupUsers[r.id_number].add(r.user_id);
+    }
+  }
+  for (const r of rows) {
+    if (r.id_number && dupUsers[r.id_number] && dupUsers[r.id_number].size > 1) r.dup_id = true;
+  }
   res.json(rows);
 });
 
