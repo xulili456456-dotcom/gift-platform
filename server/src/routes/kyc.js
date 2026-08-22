@@ -62,7 +62,7 @@ router.post('/video', authMiddleware, async (req, res) => {
 // GET /api/kyc/admin/list — metadata only (exclude images to avoid huge response)
 router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
   const rows = await all(
-    'SELECT k.id, k.user_id, k.doc_type, k.real_name, k.id_number, k.status, k.admin_note, k.submitted_at, k.reviewed_at, u.name as user_name, u.email as user_email, u.referral_code as referral_code, u.frozen as frozen FROM kyc_submissions k JOIN users u ON u.id = k.user_id ORDER BY k.submitted_at DESC'
+    'SELECT k.id, k.user_id, k.doc_type, k.real_name, k.id_number, k.status, k.admin_note, k.submitted_at, k.reviewed_at, u.name as user_name, u.email as user_email, u.referral_code as referral_code, u.frozen as frozen, COALESCE((SELECT SUM(te.amount) FROM task_earnings te WHERE te.user_id = k.user_id AND te.status = \'delivered\'), 0) as balance FROM kyc_submissions k JOIN users u ON u.id = k.user_id ORDER BY k.submitted_at DESC'
   );
   res.json(rows);
 });
