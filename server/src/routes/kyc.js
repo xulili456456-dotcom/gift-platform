@@ -112,6 +112,19 @@ router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
     const bDup = r.back_hash && dupPhotos['b:' + r.back_hash] && dupPhotos['b:' + r.back_hash].size > 1;
     if (fDup || bDup) r.dup_photo = true;
   }
+  // Detect duplicate names across accounts (same person, possibly different ID numbers)
+  const dupNames = {};
+  for (const r of rows) {
+    const nm = String(r.real_name || '').trim();
+    if (nm) {
+      if (!dupNames[nm]) dupNames[nm] = new Set();
+      dupNames[nm].add(r.user_id);
+    }
+  }
+  for (const r of rows) {
+    const nm = String(r.real_name || '').trim();
+    if (nm && dupNames[nm] && dupNames[nm].size > 1) r.dup_name = true;
+  }
   res.json(rows);
 });
 
