@@ -484,6 +484,17 @@ async function migrate() {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
   } catch(e) { console.log('withdrawal_codes migration skipped:', e.message); }
+  // KYC duplicate-photo detection: image hash columns + backfill existing rows
+  try { await exec(`ALTER TABLE kyc_submissions ADD COLUMN IF NOT EXISTS front_hash TEXT DEFAULT ''`); } catch(e) {}
+  try { await exec(`ALTER TABLE kyc_submissions ADD COLUMN IF NOT EXISTS back_hash TEXT DEFAULT ''`); } catch(e) {}
+  try {
+    const { hashImage } = require('../utils/hashImage');
+    const missing = await all("SELECT id, front_image, back_image FROM kyc_submissions WHERE front_image IS NOT NULL AND front_image != '' AND (front_hash IS NULL OR front_hash = '')");
+    for (const r of missing) {
+      await run("UPDATE kyc_submissions SET front_hash = ?, back_hash = ? WHERE id = ?", [hashImage(r.front_image), hashImage(r.back_image || ''), r.id]);
+    }
+    if (missing.length) console.log(`Backfilled image hashes for ${missing.length} KYC submissions`);
+  } catch(e) { console.log('KYC image hash backfill skipped:', e.message); }
 
   // Device tokens for push notifications
   try {

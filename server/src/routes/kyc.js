@@ -4,6 +4,7 @@ const adminMiddleware = require('../middleware/admin');
 const { get, insert, run, all } = require('../db/database');
 const { updateTaskProgress } = require('./tasks');
 const { notify } = require('./notifications');
+const { hashImage } = require('../utils/hashImage');
 
 const router = Router();
 
@@ -35,18 +36,26 @@ router.post('/', authMiddleware, async (req, res) => {
     return res.status(400).json({ error: 'This ID number is already registered under another account. Please contact support if you believe this is an error.' });
   }
 
+  // Prevent the same ID photo being used across multiple accounts
+  const fh = hashImage(front_image);
+  const bh = hashImage(back_image);
+  const dupPhoto = await get("SELECT user_id FROM kyc_submissions WHERE user_id != ? AND status IN ('pending', 'approved') AND ((front_hash = ? AND front_hash != '') OR (back_hash = ? AND back_hash != '')) LIMIT 1", [req.user.id, fh, bh]);
+  if (dupPhoto) {
+    return res.status(400).json({ error: 'The ID photo has already been used by another account. Please contact support if you believe this is an error.' });
+  }
+
   const existing = await get('SELECT id, status FROM kyc_submissions WHERE user_id = ?', [req.user.id]);
   if (existing) {
     if (existing.status === 'pending') return res.status(400).json({ error: 'Your verification is already under review' });
     // Rejected or approved — allow re-submit / re-verify
-    await run('UPDATE kyc_submissions SET doc_type = ?, real_name = ?, id_number = ?, front_image = ?, back_image = ?, video = ?, status = ?, submitted_at = NOW(), reviewed_at = NULL, admin_note = NULL WHERE id = ?',
-      [doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', video || null, 'pending', existing.id]);
+    await run('UPDATE kyc_submissions SET doc_type = ?, real_name = ?, id_number = ?, front_image = ?, back_image = ?, front_hash = ?, back_hash = ?, video = ?, status = ?, submitted_at = NOW(), reviewed_at = NULL, admin_note = NULL WHERE id = ?',
+      [doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', fh, bh, video || null, 'pending', existing.id]);
     return res.json({ id: existing.id, status: 'pending', message: 'Submitted for review' });
   }
 
   const result = await insert(
-    'INSERT INTO kyc_submissions (user_id, doc_type, real_name, id_number, front_image, back_image, video) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [req.user.id, doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', video || null]
+    'INSERT INTO kyc_submissions (user_id, doc_type, real_name, id_number, front_image, back_image, front_hash, back_hash, video) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [req.user.id, doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', fh, bh, video || null]
   );
   res.status(201).json({ id: result.id, status: 'pending' });
 });
@@ -69,7 +78,7 @@ router.post('/video', authMiddleware, async (req, res) => {
 // GET /api/kyc/admin/list — metadata only (exclude images to avoid huge response)
 router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
   const rows = await all(
-    'SELECT k.id, k.user_id, k.doc_type, k.real_name, k.id_number, k.status, k.admin_note, k.submitted_at, k.reviewed_at, u.name as user_name, u.email as user_email, u.referral_code as referral_code, u.frozen as frozen, COALESCE((SELECT SUM(te.amount) FROM task_earnings te WHERE te.user_id = k.user_id AND te.status = \'delivered\'), 0) as balance FROM kyc_submissions k JOIN users u ON u.id = k.user_id ORDER BY k.submitted_at DESC'
+    'SELECT k.id, k.user_id, k.doc_type, k.real_name, k.id_number, k.front_hash, k.back_hash, k.status, k.admin_note, k.submitted_at, k.reviewed_at, u.name as user_name, u.email as user_email, u.referral_code as referral_code, u.frozen as frozen, COALESCE((SELECT SUM(te.amount) FROM task_earnings te WHERE te.user_id = k.user_id AND te.status = \'delivered\'), 0) as balance FROM kyc_submissions k JOIN users u ON u.id = k.user_id ORDER BY k.submitted_at DESC'
   );
   // Detect duplicate ID numbers across accounts (for admin review)
   const dupUsers = {};
@@ -81,6 +90,24 @@ router.get('/admin/list', authMiddleware, adminMiddleware, async (req, res) => {
   }
   for (const r of rows) {
     if (r.id_number && dupUsers[r.id_number] && dupUsers[r.id_number].size > 1) r.dup_id = true;
+  }
+  // Detect duplicate ID photos across accounts
+  const dupPhotos = {};
+  for (const r of rows) {
+    if (r.status === 'rejected') continue;
+    if (r.front_hash) {
+      if (!dupPhotos['f:' + r.front_hash]) dupPhotos['f:' + r.front_hash] = new Set();
+      dupPhotos['f:' + r.front_hash].add(r.user_id);
+    }
+    if (r.back_hash) {
+      if (!dupPhotos['b:' + r.back_hash]) dupPhotos['b:' + r.back_hash] = new Set();
+      dupPhotos['b:' + r.back_hash].add(r.user_id);
+    }
+  }
+  for (const r of rows) {
+    const fDup = r.front_hash && dupPhotos['f:' + r.front_hash] && dupPhotos['f:' + r.front_hash].size > 1;
+    const bDup = r.back_hash && dupPhotos['b:' + r.back_hash] && dupPhotos['b:' + r.back_hash].size > 1;
+    if (fDup || bDup) r.dup_photo = true;
   }
   res.json(rows);
 });
