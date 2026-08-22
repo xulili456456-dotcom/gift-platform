@@ -4,7 +4,6 @@ const adminMiddleware = require('../middleware/admin');
 const { get, insert, run, all } = require('../db/database');
 const { updateTaskProgress } = require('./tasks');
 const { notify } = require('./notifications');
-const { transcodeVideo } = require('../utils/transcode');
 
 const router = Router();
 
@@ -28,20 +27,19 @@ router.post('/', authMiddleware, async (req, res) => {
   if ((video || '').length > 10000000) {
     return res.status(400).json({ error: 'Video too large. Please upload a shorter video (max 10MB).' });
   }
-  const videoToStore = await transcodeVideo(video);
 
   const existing = await get('SELECT id, status FROM kyc_submissions WHERE user_id = ?', [req.user.id]);
   if (existing) {
     if (existing.status === 'pending') return res.status(400).json({ error: 'Your verification is already under review' });
     // Rejected or approved — allow re-submit / re-verify
     await run('UPDATE kyc_submissions SET doc_type = ?, real_name = ?, id_number = ?, front_image = ?, back_image = ?, video = ?, status = ?, submitted_at = NOW(), reviewed_at = NULL, admin_note = NULL WHERE id = ?',
-      [doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', videoToStore || null, 'pending', existing.id]);
+      [doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', video || null, 'pending', existing.id]);
     return res.json({ id: existing.id, status: 'pending', message: 'Submitted for review' });
   }
 
   const result = await insert(
     'INSERT INTO kyc_submissions (user_id, doc_type, real_name, id_number, front_image, back_image, video) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    [req.user.id, doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', videoToStore || null]
+    [req.user.id, doc_type || 'driver_license', real_name, id_number, front_image || '', back_image || '', video || null]
   );
   res.status(201).json({ id: result.id, status: 'pending' });
 });
@@ -53,10 +51,9 @@ router.post('/video', authMiddleware, async (req, res) => {
   if ((video || '').length > 10000000) {
     return res.status(400).json({ error: 'Video too large. Please upload a shorter video (max 10MB).' });
   }
-  const videoToStore = await transcodeVideo(video);
   const existing = await get('SELECT id FROM kyc_submissions WHERE user_id = ?', [req.user.id]);
   if (!existing) return res.status(404).json({ error: 'Please complete KYC verification first' });
-  await run("UPDATE kyc_submissions SET video = ?, status = 'pending', submitted_at = NOW(), reviewed_at = NULL WHERE id = ?", [videoToStore, existing.id]);
+  await run("UPDATE kyc_submissions SET video = ?, status = 'pending', submitted_at = NOW(), reviewed_at = NULL WHERE id = ?", [video, existing.id]);
   res.json({ ok: true, message: 'Selfie video uploaded, pending review' });
 });
 
