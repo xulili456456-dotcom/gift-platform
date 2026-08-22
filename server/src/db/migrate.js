@@ -232,6 +232,7 @@ CREATE TABLE IF NOT EXISTS deposits (
     network         TEXT NOT NULL DEFAULT 'trc20' CHECK(network IN ('trc20','erc20','bep20')),
     amount          NUMERIC(10,2) NOT NULL,
     tx_hash         TEXT NOT NULL DEFAULT '',
+    image           TEXT DEFAULT '',
     status          TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','confirmed','rejected')),
     admin_note      TEXT DEFAULT '',
     created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -268,6 +269,7 @@ async function migrate() {
   } catch (e) { console.log('ALTER DATABASE skipped:', e.message); }
   await exec(schema);
   try { await exec(depositsSchema); } catch (e) { console.log('Deposits migration skipped:', e.message); }
+  try { await exec(`ALTER TABLE deposits ADD COLUMN IF NOT EXISTS image TEXT DEFAULT ''`); } catch (e) { console.log('deposits.image column skipped:', e.message); }
   try { await exec(commissionsSchema); } catch (e) { console.log('Commissions migration skipped:', e.message); }
   // Fix: add 'holding' to store_orders status CHECK constraint
   try { await exec(`ALTER TABLE store_orders DROP CONSTRAINT IF EXISTS store_orders_status_check`); } catch (e) {}

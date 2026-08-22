@@ -8,18 +8,24 @@ const router = Router();
 
 // POST /api/deposits — submit deposit request
 router.post('/', authMiddleware, async (req, res) => {
-  const { network, amount, tx_hash } = req.body;
+  const { network, amount, tx_hash, image } = req.body;
   const amt = parseFloat(amount);
   if (!amt || amt < 1) return res.status(400).json({ error: 'Minimum deposit is $1' });
-  if (!network || !tx_hash) return res.status(400).json({ error: 'Network and transaction hash are required' });
+  if (!network) return res.status(400).json({ error: 'Network is required' });
   if (!['trc20','erc20','bep20'].includes(network)) return res.status(400).json({ error: 'Invalid network' });
 
+  const txHash = (tx_hash || '').trim();
+  const imageData = (image || '').trim();
+  if (!imageData) return res.status(400).json({ error: 'Transfer screenshot is required' });
+  // Guard against oversized base64 screenshots (~10MB)
+  if (imageData.length > 10 * 1024 * 1024) return res.status(400).json({ error: 'Screenshot too large (max 10MB)' });
+
   const result = await insert(
-    'INSERT INTO deposits (user_id, network, amount, tx_hash) VALUES (?, ?, ?, ?)',
-    [req.user.id, network, amt, tx_hash.trim()]
+    'INSERT INTO deposits (user_id, network, amount, tx_hash, image) VALUES (?, ?, ?, ?, ?)',
+    [req.user.id, network, amt, txHash, imageData]
   );
   try { require('./notifications').notify(req.user.id, '💵 Deposit Submitted', `$${amt} deposit pending review`, 'info'); } catch {}
-  res.status(201).json({ id: result.id, network, amount: amt, tx_hash: tx_hash.trim(), status: 'pending' });
+  res.status(201).json({ id: result.id, network, amount: amt, tx_hash: txHash, image: imageData, status: 'pending' });
 });
 
 // GET /api/deposits — user's deposit history

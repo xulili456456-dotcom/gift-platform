@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import client from '../api/client';
 import toast from 'react-hot-toast';
@@ -11,8 +11,10 @@ const NETWORKS = [
 
 export default function DepositPage() {
   const navigate = useNavigate();
+  const fileRef = useRef(null);
   const [network, setNetwork] = useState('trc20');
   const [amount, setAmount] = useState('');
+  const [image, setImage] = useState('');
   const [deposits, setDeposits] = useState([]);
   const [addresses, setAddresses] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -24,14 +26,24 @@ export default function DepositPage() {
   }, []);
 
   const currentAddress = addresses[network] || '';
+  const handleFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setImage(reader.result);
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
   const handleSubmit = async () => {
     const amt = parseFloat(amount);
     if (!amt || amt < 10) { toast.error('Minimum deposit is $10'); return; }
+    if (!image) { toast.error('Please upload your transfer screenshot'); return; }
     setSubmitting(true);
     try {
-      await client.post('/deposits', { network, amount: amt, tx_hash: 'manual-review' });
+      await client.post('/deposits', { network, amount: amt, image });
       toast.success('Deposit submitted for review');
       setAmount('');
+      setImage('');
       const {data} = await client.get('/deposits');
       setDeposits(data||[]);
     } catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
@@ -92,6 +104,20 @@ export default function DepositPage() {
           <div style={{fontSize:14,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Submit Deposit Request</div>
           <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Amount</div>
           <input type="number" value={amount} onChange={e=>setAmount(e.target.value)} placeholder="Enter USDT amount" style={{width:'100%',padding:'12px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:14,fontWeight:600,outline:'none',marginBottom:12}} />
+          <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:4}}>Transfer Screenshot</div>
+          <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} style={{display:'none'}} />
+          {image ? (
+            <div style={{position:'relative',marginBottom:12}}>
+              <img src={image} alt="proof" style={{width:'100%',borderRadius:12,border:'1px solid #eee',display:'block'}} />
+              <button onClick={()=>setImage('')} style={{position:'absolute',top:8,right:8,background:'rgba(0,0,0,.6)',color:'#fff',border:'none',borderRadius:20,width:28,height:28,fontSize:14,cursor:'pointer',lineHeight:1}}>✕</button>
+            </div>
+          ) : (
+            <button onClick={()=>fileRef.current?.click()} type="button" style={{width:'100%',padding:'16px',background:'#f8f8f8',border:'2px dashed #ddd',borderRadius:12,textAlign:'center',cursor:'pointer',marginBottom:12}}>
+              <div style={{fontSize:28,marginBottom:4,opacity:.5}}>📸</div>
+              <div style={{fontSize:12,fontWeight:600,color:'#666'}}>Upload Transfer Screenshot</div>
+              <div style={{fontSize:10,color:'#bbb',marginTop:2}}>Show the transfer amount & destination address</div>
+            </button>
+          )}
           <button onClick={handleSubmit} disabled={submitting}
             style={{width:'100%',padding:14,background:'#00A86B',color:'#fff',border:'none',borderRadius:14,fontSize:15,fontWeight:700,cursor:'pointer',opacity:submitting?0.6:1}}>{submitting?'Submitting...':'Submit Deposit'}</button>
           <div style={{marginTop:12,padding:'10px 12px',background:'#f8f8f8',borderRadius:10,fontSize:10,color:'#999',lineHeight:1.5}}>
@@ -115,6 +141,7 @@ export default function DepositPage() {
                     <div>Network: {d.network?.toUpperCase()}</div>
                     <div>Amount: ${Number(d.amount||0).toFixed(2)}</div>
                     <div>Time: {new Date(d.created_at).toLocaleString()}</div>
+                    {d.image && <img src={d.image} alt="proof" style={{width:'100%',borderRadius:8,marginTop:6,display:'block'}} />}
                   </div>
                 )}
               </div>
