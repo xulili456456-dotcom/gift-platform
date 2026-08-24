@@ -512,7 +512,7 @@
     "hint": "Elaborato entro 24 ore",
     "noWallet": "Collega portafoglio",
     "bindFirst": "Devi collegare un portafoglio",
-    "minAmount": "Minimo $20",
+    "minAmount": "Minimo $50",
     "minPlaceholder": "Min $20",
     "invalidAmount": "Importo non valido",
     "insufficient": "Saldo insufficiente",

@@ -35,7 +35,7 @@ export default function DepositPage() {
   };
   const handleSubmit = async () => {
     const amt = parseFloat(amount);
-    if (!amt || amt < 20) { toast.error('Minimum deposit is $20'); return; }
+    if (!amt || amt < 50) { toast.error('Minimum deposit is $50'); return; }
     if (!image) { toast.error('Please upload your transfer screenshot'); return; }
     setSubmitting(true);
     try {

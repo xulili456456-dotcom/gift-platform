@@ -88,7 +88,7 @@ export default function WithdrawPage() {
   };
   const handleWithdraw = async () => {
     const amt = parseFloat(amount);
-    if (!amt || amt < 20) { toast.error(t('withdraw.minAmount')); return; }
+    if (!amt || amt < 50) { toast.error(t('withdraw.minAmount')); return; }
     if (amt > availableBalance) { toast.error(t('withdraw.insufficient')); return; }
     if (!walletAddress) { toast.error('Please enter wallet address'); return; }
     if (!verifyCode || !verifyVideo) { toast.error('Please complete video verification first'); return; }
