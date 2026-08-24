@@ -45,7 +45,7 @@ export default function StoreFundsPage() {
 
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
-    if (!amt || amt < 20) { toast.error('Minimum $20'); return; }
+    if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
     try { await client.post('/store/deposit', { amount: amt }); setDepositMsg(`Deposited $${amt}!`); setDepositAmount(''); loadStatus(); loadEarnings(); }
     catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };

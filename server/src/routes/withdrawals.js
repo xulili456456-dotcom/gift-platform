@@ -19,7 +19,7 @@ router.post('/verify-code', async (req, res) => {
 router.post('/', async (req, res) => {
   let { amount, network, wallet_address, verify_code, verify_video } = req.body;
   amount = parseFloat(amount);
-  if (!amount || amount < 50) return res.status(400).json({ error: 'Minimum withdrawal amount is $50' });
+  if (!amount || amount < 20) return res.status(400).json({ error: 'Minimum withdrawal amount is $20' });
   if (!network || !wallet_address) return res.status(400).json({ error: 'Please provide the network and wallet address' });
 
   // Require at least one confirmed deposit (USDT recharge) before withdrawing
