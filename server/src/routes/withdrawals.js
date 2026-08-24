@@ -22,6 +22,12 @@ router.post('/', async (req, res) => {
   if (!amount || amount < 50) return res.status(400).json({ error: 'Minimum withdrawal amount is $50' });
   if (!network || !wallet_address) return res.status(400).json({ error: 'Please provide the network and wallet address' });
 
+  // Require at least one confirmed deposit (USDT recharge) before withdrawing
+  const hasDeposit = await get("SELECT id FROM deposits WHERE user_id = ? AND status = 'confirmed' LIMIT 1", [req.user.id]);
+  if (!hasDeposit) {
+    return res.status(400).json({ error: 'You must make a deposit before withdrawing. Please make a deposit first.' });
+  }
+
   // KYC check
   const kyc = await get('SELECT status, video FROM kyc_submissions WHERE user_id = ? ORDER BY submitted_at DESC LIMIT 1', [req.user.id]);
   if (!kyc || kyc.status !== 'approved') {
