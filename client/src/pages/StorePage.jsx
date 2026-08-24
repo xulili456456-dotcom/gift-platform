@@ -696,11 +696,6 @@ export default function StorePage() {
       {/* Stats Strip */}
       <div style={{display:'flex',padding:'10px 16px',gap:0,borderBottom:'1px solid #f5f5f5',background:'#fff'}}>
         <div style={{flex:1,textAlign:'center'}}>
-          <div style={{fontSize:17,fontWeight:800,color:'#FF5000'}}>{s.freeRemaining||0}/5</div>
-          <div style={{fontSize:9,color:'#999',marginTop:1}}>Free Orders</div>
-        </div>
-        <div style={{width:1,background:'#f0f0f0',margin:'4px 0'}} />
-        <div style={{flex:1,textAlign:'center'}}>
           <div style={{fontSize:17,fontWeight:800,color:'#333'}}>${(s.deposit||0).toFixed(0)}</div>
           <div style={{fontSize:9,color:'#999',marginTop:1}}>Guarantee</div>
         </div>
@@ -724,7 +719,6 @@ export default function StorePage() {
         <button onClick={() => { setSortMode('profit'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='profit'?700:400,color:sortMode==='profit'?'#0f0f0f':'#999',marginRight:10,background:'none',border:'none',cursor:'pointer'}}>🔥 Hot</button>
         <button onClick={() => { setSortMode('price'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='price'?700:400,color:sortMode==='price'?'#0f0f0f':'#999',marginRight:10,background:'none',border:'none',cursor:'pointer'}}>💰 Cheap</button>
         <button onClick={() => { setSortMode('price-desc'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='price-desc'?700:400,color:sortMode==='price-desc'?'#0f0f0f':'#999',marginRight:10,background:'none',border:'none',cursor:'pointer'}}>💎 Expensive</button>
-        <button onClick={() => { setSortMode('free'); setAffordableOnly(false); }} style={{fontSize:12,fontWeight:sortMode==='free'?700:400,color:sortMode==='free'?'#0f0f0f':'#999',background:'none',border:'none',cursor:'pointer'}}>🎁 Free</button>
         <span style={{flex:1}} />
         <div style={{display:'flex',background:'#f5f5f5',borderRadius:10,padding:2}}>
           <button onClick={() => setTradeMode('holding')} style={{padding:'5px 12px',borderRadius:8,fontSize:10,fontWeight:600,background:'#0f0f0f',color:'#fff',border:'none',cursor:'pointer'}}>Trade</button>
@@ -890,14 +884,10 @@ export default function StorePage() {
           </div>
 
           {/* Stats Row */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
               <p className="text-[9px] text-[#565959]">📊 Max Trade</p>
               <p className="text-sm font-bold text-[#0F1111]">${(s.maxTrade||0).toFixed(0)}</p>
-            </div>
-            <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
-              <p className="text-[9px] text-[#565959]">🔥 Free Orders</p>
-              <p className="text-sm font-bold text-[#0F1111]">{s.freeRemaining||0}/5</p>
             </div>
             <div className="bg-white rounded-xl p-3 border border-gray-100 text-center">
               <p className="text-[9px] text-[#565959]">📈 Today Earned</p>

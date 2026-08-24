@@ -235,16 +235,7 @@ export default function HomePage() {
         <div style={{ position: 'absolute', left: '20%', top: '60%', width: 4, height: 4, background: '#fff', borderRadius: '50%', animation: 'heroFloatUp 2s ease-out infinite' }} />
         <div style={{ position: 'absolute', left: '50%', top: '70%', width: 4, height: 4, background: '#fff', borderRadius: '50%', animation: 'heroFloatUp 2s ease-out infinite', animationDelay: '.6s' }} />
         <div style={{ position: 'absolute', left: '75%', top: '40%', width: 4, height: 4, background: '#fff', borderRadius: '50%', animation: 'heroFloatUp 2s ease-out infinite', animationDelay: '1.2s' }} />
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(255,255,255,.18)', border: '1px solid rgba(255,255,255,.15)', padding: '4px 10px', borderRadius: 6, fontSize: 10, fontWeight: 600, marginBottom: 12, position: 'relative', zIndex: 1 }}>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg>
-          {t('home.dailyFreeOrders')}
-        </div>
         <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6, position: 'relative', zIndex: 1 }}>{t('home.grabProducts')}</h2>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,.65)', marginBottom: 16, position: 'relative', zIndex: 1 }}>{t('home.grabSubtitle')}</p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'rgba(255,255,255,.7)', marginBottom: 16, position: 'relative', zIndex: 1 }}>
-          <div style={{ width: 6, height: 6, background: '#fff', borderRadius: '50%', animation: 'breathe 1.5s ease-in-out infinite' }} />
-          {freeRemaining > 0 ? freeRemaining : 'All 5'} free grabs used · {tier.name}
-        </div>
         <span onClick={(e) => { e.stopPropagation(); navigate('/store'); }} className="home-hero-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fff', color: 'var(--pri)', padding: '10px 22px', borderRadius: 10, fontSize: 13, fontWeight: 600, position: 'relative', zIndex: 1 }}>
           {t('home.grabNow')} →
         </span>
@@ -284,52 +275,6 @@ export default function HomePage() {
             <div style={{ fontSize: 10, fontWeight: 600, color: '#6e6e73' }}>{act.label}</div>
           </div>
         ))}
-      </div>
-
-      {/* ═══ FREE ORDERS ═══ */}
-      <div style={{ background: '#f5f5f7', borderTop: '1px solid #e8e8ed', borderBottom: '1px solid #e8e8ed', padding: 16, marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <h3 style={{ fontSize: 15, fontWeight: 700, color: '#1d1d1f', display: 'flex', alignItems: 'center', gap: 7 }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--green)" style={{ animation: 'boltZap 2s ease-in-out infinite', display: 'inline-block' }}><path d="M13 2L3 14h8l-2 8 12-12h-8l2-8z"/></svg>
-            <span style={{ animation: 'urgencyPulse 1s ease-in-out infinite', color: 'var(--green)' }}>{t('home.freeOrders')}</span>
-          </h3>
-          <span style={{ fontSize: 10, background: 'rgba(0,168,107,.08)', color: 'var(--green)', padding: '3px 8px', borderRadius: 4, fontWeight: 600, animation: 'urgencyPulse 1s ease-in-out infinite' }}>
-            {t('home.freeLeft', { n: freeRemaining })}
-          </span>
-        </div>
-        {freeProducts.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 24, color: '#999', fontSize: 13 }}>{t('home.freeEmpty')}</div>
-        ) : (
-          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-            {freeProducts.map((p) => {
-              const claimed = freeClaimed.includes(p.name) || grabbedCards.has(p.name);
-              const profit = Math.round(p.price * 0.03 * 100) / 100;
-              const imgUrl = p.img ? (p.img.startsWith('http') ? p.img : `https://amashopstore.com${p.img}`) : '';
-              return (
-                <div key={p.id} onClick={() => !claimed && handleGrab(p.id, p.name)}
-                  className="home-free-card"
-                  style={{
-                    minWidth: 134, maxWidth: 134, background: '#fff', border: `1px solid ${claimed ? 'var(--green)' : '#e8e8ed'}`,
-                    borderRadius: 13, padding: 10, textAlign: 'center', cursor: claimed ? 'default' : 'pointer',
-                    boxShadow: '0 1px 3px rgba(0,0,0,.02)', flexShrink: 0, transition: 'all .2s',
-                    opacity: claimed ? .6 : 1, position: 'relative', overflow: 'hidden',
-                  }}>
-                  {claimed && (
-                    <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 40, height: 40, background: 'var(--green)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5 }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
-                  )}
-                  <img src={imgUrl} alt={p.name} style={{ width: 58, height: 58, borderRadius: 10, objectFit: 'cover', marginBottom: 6 }} />
-                  <div style={{ fontSize: 10, fontWeight: 600, marginBottom: 2, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{p.name}</div>
-                  <div className="hold-ha-glow" style={{ fontSize: 11, fontWeight: 700, color: 'var(--green)', marginBottom: 6 }}>+${profit.toFixed(2)}</div>
-                  <span className={claimed ? '' : 'home-grab-btn'} style={{ display: 'inline-block', padding: '5px 18px', background: claimed ? '#999' : 'var(--green)', color: '#fff', borderRadius: 7, fontSize: 10, fontWeight: 700, animation: claimed ? 'none' : 'grabBounce 2s ease-in-out infinite' }}>
-                    {claimed ? t('home.claimed') : t('home.grab')}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        )}
       </div>
 
       {/* ═══ ACTIVE HOLDINGS ═══ */}
