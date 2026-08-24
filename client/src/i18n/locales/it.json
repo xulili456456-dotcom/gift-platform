@@ -513,7 +513,7 @@
     "noWallet": "Collega portafoglio",
     "bindFirst": "Devi collegare un portafoglio",
     "minAmount": "Minimo $50",
-    "minPlaceholder": "Min $20",
+    "minPlaceholder": "Min $50",
     "invalidAmount": "Importo non valido",
     "insufficient": "Saldo insufficiente",
     "success": "Inviato",

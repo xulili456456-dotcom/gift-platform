@@ -513,7 +513,7 @@
     "noWallet": "Bind wallet first",
     "bindFirst": "You need to bind a crypto wallet before withdrawing",
     "minAmount": "Minimum withdrawal is $50",
-    "minPlaceholder": "Min $20",
+    "minPlaceholder": "Min $50",
     "invalidAmount": "Enter a valid amount",
     "insufficient": "Insufficient balance",
     "success": "Withdrawal submitted",

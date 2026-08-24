@@ -94,7 +94,7 @@ export default function DepositPage() {
           <div style={{background:'#F0FAF4',borderRadius:10,padding:10,fontSize:10,color:'#00A86B',textAlign:'center',marginBottom:4}}>
             Want faster confirmation? <button onClick={contactSupport} style={{background:'#E8F5E9',color:'#00A86B',border:'1px solid #00A86B',borderRadius:8,padding:'4px 10px',fontSize:10,fontWeight:600,cursor:'pointer'}}>Contact Support</button>
           </div>
-          <div style={{fontSize:10,color:'#999',textAlign:'center'}}>Send only USDT · Minimum $20 · Usually arrives in 10-30 min</div>
+          <div style={{fontSize:10,color:'#999',textAlign:'center'}}>Send only USDT · Minimum $50 · Usually arrives in 10-30 min</div>
         </div>
 
         {/* STEP 3 */}

@@ -513,7 +513,7 @@
     "noWallet": "Cuzdan bagla",
     "bindFirst": "Cekim icin cuzdan baglamalisin",
     "minAmount": "Min $50",
-    "minPlaceholder": "Min 20",
+    "minPlaceholder": "Min 50",
     "invalidAmount": "Gecerli miktar gir",
     "insufficient": "Yetersiz bakiye",
     "success": "Talep gonderildi",
