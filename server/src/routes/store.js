@@ -131,7 +131,7 @@ router.get('/status', async (req, res) => {
       balance: Number(taskBal?.total || 0),
       deposit: Number(store.deposit || 0),
       maxTrade: Number(store.deposit || 0),
-      freeRemaining: Math.max(0, 10 - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_lifetime_' + req.user.id]))?.value || 0)),
+      freeRemaining: Math.max(0, FREE_LIFETIME_SLOTS - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_lifetime_' + req.user.id]))?.value || 0)),
       // Include free product names and claimed list so frontend has them immediately
       freeProductNames: (await getFreeProductNames(req.user.id, today)),
       claimedFreeNames: (await getClaimedFreeNames(req.user.id, today)),
