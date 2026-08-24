@@ -360,7 +360,7 @@ async function migrate() {
     await run("UPDATE task_definitions SET target_count = 5, title = 'Invite 5 Friends This Week', description = 'Get 5 new people to complete KYC with your code' WHERE task_type = 'invite_3_weekly'");
     await run("UPDATE task_definitions SET task_type = 'referral_first_deposit', title = 'Referral Makes First Deposit', description = 'Have a referred friend make their first deposit', reward = 5 WHERE task_type = 'referral_trade'");
     await run("UPDATE task_definitions SET reward = 2 WHERE task_type = 'first_order'");
-    await run("UPDATE task_definitions SET active = FALSE WHERE task_type IN ('first_deposit', 'deposit_500')");
+    await run("UPDATE task_definitions SET active = FALSE WHERE task_type IN ('first_deposit', 'deposit_500', 'referral_first_deposit')");
     console.log('Task definitions configured.');
   } catch (e) { console.log('Task config skipped:', e.message); }
   // Admin audit log

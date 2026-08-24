@@ -66,19 +66,27 @@ router.put('/:id/confirm', authMiddleware, adminMiddleware, async (req, res) => 
 
     await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
       [d.user_id, Number(d.amount), 'deposit', 'delivered']);
+
+    // 5% referral commission to the direct inviter on every downline deposit
+    const commission = Math.round(Number(d.amount) * 0.05 * 100) / 100;
+    let commissionToId = null;
+    if (commission > 0) {
+      const inviter = await t.get('SELECT parent_id FROM users WHERE id = ?', [d.user_id]);
+      if (inviter && inviter.parent_id) {
+        commissionToId = inviter.parent_id;
+        await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)',
+          [commissionToId, commission, 'commission', 'delivered']);
+      }
+    }
+
     await t.commit();
     try { require('./notifications').notify(d.user_id, '💵 Deposit Confirmed', `$${Number(d.amount)} has been credited to your account`, 'success'); } catch {}
+    if (commissionToId) {
+      try { require('./notifications').notify(commissionToId, '💰 Referral Commission', `$${commission} commission from a downline deposit`, 'success'); } catch {}
+    }
     res.json({ ok: true, message: 'Deposit confirmed' });
     updateTaskProgress(d.user_id, 'first_deposit', 1).catch(()=>{});
     updateTaskProgress(d.user_id, 'deposit_500', 0, Number(d.amount)).catch(()=>{});
-    // Reward inviter's "referral makes first deposit" on the user's first deposit
-    const depCount = await get("SELECT COUNT(*)::int as c FROM deposits WHERE user_id = ? AND status = 'confirmed'", [d.user_id]);
-    if (Number(depCount?.c || 0) === 1) {
-      const parentRow = await get('SELECT parent_id FROM users WHERE id = ?', [d.user_id]);
-      if (parentRow?.parent_id) {
-        updateTaskProgress(parentRow.parent_id, 'referral_first_deposit', 1).catch(()=>{});
-      }
-    }
   } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 
