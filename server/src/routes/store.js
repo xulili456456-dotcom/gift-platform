@@ -603,7 +603,7 @@ router.post('/claim-free/:productId', authMiddleware, async (req, res) => {
 // POST /api/store/deposit — move funds from balance to deposit (instant, no approval needed)
 router.post('/deposit', authMiddleware, async (req, res) => {
   const amount = parseFloat(req.body.amount);
-  if (!amount || amount < 1) return res.status(400).json({ error: 'Minimum deposit is $1' });
+  if (!amount || amount < 20) return res.status(400).json({ error: 'Minimum deposit is $20' });
 
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!store) return res.status(400).json({ error: 'Please open a store first' });
