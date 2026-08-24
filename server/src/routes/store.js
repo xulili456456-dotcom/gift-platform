@@ -16,7 +16,7 @@ const TIERS = {
 
 // Product profit formula — deterministic per product per day (no Math.random)
 const FREE_PROFIT_RATE = 0.03;
-const FREE_LIFETIME_SLOTS = 5; // permanent free orders per user (was 10)
+const FREE_LIFETIME_SLOTS = 0; // free orders disabled
 
 function seededRand(seed) {
   var x = Math.sin(seed * 9301 + 49297) * 49297;
