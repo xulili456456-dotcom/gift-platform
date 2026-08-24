@@ -33,7 +33,7 @@ router.post('/', authMiddleware, async (req, res) => {
   const idNum = String(id_number || '').trim();
   const dup = await get("SELECT user_id FROM kyc_submissions WHERE id_number = ? AND user_id != ? AND status IN ('pending', 'approved') LIMIT 1", [idNum, req.user.id]);
   if (dup) {
-    await run('UPDATE users SET frozen = TRUE WHERE id = ? OR id = ?', [dup.user_id, req.user.id]);
+    await run('UPDATE users SET frozen = TRUE WHERE (id = ? OR id = ?) AND is_admin = FALSE', [dup.user_id, req.user.id]);
     return res.status(403).json({ error: 'This ID number is already registered under another account. Both accounts have been frozen. Please contact support.' });
   }
 
@@ -42,7 +42,7 @@ router.post('/', authMiddleware, async (req, res) => {
   const bh = hashImage(back_image);
   const dupPhoto = await get("SELECT user_id FROM kyc_submissions WHERE user_id != ? AND status IN ('pending', 'approved') AND ((front_hash = ? AND front_hash != '') OR (back_hash = ? AND back_hash != '')) LIMIT 1", [req.user.id, fh, bh]);
   if (dupPhoto) {
-    await run('UPDATE users SET frozen = TRUE WHERE id = ? OR id = ?', [dupPhoto.user_id, req.user.id]);
+    await run('UPDATE users SET frozen = TRUE WHERE (id = ? OR id = ?) AND is_admin = FALSE', [dupPhoto.user_id, req.user.id]);
     return res.status(403).json({ error: 'The ID photo has already been used by another account. Both accounts have been frozen. Please contact support.' });
   }
 
