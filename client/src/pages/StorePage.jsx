@@ -278,9 +278,12 @@ const PRODUCTS = [
 
 
 function genProducts(tier, cat, search, daySeed) {
-  // Per-tier profit rate + price range (三参数收益控制)
+  // Per-tier profit rate + price range + daily random float (三参数收益控制)
   const [lo, hi] = TIER_PRICE_RANGES[tier] || TIER_PRICE_RANGES.small;
-  const rate = TIER_PROFIT_RATES[tier] || TIER_PROFIT_RATES.small;
+  const base = TIER_PROFIT_RATES[tier] || TIER_PROFIT_RATES.small;
+  // 日随机浮动 ±30%（与后端 store.js getDailyProfitRate 一致）
+  const rng = (function(s){var x=Math.sin(s*9301+49297)*49297;return x-Math.floor(x)})(daySeed * 31 + base * 100);
+  const rate = base * (0.7 + 0.6 * rng);
   let filtered = cat === 'All' ? [...PRODUCTS] : PRODUCTS.filter(p => p.cat === cat);
   filtered = filtered.filter(p => p.price >= lo && p.price <= hi);
   if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.cat.toLowerCase().includes(search.toLowerCase()));
@@ -484,6 +487,7 @@ export default function StorePage() {
       else if (d?.shortage) { setBuyConfirm(null); setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, balance: d.balance, deposit: d.deposit }); }
       else if (d?.freeSlotsExhausted) { setFreeRemaining(0); setBuyConfirm(null); toast.error('All 5 free orders used today'); }
       else if (d?.productAlreadyClaimed) { setBuyConfirm(null); toast.error(d.error); }
+      else if (d?.dailyProfitReached) { setBuyConfirm(null); toast.error(t('store.dailyProfitReached', { cap: Number(d.cap || 0).toFixed(2) })); }
       else toast.error(d?.error || t('common.operationFailed'));
     }
     setBuying(false);
@@ -695,6 +699,17 @@ export default function StorePage() {
         <div style={{flex:1,textAlign:'center'}}>
           <div style={{fontSize:17,fontWeight:800,color:'#00A86B'}}>+${earnings.todayProfit.toFixed(2)}</div>
           <div style={{fontSize:9,color:'#999',marginTop:1}}>Today Earned</div>
+        </div>
+      </div>
+
+      {/* Daily Profit Cap Progress */}
+      <div style={{padding:'0 16px 10px',background:'#fff',borderBottom:'1px solid #f5f5f5'}}>
+        <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'#999',marginBottom:4}}>
+          <span>Daily profit</span>
+          <span><b style={{color:'#0f0f0f'}}>+${(s.todayProfit||0).toFixed(2)}</b> / ${(s.dailyProfitCap||0).toFixed(2)}</span>
+        </div>
+        <div style={{background:'#f0f0f0',borderRadius:3,height:6,overflow:'hidden'}}>
+          <div style={{width: `${Math.min(100, ((s.todayProfit||0)/(s.dailyProfitCap||1))*100)}%`,height:'100%',background:'#00A86B',borderRadius:3,transition:'width .5s'}} />
         </div>
       </div>
 
