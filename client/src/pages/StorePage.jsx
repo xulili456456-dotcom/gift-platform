@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import client from '../api/client';
 import { ShoppingCart, X, Store, Search, Star, ChevronLeft, Truck, Shield, RotateCcw, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
+import TierGuide from '../components/TierGuide';
 
 function daysUntil(iso) {
   if (!iso) return null;
@@ -469,6 +470,7 @@ export default function StorePage() {
   };
   const [buyConfirm, setBuyConfirm] = useState(null);
   const [buying, setBuying] = useState(false);
+  const [showTierGuide, setShowTierGuide] = useState(false);
   const handleBuy = (product) => { setBuyConfirm(product); };
   const handleConfirmBuy = async () => {
     if (!buyConfirm) return;
@@ -505,6 +507,9 @@ export default function StorePage() {
       <p className="text-sm text-[#565959] mb-8">{t('store.subtitle')}</p>
       <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-[#FF5000] hover:bg-[#E04500] text-[#0F1111] font-bold rounded-full shadow-lg active:scale-[0.98] transition-all text-base border border-[#FF5000]">{opening ? '...' : t('store.openBtn', { deposit: 20 })}</button>
       <p className="text-xs text-[#999999] mt-3 max-w-xs leading-relaxed">{t('store.openDepositNote')}</p>
+      <div className="w-full max-w-sm mt-8 text-left">
+        <TierGuide />
+      </div>
     </div>
   );
 
@@ -708,7 +713,7 @@ export default function StorePage() {
       {/* Daily Profit Cap Progress */}
       <div style={{padding:'0 16px 10px',background:'#fff',borderBottom:'1px solid #f5f5f5'}}>
         <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'#999',marginBottom:4}}>
-          <span>Daily profit</span>
+          <span style={{display:'flex',alignItems:'center',gap:6}}>Daily profit <button onClick={() => setShowTierGuide(true)} style={{background:'none',border:'none',color:'#FF5000',fontSize:10,fontWeight:600,cursor:'pointer',padding:0}}>{t('store.tierGuide')} ›</button></span>
           <span><b style={{color:'#0f0f0f'}}>+${(s.todayProfit||0).toFixed(2)}</b> / ${(s.dailyProfitCap||0).toFixed(2)}</span>
         </div>
         <div style={{background:'#f0f0f0',borderRadius:3,height:6,overflow:'hidden'}}>
@@ -1034,6 +1039,16 @@ export default function StorePage() {
           </div>
         </div>
       )})()}
+
+      {/* Tier Guide Modal */}
+      {showTierGuide && (
+        <div style={{position:'fixed',inset:0,zIndex:300,background:'rgba(0,0,0,.45)',display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={() => setShowTierGuide(false)}>
+          <div style={{width:'100%',maxWidth:360}} onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowTierGuide(false)} style={{display:'block',marginLeft:'auto',marginBottom:8,background:'rgba(255,255,255,.2)',border:'none',color:'#fff',width:28,height:28,borderRadius:14,cursor:'pointer',fontSize:16,lineHeight:1}}>×</button>
+            <TierGuide />
+          </div>
+        </div>
+      )}
 
       {/* Draggable Floating Contact Button */}
       <FloatingContact />

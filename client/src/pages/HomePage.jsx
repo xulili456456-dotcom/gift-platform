@@ -7,6 +7,7 @@ import { claimsApi } from '../api/claims';
 import client from '../api/client';
 import toast from 'react-hot-toast';
 import RedEnvelopeTeaser from './RedEnvelopeTeaser';
+import TierGuide from '../components/TierGuide';
 
 const TIER_INFO = {
   small:   { name: 'Small Store',   dailyOrders: 3,  threshold: 0,    next: 'Medium',  nextThreshold: 50 },
@@ -358,6 +359,11 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ═══ TIER GUIDE ═══ */}
+      <div style={{ padding: '0 16px', marginBottom: 16 }}>
+        <TierGuide />
       </div>
 
       {/* ═══ INVITE ═══ */}

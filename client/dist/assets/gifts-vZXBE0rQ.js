@@ -1,0 +1,1 @@
+import{t as e}from"./client-CFcy3jmz.js";var t={list(){return e.get(`/gifts`)},detail(t){return e.get(`/gifts/${t}`)},eligible(){return e.get(`/gifts/eligible`)}};export{t};
