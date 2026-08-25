@@ -496,6 +496,13 @@ async function migrate() {
     if (missing.length) console.log(`Backfilled image hashes for ${missing.length} KYC submissions`);
   } catch(e) { console.log('KYC image hash backfill skipped:', e.message); }
 
+  // Store deposit lock (押金开店: 365-day lock)
+  try { await exec(`ALTER TABLE stores ADD COLUMN IF NOT EXISTS deposit_unlock_at TIMESTAMP DEFAULT NULL`); } catch(e) { console.log('deposit_unlock_at skipped:', e.message); }
+  try { await exec(`UPDATE stores SET deposit_unlock_at = opened_at + INTERVAL '365 days' WHERE deposit > 0 AND deposit_unlock_at IS NULL`); } catch(e) { console.log('deposit_unlock_at backfill skipped:', e.message); }
+  // Daily profit cap (日赚上限: 押金÷30, admin override)
+  try { await exec(`ALTER TABLE stores ADD COLUMN IF NOT EXISTS daily_profit_cap NUMERIC(10,2) DEFAULT NULL`); } catch(e) { console.log('daily_profit_cap skipped:', e.message); }
+  try { await exec(`ALTER TABLE store_orders ADD COLUMN IF NOT EXISTS profit NUMERIC(10,2) DEFAULT 0`); } catch(e) { console.log('store_orders.profit skipped:', e.message); }
+
   // Device tokens for push notifications
   try {
     await exec(`CREATE TABLE IF NOT EXISTS device_tokens (

@@ -9,9 +9,9 @@ import toast from 'react-hot-toast';
 import RedEnvelopeTeaser from './RedEnvelopeTeaser';
 
 const TIER_INFO = {
-  small:  { name: 'Small Store', dailyOrders: 10, threshold: 0,   next: 'Medium', nextThreshold: 50 },
-  medium: { name: 'Medium Store', dailyOrders: 20, threshold: 50,  next: 'Large', nextThreshold: 200 },
-  large:  { name: 'Large Store', dailyOrders: 40, threshold: 200, next: null, nextThreshold: 0 },
+  small:  { name: 'Small Store', dailyOrders: 3, threshold: 0,   next: 'Medium', nextThreshold: 50 },
+  medium: { name: 'Medium Store', dailyOrders: 5, threshold: 50,  next: 'Large', nextThreshold: 200 },
+  large:  { name: 'Large Store', dailyOrders: 8, threshold: 200, next: null, nextThreshold: 0 },
 };
 
 export default function HomePage() {

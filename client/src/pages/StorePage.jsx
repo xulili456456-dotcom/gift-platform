@@ -5,26 +5,21 @@ import client from '../api/client';
 import { ShoppingCart, X, Store, Search, Star, ChevronLeft, Truck, Shield, RotateCcw, Bell } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-function getRates(price){
-  var today = new Date().toISOString().slice(0,10);
-  var daySeed = today.split('-').reduce(function(s,x){return s+parseInt(x)},0);
-  var shift = ((daySeed * 7 + 13) % 100 - 50) / 500;
-  // Deterministic — same price on same day = same rate (matches server)
-  var rng = (function(s){var x=Math.sin(s*9301+49297)*49297;return x-Math.floor(x)})(price*31+daySeed);
-  var base;
-  if (price < 20) base = 0.05 + 0.04 * rng;
-  else if (price < 100) base = 0.06 + 0.09 * rng;
-  else if (price < 500) base = 0.08 + 0.10 * rng;
-  else base = 0.13 + 0.12 * rng;
-  var pr = Math.max(0.05, Math.min(0.25, base + shift));
-  return { profitRate: pr, costRate: 1 - pr };
+function daysUntil(iso) {
+  if (!iso) return null;
+  const diff = new Date(iso).getTime() - Date.now();
+  return Math.max(0, Math.ceil(diff / 86400000));
 }
 
 const TIER_INFO = {
-  small:  { nameKey: 'store.small',  daily: 10, color: '#F59E0B', tag: 'Lv.1' },
-  medium: { nameKey: 'store.medium', daily: 20, color: '#8B5CF6', tag: 'Lv.2', need: 50 },
-  large:  { nameKey: 'store.large',  daily: 40, color: '#EF4444', tag: 'Lv.3', need: 200 },
+  small:  { nameKey: 'store.small',  daily: 3, color: '#F59E0B', tag: 'Lv.1' },
+  medium: { nameKey: 'store.medium', daily: 5, color: '#8B5CF6', tag: 'Lv.2', need: 50 },
+  large:  { nameKey: 'store.large',  daily: 8, color: '#EF4444', tag: 'Lv.3', need: 200 },
 };
+
+// 三参数收益控制: per-tier profit rate + price range (matches server/store.js)
+const TIER_PROFIT_RATES = { small: 0.02, medium: 0.03, large: 0.04 };
+const TIER_PRICE_RANGES = { small: [5, 15], medium: [15, 35], large: [35, 70] };
 
 const CAT_KEYS = ['store.all', 'store.digital', 'store.women', 'store.men', 'store.beauty', 'store.shoes', 'store.home', 'store.accessories', 'store.food', 'store.toys', 'store.sports', 'store.auto'];
 const CAT_VALUES = ['All', 'Digital', 'Women', 'Men', 'Beauty', 'Shoes', 'Home', 'Accessories', 'Food', 'Toys', 'Sports', 'Auto'];
@@ -283,25 +278,18 @@ const PRODUCTS = [
 
 
 function genProducts(tier, cat, search, daySeed) {
-  // Profit rate based on price tier + deterministic daily seed + per-product jitter
+  // Per-tier profit rate + price range (三参数收益控制)
+  const [lo, hi] = TIER_PRICE_RANGES[tier] || TIER_PRICE_RANGES.small;
+  const rate = TIER_PROFIT_RATES[tier] || TIER_PROFIT_RATES.small;
   let filtered = cat === 'All' ? [...PRODUCTS] : PRODUCTS.filter(p => p.cat === cat);
+  filtered = filtered.filter(p => p.price >= lo && p.price <= hi);
   if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.cat.toLowerCase().includes(search.toLowerCase()));
   filtered.sort((a,b) => b.sold - a.sold);
   return filtered.map((p, idx) => {
     var price = p.price;
-    // Use product index + day seed for deterministic per-product randomness
-    var rng = (function(s){var x=Math.sin(s*9301+49297)*49297;return x-Math.floor(x)})(price*31+daySeed);
-    var shift = ((daySeed * 7 + 13) % 100 - 50) / 500;
-    var baseRate;
-    if (price < 20) baseRate = 0.05 + 0.04 * rng;        // 5-8%
-    else if (price < 100) baseRate = 0.06 + 0.09 * rng;
-    else if (price < 500) baseRate = 0.08 + 0.10 * rng;
-    else baseRate = 0.13 + 0.12 * rng;
-    var profitRate = Math.max(0.05, Math.min(0.25, baseRate + shift));
-    profitRate = Math.round(profitRate * 100) / 100;
-    var cost = Math.round(price * (1 - profitRate) * 100) / 100;
-    var profit = Math.round(price * profitRate * 100) / 100;
-    var roi = Math.round(profitRate * 100);
+    var profit = Math.round(price * rate * 100) / 100;
+    var cost = Math.round(price * (1 - rate) * 100) / 100;
+    var roi = Math.round(rate * 100);
     // Dynamic sales: daily variation ±25% based on product index + day seed
     var soldVariation = 0.75 + ((daySeed * (idx + 7) * 13 + idx * 19) % 500) / 1000;
     var sold = Math.max(1, Math.round((p.sold || 50) * soldVariation));
@@ -441,7 +429,7 @@ export default function StorePage() {
   const [tradeMode, setTradeMode] = useState('holding'); // 'holding' | 'share'
   const [shareProduct, setShareProduct] = useState(null);
   const [shareMsg, setShareMsg] = useState('');
-  const handleOpen = async () => { setOpening(true); try { await client.post('/store/open'); toast.success(t('store.openSuccess')); loadStatus(); loadEarnings(); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } finally { setOpening(false); } };
+  const handleOpen = async () => { setOpening(true); try { await client.post('/store/open'); toast.success(t('store.openSuccess')); loadStatus(); loadEarnings(); } catch (err) { const d = err.response?.data; if (d?.depositRequired) { toast.error(t('store.depositRequired')); navigate('/mine/deposit'); } else toast.error(d?.error || t('common.operationFailed')); } finally { setOpening(false); } };
   const handleShare = async (product) => {
     try {
       const { data } = await client.post('/commissions/claim', { productId: product.id, productPrice: product.price, productName: product.name, productImg: product.img });
@@ -465,10 +453,12 @@ export default function StorePage() {
     catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
   };
   const handleWithdrawDeposit = async () => {
-    try { const { data } = await client.post('/store/withdraw-deposit', {}); toast.success(`$${data.returned} returned to balance`); loadStatus(); loadEarnings(); }
+    try { const { data } = await client.post('/store/refund-deposit'); toast.success(t('store.refundDone', { amount: Number(data.returned || 0).toFixed(2) })); loadStatus(); loadEarnings(); }
     catch (err) {
       const d = err.response?.data;
-      toast.error(d?.detail ? `${d.error}\n\n${d.detail}` : (d?.error || 'Withdraw failed'), { duration: 8000 });
+      if (d?.depositLocked) toast.error(t('store.depositLocked', { days: d.daysLeft }), { duration: 6000 });
+      else if (d?.activeOrders) toast.error(d.error, { duration: 8000 });
+      else toast.error(d?.error || t('common.operationFailed'), { duration: 8000 });
     }
   };
   const [buyConfirm, setBuyConfirm] = useState(null);
@@ -490,14 +480,16 @@ export default function StorePage() {
     } catch (err) {
       const d = err.response?.data;
       if (d?.depositRequired) { setBuyConfirm(null); setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, isDeposit: true, balance: d.balance }); }
+      else if (d?.minDeposit) { setBuyConfirm(null); setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, isDeposit: true, balance: d.balance, deposit: d.have }); }
       else if (d?.shortage) { setBuyConfirm(null); setShowInsufficient({ need: d.need, have: d.have, shortage: d.shortage, balance: d.balance, deposit: d.deposit }); }
       else if (d?.freeSlotsExhausted) { setFreeRemaining(0); setBuyConfirm(null); toast.error('All 5 free orders used today'); }
       else if (d?.productAlreadyClaimed) { setBuyConfirm(null); toast.error(d.error); }
+      else if (d?.dailyProfitReached) { setBuyConfirm(null); toast.error(t('store.dailyProfitReached', { cap: Number(d.cap || 0).toFixed(2) })); }
       else toast.error(d?.error || t('common.operationFailed'));
     }
     setBuying(false);
   };
-  const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { await client.post('/store/close'); setStatus({ hasStore: false }); toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
+  const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { const { data } = await client.post('/store/close'); setStatus({ hasStore: false }); if (data?.deposit > 0) toast.success(t('store.closeDepositLocked', { amount: Number(data.deposit).toFixed(2) })); else toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
 
   if (loading) return <div className="min-h-screen bg-[#ffffff] flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#FF5000] border-t-transparent rounded-full animate-spin" /></div>;
   if (!status?.hasStore) return (
@@ -505,7 +497,8 @@ export default function StorePage() {
       <div className="w-24 h-24 rounded-full bg-[#FF5000] flex items-center justify-center mb-6 shadow-2xl"><Store size={44} className="text-white" /></div>
       <h1 className="text-2xl font-black text-[#0F1111] mb-1">{t('store.title')}</h1>
       <p className="text-sm text-[#565959] mb-8">{t('store.subtitle')}</p>
-      <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-[#FF5000] hover:bg-[#E04500] text-[#0F1111] font-bold rounded-full shadow-lg active:scale-[0.98] transition-all text-base border border-[#FF5000]">{opening ? '...' : t('store.openFree')}</button>
+      <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-[#FF5000] hover:bg-[#E04500] text-[#0F1111] font-bold rounded-full shadow-lg active:scale-[0.98] transition-all text-base border border-[#FF5000]">{opening ? '...' : t('store.openBtn', { deposit: 20 })}</button>
+      <p className="text-xs text-[#999999] mt-3 max-w-xs leading-relaxed">{t('store.openDepositNote')}</p>
     </div>
   );
 
@@ -703,6 +696,17 @@ export default function StorePage() {
         <div style={{flex:1,textAlign:'center'}}>
           <div style={{fontSize:17,fontWeight:800,color:'#00A86B'}}>+${earnings.todayProfit.toFixed(2)}</div>
           <div style={{fontSize:9,color:'#999',marginTop:1}}>Today Earned</div>
+        </div>
+      </div>
+
+      {/* Daily Profit Cap Progress */}
+      <div style={{padding:'0 16px 10px',background:'#fff',borderBottom:'1px solid #f5f5f5'}}>
+        <div style={{display:'flex',justifyContent:'space-between',fontSize:10,color:'#999',marginBottom:4}}>
+          <span>Daily profit limit</span>
+          <span><b style={{color:'#0f0f0f'}}>+${(s.todayProfit||0).toFixed(2)}</b> / ${(s.dailyProfitCap||0).toFixed(2)}</span>
+        </div>
+        <div style={{background:'#f0f0f0',borderRadius:3,height:6,overflow:'hidden'}}>
+          <div style={{width: `${Math.min(100, ((s.todayProfit||0)/(s.dailyProfitCap||1))*100)}%`,height:'100%',background:'#00A86B',borderRadius:3,transition:'width .5s'}} />
         </div>
       </div>
 
@@ -905,11 +909,15 @@ export default function StorePage() {
             </div>
             <p className="text-[9px] text-[#999] mb-2">Available balance: <b className="text-[#0F1111]">${s.balance.toFixed(2)}</b> · After deposit max trade: <b className="text-[#0F1111]">${((s.deposit||0) + parseFloat(depositAmount||0)).toFixed(2)}</b></p>
             {depositMsg && <p className="text-xs text-[#067D62] font-bold mb-2">{depositMsg}</p>}
-            {(s.deposit||0) > 0 && (
-              <button onClick={handleWithdrawDeposit} className="w-full py-2.5 rounded-xl text-sm font-bold bg-[#FFF0F0] text-[#CC0C39] border border-[#FFCDD2] hover:bg-[#FFE0E0]">
-                ↩ Withdraw All Deposit (${(s.deposit||0).toFixed(2)})
-              </button>
-            )}
+            {(s.deposit||0) > 0 && (() => {
+              const daysLeft = s.deposit_unlock_at ? daysUntil(s.deposit_unlock_at) : 365;
+              const unlocked = daysLeft === 0;
+              return (
+                <button onClick={handleWithdrawDeposit} disabled={!unlocked} className="w-full py-2.5 rounded-xl text-sm font-bold border" style={{ background: unlocked ? '#FFF0F0' : '#f5f5f5', color: unlocked ? '#CC0C39' : '#999', borderColor: unlocked ? '#FFCDD2' : '#eee', cursor: unlocked ? 'pointer' : 'not-allowed' }}>
+                  {unlocked ? `↩ ${t('store.withdrawDeposit')} ($${(s.deposit||0).toFixed(2)})` : `🔒 ${t('store.depositLockedShort', { days: daysLeft })} ($${(s.deposit||0).toFixed(2)})`}
+                </button>
+              );
+            })()}
           </div>
 
           {/* Active Holdings */}

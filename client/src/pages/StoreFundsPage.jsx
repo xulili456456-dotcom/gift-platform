@@ -18,13 +18,18 @@ function getRates(price){
   return { profitRate: pr, costRate: 1 - pr };
 }
 
+function daysUntil(iso) {
+  if (!iso) return null;
+  const diff = new Date(iso).getTime() - Date.now();
+  return Math.max(0, Math.ceil(diff / 86400000));
+}
+
 export default function StoreFundsPage() {
   const navigate = useNavigate();
   const [status, setStatus] = useState(null);
   const [holdings, setHoldings] = useState([]);
   const [earnings, setEarnings] = useState({ todayProfit: 0, totalProfit: 0 });
   const [depositAmount, setDepositAmount] = useState('');
-  const [withdrawAmount, setWithdrawAmount] = useState('');
   const [depositMsg, setDepositMsg] = useState('');
   const [withdrawError, setWithdrawError] = useState(null);
   const [orderHistory, setOrderHistory] = useState(null);
@@ -51,10 +56,7 @@ export default function StoreFundsPage() {
   };
   const handleWithdrawDeposit = async () => {
     setWithdrawError(null);
-    const amt = parseFloat(withdrawAmount);
-    if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
-    if (amt > (s.deposit || 0)) { toast.error('Insufficient deposit'); return; }
-    try { await client.post('/store/withdraw-deposit', { amount: amt }); toast.success(`$${amt} returned to balance`); setWithdrawAmount(''); loadStatus(); loadEarnings(); }
+    try { const { data } = await client.post('/store/refund-deposit'); toast.success(`$${Number(data.returned || 0).toFixed(2)} returned to balance`); loadStatus(); loadEarnings(); }
     catch (err) { setWithdrawError(err.response?.data || { error: 'Failed' }); }
   };
 
@@ -86,22 +88,29 @@ export default function StoreFundsPage() {
 
         {/* Security Deposit Card */}
         <div style={{background:'#fff',borderRadius:20,padding:16,marginBottom:14}}>
-          <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:10}}>Security Deposit</div>
+          <div style={{fontSize:12,fontWeight:700,color:'#0f0f0f',marginBottom:6}}>Security Deposit</div>
+          <div style={{fontSize:11,color:'#999',marginBottom:10}}>
+            ${(s.deposit||0).toFixed(2)} · {(() => {
+              const daysLeft = s.deposit_unlock_at ? daysUntil(s.deposit_unlock_at) : 365;
+              return daysLeft === 0 ? 'Refundable now' : `Locked · ${daysLeft} days remaining`;
+            })()}
+          </div>
           <div style={{display:'flex',gap:8,marginBottom:8}}>
             <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="Amount" style={{flex:1,padding:'10px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:14,outline:'none'}} />
             <button onClick={handleDeposit} style={{padding:'10px 20px',background:'#00A86B',color:'#fff',border:'none',borderRadius:12,fontSize:13,fontWeight:700,cursor:'pointer'}}>Add Security</button>
           </div>
           {depositMsg && <p style={{fontSize:11,color:'#00A86B',fontWeight:600,marginBottom:8}}>{depositMsg}</p>}
-          {(s.deposit||0) > 0 && (
-            <div style={{marginBottom:8}}>
-              <div style={{fontSize:11,color:'#999',marginBottom:4}}>Withdraw amount (max ${(s.deposit||0).toFixed(0)})</div>
-              <div style={{display:'flex',gap:8}}>
-                <input type="number" value={withdrawAmount} onChange={e => setWithdrawAmount(e.target.value)} placeholder="Amount" style={{flex:1,padding:'10px 14px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:14,outline:'none'}} />
-                <button onClick={() => setWithdrawAmount(String(s.deposit||0))} style={{padding:'10px 12px',background:'#f5f5f5',border:'none',borderRadius:12,fontSize:11,fontWeight:600,color:'#666',cursor:'pointer'}}>Max</button>
-                <button onClick={handleWithdrawDeposit} style={{padding:'10px 18px',background:'#FF5000',color:'#fff',border:'none',borderRadius:12,fontSize:12,fontWeight:600,cursor:'pointer',whiteSpace:'nowrap'}}>Withdraw</button>
+          {(s.deposit||0) > 0 && (() => {
+            const daysLeft = s.deposit_unlock_at ? daysUntil(s.deposit_unlock_at) : 365;
+            const unlocked = daysLeft === 0;
+            return (
+              <div style={{marginBottom:8}}>
+                <button onClick={handleWithdrawDeposit} disabled={!unlocked} style={{width:'100%',padding:'12px 18px',background:unlocked?'#FF5000':'#e0e0e0',color:unlocked?'#fff':'#999',border:'none',borderRadius:12,fontSize:13,fontWeight:700,cursor:unlocked?'pointer':'not-allowed'}}>
+                  {unlocked ? `Withdraw Deposit ($${(s.deposit||0).toFixed(2)})` : `🔒 Locked ${daysLeft} days ($${(s.deposit||0).toFixed(2)})`}
+                </button>
               </div>
-            </div>
-          )}
+            );
+          })()}
           {withdrawError && (
             <div style={{background:'#FFFBEB',border:'1px solid #FDE68A',borderRadius:16,padding:20,marginTop:12}}>
               <div style={{display:'flex',alignItems:'flex-start',gap:12}}>

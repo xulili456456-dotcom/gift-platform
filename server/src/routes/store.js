@@ -7,41 +7,55 @@ const router = Router();
 router.use(authMiddleware);
 
 // Tier definitions — tiers control daily order limits and upgrade thresholds
-// Profit is now product-based: cost = price × 0.8, profit = price × 0.08
+// Daily orders + profit rate + price range are per-tier (三参数收益控制)
 const TIERS = {
-  small:  { name: 'Small Store', dailyOrders: 10, threshold: 0 },
-  medium: { name: 'Medium Store', dailyOrders: 20, threshold: 50 },
-  large:  { name: 'Large Store', dailyOrders: 40, threshold: 200 },
+  small:  { name: 'Small Store', dailyOrders: 3, threshold: 0 },
+  medium: { name: 'Medium Store', dailyOrders: 5, threshold: 50 },
+  large:  { name: 'Large Store', dailyOrders: 8, threshold: 200 },
 };
+
+// Per-tier profit rate (每单利润 = 商品价 × 等级利润率)
+const TIER_PROFIT_RATES = { small: 0.02, medium: 0.03, large: 0.04 };
+// Per-tier product price range (每天随机商品的价格区间)
+const TIER_PRICE_RANGES = { small: [5, 15], medium: [15, 35], large: [35, 70] };
+
+// 押金开店: minimum security deposit per tier + 365-day lock before refund
+const MIN_DEPOSITS = { small: 20, medium: 50, large: 100 };
+const DEPOSIT_LOCK_DAYS = 365;
+
+// 日赚上限: daily profit cap = deposit / 30 (30-day recovery), admin override supported
+const PROFIT_RECOVERY_DAYS = 30;
+
+function getDailyProfitCap(deposit, override) {
+  if (override !== null && override !== undefined) return Number(override);
+  return Math.round((Number(deposit || 0) / PROFIT_RECOVERY_DAYS) * 100) / 100;
+}
 
 // Product profit formula — deterministic per product per day (no Math.random)
 const FREE_PROFIT_RATE = 0.03;
 const FREE_LIFETIME_SLOTS = 0; // free orders disabled
 
-function seededRand(seed) {
-  var x = Math.sin(seed * 9301 + 49297) * 49297;
-  return x - Math.floor(x);
-}
-
-function getRateForProduct(productPrice) {
-  const today = new Date().toISOString().slice(0, 10);
-  const daySeed = today.split('-').reduce((s, x) => s + parseInt(x), 0);
-  const shift = ((daySeed * 7 + 13) % 100 - 50) / 500; // deterministic daily shift
-  // Use product price as seed for deterministic per-product randomness
-  const rng = seededRand(productPrice * 31 + daySeed);
-  let base;
-  if (productPrice < 20) base = 0.05 + 0.04 * rng;
-  else if (productPrice < 100) base = 0.06 + 0.09 * rng;
-  else if (productPrice < 500) base = 0.08 + 0.10 * rng;
-  else base = 0.13 + 0.12 * rng;
-  return Math.round(Math.max(0.05, Math.min(0.25, base + shift)) * 100) / 100;
-}
-
-function calcProduct(productPrice) {
-  const rate = getRateForProduct(productPrice);
+function calcProduct(productPrice, tier) {
+  const rate = TIER_PROFIT_RATES[tier] || TIER_PROFIT_RATES.small;
   const profit = Math.round(productPrice * rate * 100) / 100;
   const cost = Math.round(productPrice * (1 - rate) * 100) / 100;
   return { cost, profit, totalReturn: Math.round((cost + profit) * 100) / 100, rate: Math.round(rate * 100) };
+}
+
+// Deduct `amount` from the user's delivered balance, splitting rows as needed.
+// Runs inside a transaction (t). Returns true if fully deducted.
+async function deductBalance(t, userId, amount) {
+  let remaining = amount;
+  const tasks = await t.all('SELECT id, amount FROM task_earnings WHERE user_id = ? AND status = ? ORDER BY id ASC FOR UPDATE', [userId, 'delivered']);
+  for (const task of tasks) {
+    if (remaining <= 0) break;
+    const deduct = Math.min(Number(task.amount), remaining);
+    await t.run('UPDATE task_earnings SET status = ? WHERE id = ?', ['withdrawn', task.id]);
+    const rest = Number(task.amount) - deduct;
+    if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [userId, rest, 'balance_split', 'delivered']);
+    remaining -= deduct;
+  }
+  return remaining <= 0.01;
 }
 
 function getTier(totalOrders) {
@@ -110,6 +124,10 @@ router.get('/status', async (req, res) => {
     [store.id, today]
   );
   const totalEarnings = await get("SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ?", [store.id]);
+  const todayProfit = await get(
+    "SELECT COALESCE(SUM(profit), 0) as total FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND created_at::date = ?::date",
+    [store.id, today]
+  );
 
   const taskBal = await get(
     "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
@@ -131,6 +149,8 @@ router.get('/status', async (req, res) => {
       balance: Number(taskBal?.total || 0),
       deposit: Number(store.deposit || 0),
       maxTrade: Number(store.deposit || 0),
+      dailyProfitCap: getDailyProfitCap(store.deposit, store.daily_profit_cap),
+      todayProfit: Number(todayProfit?.total || 0),
       freeRemaining: Math.max(0, FREE_LIFETIME_SLOTS - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_lifetime_' + req.user.id]))?.value || 0)),
       // Include free product names and claimed list so frontend has them immediately
       freeProductNames: (await getFreeProductNames(req.user.id, today)),
@@ -139,38 +159,77 @@ router.get('/status', async (req, res) => {
   });
 });
 
-// POST /api/store/open — always starts as small
+// POST /api/store/open — 押金开店: requires a $20 security deposit from balance (locked 365 days)
 router.post('/open', async (req, res) => {
+  const DEPOSIT = MIN_DEPOSITS.small;
   const existing = await get('SELECT * FROM stores WHERE user_id = ?', [req.user.id]);
-  if (existing) {
-    if (existing.status === 'active') {
-      return res.status(400).json({ error: 'You already have a store in operation' });
+
+  if (existing && existing.status === 'active') {
+    return res.status(400).json({ error: 'You already have a store in operation' });
+  }
+
+  // Reopen a closed store: deposit stays locked — no re-charge unless never paid
+  if (existing && existing.status === 'closed') {
+    const hasPaid = Number(existing.deposit || 0) >= DEPOSIT || existing.deposit_unlock_at;
+    if (!hasPaid) {
+      // Old user who never paid a deposit must top up to the minimum now
+      const shortfall = Math.max(0, DEPOSIT - Number(existing.deposit || 0));
+      const availBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
+      const available = Number(availBal?.total || 0);
+      if (available < shortfall) {
+        return res.status(400).json({ error: `Insufficient balance. A $${shortfall} security deposit is required.`, need: shortfall, have: Math.max(0, available), shortage: Math.round((shortfall - available) * 100) / 100, depositRequired: true });
+      }
+      const t = await tx();
+      try {
+        const ok = await deductBalance(t, req.user.id, shortfall);
+        if (!ok) { await t.rollback(); return res.status(400).json({ error: 'Balance changed during checkout, please try again' }); }
+        const unlockAt = new Date(Date.now() + DEPOSIT_LOCK_DAYS * 86400000).toISOString();
+        await t.run("UPDATE stores SET status = 'active', tier = 'small', deposit = deposit + ?, deposit_unlock_at = COALESCE(deposit_unlock_at, ?), opened_at = NOW(), closed_at = NULL WHERE id = ?", [shortfall, unlockAt, existing.id]);
+        await t.commit();
+      } catch (err) { await t.rollback().catch(() => {}); throw err; }
+    } else {
+      await run("UPDATE stores SET status = 'active', tier = 'small', opened_at = NOW(), closed_at = NULL WHERE id = ?", [existing.id]);
     }
-    await run("UPDATE stores SET status = 'active', tier = 'small', deposit = 0, opened_at = NOW(), closed_at = NULL WHERE id = ?",
-      [existing.id]);
     const tier = TIERS.small;
     require('./notifications').notify(req.user.id, '🏪 Store Reopened',
-      `Your store is back! ${tier.dailyOrders} orders/day. Complete 50 more to upgrade`, 'success');
+      `Your store is back! Deposit locked for ${DEPOSIT_LOCK_DAYS} days. ${tier.dailyOrders} orders/day.`, 'success');
     return res.status(200).json({ id: existing.id, tier: 'small', dailyOrders: tier.dailyOrders });
   }
 
-  const result = await insert(
-    'INSERT INTO stores (user_id, tier, deposit) VALUES (?, ?, ?)',
-    [req.user.id, 'small', 0]
-  );
-  const tier = TIERS.small;
-  require('./notifications').notify(req.user.id, '🏪 Store Opened!',
-    `Your store is open! ${tier.dailyOrders} orders/day. Complete 50 more to upgrade`, 'success');
-  res.status(201).json({ id: result.id, tier: 'small', dailyOrders: tier.dailyOrders });
+  // New store: require deposit from balance
+  const availBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
+  const available = Number(availBal?.total || 0);
+  if (available < DEPOSIT) {
+    return res.status(400).json({ error: `Insufficient balance. A $${DEPOSIT} security deposit is required to open a store.`, need: DEPOSIT, have: Math.max(0, available), shortage: Math.round((DEPOSIT - available) * 100) / 100, depositRequired: true });
+  }
+
+  const t = await tx();
+  try {
+    const ok = await deductBalance(t, req.user.id, DEPOSIT);
+    if (!ok) { await t.rollback(); return res.status(400).json({ error: 'Balance changed during checkout, please try again' }); }
+    const unlockAt = new Date(Date.now() + DEPOSIT_LOCK_DAYS * 86400000).toISOString();
+    const result = await t.insert('INSERT INTO stores (user_id, tier, deposit, deposit_unlock_at) VALUES (?, ?, ?, ?)', [req.user.id, 'small', DEPOSIT, unlockAt]);
+    await t.commit();
+    const tier = TIERS.small;
+    require('./notifications').notify(req.user.id, '🏪 Store Opened!',
+      `Your store is open! $${DEPOSIT} deposit locked for ${DEPOSIT_LOCK_DAYS} days. ${tier.dailyOrders} orders/day.`, 'success');
+    res.status(201).json({ id: result.id, tier: 'small', dailyOrders: tier.dailyOrders, deposit: DEPOSIT, depositUnlockAt: unlockAt });
+  } catch (err) {
+    await t.rollback().catch(() => {});
+    throw err;
+  }
 });
 
-// POST /api/store/close
+// POST /api/store/close — closes store; deposit stays locked until unlock date
 router.post('/close', async (req, res) => {
   const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
   if (!store) return res.status(400).json({ error: 'You do not have an active store' });
   await run("UPDATE stores SET status = 'closed', closed_at = NOW() WHERE id = ?", [store.id]);
-  require('./notifications').notify(req.user.id, '🏪 Store Closed', 'You can reopen anytime, order data is preserved', 'info');
-  res.json({ message: 'Store closed' });
+  const deposit = Number(store.deposit || 0);
+  const unlockAt = store.deposit_unlock_at ? new Date(store.deposit_unlock_at).toLocaleDateString() : null;
+  const msg = unlockAt ? `Deposit $${deposit.toFixed(2)} stays locked until ${unlockAt}.` : 'You can reopen anytime, order data is preserved';
+  require('./notifications').notify(req.user.id, '🏪 Store Closed', msg, 'info');
+  res.json({ message: 'Store closed', deposit, depositUnlockAt: store.deposit_unlock_at });
 });
 
 // POST /api/store/orders/process — buy & hold (capital locked until sell)
@@ -192,7 +251,12 @@ router.post('/orders/process', async (req, res) => {
   const freeKey = 'free_lifetime_' + req.user.id;
   const freeProductKey = 'free_prod_' + req.user.id + '_' + pName;
 
-  let { cost, profit, totalReturn } = calcProduct(productPrice);
+  const [priceLo, priceHi] = TIER_PRICE_RANGES[store.tier] || TIER_PRICE_RANGES.small;
+  if (productPrice < priceLo || productPrice > priceHi) {
+    return res.status(400).json({ error: `Product price out of range for your tier ($${priceLo}–$${priceHi})`, priceRange: [priceLo, priceHi] });
+  }
+
+  let { cost, profit, totalReturn } = calcProduct(productPrice, store.tier);
   const couldBeFree = cost <= FREE_MAX_COST;
 
   // Check available balance (exclude locked in holdings)
@@ -240,6 +304,11 @@ router.post('/orders/process', async (req, res) => {
     }
     // Validate: all non-free orders need deposit + balance
     if (!isFreeOrder) {
+      const minDeposit = MIN_DEPOSITS[store.tier] || MIN_DEPOSITS.small;
+      if (deposit < minDeposit) {
+        await t.rollback();
+        return res.status(400).json({ error: `Security deposit below minimum. Top up to $${minDeposit} to continue trading.`, need: minDeposit, have: deposit, shortage: Math.round((minDeposit - deposit) * 100) / 100, minDeposit: true });
+      }
       if (cost > deposit) {
         await t.rollback();
         return res.status(400).json({ error: 'Insufficient deposit', need: cost, have: deposit, shortage: Math.round((cost - deposit) * 100) / 100, depositRequired: true, freeRemaining });
@@ -248,6 +317,15 @@ router.post('/orders/process', async (req, res) => {
         await t.rollback();
         return res.status(400).json({ error: 'Insufficient balance', need: cost, have: Math.max(0, available), shortage: Math.max(0, Math.round((cost - available) * 100) / 100), balance: available, deposit });
       }
+    }
+
+    // Daily profit cap: today's planned profit (done + holding) + this order must not exceed cap
+    const cap = getDailyProfitCap(deposit, store.daily_profit_cap);
+    const todayProfitRow = await t.get("SELECT COALESCE(SUM(profit), 0) as total FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND created_at::date = ?::date", [store.id, today]);
+    const planned = Number(todayProfitRow?.total || 0) + profit;
+    if (planned > cap) {
+      await t.rollback();
+      return res.status(400).json({ error: 'Daily profit limit reached', cap, earned: Number(todayProfitRow?.total || 0), profit, dailyProfitReached: true });
     }
 
     // Deduct balance (skip for free orders)
@@ -274,8 +352,8 @@ router.post('/orders/process', async (req, res) => {
       await t.run("UPDATE admin_settings SET value = '1' WHERE key = $1", [freeProductKey]);
     }
 
-    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price) VALUES ($1, $2, $3, 'holding', $4, $5, $6)",
-      [store.id, req.user.id, isFreeOrder ? 0 : cost, sellBy, pName, productPrice]);
+    const result = await t.insert("INSERT INTO store_orders (store_id, user_id, amount, status, processed_at, product_name, product_price, profit) VALUES ($1, $2, $3, 'holding', $4, $5, $6, $7)",
+      [store.id, req.user.id, isFreeOrder ? 0 : cost, sellBy, pName, productPrice, profit]);
     await t.commit();
 
     res.json({ id: result.id, cost: isFreeOrder ? 0 : cost, profit, totalReturn, sellBy, status: 'holding', isFreeOrder, freeRemaining: FREE_SLOTS - freeUsedCount - 1 });
@@ -295,7 +373,7 @@ router.post('/orders/process', async (req, res) => {
 
 // GET /api/store/holdings — current inventory
 router.get('/holdings', async (req, res) => {
-  const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
+  const store = await get('SELECT id, tier FROM stores WHERE user_id = ?', [req.user.id]);
   if (!store) return res.json([]);
   const holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at, product_name, product_price FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
 
@@ -314,7 +392,7 @@ router.get('/holdings', async (req, res) => {
     const progress = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
     const price = Number(h.product_price) || (cost > 0 ? Math.round(cost / 0.85 * 100) / 100 : 0);
     const isFree = cost === 0 && price > 0;
-    const { profit: p, rate } = calcProduct(price);
+    const { profit: p, rate } = calcProduct(price, store.tier);
     const actualProfit = isFree ? Math.round(price * 0.03 * 100) / 100 : p;
     const roi = isFree ? 3 : rate;
     const img = productMap[h.product_name] || null;
@@ -325,7 +403,7 @@ router.get('/holdings', async (req, res) => {
 // POST /api/store/check-sell — settle due holdings
 router.post('/check-sell', async (req, res) => {
   try {
-    const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
+    const store = await get('SELECT id, tier FROM stores WHERE user_id = ?', [req.user.id]);
     if (!store) return res.json({ settled: [] });
     const due = await all("SELECT id, amount as cost, user_id, product_price FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
     const settled = [];
@@ -334,7 +412,7 @@ router.post('/check-sell', async (req, res) => {
       const orderCost = Number(order.cost);
       const price = Number(order.product_price) || (orderCost > 0 ? Math.round((orderCost / 0.85) * 100) / 100 : 0);
       const isFreeOrder = orderCost === 0 && price > 0;
-      const { profit, totalReturn } = calcProduct(price);
+      const { profit, totalReturn } = calcProduct(price, store.tier);
       // Free orders: user paid $0, only credit the profit (not cost+profit)
       const creditAmount = isFreeOrder ? Math.round(price * FREE_PROFIT_RATE * 100) / 100 : totalReturn;
       const t = await tx();
@@ -624,8 +702,8 @@ router.post('/deposit', authMiddleware, async (req, res) => {
       if (rest > 0.001) await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, rest, 'balance_split', 'delivered']);
       remaining -= deduct;
     }
-    // Atomic deposit increment — avoids lost-update race
-    await t.run('UPDATE stores SET deposit = deposit + ? WHERE id = ?', [amount, store.id]);
+    // Atomic deposit increment — avoids lost-update race; first deposit starts the 365-day lock
+    await t.run("UPDATE stores SET deposit = deposit + ?, deposit_unlock_at = COALESCE(deposit_unlock_at, NOW() + INTERVAL '365 days') WHERE id = ?", [amount, store.id]);
     await t.commit();
     const newDeposit = Number(store.deposit || 0) + amount;
     try { require('./notifications').notify(req.user.id, '🔒 Deposit Added', `$${amount} locked as deposit. Max trade: $${newDeposit.toFixed(2)}`, 'success'); } catch {}
@@ -633,41 +711,40 @@ router.post('/deposit', authMiddleware, async (req, res) => {
   } catch (err) { await t.rollback().catch(() => {}); throw err; }
 });
 
-// POST /api/store/withdraw-deposit — return deposit to balance (if no active holdings exceed new limit)
-router.post('/withdraw-deposit', authMiddleware, async (req, res) => {
-  const amount = parseFloat(req.body.amount);
-  const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (!store) return res.status(400).json({ error: 'Please open a store first' });
+// POST /api/store/refund-deposit — refund security deposit (locked 365 days, full refund)
+async function refundDepositHandler(req, res) {
+  const store = await get('SELECT * FROM stores WHERE user_id = ?', [req.user.id]);
+  if (!store) return res.status(400).json({ error: 'No store found' });
 
-  const currentDeposit = Number(store.deposit || 0);
-  const withdrawAmt = amount ? Math.min(amount, currentDeposit) : currentDeposit;
-  if (withdrawAmt <= 0) return res.status(400).json({ error: 'No deposit to withdraw' });
+  const unlockAt = store.deposit_unlock_at ? new Date(store.deposit_unlock_at).getTime() : null;
+  if (!unlockAt || Date.now() < unlockAt) {
+    const daysLeft = unlockAt ? Math.ceil((unlockAt - Date.now()) / 86400000) : DEPOSIT_LOCK_DAYS;
+    return res.status(400).json({ error: `Deposit is locked. Available in ${daysLeft} day(s).`, unlockAt: store.deposit_unlock_at, daysLeft, depositLocked: true });
+  }
 
-  // Check: active holdings must not exceed remaining deposit (read inside tx)
   const t = await tx();
   try {
     const storeRow = await t.get('SELECT deposit FROM stores WHERE id = ? FOR UPDATE', [store.id]);
-    const actualDeposit = Number(storeRow?.deposit || 0);
-    const actualWithdraw = Math.min(withdrawAmt, actualDeposit);
-    if (actualWithdraw <= 0) { await t.rollback(); return res.status(400).json({ error: 'No deposit to withdraw' }); }
+    const deposit = Number(storeRow?.deposit || 0);
+    if (deposit <= 0) { await t.rollback(); return res.status(400).json({ error: 'No deposit to refund' }); }
 
-    const activeOrders = await t.get("SELECT COUNT(*) as c, COALESCE(MAX(amount), 0) as max_cost FROM store_orders WHERE store_id = ? AND status = 'holding'", [store.id]);
+    const activeOrders = await t.get("SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'holding'", [store.id]);
     if (Number(activeOrders?.c || 0) > 0) {
       await t.rollback();
-      return res.status(400).json({
-        error: `Cannot withdraw: you have ${activeOrders.c} active order(s)`,
-        detail: `Your deposit is locked while orders are being traded. Wait for all ${activeOrders.c} order(s) to complete (6-30 hours), then you can withdraw the full deposit.`,
-        activeOrders: Number(activeOrders.c), maxOrderCost: Number(activeOrders.max_cost), currentDeposit: actualDeposit,
-      });
+      return res.status(400).json({ error: `Cannot refund: you have ${activeOrders.c} active order(s)`, activeOrders: Number(activeOrders.c) });
     }
 
-    await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, actualWithdraw, 'deposit_return', 'delivered']);
-    await t.run('UPDATE stores SET deposit = deposit - ? WHERE id = ?', [actualWithdraw, store.id]);
+    await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, deposit, 'deposit_return', 'delivered']);
+    await t.run('UPDATE stores SET deposit = 0 WHERE id = ?', [store.id]);
     await t.commit();
-    try { require('./notifications').notify(req.user.id, '🔓 Deposit Returned', `$${actualWithdraw} returned to balance`, 'info'); } catch {}
-    res.json({ deposit: newDeposit, maxTrade: newDeposit, returned: actualWithdraw });
+    try { require('./notifications').notify(req.user.id, '🔓 Deposit Refunded', `$${deposit.toFixed(2)} returned to balance`, 'success'); } catch {}
+    res.json({ returned: deposit, deposit: 0 });
   } catch (err) { await t.rollback().catch(() => {}); throw err; }
-});
+}
+
+router.post('/refund-deposit', authMiddleware, refundDepositHandler);
+// Legacy alias — kept so existing clients calling withdraw-deposit get the locked refund behavior
+router.post('/withdraw-deposit', authMiddleware, refundDepositHandler);
 
 module.exports = router;
 
