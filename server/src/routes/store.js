@@ -9,18 +9,22 @@ router.use(authMiddleware);
 // Tier definitions — tiers control daily order limits and upgrade thresholds
 // Daily orders + profit rate + price range are per-tier (三参数收益控制)
 const TIERS = {
-  small:  { name: 'Small Store', dailyOrders: 3, threshold: 0 },
-  medium: { name: 'Medium Store', dailyOrders: 5, threshold: 50 },
-  large:  { name: 'Large Store', dailyOrders: 8, threshold: 200 },
+  small:   { name: 'Small Store',   dailyOrders: 3,  threshold: 0 },
+  medium:  { name: 'Medium Store',  dailyOrders: 5,  threshold: 50 },
+  large:   { name: 'Large Store',   dailyOrders: 8,  threshold: 200 },
+  premium: { name: 'Premium Store', dailyOrders: 12, threshold: 500 },
+  elite:   { name: 'Elite Store',   dailyOrders: 16, threshold: 1000 },
+  supreme: { name: 'Supreme Store', dailyOrders: 20, threshold: 2000 },
 };
+const TIER_ORDER = ['small', 'medium', 'large', 'premium', 'elite', 'supreme'];
 
 // Per-tier profit rate (每单利润 = 商品价 × 等级利润率)
-const TIER_PROFIT_RATES = { small: 0.02, medium: 0.03, large: 0.04 };
+const TIER_PROFIT_RATES = { small: 0.02, medium: 0.03, large: 0.04, premium: 0.05, elite: 0.06, supreme: 0.08 };
 // Per-tier product price range (每天随机商品的价格区间)
-const TIER_PRICE_RANGES = { small: [5, 15], medium: [15, 35], large: [35, 70] };
+const TIER_PRICE_RANGES = { small: [5, 15], medium: [15, 35], large: [35, 70], premium: [70, 150], elite: [150, 300], supreme: [300, 600] };
 
 // 押金开店: minimum security deposit per tier + 365-day lock before refund
-const MIN_DEPOSITS = { small: 20, medium: 50, large: 100 };
+const MIN_DEPOSITS = { small: 20, medium: 50, large: 100, premium: 200, elite: 500, supreme: 2000 };
 const DEPOSIT_LOCK_DAYS = 365;
 
 // 日赚上限: daily profit cap = deposit / 30 (回本周期 ≥ 30 天)
@@ -73,15 +77,18 @@ async function deductBalance(t, userId, amount) {
 }
 
 function getTier(totalOrders) {
-  if (totalOrders >= TIERS.large.threshold) return 'large';
-  if (totalOrders >= TIERS.medium.threshold) return 'medium';
-  return 'small';
+  let tier = 'small';
+  for (const t of TIER_ORDER) {
+    if (totalOrders >= TIERS[t].threshold) tier = t;
+  }
+  return tier;
 }
 
 function nextTier(currentTier) {
-  if (currentTier === 'small') return { tier: 'medium', ...TIERS.medium };
-  if (currentTier === 'medium') return { tier: 'large', ...TIERS.large };
-  return null;
+  const idx = TIER_ORDER.indexOf(currentTier);
+  if (idx === -1 || idx >= TIER_ORDER.length - 1) return null;
+  const next = TIER_ORDER[idx + 1];
+  return { tier: next, ...TIERS[next] };
 }
 
 async function getFreeProductNames(userId, today) {

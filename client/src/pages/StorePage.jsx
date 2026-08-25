@@ -12,14 +12,17 @@ function daysUntil(iso) {
 }
 
 const TIER_INFO = {
-  small:  { nameKey: 'store.small',  daily: 3, color: '#F59E0B', tag: 'Lv.1' },
-  medium: { nameKey: 'store.medium', daily: 5, color: '#8B5CF6', tag: 'Lv.2', need: 50 },
-  large:  { nameKey: 'store.large',  daily: 8, color: '#EF4444', tag: 'Lv.3', need: 200 },
+  small:   { nameKey: 'store.small',   daily: 3,  color: '#F59E0B', tag: 'Lv.1' },
+  medium:  { nameKey: 'store.medium',  daily: 5,  color: '#8B5CF6', tag: 'Lv.2', need: 50 },
+  large:   { nameKey: 'store.large',   daily: 8,  color: '#EF4444', tag: 'Lv.3', need: 200 },
+  premium: { nameKey: 'store.premium', daily: 12, color: '#EC4899', tag: 'Lv.4', need: 500 },
+  elite:   { nameKey: 'store.elite',   daily: 16, color: '#06B6D4', tag: 'Lv.5', need: 1000 },
+  supreme: { nameKey: 'store.supreme', daily: 20, color: '#F97316', tag: 'Lv.6', need: 2000 },
 };
 
 // 三参数收益控制: per-tier profit rate + price range (matches server/store.js)
-const TIER_PROFIT_RATES = { small: 0.02, medium: 0.03, large: 0.04 };
-const TIER_PRICE_RANGES = { small: [5, 15], medium: [15, 35], large: [35, 70] };
+const TIER_PROFIT_RATES = { small: 0.02, medium: 0.03, large: 0.04, premium: 0.05, elite: 0.06, supreme: 0.08 };
+const TIER_PRICE_RANGES = { small: [5, 15], medium: [15, 35], large: [35, 70], premium: [70, 150], elite: [150, 300], supreme: [300, 600] };
 
 const CAT_KEYS = ['store.all', 'store.digital', 'store.women', 'store.men', 'store.beauty', 'store.shoes', 'store.home', 'store.accessories', 'store.food', 'store.toys', 'store.sports', 'store.auto'];
 const CAT_VALUES = ['All', 'Digital', 'Women', 'Men', 'Beauty', 'Shoes', 'Home', 'Accessories', 'Food', 'Toys', 'Sports', 'Auto'];

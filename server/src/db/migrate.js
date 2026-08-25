@@ -172,7 +172,7 @@ ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP DEFAULT 
 CREATE TABLE IF NOT EXISTS stores (
     id              SERIAL PRIMARY KEY,
     user_id         INTEGER NOT NULL UNIQUE,
-    tier            TEXT NOT NULL CHECK(tier IN ('small', 'medium', 'large')),
+    tier            TEXT NOT NULL CHECK(tier IN ('small', 'medium', 'large', 'premium', 'elite', 'supreme')),
     deposit         NUMERIC(10,2) NOT NULL,
     status          TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'closed')),
     opened_at       TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -502,6 +502,9 @@ async function migrate() {
   // Daily profit cap (日赚上限: 押金÷30, admin override)
   try { await exec(`ALTER TABLE stores ADD COLUMN IF NOT EXISTS daily_profit_cap NUMERIC(10,2) DEFAULT NULL`); } catch(e) { console.log('daily_profit_cap skipped:', e.message); }
   try { await exec(`ALTER TABLE store_orders ADD COLUMN IF NOT EXISTS profit NUMERIC(10,2) DEFAULT 0`); } catch(e) { console.log('store_orders.profit skipped:', e.message); }
+  // 6-tier stores: update tier CHECK constraint
+  try { await exec(`ALTER TABLE stores DROP CONSTRAINT IF EXISTS stores_tier_check`); } catch(e) {}
+  try { await exec(`ALTER TABLE stores ADD CONSTRAINT stores_tier_check CHECK(tier IN ('small','medium','large','premium','elite','supreme'))`); } catch(e) { console.log('stores_tier_check skipped:', e.message); }
 
   // Device tokens for push notifications
   try {
