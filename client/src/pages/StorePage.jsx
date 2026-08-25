@@ -291,6 +291,13 @@ function genProducts(tier, cat, search, daySeed) {
   let filtered = cat === 'All' ? [...PRODUCTS] : PRODUCTS.filter(p => p.cat === cat);
   filtered = filtered.filter(p => p.price >= lo && p.price <= hi);
   if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.cat.toLowerCase().includes(search.toLowerCase()));
+  // 每天随机选 N 个展示（确定性：同一天同档位同结果）
+  const N = 20;
+  filtered = filtered
+    .map((p, idx) => ({ p, r: (function(s){var x=Math.sin(s*9301+49297)*49297;return x-Math.floor(x)})(daySeed * 1000 + idx * 31 + base * 100) }))
+    .sort((a, b) => a.r - b.r)
+    .map(x => x.p)
+    .slice(0, N);
   filtered.sort((a,b) => b.sold - a.sold);
   return filtered.map((p, idx) => {
     var price = p.price;
