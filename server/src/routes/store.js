@@ -389,7 +389,7 @@ router.post('/orders/process', async (req, res) => {
 router.get('/holdings', async (req, res) => {
   const store = await get('SELECT id, tier FROM stores WHERE user_id = ?', [req.user.id]);
   if (!store) return res.json([]);
-  const holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at, product_name, product_price FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
+  const holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at, product_name, product_price, profit FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
 
   // Load product catalog for images
   let catalog = [];
@@ -406,9 +406,9 @@ router.get('/holdings', async (req, res) => {
     const progress = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
     const price = Number(h.product_price) || (cost > 0 ? Math.round(cost / 0.85 * 100) / 100 : 0);
     const isFree = cost === 0 && price > 0;
-    const { profit: p, rate } = calcProduct(price, store.tier);
-    const actualProfit = isFree ? Math.round(price * 0.03 * 100) / 100 : p;
-    const roi = isFree ? 3 : rate;
+    // 用下单时存的预期利润（profit 字段），保证展示与结算一致
+    const actualProfit = Number(h.profit) || (isFree ? Math.round(price * 0.03 * 100) / 100 : 0);
+    const roi = price > 0 ? Math.round((actualProfit / price) * 100) : 0;
     const img = productMap[h.product_name] || null;
     return { ...h, cost, profit: actualProfit, roi, progress, sellBy: h.sell_by, img };
   }));
@@ -419,19 +419,19 @@ router.post('/check-sell', async (req, res) => {
   try {
     const store = await get('SELECT id, tier FROM stores WHERE user_id = ?', [req.user.id]);
     if (!store) return res.json({ settled: [] });
-    const due = await all("SELECT id, amount as cost, user_id, product_price FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
+    const due = await all("SELECT id, amount as cost, user_id, product_price, profit as planned_profit FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
     const settled = [];
     const errors = [];
     for (const order of due) {
       const orderCost = Number(order.cost);
       const price = Number(order.product_price) || (orderCost > 0 ? Math.round((orderCost / 0.85) * 100) / 100 : 0);
       const isFreeOrder = orderCost === 0 && price > 0;
-      const { profit, totalReturn } = calcProduct(price, store.tier);
-      // Free orders: user paid $0, only credit the profit (not cost+profit)
-      const creditAmount = isFreeOrder ? Math.round(price * FREE_PROFIT_RATE * 100) / 100 : totalReturn;
+      // 用下单时存的预期利润（planned_profit），保证结算到账 = 下单承诺 = 日赚上限统计
+      const profit = isFreeOrder ? Math.round(price * FREE_PROFIT_RATE * 100) / 100 : (Number(order.planned_profit) || 0);
+      const creditAmount = isFreeOrder ? profit : (orderCost + profit);
       const t = await tx();
       try {
-        const updateRes = await t.run("UPDATE store_orders SET status = 'done', amount = ?, processed_at = NOW() WHERE id = ? AND status = 'holding'", [isFreeOrder ? creditAmount : profit, order.id]);
+        const updateRes = await t.run("UPDATE store_orders SET status = 'done', amount = ?, processed_at = NOW() WHERE id = ? AND status = 'holding'", [profit, order.id]);
         if (updateRes.changes === 0) { await t.rollback(); continue; } // Already settled by another request
         await t.insert('INSERT INTO task_earnings (user_id, amount, type, status) VALUES (?, ?, ?, ?)', [req.user.id, creditAmount, 'order_profit', 'delivered']);
         await t.commit();
