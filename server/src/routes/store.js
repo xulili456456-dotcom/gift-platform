@@ -23,14 +23,6 @@ const TIER_PRICE_RANGES = { small: [5, 15], medium: [15, 35], large: [35, 70] };
 const MIN_DEPOSITS = { small: 20, medium: 50, large: 100 };
 const DEPOSIT_LOCK_DAYS = 365;
 
-// 日赚上限: daily profit cap = deposit / 30 (30-day recovery), admin override supported
-const PROFIT_RECOVERY_DAYS = 30;
-
-function getDailyProfitCap(deposit, override) {
-  if (override !== null && override !== undefined) return Number(override);
-  return Math.round((Number(deposit || 0) / PROFIT_RECOVERY_DAYS) * 100) / 100;
-}
-
 // Product profit formula — deterministic per product per day (no Math.random)
 const FREE_PROFIT_RATE = 0.03;
 const FREE_LIFETIME_SLOTS = 0; // free orders disabled
@@ -124,10 +116,6 @@ router.get('/status', async (req, res) => {
     [store.id, today]
   );
   const totalEarnings = await get("SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ?", [store.id]);
-  const todayProfit = await get(
-    "SELECT COALESCE(SUM(profit), 0) as total FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND created_at::date = ?::date",
-    [store.id, today]
-  );
 
   const taskBal = await get(
     "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
@@ -149,8 +137,6 @@ router.get('/status', async (req, res) => {
       balance: Number(taskBal?.total || 0),
       deposit: Number(store.deposit || 0),
       maxTrade: Number(store.deposit || 0),
-      dailyProfitCap: getDailyProfitCap(store.deposit, store.daily_profit_cap),
-      todayProfit: Number(todayProfit?.total || 0),
       freeRemaining: Math.max(0, FREE_LIFETIME_SLOTS - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_lifetime_' + req.user.id]))?.value || 0)),
       // Include free product names and claimed list so frontend has them immediately
       freeProductNames: (await getFreeProductNames(req.user.id, today)),
@@ -317,15 +303,6 @@ router.post('/orders/process', async (req, res) => {
         await t.rollback();
         return res.status(400).json({ error: 'Insufficient balance', need: cost, have: Math.max(0, available), shortage: Math.max(0, Math.round((cost - available) * 100) / 100), balance: available, deposit });
       }
-    }
-
-    // Daily profit cap: today's planned profit (done + holding) + this order must not exceed cap
-    const cap = getDailyProfitCap(deposit, store.daily_profit_cap);
-    const todayProfitRow = await t.get("SELECT COALESCE(SUM(profit), 0) as total FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND created_at::date = ?::date", [store.id, today]);
-    const planned = Number(todayProfitRow?.total || 0) + profit;
-    if (planned > cap) {
-      await t.rollback();
-      return res.status(400).json({ error: 'Daily profit limit reached', cap, earned: Number(todayProfitRow?.total || 0), profit, dailyProfitReached: true });
     }
 
     // Deduct balance (skip for free orders)
