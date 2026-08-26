@@ -182,19 +182,19 @@ router.get('/status', async (req, res) => {
 
 // POST /api/store/open — 押金开店: requires a $20 security deposit from balance (locked 365 days)
 router.post('/open', async (req, res) => {
-  const DEPOSIT = MIN_DEPOSITS.small;
+  // 可选档位开店：tier 可选 small/medium/large/premium/elite/supreme，默认 small
+  const targetTier = TIERS[req.body?.tier] ? req.body.tier : 'small';
+  const DEPOSIT = MIN_DEPOSITS[targetTier];
   const existing = await get('SELECT * FROM stores WHERE user_id = ?', [req.user.id]);
 
   if (existing && existing.status === 'active') {
     return res.status(400).json({ error: 'You already have a store in operation' });
   }
 
-  // Reopen a closed store: deposit stays locked — no re-charge unless never paid
+  // Reopen a closed store: top up to the target tier deposit if needed
   if (existing && existing.status === 'closed') {
-    const hasPaid = Number(existing.deposit || 0) >= DEPOSIT || existing.deposit_unlock_at;
-    if (!hasPaid) {
-      // Old user who never paid a deposit must top up to the minimum now
-      const shortfall = Math.max(0, DEPOSIT - Number(existing.deposit || 0));
+    const shortfall = Math.max(0, DEPOSIT - Number(existing.deposit || 0));
+    if (shortfall > 0) {
       const availBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
       const available = Number(availBal?.total || 0);
       if (available < shortfall) {
@@ -205,16 +205,16 @@ router.post('/open', async (req, res) => {
         const ok = await deductBalance(t, req.user.id, shortfall);
         if (!ok) { await t.rollback(); return res.status(400).json({ error: 'Balance changed during checkout, please try again' }); }
         const unlockAt = new Date(Date.now() + DEPOSIT_LOCK_DAYS * 86400000).toISOString();
-        await t.run("UPDATE stores SET status = 'active', tier = 'small', deposit = deposit + ?, deposit_unlock_at = COALESCE(deposit_unlock_at, ?), opened_at = NOW(), closed_at = NULL WHERE id = ?", [shortfall, unlockAt, existing.id]);
+        await t.run("UPDATE stores SET status = 'active', tier = ?, deposit = deposit + ?, deposit_unlock_at = COALESCE(deposit_unlock_at, ?), opened_at = NOW(), closed_at = NULL WHERE id = ?", [targetTier, shortfall, unlockAt, existing.id]);
         await t.commit();
       } catch (err) { await t.rollback().catch(() => {}); throw err; }
     } else {
-      await run("UPDATE stores SET status = 'active', tier = 'small', opened_at = NOW(), closed_at = NULL WHERE id = ?", [existing.id]);
+      await run("UPDATE stores SET status = 'active', tier = ?, opened_at = NOW(), closed_at = NULL WHERE id = ?", [targetTier, existing.id]);
     }
-    const tier = TIERS.small;
+    const tier = TIERS[targetTier];
     require('./notifications').notify(req.user.id, '🏪 Store Reopened',
       `Your store is back! Deposit locked for ${DEPOSIT_LOCK_DAYS} days. ${tier.dailyOrders} orders/day.`, 'success');
-    return res.status(200).json({ id: existing.id, tier: 'small', dailyOrders: tier.dailyOrders });
+    return res.status(200).json({ id: existing.id, tier: targetTier, dailyOrders: tier.dailyOrders });
   }
 
   // New store: require deposit from balance
@@ -229,12 +229,12 @@ router.post('/open', async (req, res) => {
     const ok = await deductBalance(t, req.user.id, DEPOSIT);
     if (!ok) { await t.rollback(); return res.status(400).json({ error: 'Balance changed during checkout, please try again' }); }
     const unlockAt = new Date(Date.now() + DEPOSIT_LOCK_DAYS * 86400000).toISOString();
-    const result = await t.insert('INSERT INTO stores (user_id, tier, deposit, deposit_unlock_at) VALUES (?, ?, ?, ?)', [req.user.id, 'small', DEPOSIT, unlockAt]);
+    const result = await t.insert('INSERT INTO stores (user_id, tier, deposit, deposit_unlock_at) VALUES (?, ?, ?, ?)', [req.user.id, targetTier, DEPOSIT, unlockAt]);
     await t.commit();
-    const tier = TIERS.small;
+    const tier = TIERS[targetTier];
     require('./notifications').notify(req.user.id, '🏪 Store Opened!',
       `Your store is open! $${DEPOSIT} deposit locked for ${DEPOSIT_LOCK_DAYS} days. ${tier.dailyOrders} orders/day.`, 'success');
-    res.status(201).json({ id: result.id, tier: 'small', dailyOrders: tier.dailyOrders, deposit: DEPOSIT, depositUnlockAt: unlockAt });
+    res.status(201).json({ id: result.id, tier: targetTier, dailyOrders: tier.dailyOrders, deposit: DEPOSIT, depositUnlockAt: unlockAt });
   } catch (err) {
     await t.rollback().catch(() => {});
     throw err;

@@ -24,6 +24,8 @@ const TIER_INFO = {
 // 三参数收益控制: per-tier profit rate + price range (matches server/store.js)
 const TIER_PROFIT_RATES = { small: 0.02, medium: 0.03, large: 0.04, premium: 0.05, elite: 0.06, supreme: 0.08 };
 const TIER_PRICE_RANGES = { small: [5, 15], medium: [15, 35], large: [35, 70], premium: [70, 150], elite: [150, 300], supreme: [300, 600] };
+const TIER_ORDER = ['small', 'medium', 'large', 'premium', 'elite', 'supreme'];
+const MIN_DEPOSITS = { small: 20, medium: 50, large: 100, premium: 200, elite: 500, supreme: 2000 };
 
 const CAT_KEYS = ['store.all', 'store.digital', 'store.women', 'store.men', 'store.beauty', 'store.shoes', 'store.home', 'store.accessories', 'store.food', 'store.toys', 'store.sports', 'store.auto'];
 const CAT_VALUES = ['All', 'Digital', 'Women', 'Men', 'Beauty', 'Shoes', 'Home', 'Accessories', 'Food', 'Toys', 'Sports', 'Auto'];
@@ -443,7 +445,7 @@ export default function StorePage() {
   const [tradeMode, setTradeMode] = useState('holding'); // 'holding' | 'share'
   const [shareProduct, setShareProduct] = useState(null);
   const [shareMsg, setShareMsg] = useState('');
-  const handleOpen = async () => { setOpening(true); try { await client.post('/store/open'); toast.success(t('store.openSuccess')); loadStatus(); loadEarnings(); } catch (err) { const d = err.response?.data; if (d?.depositRequired) { toast.error(t('store.depositRequired')); navigate('/mine/deposit'); } else toast.error(d?.error || t('common.operationFailed')); } finally { setOpening(false); } };
+  const handleOpen = async (tier) => { setOpening(true); try { await client.post('/store/open', { tier }); toast.success(t('store.openSuccess')); loadStatus(); loadEarnings(); } catch (err) { const d = err.response?.data; if (d?.depositRequired) { toast.error(t('store.depositRequired')); navigate('/mine/deposit'); } else toast.error(d?.error || t('common.operationFailed')); } finally { setOpening(false); } };
   const handleShare = async (product) => {
     try {
       const { data } = await client.post('/commissions/claim', { productId: product.id, productPrice: product.price, productName: product.name, productImg: product.img });
@@ -478,6 +480,7 @@ export default function StorePage() {
   const [buyConfirm, setBuyConfirm] = useState(null);
   const [buying, setBuying] = useState(false);
   const [showTierGuide, setShowTierGuide] = useState(false);
+  const [selectedTier, setSelectedTier] = useState('small');
   const handleBuy = (product) => { setBuyConfirm(product); };
   const handleConfirmBuy = async () => {
     if (!buyConfirm) return;
@@ -508,15 +511,43 @@ export default function StorePage() {
 
   if (loading) return <div className="min-h-screen bg-[#ffffff] flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#FF5000] border-t-transparent rounded-full animate-spin" /></div>;
   if (!status?.hasStore) return (
-    <div className="min-h-screen bg-[#ffffff] safe-top safe-bottom flex flex-col items-center justify-center px-6 text-center">
-      <div className="w-24 h-24 rounded-full bg-[#FF5000] flex items-center justify-center mb-6 shadow-2xl"><Store size={44} className="text-white" /></div>
-      <h1 className="text-2xl font-black text-[#0F1111] mb-1">{t('store.title')}</h1>
-      <p className="text-sm text-[#565959] mb-8">{t('store.subtitle')}</p>
-      <button onClick={handleOpen} disabled={opening} className="w-full max-w-xs py-4 bg-[#FF5000] hover:bg-[#E04500] text-[#0F1111] font-bold rounded-full shadow-lg active:scale-[0.98] transition-all text-base border border-[#FF5000]">{opening ? '...' : t('store.openBtn', { deposit: 20 })}</button>
-      <p className="text-xs text-[#999999] mt-3 max-w-xs leading-relaxed">{t('store.openDepositNote')}</p>
-      <div className="w-full max-w-sm mt-8 text-left">
-        <TierGuide />
+    <div className="min-h-screen bg-[#ffffff] safe-top safe-bottom flex flex-col items-center px-5" style={{paddingBottom:'40px', overflowY:'auto'}}>
+      <div className="w-20 h-20 rounded-2xl bg-[#FF5000] flex items-center justify-center mt-10 mb-5 shadow-lg"><Store size={38} className="text-white" /></div>
+      <h1 className="text-2xl font-black text-[#0F1111] mb-1 text-center">{t('store.title')}</h1>
+      <p className="text-sm text-[#565959] mb-6 text-center">{t('store.subtitle')}</p>
+
+      {/* 可选档位 */}
+      <div className="w-full max-w-sm text-left mb-6">
+        <div className="text-sm font-bold text-[#0F1111] mb-3">{t('store.chooseTier')}</div>
+        <div className="flex flex-col gap-2">
+          {TIER_ORDER.map((key, i) => {
+            const tInfo = TIER_INFO[key];
+            const dep = MIN_DEPOSITS[key];
+            const cap = (dep / 30).toFixed(2);
+            const sel = selectedTier === key;
+            return (
+              <div key={key} onClick={() => setSelectedTier(key)}
+                className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all"
+                style={{ background: sel ? '#FFF5F0' : '#fff', borderColor: sel ? '#FF5000' : '#e8e8ed', boxShadow: sel ? '0 0 0 3px rgba(255,80,0,.08)' : 'none' }}>
+                <span className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style={{background: sel ? '#FF5000' : '#f5f5f5', color: sel ? '#fff' : '#666'}}>{i+1}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13px] font-bold text-[#0F1111]">{t(tInfo.nameKey)}</div>
+                  <div className="text-[10px] text-[#999]">{t('store.deposit')} ${dep}</div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-[13px] font-bold text-[#00A86B]">${cap}</div>
+                  <div className="text-[9px] text-[#999]">/day</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
+
+      <button onClick={() => handleOpen(selectedTier)} disabled={opening} className="w-full max-w-sm py-4 bg-[#FF5000] hover:bg-[#E04500] text-white font-bold rounded-full shadow-lg active:scale-[0.98] transition-all text-base border border-[#FF5000]">
+        {opening ? '...' : t('store.openBtn', { deposit: MIN_DEPOSITS[selectedTier] })}
+      </button>
+      <p className="text-xs text-[#999999] mt-3 max-w-xs leading-relaxed text-center">{t('store.openDepositNote')}</p>
     </div>
   );
 

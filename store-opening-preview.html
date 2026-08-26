@@ -1,0 +1,329 @@
+<title>Store Opening</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+  :root {
+    --accent: #FF5000;
+    --accent-deep: #E04500;
+    --accent-soft: #FFF1EB;
+    --ink: #1A1613;
+    --ink-soft: #433C35;
+    --muted: #8A8178;
+    --green: #0E8A5F;
+    --green-soft: #E9F6F0;
+    --ground: #F4F0EC;
+    --card: #FFFFFF;
+    --line: #ECE5DE;
+    --head: #17130F;
+    --head-ink: #F6F1EB;
+  }
+  :root[data-theme="dark"] {
+    --accent-soft: #2A1A10;
+    --ink: #F3EEE8;
+    --ink-soft: #D4CABF;
+    --muted: #9C9085;
+    --green-soft: #122A20;
+    --ground: #16120E;
+    --card: #201A15;
+    --line: #2E2721;
+    --head: #0D0A08;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 32px 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 手机屏幕容器 */
+  .phone {
+    width: 390px;
+    max-width: 100%;
+    background: var(--card);
+    border-radius: 40px;
+    box-shadow: 0 30px 80px rgba(23, 19, 15, 0.25), 0 0 0 10px #2a241d;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* 状态栏 */
+  .statusbar {
+    height: 46px;
+    background: var(--head);
+    color: var(--head-ink);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 26px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+  .statusbar .dots { display: flex; gap: 4px; }
+  .statusbar .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(246,241,235,.25); }
+  .statusbar .dot.on { background: var(--accent); }
+
+  /* 头部 */
+  .header {
+    background: var(--head);
+    color: var(--head-ink);
+    padding: 16px 20px 20px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .brand .logo {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #FF5000, #FF7A3D);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+  }
+  .brand .name { font-size: 14px; font-weight: 700; letter-spacing: 0.2px; }
+  .brand .tag { font-size: 10.5px; color: rgba(246,241,235,.5); font-weight: 500; }
+
+  .headline {
+    font-family: "Sora", -apple-system, "Segoe UI", sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.5px;
+    text-wrap: balance;
+  }
+  .headline .accent { color: var(--accent); }
+  .subhead { font-size: 13px; color: rgba(246,241,235,.55); margin-top: 8px; line-height: 1.5; }
+
+  /* 内容 */
+  .content { padding: 20px; }
+
+  /* 每日收益焦点 */
+  .focus {
+    background: linear-gradient(135deg, #FF5000 0%, #FF7A3D 60%, #FF9A55 100%);
+    border-radius: 18px;
+    padding: 20px;
+    color: #fff;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .focus::after {
+    content: "";
+    position: absolute; right: -40px; top: -50px;
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, rgba(255,255,255,.22), transparent 70%);
+    border-radius: 50%;
+  }
+  .focus .label { font-size: 11px; font-weight: 600; opacity: .85; letter-spacing: 0.4px; text-transform: uppercase; }
+  .focus .value {
+    font-family: "Sora", sans-serif;
+    font-size: 40px; font-weight: 800; line-height: 1;
+    margin: 8px 0 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .focus .value .per { font-size: 15px; font-weight: 600; opacity: .85; }
+  .focus .note { font-size: 12px; opacity: .9; }
+
+  /* 卖点 */
+  .perks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+  .perk {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .perk .ic { font-size: 20px; margin-bottom: 6px; }
+  .perk .t { font-size: 12px; font-weight: 700; color: var(--ink); }
+  .perk .d { font-size: 10px; color: var(--muted); margin-top: 3px; line-height: 1.3; }
+
+  /* 档位表 */
+  .levels-title {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .levels-title h2 { font-family: "Sora", sans-serif; font-size: 16px; font-weight: 700; }
+  .levels-title .hint { font-size: 11px; color: var(--muted); }
+
+  .levels { display: flex; flex-direction: column; gap: 8px; }
+  .level {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 14px;
+    border-radius: 13px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    position: relative;
+  }
+  .level.current {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 0 3px rgba(255,80,0,.08);
+  }
+  .level .lv {
+    display: flex; align-items: center; gap: 9px;
+    min-width: 0;
+  }
+  .level .lv .badge {
+    width: 30px; height: 30px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: "Sora", sans-serif; font-size: 11px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .level .lv .nm { font-size: 13px; font-weight: 700; color: var(--ink); }
+  .level.current .lv .nm { color: var(--accent-deep); }
+  .level .dep { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .level .gain { text-align: right; }
+  .level .gain .g {
+    font-family: "Sora", sans-serif; font-size: 14px; font-weight: 800;
+    color: var(--green); font-variant-numeric: tabular-nums;
+  }
+  .level .gain .p { font-size: 9.5px; color: var(--muted); margin-top: 1px; }
+
+  /* CTA */
+  .cta {
+    margin-top: 20px;
+    background: linear-gradient(135deg, #FF5000, #E04500);
+    color: #fff;
+    border: none;
+    width: 100%;
+    padding: 17px;
+    border-radius: 16px;
+    font-family: "Sora", -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 10px 24px rgba(255,80,0,.32);
+    transition: transform .15s ease;
+  }
+  .cta:active { transform: scale(.98); }
+  .cta .arr { font-size: 18px; }
+
+  .terms { text-align: center; font-size: 11px; color: var(--muted); margin-top: 14px; line-height: 1.6; }
+
+  .link { color: var(--accent); font-weight: 600; }
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&display=swap">
+
+<div class="phone">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="dots"><span class="dot"></span><span class="dot on"></span><span class="dot"></span></span>
+  </div>
+
+  <div class="header">
+    <div class="brand">
+      <div class="logo">🏪</div>
+      <div>
+        <div class="name">Shopee Shopping Operations</div>
+        <div class="tag">E-Commerce</div>
+      </div>
+    </div>
+    <div class="headline">Open your store.<br>Earn <span class="accent">every day</span>.</div>
+    <div class="subhead">Source products, sell for profit. No inventory, no shipping — a $20 deposit gets you started.</div>
+  </div>
+
+  <div class="content">
+    <div class="focus">
+      <div class="label">Daily max earnings</div>
+      <div class="value">$66.67 <span class="per">/ day</span></div>
+      <div class="note">Supreme Store · deposit $2000 · payback in 30 days</div>
+    </div>
+
+    <div class="perks">
+      <div class="perk">
+        <div class="ic">📦</div>
+        <div class="t">No inventory</div>
+        <div class="d">Source &amp; sell, nothing to stock</div>
+      </div>
+      <div class="perk">
+        <div class="ic">🚚</div>
+        <div class="t">No shipping</div>
+        <div class="d">We handle fulfilment</div>
+      </div>
+      <div class="perk">
+        <div class="ic">💸</div>
+        <div class="t">Withdraw daily</div>
+        <div class="d">Profit withdrawable every day</div>
+      </div>
+      <div class="perk">
+        <div class="ic">📈</div>
+        <div class="t">Upgrade your store</div>
+        <div class="d">Level up, earn more daily</div>
+      </div>
+    </div>
+
+    <div class="levels-title">
+      <h2>Store Levels</h2>
+      <span class="hint">deposit · daily max</span>
+    </div>
+
+    <div class="levels">
+      <div class="level current">
+        <div class="lv">
+          <div class="badge" style="background:#FFF1EB;color:#E04500;">1</div>
+          <div class="nm">Small Store</div>
+        </div>
+        <div class="dep">$20</div>
+        <div class="gain"><div class="g">$0.67</div><div class="p">30d</div></div>
+      </div>
+      <div class="level">
+        <div class="lv">
+          <div class="badge" style="background:#F0EBFF;color:#7C5CFC;">2</div>
+          <div class="nm">Medium Store</div>
+        </div>
+        <div class="dep">$50</div>
+        <div class="gain"><div class="g">$1.67</div><div class="p">30d</div></div>
+      </div>
+      <div class="level">
+        <div class="lv">
+          <div class="badge" style="background:#FFEBEE;color:#E04545;">3</div>
+          <div class="nm">Large Store</div>
+        </div>
+        <div class="dep">$100</div>
+        <div class="gain"><div class="g">$3.33</div><div class="p">30d</div></div>
+      </div>
+      <div class="level">
+        <div class="lv">
+          <div class="badge" style="background:#FCE4F1;color:#D63384;">4</div>
+          <div class="nm">Premium Store</div>
+        </div>
+        <div class="dep">$200</div>
+        <div class="gain"><div class="g">$6.67</div><div class="p">30d</div></div>
+      </div>
+      <div class="level">
+        <div class="lv">
+          <div class="badge" style="background:#E0F5F8;color:#0E7C8A;">5</div>
+          <div class="nm">Elite Store</div>
+        </div>
+        <div class="dep">$500</div>
+        <div class="gain"><div class="g">$16.67</div><div class="p">30d</div></div>
+      </div>
+      <div class="level">
+        <div class="lv">
+          <div class="badge" style="background:#FFF0E0;color:#E07C2A;">6</div>
+          <div class="nm">Supreme Store</div>
+        </div>
+        <div class="dep">$2000</div>
+        <div class="gain"><div class="g">$66.67</div><div class="p">30d</div></div>
+      </div>
+    </div>
+
+    <button class="cta">Open Store — $20 deposit <span class="arr">→</span></button>
+    <div class="terms">Deposit locked for 365 days, then fully refundable.<br>View <span class="link">full terms</span></div>
+  </div>
+</div>
