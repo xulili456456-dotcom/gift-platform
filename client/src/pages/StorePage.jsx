@@ -515,46 +515,91 @@ export default function StorePage() {
 
   if (loading) return <div className="min-h-screen bg-[#ffffff] flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#FF5000] border-t-transparent rounded-full animate-spin" /></div>;
   if (!status?.hasStore || showOpen) return (
-    <div className="min-h-screen bg-[#ffffff] safe-top safe-bottom flex flex-col items-center px-5" style={{paddingBottom:'40px', overflowY:'auto'}}>
-      <div className="w-20 h-20 rounded-2xl bg-[#FF5000] flex items-center justify-center mt-10 mb-5 shadow-lg"><Store size={38} className="text-white" /></div>
-      <h1 className="text-2xl font-black text-[#0F1111] mb-1 text-center">{t('store.title')}</h1>
-      <p className="text-sm text-[#565959] mb-6 text-center">{t('store.subtitle')}</p>
-
-      {/* 可选档位 */}
-      <div className="w-full max-w-sm text-left mb-6">
-        <div className="text-sm font-bold text-[#0F1111] mb-3">{t('store.chooseTier')}</div>
-        <div className="flex flex-col gap-2">
-          {TIER_ORDER.map((key, i) => {
-            const tInfo = TIER_INFO[key];
-            const dep = MIN_DEPOSITS[key];
-            const cap = (dep / 30).toFixed(2);
-            const sel = selectedTier === key;
-            return (
-              <div key={key} onClick={() => setSelectedTier(key)}
-                className="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all"
-                style={{ background: sel ? '#FFF5F0' : '#fff', borderColor: sel ? '#FF5000' : '#e8e8ed', boxShadow: sel ? '0 0 0 3px rgba(255,80,0,.08)' : 'none' }}>
-                <span className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0" style={{background: sel ? '#FF5000' : '#f5f5f5', color: sel ? '#fff' : '#666'}}>{i+1}</span>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13px] font-bold text-[#0F1111]">{t(tInfo.nameKey)}</div>
-                  <div className="text-[10px] text-[#999]">{t('store.deposit')} ${dep}</div>
-                </div>
-                <div className="text-right shrink-0">
-                  <div className="text-[13px] font-bold text-[#00A86B]">${cap}</div>
-                  <div className="text-[9px] text-[#999]">/day</div>
-                </div>
-              </div>
-            );
-          })}
+    <div className="min-h-screen bg-[#0f0f0f] safe-top safe-bottom" style={{paddingBottom:'40px'}}>
+      {/* 深色头部 */}
+      <div style={{background:'#0f0f0f', padding:'16px 20px 20px', color:'#fff'}}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:18}}>
+          <div style={{width:34,height:34,borderRadius:10,background:'linear-gradient(135deg,#FF5000,#FF7A3D)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:17}}>🏪</div>
+          <div>
+            <div style={{fontSize:14,fontWeight:700,letterSpacing:.2}}>Shopee Shopping Operations</div>
+            <div style={{fontSize:10.5,color:'rgba(255,255,255,.5)',fontWeight:500}}>{t('store.title')}</div>
+          </div>
         </div>
+        <div style={{fontSize:30,fontWeight:800,lineHeight:1.08,letterSpacing:-.5}}>Open your store.<br/>Earn <span style={{color:'#FF5000'}}>every day</span>.</div>
+        <div style={{fontSize:13,color:'rgba(255,255,255,.55)',marginTop:8,lineHeight:1.5}}>{t('store.subtitle')}</div>
       </div>
 
-      <button onClick={() => handleOpen(selectedTier)} disabled={opening} className="w-full max-w-sm py-4 bg-[#FF5000] hover:bg-[#E04500] text-white font-bold rounded-full shadow-lg active:scale-[0.98] transition-all text-base border border-[#FF5000]">
-        {opening ? '...' : t('store.openBtn', { deposit: MIN_DEPOSITS[selectedTier] })}
-      </button>
-      <p className="text-xs text-[#999999] mt-3 max-w-xs leading-relaxed text-center">{t('store.openDepositNote')}</p>
-      {status?.hasStore && (
-        <button onClick={() => setShowOpen(false)} className="mt-5 text-sm font-bold text-[#FF5000]" style={{background:'none',border:'none',cursor:'pointer'}}>{t('common.close')}</button>
-      )}
+      {/* 内容 */}
+      <div style={{padding:20, background:'#fff', minHeight:'calc(100vh - 180px)'}}>
+        {/* 每日收益焦点卡 */}
+        <div style={{background:'linear-gradient(135deg,#FF5000,#FF7A3D,#FF9A55)',borderRadius:18,padding:20,color:'#fff',marginBottom:16,position:'relative',overflow:'hidden'}}>
+          <div style={{position:'absolute',right:-40,top:-50,width:160,height:160,background:'radial-gradient(circle,rgba(255,255,255,.22),transparent 70%)',borderRadius:'50%'}} />
+          <div style={{fontSize:11,fontWeight:600,opacity:.85,letterSpacing:.4,textTransform:'uppercase'}}>Daily max earnings</div>
+          <div style={{fontSize:40,fontWeight:800,lineHeight:1,margin:'8px 0 4px',fontVariantNumeric:'tabular-nums'}}>${(MIN_DEPOSITS[selectedTier]/30).toFixed(2)} <span style={{fontSize:15,fontWeight:600,opacity:.85}}>/ day</span></div>
+          <div style={{fontSize:12,opacity:.9}}>{t(TIER_INFO[selectedTier].nameKey)} · {t('store.deposit')} ${MIN_DEPOSITS[selectedTier]} · payback in 30 days</div>
+        </div>
+
+        {/* 卖点 2x2 */}
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:20}}>
+          <div style={{background:'#fff',border:'1px solid #ece5de',borderRadius:14,padding:'14px 10px',textAlign:'center'}}>
+            <div style={{fontSize:20,marginBottom:6}}>📦</div>
+            <div style={{fontSize:12,fontWeight:700,color:'#0F1111'}}>No inventory</div>
+            <div style={{fontSize:10,color:'#999',marginTop:3,lineHeight:1.3}}>Source &amp; sell, nothing to stock</div>
+          </div>
+          <div style={{background:'#fff',border:'1px solid #ece5de',borderRadius:14,padding:'14px 10px',textAlign:'center'}}>
+            <div style={{fontSize:20,marginBottom:6}}>🚚</div>
+            <div style={{fontSize:12,fontWeight:700,color:'#0F1111'}}>No shipping</div>
+            <div style={{fontSize:10,color:'#999',marginTop:3,lineHeight:1.3}}>We handle fulfilment</div>
+          </div>
+          <div style={{background:'#fff',border:'1px solid #ece5de',borderRadius:14,padding:'14px 10px',textAlign:'center'}}>
+            <div style={{fontSize:20,marginBottom:6}}>💸</div>
+            <div style={{fontSize:12,fontWeight:700,color:'#0F1111'}}>Withdraw daily</div>
+            <div style={{fontSize:10,color:'#999',marginTop:3,lineHeight:1.3}}>Profit withdrawable every day</div>
+          </div>
+          <div style={{background:'#fff',border:'1px solid #ece5de',borderRadius:14,padding:'14px 10px',textAlign:'center'}}>
+            <div style={{fontSize:20,marginBottom:6}}>📈</div>
+            <div style={{fontSize:12,fontWeight:700,color:'#0F1111'}}>Upgrade your store</div>
+            <div style={{fontSize:10,color:'#999',marginTop:3,lineHeight:1.3}}>Level up, earn more daily</div>
+          </div>
+        </div>
+
+        {/* 档位选择 */}
+        <div style={{marginBottom:20}}>
+          <div style={{fontSize:16,fontWeight:700,color:'#0F1111',marginBottom:12}}>{t('store.chooseTier')}</div>
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            {TIER_ORDER.map((key, i) => {
+              const tInfo = TIER_INFO[key];
+              const dep = MIN_DEPOSITS[key];
+              const cap = (dep / 30).toFixed(2);
+              const sel = selectedTier === key;
+              return (
+                <div key={key} onClick={() => setSelectedTier(key)}
+                  style={{display:'flex',alignItems:'center',gap:10,padding:'13px 14px',borderRadius:13,border:sel?'1px solid #FF5000':'1px solid #ece5de',background:sel?'#FFF5F0':'#fff',boxShadow:sel?'0 0 0 3px rgba(255,80,0,.08)':'none',cursor:'pointer'}}>
+                  <span style={{width:30,height:30,borderRadius:9,display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,background:sel?'#FF5000':'#f5f5f5',color:sel?'#fff':'#666',flexShrink:0}}>{i+1}</span>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:13,fontWeight:700,color:sel?'#E04500':'#0F1111'}}>{t(tInfo.nameKey)}</div>
+                    <div style={{fontSize:10,color:'#999',marginTop:1}}>{t('store.deposit')} ${dep}</div>
+                  </div>
+                  <div style={{textAlign:'right',flexShrink:0}}>
+                    <div style={{fontSize:14,fontWeight:800,color:'#0E8A5F',fontVariantNumeric:'tabular-nums'}}>${cap}</div>
+                    <div style={{fontSize:9.5,color:'#999',marginTop:1}}>/day · 30d</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <button onClick={() => handleOpen(selectedTier)} disabled={opening}
+          style={{width:'100%',padding:'17px',borderRadius:16,border:'none',cursor:'pointer',background:'linear-gradient(135deg,#FF5000,#E04500)',color:'#fff',fontSize:16,fontWeight:700,boxShadow:'0 10px 24px rgba(255,80,0,.32)',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}>
+          {opening ? '...' : `${t('store.openBtn', { deposit: MIN_DEPOSITS[selectedTier] })} →`}
+        </button>
+        <div style={{textAlign:'center',fontSize:11,color:'#999',marginTop:14,lineHeight:1.6}}>{t('store.openDepositNote')}</div>
+        {status?.hasStore && (
+          <button onClick={() => setShowOpen(false)} style={{display:'block',margin:'16px auto 0',background:'none',border:'none',color:'#FF5000',fontSize:14,fontWeight:700,cursor:'pointer'}}>{t('common.close')}</button>
+        )}
+      </div>
     </div>
   );
 
