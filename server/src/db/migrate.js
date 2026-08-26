@@ -171,7 +171,7 @@ ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP DEFAULT 
 -- Store (simulated e-commerce)
 CREATE TABLE IF NOT EXISTS stores (
     id              SERIAL PRIMARY KEY,
-    user_id         INTEGER NOT NULL UNIQUE,
+    user_id         INTEGER NOT NULL,
     tier            TEXT NOT NULL CHECK(tier IN ('small', 'medium', 'large', 'premium', 'elite', 'supreme')),
     deposit         NUMERIC(10,2) NOT NULL,
     status          TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'closed')),
@@ -505,6 +505,8 @@ async function migrate() {
   // 6-tier stores: update tier CHECK constraint
   try { await exec(`ALTER TABLE stores DROP CONSTRAINT IF EXISTS stores_tier_check`); } catch(e) {}
   try { await exec(`ALTER TABLE stores ADD CONSTRAINT stores_tier_check CHECK(tier IN ('small','medium','large','premium','elite','supreme'))`); } catch(e) { console.log('stores_tier_check skipped:', e.message); }
+  // 一用户多店: drop UNIQUE on stores.user_id (up to 5 stores per user)
+  try { await exec(`ALTER TABLE stores DROP CONSTRAINT IF EXISTS stores_user_id_key`); } catch(e) { console.log('stores_user_id_key skipped:', e.message); }
 
   // Device tokens for push notifications
   try {

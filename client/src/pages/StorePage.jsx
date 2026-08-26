@@ -389,22 +389,24 @@ export default function StorePage() {
   const [orderHistory, setOrderHistory] = useState(null);
   const [orderPeriod, setOrderPeriod] = useState('today');
   const loadStatus = useCallback(async () => {
-    try { const { data } = await client.get('/store/status'); setStatus(data); } catch { /* */ }
+    try { const { data } = await client.get('/store/status'); setStatus(data); setStoreId((prev) => { const list = data?.stores || []; if (list.some(s => s.id === prev)) return prev; return list[0]?.id ?? null; }); } catch { /* */ }
     finally { setLoading(false); }
   }, []);
   const loadEarnings = useCallback(async () => {
     try { const { data } = await client.get('/store/earnings-stats'); setEarnings(data); } catch {}
   }, []);
-  const checkSell = useCallback(async () => { try { const { data } = await client.post('/store/check-sell'); if (data.settled?.length > 0) { toast.success(t('store.itemsSold', { n: data.settled.length })); loadStatus(); loadEarnings(); } } catch {} }, []);
-  const loadHoldings = useCallback(async () => { try { const { data } = await client.get('/store/holdings'); setHoldings(data); } catch {} }, []);
+  const currentStore = status?.stores?.find(x => x.id === storeId);
+  const checkSell = useCallback(async () => { try { const { data } = await client.post('/store/check-sell', { storeId }); if (data.settled?.length > 0) { toast.success(t('store.itemsSold', { n: data.settled.length })); loadStatus(); loadEarnings(); } } catch {} }, [storeId]);
+  const loadHoldings = useCallback(async () => { try { const { data } = await client.get('/store/holdings', { params: { storeId } }); setHoldings(data); } catch {} }, [storeId]);
 
   useEffect(() => { loadStatus(); loadEarnings(); checkSell(); loadHoldings(); client.get('/notifications').then(({data}) => setNotifCount(data.unread||0)).catch(()=>{}); }, []);
-  useEffect(() => { const t = setInterval(checkSell, 180000); return () => clearInterval(t); }, []);
-  useEffect(() => { client.get('/store/analytics').then(({data}) => setAnalytics(data)).catch(()=>{}); }, [status?.store?.doneToday]);
-  useEffect(() => { client.get(`/store/orders-history?period=${orderPeriod}`).then(({data}) => setOrderHistory(data)).catch(()=>{}); }, [orderPeriod, status?.store?.doneToday]);
+  useEffect(() => { if (storeId) { loadHoldings(); checkSell(); } }, [storeId]);
+  useEffect(() => { const t = setInterval(checkSell, 180000); return () => clearInterval(t); }, [checkSell]);
+  useEffect(() => { if (storeId) client.get(`/store/analytics?storeId=${storeId}`).then(({data}) => setAnalytics(data)).catch(()=>{}); }, [storeId, currentStore?.doneToday]);
+  useEffect(() => { if (storeId) client.get(`/store/orders-history?period=${orderPeriod}&storeId=${storeId}`).then(({data}) => setOrderHistory(data)).catch(()=>{}); }, [orderPeriod, storeId, currentStore?.doneToday]);
   const [freeProducts, setFreeProducts] = useState([]);
   const [freeRemaining, setFreeRemaining] = useState(0);
-  const claimedNames = status?.store?.claimedFreeNames || [];
+  const claimedNames = status?.claimedFreeNames || [];
   useEffect(() => {
     client.get('/store/free-products').then(({data}) => {
       setFreeProducts(data.products || []);
@@ -412,19 +414,19 @@ export default function StorePage() {
     }).catch(()=>{});
   }, []);
   useEffect(() => {
-    if (status?.store?.freeRemaining !== undefined) {
-      setFreeRemaining(status.store.freeRemaining);
+    if (status?.freeRemaining !== undefined) {
+      setFreeRemaining(status.freeRemaining);
     }
-    if (status?.store?.freeProductNames?.length > 0 && freeProducts.length === 0) {
-      setFreeProducts(status.store.freeProductNames.map(n => ({ name: n })));
+    if (status?.freeProductNames?.length > 0 && freeProducts.length === 0) {
+      setFreeProducts(status.freeProductNames.map(n => ({ name: n })));
     }
-  }, [status?.store?.freeRemaining, status?.store?.freeProductNames]);
+  }, [status?.freeRemaining, status?.freeProductNames]);
 
   var daySeed = new Date().toISOString().slice(0,10).split('-').reduce((s,x) => s + parseInt(x), 0);
   const freeProductNames = useMemo(() => freeProducts.map(fp => fp.name), [freeProducts]);
   const products = useMemo(() => {
     if (!status?.hasStore) return [];
-    let list = genProducts(status.store.tier, CAT_VALUES[catIdx], search, daySeed);
+    let list = genProducts(currentStore?.tier, CAT_VALUES[catIdx], search, daySeed);
     // Override free products with actual free-order rates (3% profit, $0 cost)
     const freeNames = freeProducts.map(fp => fp.name);
     list = list.map(p => {
@@ -433,14 +435,14 @@ export default function StorePage() {
       return { ...p, costPrice: 0, profit: freeProfit, roi: 3 };
     });
     if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => fp.name === p.name));
-    else if (affordableOnly) list = list.filter(p => p.costPrice <= (status.store.balance || 0));
+    else if (affordableOnly) list = list.filter(p => p.costPrice <= (statustatus.balance || 0));
     if (sortMode === 'profit') list.sort((a, b) => b.profit - a.profit);
     else if (sortMode === 'price') list.sort((a, b) => a.price - b.price);
     else if (sortMode === 'price-desc') list.sort((a, b) => b.price - a.price);
     else if (sortMode === 'free') list.sort((a, b) => a.price - b.price);
     else list.sort((a, b) => b.sold - a.sold);
     return list;
-  }, [status?.hasStore, status?.store?.tier, status?.store?.doneToday, catIdx, search, sortMode, affordableOnly, status?.store?.balance, freeProducts, daySeed]);
+  }, [status?.hasStore, currentStore?.tier, currentStore?.doneToday, catIdx, search, sortMode, affordableOnly, status?.balance, freeProducts, daySeed]);
 
   const [tradeMode, setTradeMode] = useState('holding'); // 'holding' | 'share'
   const [shareProduct, setShareProduct] = useState(null);
@@ -465,11 +467,11 @@ export default function StorePage() {
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
     if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
-    try { const { data } = await client.post('/store/deposit', { amount: amt }); setDepositMsg(`Deposited $${amt}!`); setDepositAmount(''); loadStatus(); loadEarnings(); }
+    try { const { data } = await client.post('/store/deposit', { amount: amt, storeId }); setDepositMsg(`Deposited $${amt}!`); setDepositAmount(''); loadStatus(); loadEarnings(); }
     catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); }
   };
   const handleWithdrawDeposit = async () => {
-    try { const { data } = await client.post('/store/refund-deposit'); toast.success(t('store.refundDone', { amount: Number(data.returned || 0).toFixed(2) })); loadStatus(); loadEarnings(); }
+    try { const { data } = await client.post('/store/refund-deposit', { storeId }); toast.success(t('store.refundDone', { amount: Number(data.returned || 0).toFixed(2) })); loadStatus(); loadEarnings(); }
     catch (err) {
       const d = err.response?.data;
       if (d?.depositLocked) toast.error(t('store.depositLocked', { days: d.daysLeft }), { duration: 6000 });
@@ -481,12 +483,14 @@ export default function StorePage() {
   const [buying, setBuying] = useState(false);
   const [showTierGuide, setShowTierGuide] = useState(false);
   const [selectedTier, setSelectedTier] = useState('small');
+  const [storeId, setStoreId] = useState(null);
+  const [showOpen, setShowOpen] = useState(false);
   const handleBuy = (product) => { setBuyConfirm(product); };
   const handleConfirmBuy = async () => {
     if (!buyConfirm) return;
     setBuying(true);
     try {
-      const { data } = await client.post('/store/orders/process', { productPrice: buyConfirm.price, productName: buyConfirm.name });
+      const { data } = await client.post('/store/orders/process', { productPrice: buyConfirm.price, productName: buyConfirm.name, storeId });
       toast.success(data.isFreeOrder
         ? `🎁 Free order! +$${data.profit.toFixed(2)} profit (${data.freeRemaining} free left)`
         : `🛒 Bought! Cost $${data.cost.toFixed(2)} · Sell by ${new Date(data.sellBy).toLocaleDateString()}`);
@@ -507,10 +511,10 @@ export default function StorePage() {
     }
     setBuying(false);
   };
-  const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { const { data } = await client.post('/store/close'); setStatus({ hasStore: false }); if (data?.deposit > 0) toast.success(t('store.closeDepositLocked', { amount: Number(data.deposit).toFixed(2) })); else toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
+  const handleClose = async () => { if (!confirm(t('store.confirmClose'))) return; try { const { data } = await client.post('/store/close', { storeId }); loadStatus(); if (data?.deposit > 0) toast.success(t('store.closeDepositLocked', { amount: Number(data.deposit).toFixed(2) })); else toast.success(t('store.closed')); } catch (err) { toast.error(err.response?.data?.error || t('common.operationFailed')); } };
 
   if (loading) return <div className="min-h-screen bg-[#ffffff] flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#FF5000] border-t-transparent rounded-full animate-spin" /></div>;
-  if (!status?.hasStore) return (
+  if (!status?.hasStore || showOpen) return (
     <div className="min-h-screen bg-[#ffffff] safe-top safe-bottom flex flex-col items-center px-5" style={{paddingBottom:'40px', overflowY:'auto'}}>
       <div className="w-20 h-20 rounded-2xl bg-[#FF5000] flex items-center justify-center mt-10 mb-5 shadow-lg"><Store size={38} className="text-white" /></div>
       <h1 className="text-2xl font-black text-[#0F1111] mb-1 text-center">{t('store.title')}</h1>
@@ -548,10 +552,13 @@ export default function StorePage() {
         {opening ? '...' : t('store.openBtn', { deposit: MIN_DEPOSITS[selectedTier] })}
       </button>
       <p className="text-xs text-[#999999] mt-3 max-w-xs leading-relaxed text-center">{t('store.openDepositNote')}</p>
+      {status?.hasStore && (
+        <button onClick={() => setShowOpen(false)} className="mt-5 text-sm font-bold text-[#FF5000]" style={{background:'none',border:'none',cursor:'pointer'}}>{t('common.close')}</button>
+      )}
     </div>
   );
 
-  const s = status.store;
+  const s = currentStore;
   const ti = TIER_INFO[s.tier];
 
   // ==== Product Detail Page ====
@@ -717,7 +724,7 @@ export default function StorePage() {
           <span style={{fontSize:14,fontWeight:700,color:'#fff'}}>My Little Shop</span>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
-          <span style={{fontSize:14,color:'#999',fontWeight:600}}>${s.balance.toFixed(0)}</span>
+          <span style={{fontSize:14,color:'#999',fontWeight:600}}>${status.balance.toFixed(0)}</span>
           <button onClick={() => navigate('/store/funds')} style={{padding:'5px 12px',background:'rgba(255,80,0,.15)',color:'#FF5000',borderRadius:14,border:'none',fontSize:11,fontWeight:600,cursor:'pointer'}}>💰 Funds</button>
           <button onClick={() => navigate('/mine/notifications')} style={{position:'relative',padding:3,background:'none',border:'none',cursor:'pointer'}}>
             <Bell size={22} color="#fff" />
@@ -734,6 +741,26 @@ export default function StorePage() {
           {search && <button onClick={() => setSearch('')} style={{background:'none',border:'none',cursor:'pointer'}}><X size={14} color="#666" /></button>}
         </div>
       </div>
+
+      {/* Store Switcher */}
+      {(status?.stores?.length || 0) > 0 && (
+        <div style={{background:'#0f0f0f',padding:'0 16px 10px',display:'flex',gap:8,overflowX:'auto',alignItems:'center'}}>
+          {status.stores.map((st) => {
+            const key = TIER_INFO[st.tier]?.nameKey;
+            return (
+              <button key={st.id} onClick={() => setStoreId(st.id)}
+                style={{padding:'7px 14px',borderRadius:16,fontSize:12,fontWeight:600,whiteSpace:'nowrap',background:st.id===storeId?'#FF5000':'rgba(255,255,255,.08)',color:st.id===storeId?'#fff':'#bbb',border:'none',cursor:'pointer',flexShrink:0}}>
+                {key ? t(key) : st.tier} · ${st.deposit}
+              </button>
+            );
+          })}
+          {status.stores.length < 5 && (
+            <button onClick={() => setShowOpen(true)} style={{padding:'7px 14px',borderRadius:16,fontSize:12,fontWeight:600,whiteSpace:'nowrap',background:'rgba(255,80,0,.2)',color:'#FF5000',border:'1px dashed #FF5000',cursor:'pointer',flexShrink:0}}>
+              + {t('store.addStore')}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Stats Strip */}
       <div style={{display:'flex',padding:'10px 16px',gap:0,borderBottom:'1px solid #f5f5f5',background:'#fff'}}>
@@ -779,11 +806,11 @@ export default function StorePage() {
       </div>
 
       {/* Free Orders Banner */}
-      {(s.freeRemaining||0) > 0 && (
+      {(freeRemaining||0) > 0 && (
         <div style={{margin:'8px 16px',padding:'10px 14px',background:'#FFF8F0',borderRadius:12,display:'flex',alignItems:'center',gap:8}}>
           <span style={{fontSize:16}}>🔥</span>
           <div style={{flex:1}}>
-            <div style={{fontSize:12,fontWeight:600,color:'#FF5000'}}>{s.freeRemaining} free trades remaining</div>
+            <div style={{fontSize:12,fontWeight:600,color:'#FF5000'}}>{freeRemaining} free trades remaining</div>
             <div style={{fontSize:10,color:'#999',marginTop:1}}>No security deposit needed for items under $50</div>
           </div>
         </div>
@@ -928,7 +955,7 @@ export default function StorePage() {
           <div className="grid grid-cols-2 gap-2">
             <div className="bg-white rounded-xl p-4 border border-gray-100">
               <p className="text-[10px] text-[#565959] mb-1">💰 {t('store.balance')}</p>
-              <p className="text-2xl font-bold text-[#0F1111]">${s.balance.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-[#0F1111]">${status.balance.toFixed(2)}</p>
             </div>
             <div className="bg-white rounded-xl p-4 border border-gray-100">
               <p className="text-[10px] text-[#565959] mb-1">🔒 Security</p>
@@ -956,7 +983,7 @@ export default function StorePage() {
               <input type="number" value={depositAmount} onChange={e => setDepositAmount(e.target.value)} placeholder="Amount" className="flex-1 px-3 py-2.5 border border-gray-100 rounded-xl text-sm outline-none focus:border-[#FF5000]" />
               <button onClick={handleDeposit} className="px-4 py-2.5 rounded-xl text-sm font-bold bg-[#FF5000] text-[#0F1111] shrink-0">+ Deposit</button>
             </div>
-            <p className="text-[9px] text-[#999] mb-2">Available balance: <b className="text-[#0F1111]">${s.balance.toFixed(2)}</b> · After deposit max trade: <b className="text-[#0F1111]">${((s.deposit||0) + parseFloat(depositAmount||0)).toFixed(2)}</b></p>
+            <p className="text-[9px] text-[#999] mb-2">Available balance: <b className="text-[#0F1111]">${status.balance.toFixed(2)}</b> · After deposit max trade: <b className="text-[#0F1111]">${((s.deposit||0) + parseFloat(depositAmount||0)).toFixed(2)}</b></p>
             {depositMsg && <p className="text-xs text-[#067D62] font-bold mb-2">{depositMsg}</p>}
             {(s.deposit||0) > 0 && (() => {
               const daysLeft = s.deposit_unlock_at ? daysUntil(s.deposit_unlock_at) : 365;

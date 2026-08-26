@@ -34,6 +34,14 @@ function getDailyProfitCap(deposit, override) {
   return Math.round((Number(deposit || 0) / PROFIT_RECOVERY_DAYS) * 100) / 100;
 }
 
+// 一用户多店: 最多 active 店数
+const MAX_STORES_PER_USER = 5;
+
+// 按 store_id 取店（校验属于当前用户，防越权）
+async function getStoreById(storeId, userId) {
+  return get('SELECT * FROM stores WHERE id = ? AND user_id = ?', [storeId, userId]);
+}
+
 // Product profit formula — deterministic per product per day (no Math.random)
 const FREE_PROFIT_RATE = 0.03;
 const FREE_LIFETIME_SLOTS = 0; // free orders disabled
@@ -115,49 +123,47 @@ router.get('/tiers', (req, res) => {
   res.json(TIERS);
 });
 
-// GET /api/store/status
+// GET /api/store/status — 返回所有 active 店列表
 router.get('/status', async (req, res) => {
-  const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (!store) return res.json({ hasStore: false });
+  const stores = await all('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
+  if (stores.length === 0) return res.json({ hasStore: false, stores: [] });
 
   const today = new Date().toISOString().slice(0, 10);
 
-  // Total orders for tier determination
-  const totalOrdersRow = await get("SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done'", [store.id]);
-  const totalOrders = Number(totalOrdersRow?.c) || 0;
-
-  // Auto-upgrade tier based on total orders
-  const newTier = getTier(totalOrders);
-  if (newTier !== store.tier) {
-    await run('UPDATE stores SET tier = ? WHERE id = ?', [newTier, store.id]);
-    store.tier = newTier;
-  }
-
-  const tier = TIERS[store.tier];
-  const next = nextTier(store.tier);
-
-  const doneToday = await get(
-    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND COALESCE(processed_at, created_at)::date = ?::date",
-    [store.id, today]
-  );
-  const earningsToday = await get(
-    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND COALESCE(processed_at, created_at)::date = ?::date",
-    [store.id, today]
-  );
-  const totalEarnings = await get("SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ?", [store.id]);
-  const todayProfit = await get(
-    "SELECT COALESCE(SUM(profit), 0) as total FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND created_at::date = ?::date",
-    [store.id, today]
-  );
-
+  // 余额是用户级的
   const taskBal = await get(
     "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
     [req.user.id, 'delivered']
   );
+  const balance = Number(taskBal?.total || 0);
 
-  res.json({
-    hasStore: true,
-    store: {
+  const storesDetail = [];
+  for (const store of stores) {
+    // Auto-upgrade tier based on total orders
+    const totalOrdersRow = await get("SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done'", [store.id]);
+    const totalOrders = Number(totalOrdersRow?.c) || 0;
+    const newTier = getTier(totalOrders);
+    if (newTier !== store.tier) {
+      await run('UPDATE stores SET tier = ? WHERE id = ?', [newTier, store.id]);
+      store.tier = newTier;
+    }
+
+    const tier = TIERS[store.tier];
+    const doneToday = await get(
+      "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND COALESCE(processed_at, created_at)::date = ?::date",
+      [store.id, today]
+    );
+    const earningsToday = await get(
+      "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND COALESCE(processed_at, created_at)::date = ?::date",
+      [store.id, today]
+    );
+    const totalEarnings = await get("SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ?", [store.id]);
+    const todayProfit = await get(
+      "SELECT COALESCE(SUM(profit), 0) as total FROM store_orders WHERE store_id = ? AND status IN ('done','holding') AND created_at::date = ?::date",
+      [store.id, today]
+    );
+
+    storesDetail.push({
       ...store,
       tierName: tier.name,
       dailyOrders: tier.dailyOrders,
@@ -167,16 +173,22 @@ router.get('/status', async (req, res) => {
       todayEarnings: Number(earningsToday?.total) || 0,
       totalOrders,
       totalEarnings: Number(totalEarnings?.total) || 0,
-      balance: Number(taskBal?.total || 0),
       deposit: Number(store.deposit || 0),
       maxTrade: Number(store.deposit || 0),
       dailyProfitCap: getDailyProfitCap(store.deposit, store.daily_profit_cap),
       todayProfit: Number(todayProfit?.total || 0),
-      freeRemaining: Math.max(0, FREE_LIFETIME_SLOTS - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_lifetime_' + req.user.id]))?.value || 0)),
-      // Include free product names and claimed list so frontend has them immediately
-      freeProductNames: (await getFreeProductNames(req.user.id, today)),
-      claimedFreeNames: (await getClaimedFreeNames(req.user.id, today)),
-    },
+    });
+  }
+
+  const freeRemaining = Math.max(0, FREE_LIFETIME_SLOTS - Number((await get("SELECT value FROM admin_settings WHERE key = ?", ['free_lifetime_' + req.user.id]))?.value || 0));
+
+  res.json({
+    hasStore: true,
+    stores: storesDetail,
+    balance,
+    freeRemaining,
+    freeProductNames: (await getFreeProductNames(req.user.id, today)),
+    claimedFreeNames: (await getClaimedFreeNames(req.user.id, today)),
   });
 });
 
@@ -185,14 +197,24 @@ router.post('/open', async (req, res) => {
   // 可选档位开店：tier 可选 small/medium/large/premium/elite/supreme，默认 small
   const targetTier = TIERS[req.body?.tier] ? req.body.tier : 'small';
   const DEPOSIT = MIN_DEPOSITS[targetTier];
-  const existing = await get('SELECT * FROM stores WHERE user_id = ?', [req.user.id]);
 
-  if (existing && existing.status === 'active') {
-    return res.status(400).json({ error: 'You already have a store in operation' });
+  // 重开：指定 storeId 时重开该 closed store；否则新建
+  const storeId = parseInt(req.body?.storeId);
+  let existing = null;
+  if (storeId) {
+    existing = await getStoreById(storeId, req.user.id);
+    if (!existing) return res.status(400).json({ error: 'Store not found' });
+    if (existing.status === 'active') return res.status(400).json({ error: 'This store is already active' });
+  }
+
+  // 最多 5 个 active 店
+  const activeCount = await get("SELECT COUNT(*)::int as c FROM stores WHERE user_id = ? AND status = 'active'", [req.user.id]);
+  if (Number(activeCount?.c || 0) >= MAX_STORES_PER_USER) {
+    return res.status(400).json({ error: `You can open at most ${MAX_STORES_PER_USER} stores`, maxStores: true });
   }
 
   // Reopen a closed store: top up to the target tier deposit if needed
-  if (existing && existing.status === 'closed') {
+  if (existing) {
     const shortfall = Math.max(0, DEPOSIT - Number(existing.deposit || 0));
     if (shortfall > 0) {
       const availBal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
@@ -243,8 +265,8 @@ router.post('/open', async (req, res) => {
 
 // POST /api/store/close — closes store; deposit stays locked until unlock date
 router.post('/close', async (req, res) => {
-  const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (!store) return res.status(400).json({ error: 'You do not have an active store' });
+  const store = await getStoreById(parseInt(req.body?.storeId), req.user.id);
+  if (!store || store.status !== 'active') return res.status(400).json({ error: 'Store not found or not active' });
   await run("UPDATE stores SET status = 'closed', closed_at = NOW() WHERE id = ?", [store.id]);
   const deposit = Number(store.deposit || 0);
   const unlockAt = store.deposit_unlock_at ? new Date(store.deposit_unlock_at).toLocaleDateString() : null;
@@ -260,8 +282,8 @@ router.post('/orders/process', async (req, res) => {
   const pName = (productName || '').trim();
   if (!pName || pName.length > 500) return res.status(400).json({ error: 'Invalid product name' });
 
-  const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (!store) return res.status(400).json({ error: 'Please open a store first' });
+  const store = await getStoreById(parseInt(req.body?.storeId), req.user.id);
+  if (!store || store.status !== 'active') return res.status(400).json({ error: 'Please open a store first' });
 
   const tier = TIERS[store.tier];
   const today = new Date().toISOString().slice(0, 10);
@@ -392,11 +414,20 @@ router.post('/orders/process', async (req, res) => {
   }
 });
 
-// GET /api/store/holdings — current inventory
+// GET /api/store/holdings — current inventory（缺省聚合所有店）
 router.get('/holdings', async (req, res) => {
-  const store = await get('SELECT id, tier FROM stores WHERE user_id = ?', [req.user.id]);
-  if (!store) return res.json([]);
-  const holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at, product_name, product_price, profit FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
+  let holdings;
+  const storeId = parseInt(req.query?.storeId);
+  if (storeId) {
+    const store = await getStoreById(storeId, req.user.id);
+    if (!store) return res.json([]);
+    holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at, product_name, product_price, profit FROM store_orders WHERE store_id = ? AND status = 'holding' ORDER BY created_at DESC", [store.id]);
+  } else {
+    const stores = await all('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
+    const storeIds = stores.map(s => s.id);
+    if (storeIds.length === 0) return res.json([]);
+    holdings = await all("SELECT id, amount as cost, status, processed_at as sell_by, created_at, product_name, product_price, profit FROM store_orders WHERE store_id = ANY(?) AND status = 'holding' ORDER BY created_at DESC", [storeIds]);
+  }
 
   // Load product catalog for images
   let catalog = [];
@@ -421,12 +452,21 @@ router.get('/holdings', async (req, res) => {
   }));
 });
 
-// POST /api/store/check-sell — settle due holdings
+// POST /api/store/check-sell — settle due holdings（缺省聚合所有店）
 router.post('/check-sell', async (req, res) => {
   try {
-    const store = await get('SELECT id, tier FROM stores WHERE user_id = ?', [req.user.id]);
-    if (!store) return res.json({ settled: [] });
-    const due = await all("SELECT id, amount as cost, user_id, product_price, profit as planned_profit FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
+    let due;
+    const storeId = parseInt(req.body?.storeId);
+    if (storeId) {
+      const store = await getStoreById(storeId, req.user.id);
+      if (!store) return res.json({ settled: [] });
+      due = await all("SELECT id, amount as cost, user_id, product_price, profit as planned_profit FROM store_orders WHERE store_id = ? AND status = 'holding' AND processed_at <= NOW()", [store.id]);
+    } else {
+      const stores = await all('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
+      const storeIds = stores.map(s => s.id);
+      if (storeIds.length === 0) return res.json({ settled: [] });
+      due = await all("SELECT id, amount as cost, user_id, product_price, profit as planned_profit FROM store_orders WHERE store_id = ANY(?) AND status = 'holding' AND processed_at <= NOW()", [storeIds]);
+    }
     const settled = [];
     const errors = [];
     for (const order of due) {
@@ -462,23 +502,22 @@ router.post('/check-sell', async (req, res) => {
 // GET /api/store/earnings-stats — daily & total profit stats
 router.get('/earnings-stats', async (req, res) => {
   const today = new Date().toISOString().slice(0, 10);
-  const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
 
   const todayProfit = await get(
-    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done' AND COALESCE(processed_at, created_at)::date = ?::date",
-    [store?.id || 0, today]
+    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE user_id = ? AND status = 'done' AND COALESCE(processed_at, created_at)::date = ?::date",
+    [req.user.id, today]
   );
   const totalProfit = await get(
-    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE store_id = ? AND status = 'done'",
-    [store?.id || 0]
+    "SELECT COALESCE(SUM(amount), 0) as total FROM store_orders WHERE user_id = ? AND status = 'done'",
+    [req.user.id]
   );
   const totalOrders = await get(
-    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'done'",
-    [store?.id || 0]
+    "SELECT COUNT(*) as c FROM store_orders WHERE user_id = ? AND status = 'done'",
+    [req.user.id]
   );
   const activeOrders = await get(
-    "SELECT COUNT(*) as c FROM store_orders WHERE store_id = ? AND status = 'holding'",
-    [store?.id || 0]
+    "SELECT COUNT(*) as c FROM store_orders WHERE user_id = ? AND status = 'holding'",
+    [req.user.id]
   );
   const balance = await get(
     "SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?",
@@ -499,7 +538,7 @@ router.get('/earnings-stats', async (req, res) => {
     [req.user.id]
   );
   const bal = Number(balance?.total || 0);
-  const deposit = Number((await get("SELECT COALESCE(deposit, 0) as deposit FROM stores WHERE user_id = ? AND status = ?", [req.user.id, 'active']))?.deposit || 0);
+  const deposit = Number((await get("SELECT COALESCE(SUM(deposit), 0) as deposit FROM stores WHERE user_id = ? AND status = ?", [req.user.id, 'active']))?.deposit || 0);
   const tomorrowEstimate = Math.round(bal * 1.15 * 100) / 100;
 
   res.json({
@@ -516,9 +555,9 @@ router.get('/earnings-stats', async (req, res) => {
   });
 });
 
-// GET /api/store/analytics — dashboard data
+// GET /api/store/analytics — dashboard data (按 store_id)
 router.get('/analytics', async (req, res) => {
-  const store = await get('SELECT id, tier FROM stores WHERE user_id = ?', [req.user.id]);
+  const store = await getStoreById(parseInt(req.query?.storeId), req.user.id);
   const today = new Date().toISOString().slice(0, 10);
 
   // 7-day profit trend
@@ -572,9 +611,9 @@ router.get('/analytics', async (req, res) => {
   });
 });
 
-// GET /api/store/orders-history
+// GET /api/store/orders-history (按 store_id)
 router.get('/orders-history', async (req, res) => {
-  const store = await get('SELECT id FROM stores WHERE user_id = ?', [req.user.id]);
+  const store = await getStoreById(parseInt(req.query?.storeId), req.user.id);
   if (!store) return res.json({ orders: [], summary: { count: 0, totalProfit: 0 } });
 
   const period = req.query.period || 'today';
@@ -704,8 +743,8 @@ router.post('/deposit', authMiddleware, async (req, res) => {
   const amount = parseFloat(req.body.amount);
   if (!amount || amount < 1) return res.status(400).json({ error: 'Minimum deposit is $1' });
 
-  const store = await get('SELECT * FROM stores WHERE user_id = ? AND status = ?', [req.user.id, 'active']);
-  if (!store) return res.status(400).json({ error: 'Please open a store first' });
+  const store = await getStoreById(parseInt(req.body?.storeId), req.user.id);
+  if (!store || store.status !== 'active') return res.status(400).json({ error: 'Please open a store first' });
 
   const bal = await get("SELECT COALESCE(SUM(amount), 0) as total FROM task_earnings WHERE user_id = ? AND status = ?", [req.user.id, 'delivered']);
   const available = Number(bal?.total || 0);
@@ -734,7 +773,7 @@ router.post('/deposit', authMiddleware, async (req, res) => {
 
 // POST /api/store/refund-deposit — refund security deposit (locked 365 days, full refund)
 async function refundDepositHandler(req, res) {
-  const store = await get('SELECT * FROM stores WHERE user_id = ?', [req.user.id]);
+  const store = await getStoreById(parseInt(req.body?.storeId), req.user.id);
   if (!store) return res.status(400).json({ error: 'No store found' });
 
   const unlockAt = store.deposit_unlock_at ? new Date(store.deposit_unlock_at).getTime() : null;
