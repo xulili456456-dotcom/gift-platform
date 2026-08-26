@@ -6,6 +6,7 @@ WORKDIR /app/client
 COPY client/package.json client/package-lock.json ./
 RUN npm install
 COPY client/ ./
+COPY scripts/ ../scripts/
 RUN npm run build
 
 # Stage 2: Production server

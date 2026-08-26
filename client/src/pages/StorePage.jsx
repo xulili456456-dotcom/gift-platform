@@ -435,7 +435,7 @@ export default function StorePage() {
       return { ...p, costPrice: 0, profit: freeProfit, roi: 3 };
     });
     if (sortMode === 'free') list = list.filter(p => freeProducts.some(fp => fp.name === p.name));
-    else if (affordableOnly) list = list.filter(p => p.costPrice <= (statustatus.balance || 0));
+    else if (affordableOnly) list = list.filter(p => p.costPrice <= (status.balance || 0));
     if (sortMode === 'profit') list.sort((a, b) => b.profit - a.profit);
     else if (sortMode === 'price') list.sort((a, b) => a.price - b.price);
     else if (sortMode === 'price-desc') list.sort((a, b) => b.price - a.price);
