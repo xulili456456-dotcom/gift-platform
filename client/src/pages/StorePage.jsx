@@ -388,6 +388,7 @@ export default function StorePage() {
   const [analytics, setAnalytics] = useState(null);
   const [orderHistory, setOrderHistory] = useState(null);
   const [orderPeriod, setOrderPeriod] = useState('today');
+  const [storeId, setStoreId] = useState(null);
   const loadStatus = useCallback(async () => {
     try { const { data } = await client.get('/store/status'); setStatus(data); setStoreId((prev) => { const list = data?.stores || []; if (list.some(s => s.id === prev)) return prev; return list[0]?.id ?? null; }); } catch { /* */ }
     finally { setLoading(false); }
@@ -483,7 +484,6 @@ export default function StorePage() {
   const [buying, setBuying] = useState(false);
   const [showTierGuide, setShowTierGuide] = useState(false);
   const [selectedTier, setSelectedTier] = useState('small');
-  const [storeId, setStoreId] = useState(null);
   const [showOpen, setShowOpen] = useState(false);
   const handleBuy = (product) => { setBuyConfirm(product); };
   const handleConfirmBuy = async () => {
