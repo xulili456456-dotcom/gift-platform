@@ -604,7 +604,8 @@ export default function StorePage() {
   );
 
   const s = currentStore;
-  const ti = TIER_INFO[s.tier];
+  if (!s) return <div className="min-h-screen bg-[#ffffff] flex items-center justify-center"><div className="w-8 h-8 border-3 border-[#FF5000] border-t-transparent rounded-full animate-spin" /></div>;
+  const ti = TIER_INFO[s.tier] || TIER_INFO.small;
 
   // ==== Product Detail Page ====
   if (detail) {

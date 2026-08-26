@@ -35,35 +35,37 @@ export default function StoreFundsPage() {
   const [orderHistory, setOrderHistory] = useState(null);
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [expandedHolding, setExpandedHolding] = useState(null);
+  const [storeId, setStoreId] = useState(null);
 
   const loadStatus = useCallback(async () => {
-    try { const { data } = await client.get('/store/status'); setStatus(data); } catch {}
+    try { const { data } = await client.get('/store/status'); setStatus(data); setStoreId((prev) => { const list = data?.stores || []; if (list.some(s => s.id === prev)) return prev; return list[0]?.id ?? null; }); } catch {}
   }, []);
   const loadEarnings = useCallback(async () => {
     try { const { data } = await client.get('/store/earnings-stats'); setEarnings(data); } catch {}
   }, []);
   const loadHoldings = useCallback(async () => {
-    try { const { data } = await client.get('/store/holdings'); setHoldings(data); } catch {}
-  }, []);
+    try { const { data } = await client.get('/store/holdings', { params: { storeId } }); setHoldings(data); } catch {}
+  }, [storeId]);
 
   useEffect(() => { loadStatus(); loadEarnings(); loadHoldings(); client.get('/store/orders-history?period=all').then(({data}) => setOrderHistory(data)).catch(()=>{}); }, []);
 
   const handleDeposit = async () => {
     const amt = parseFloat(depositAmount);
     if (!amt || amt < 1) { toast.error('Minimum $1'); return; }
-    try { await client.post('/store/deposit', { amount: amt }); setDepositMsg(`Deposited $${amt}!`); setDepositAmount(''); loadStatus(); loadEarnings(); }
+    try { await client.post('/store/deposit', { amount: amt, storeId }); setDepositMsg(`Deposited $${amt}!`); setDepositAmount(''); loadStatus(); loadEarnings(); }
     catch (err) { toast.error(err.response?.data?.error || 'Failed'); }
   };
   const handleWithdrawDeposit = async () => {
     setWithdrawError(null);
-    try { const { data } = await client.post('/store/refund-deposit'); toast.success(`$${Number(data.returned || 0).toFixed(2)} returned to balance`); loadStatus(); loadEarnings(); }
+    try { const { data } = await client.post('/store/refund-deposit', { storeId }); toast.success(`$${Number(data.returned || 0).toFixed(2)} returned to balance`); loadStatus(); loadEarnings(); }
     catch (err) { setWithdrawError(err.response?.data || { error: 'Failed' }); }
   };
 
   if (!status) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="w-8 h-8 border-3 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>;
   if (!status.hasStore && (!orderHistory?.orders || orderHistory.orders.length === 0)) return <div className="min-h-screen bg-gray-50 flex items-center justify-center flex-col gap-3"><p className="text-gray-400">No store opened</p><button onClick={() => navigate('/store')} style={{padding:'10px 24px',background:'#FF5000',color:'#fff',border:'none',borderRadius:10,fontSize:13,fontWeight:600,cursor:'pointer'}}>Open Store</button></div>;
 
-  const s = status.store;
+  const s = status.stores?.find(x => x.id === storeId) || status.stores?.[0];
+  if (!s) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="w-8 h-8 border-3 border-orange-500 border-t-transparent rounded-full animate-spin" /></div>;
 
   return (
     <div className="min-h-screen bg-gray-50" style={{maxWidth:430,margin:'0 auto',paddingBottom:80}}>
@@ -78,7 +80,7 @@ export default function StoreFundsPage() {
         <div style={{background:'#fff',borderRadius:20,padding:20,textAlign:'center',marginBottom:14}}>
           <div style={{fontSize:11,color:'#999',marginBottom:4}}>Available Balance</div>
           <div style={{fontSize:42,fontWeight:800,color:'#0f0f0f',lineHeight:1}}>
-            ${Math.floor(s.balance||0)}<span style={{fontSize:20,color:'#ccc'}}>.{((s.balance||0)%1).toFixed(2).substring(2)}</span>
+            ${Math.floor(status.balance||0)}<span style={{fontSize:20,color:'#ccc'}}>.{((status.balance||0)%1).toFixed(2).substring(2)}</span>
           </div>
           <div style={{display:'flex',justifyContent:'center',gap:24,marginTop:10}}>
             <div><span style={{fontSize:10,color:'#999'}}>Security </span><span style={{fontSize:14,fontWeight:700}}>${(s.deposit||0).toFixed(0)}</span></div>

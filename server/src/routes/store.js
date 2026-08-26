@@ -611,10 +611,15 @@ router.get('/analytics', async (req, res) => {
   });
 });
 
-// GET /api/store/orders-history (按 store_id)
+// GET /api/store/orders-history (按 store_id，缺省聚合所有店)
 router.get('/orders-history', async (req, res) => {
-  const store = await getStoreById(parseInt(req.query?.storeId), req.user.id);
-  if (!store) return res.json({ orders: [], summary: { count: 0, totalProfit: 0 } });
+  const storeId = parseInt(req.query?.storeId);
+  if (storeId) {
+    const store = await getStoreById(storeId, req.user.id);
+    if (!store) return res.json({ orders: [], summary: { count: 0, totalProfit: 0 } });
+  }
+  const whereStore = storeId ? 'store_id = ?' : 'user_id = ?';
+  const storeParam = storeId ? storeId : req.user.id;
 
   const period = req.query.period || 'today';
   let dateFilter = '';
@@ -624,12 +629,12 @@ router.get('/orders-history', async (req, res) => {
   else dateFilter = ''; // 'all' or any other value = no date filter
 
   const orders = await all(
-    `SELECT id, amount as profit, product_price, created_at, status, product_name FROM store_orders WHERE store_id = ? AND status = 'done' ${dateFilter} ORDER BY created_at DESC LIMIT 50`,
-    [store.id]);
+    `SELECT id, amount as profit, product_price, created_at, status, product_name FROM store_orders WHERE ${whereStore} AND status = 'done' ${dateFilter} ORDER BY created_at DESC LIMIT 50`,
+    [storeParam]);
 
   const summary = await get(
-    `SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as totalProfit FROM store_orders WHERE store_id = ? AND status = 'done' ${dateFilter}`,
-    [store.id]);
+    `SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as totalProfit FROM store_orders WHERE ${whereStore} AND status = 'done' ${dateFilter}`,
+    [storeParam]);
 
   res.json({
     orders: orders.map(o => ({ ...o, profit: Number(o.profit) })),
