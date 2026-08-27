@@ -1,0 +1,345 @@
+{
+  "app": {
+    "name": "Shopee Shopping Operations",
+    "slogan": "Nền tảng nhiệm vụ thương mại điện tử — Kết nối thị trường toàn cầu và kiếm tiền từ mỗi giao dịch",
+    "cta_register": "Tải App",
+    "cta_download": "Tải App",
+    "cta_share": "Chia sẻ",
+    "cta_store": "Mở trong App"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "download": "Tải xuống",
+    "store": "Cửa hàng",
+    "faq": "Câu hỏi"
+  },
+  "hero": {
+    "title": "Amazon · Shopee · Lazada\nBạn quảng bá, chúng tôi hoàn thiện, bạn kiếm tiền",
+    "subtitle": "Không tồn kho. Không vận chuyển. Không hỗ trợ khách hàng. Chọn nhiệm vụ thương mại điện tử trên Shopee Shopping Operations, quảng bá sản phẩm từ các sàn hàng đầu thế giới và bỏ túi lợi nhuận từ mỗi đơn hàng.",
+    "badge": "🔥 Kết nối 20+ nền tảng gồm Amazon, Shopee, Lazada, AliExpress"
+  },
+  "stats": {
+    "users": "Người bán lại toàn cầu",
+    "gifts": "Danh mục sản phẩm",
+    "invites": "Đơn hàng mỗi ngày",
+    "volume": "Tổng chi trả"
+  },
+  "platforms": {
+    "label": "Kết nối thị trường toàn cầu",
+    "title": "Nhiệm vụ của bạn đến từ đơn hàng thật trên các nền tảng này",
+    "desc": "Chúng tôi tích hợp 20+ API thương mại điện tử toàn cầu — Amazon, Shopee, Lazada, AliExpress, TikTok Shop và nhiều hơn nữa. Mỗi nhiệm vụ đại diện cho một giao dịch thật. Bạn nhận lợi nhuận, chúng tôi lo chuỗi cung ứng và logistics.",
+    "items": [
+      {
+        "name": "Amazon",
+        "desc": "Sàn lớn nhất thế giới, hơn 300 triệu khách hàng",
+        "color": "#FF9900"
+      },
+      {
+        "name": "Shopee",
+        "desc": "Số 1 Đông Nam Á, hơn 700 triệu người dùng",
+        "color": "#EE4D2D"
+      },
+      {
+        "name": "Lazada",
+        "desc": "6 quốc gia trên khắp Đông Nam Á",
+        "color": "#0F1470"
+      },
+      {
+        "name": "AliExpress",
+        "desc": "Nền tảng bán lẻ xuyên biên giới toàn cầu",
+        "color": "#E62E04"
+      },
+      {
+        "name": "TikTok Shop",
+        "desc": "Thương mại xã hội tăng trưởng nhanh nhất",
+        "color": "#000000"
+      },
+      {
+        "name": "eBay",
+        "desc": "Gã khổng lồ C2C toàn cầu",
+        "color": "#0064D2"
+      }
+    ]
+  },
+  "value": {
+    "label": "Vì sao chọn Shopee Shopping Operations",
+    "title": "Kiếm lợi nhuận thương mại điện tử mà không cần là người bán",
+    "desc": "Thương mại điện tử truyền thống nghĩa là tìm nguồn hàng, tồn kho, vận hành, hỗ trợ và vận chuyển. Chúng tôi lo tất cả. Bạn chỉ cần chọn nhiệm vụ và chia sẻ liên kết — nhận hoa hồng từ mỗi đơn hàng.",
+    "items": [
+      {
+        "icon": "Package",
+        "title": "Không tồn kho",
+        "desc": "Không hàng, không chi phí trả trước. Kết nối trực tiếp chuỗi cung ứng toàn cầu — bắt đầu với $0."
+      },
+      {
+        "icon": "Truck",
+        "title": "Chúng tôi lo logistics",
+        "desc": "Amazon FBA, Shopee Xpress và các đối tác vận chuyển tự động hoàn thiện mọi đơn hàng."
+      },
+      {
+        "icon": "Headphones",
+        "title": "Không hỗ trợ khách hàng",
+        "desc": "Hậu mãi do nền tảng và thương hiệu xử lý. Bạn chỉ tập trung quảng bá."
+      },
+      {
+        "icon": "TrendingUp",
+        "title": "Lợi nhuận minh bạch",
+        "desc": "Giá vốn, giá thị trường, lợi nhuận của bạn — hiển thị rõ ràng. Thấy gì nhận nấy."
+      }
+    ]
+  },
+  "how": {
+    "label": "Cách hoạt động",
+    "title": "Bắt đầu kiếm tiền chỉ với 3 bước đơn giản",
+    "desc": "Không cần kinh nghiệm. Đăng ký và bắt đầu kiếm tiền ngay.",
+    "step1_title": "Chọn nhiệm vụ",
+    "step1_desc": "Duyệt sản phẩm thịnh hành từ Amazon, Shopee, Lazada. Mỗi nhiệm vụ cho biết chính xác bạn kiếm được bao nhiêu mỗi đơn.",
+    "step2_title": "Chia sẻ liên kết",
+    "step2_desc": "Đăng liên kết sản phẩm trên Instagram, TikTok, WhatsApp, Telegram — bất cứ nơi nào có khán giả của bạn. Mỗi lượt chuyển đổi đều được tính.",
+    "step3_title": "Nhận lợi nhuận",
+    "step3_desc": "Khi đơn hàng hoàn tất, lợi nhuận tự động vào ví của bạn. Rút tiền bất cứ lúc nào, không phí ẩn."
+  },
+  "gifts": {
+    "label": "Nhiệm vụ thịnh hành",
+    "title": "Mỗi sản phẩm bạn quảng bá đều mang lại lợi nhuận",
+    "desc": "Từ điện tử đến đồ gia dụng — đội ngũ của chúng tôi thêm nhiệm vụ lợi nhuận cao mỗi ngày ở mọi danh mục."
+  },
+  "testimonials": {
+    "label": "Thu nhập thật",
+    "title": "Họ đang kiếm tiền",
+    "desc": "Thu nhập đã xác minh từ người bán lại toàn cầu.",
+    "items": [
+      {
+        "name": "Mike",
+        "role": "Sinh viên · Bán thời gian · Mỹ",
+        "text": "Đăng liên kết tai nghe Amazon trên Instagram và TikTok. Hơn 30 đơn trong tuần đầu, lợi nhuận $5-8 mỗi đơn. Kiếm $340 trong tháng đầu. Không lo vận chuyển — hoàn hảo cho sinh viên.",
+        "earned": "$340/tháng"
+      },
+      {
+        "name": "Sarah",
+        "role": "Mẹ nội trợ · Philippines",
+        "text": "Chia sẻ sản phẩm em bé Shopee trong nhóm mẹ bỉm và WhatsApp. 30 phút mỗi ngày, kiếm $700+/tháng. Dễ hơn dropshipping nhiều — không tồn kho, không vận chuyển.",
+        "earned": "$720/tháng"
+      },
+      {
+        "name": "Alex",
+        "role": "Nhân viên văn phòng · Nghề tay trái · Malaysia",
+        "text": "Tôi đăng ưu đãi công nghệ Lazada trên Telegram và Twitter khi đi làm và giờ nghỉ trưa. Giờ kiếm $1,250/tháng thu nhập thụ động đều đặn.",
+        "earned": "$1,250/tháng"
+      },
+      {
+        "name": "Maria",
+        "role": "Freelancer · Toàn thời gian · Brazil",
+        "text": "Chạy video sản phẩm trên TikTok, Instagram Reels và YouTube Shorts. Xây dựng ma trận nội dung — giờ đạt $3,200/tháng, vượt cả công việc cũ.",
+        "earned": "$3,200/tháng"
+      }
+    ]
+  },
+  "store": {
+    "label": "Mua sắm",
+    "title": "Sản phẩm cao cấp, giá tốt",
+    "desc": "Dùng thu nhập để mua sắm — điện tử, làm đẹp, đồ gia dụng và hơn thế nữa.",
+    "all": "Tất cả",
+    "digital": "Điện tử",
+    "women": "Nữ",
+    "men": "Nam",
+    "beauty": "Làm đẹp",
+    "shoes": "Giày dép",
+    "home": "Nhà cửa",
+    "accessories": "Phụ kiện",
+    "food": "Thực phẩm",
+    "toys": "Đồ chơi",
+    "sold": "đã bán",
+    "hot": "Nổi bật",
+    "searchPlaceholder": "Tìm sản phẩm...",
+    "products": "sản phẩm",
+    "noResults": "Không tìm thấy sản phẩm phù hợp",
+    "viewApp": "Xem tất cả sản phẩm trong App →"
+  },
+  "download": {
+    "label": "Tải xuống",
+    "title": "Kiếm tiền mọi lúc, mọi nơi",
+    "desc": "Tải app Shopee Shopping Operations để có trải nghiệm tốt nhất. Có sẵn cho Android.",
+    "version": "Phiên bản 1.0.0",
+    "size": "~15MB",
+    "features_title": "Tính năng App",
+    "features": [
+      {
+        "icon": "Zap",
+        "title": "Nhanh như chớp",
+        "desc": "Trải nghiệm native — nhanh và mượt hơn web di động"
+      },
+      {
+        "icon": "Bell",
+        "title": "Thông báo thời gian thực",
+        "desc": "Đẩy thông báo tức thì cho đơn hàng, hoa hồng và chi trả"
+      },
+      {
+        "icon": "Shield",
+        "title": "Bảo mật cấp ngân hàng",
+        "desc": "Truyền tải mã hóa, ví an toàn, xác thực đa yếu tố"
+      },
+      {
+        "icon": "Smartphone",
+        "title": "Chế độ ngoại tuyến",
+        "desc": "Xem nhiệm vụ và thu nhập ngay cả khi không có internet"
+      }
+    ],
+    "install_title": "Hướng dẫn cài đặt",
+    "install_steps": [
+      {
+        "step": "1",
+        "title": "Tải APK",
+        "desc": "Chạm nút tải ở trên để lưu file APK"
+      },
+      {
+        "step": "2",
+        "title": "Cho phép cài đặt",
+        "desc": "Bật \"Cài đặt từ nguồn không xác định\" trong cài đặt thiết bị"
+      },
+      {
+        "step": "3",
+        "title": "Cài đặt & Mở",
+        "desc": "Mở APK, cài đặt, rồi đăng ký hoặc đăng nhập để bắt đầu kiếm tiền"
+      }
+    ],
+    "heroTitle": "Bắt đầu giao dịch ngay",
+    "heroDesc": "Không cần tải — dùng trực tiếp trên trình duyệt. Ưu tiên di động, hoạt động mọi nơi.",
+    "step1Title": "Mở trong trình duyệt",
+    "step1Desc": "Hoạt động trên Chrome, Safari, Firefox — mọi thiết bị, mọi nền tảng.",
+    "step2Title": "Tạo tài khoản",
+    "step2Desc": "Đăng ký trong 30 giây với email và số điện thoại. Không chờ xác minh.",
+    "step3Title": "Bắt đầu kiếm tiền",
+    "step3Desc": "Nạp tiền, chọn sản phẩm, kiếm lợi nhuận. $5 đầu tiên miễn phí.",
+    "ctaBtn": "Mở App — Bắt đầu miễn phí",
+    "ctaNote": "Không cài đặt. Không APK. Chỉ cần mở và giao dịch.",
+    "coming_soon": "Sắp ra mắt",
+    "apk_placeholder": "File APK sắp có — hãy theo dõi!",
+    "scanQr": "Quét QR để tải",
+    "downloadApk": "Tải APK Android"
+  },
+  "about": {
+    "label": "Về chúng tôi",
+    "title": "Kết nối thương mại điện tử toàn cầu, trao quyền cho mọi người kiếm tiền",
+    "desc": "Shopee Shopping Operations thành lập năm 2024 để phá bỏ rào cản tham gia thương mại điện tử. Không cần mở cửa hàng, không tồn kho, không vận chuyển — ai cũng có thể kiếm tiền từ giao dịch thương mại điện tử toàn cầu.",
+    "mission_title": "Sứ mệnh của chúng tôi",
+    "mission": "Tích hợp với Amazon, Shopee, Lazada và các sàn toàn cầu để biến mỗi giao dịch thành một nhiệm vụ — giúp người bình thường tham gia bùng nổ thương mại điện tử toàn cầu.",
+    "vision_title": "Tầm nhìn của chúng tôi",
+    "vision": "Trở thành nền tảng phân phối nhiệm vụ thương mại điện tử lớn nhất thế giới, kết nối 1 tỷ người dùng với thị trường toàn cầu và định nghĩa lại \"làm thương mại điện tử\".",
+    "values_title": "Giá trị cốt lõi",
+    "values": [
+      {
+        "title": "Lợi nhuận minh bạch",
+        "desc": "Giá vốn và lợi nhuận của mỗi sản phẩm được công khai đầy đủ. Không bao giờ cắt phí ẩn."
+      },
+      {
+        "title": "Không rào cản",
+        "desc": "Không cần kinh nghiệm. Không cần vốn. Chỉ cần đăng ký và bắt đầu."
+      },
+      {
+        "title": "Sức mạnh nền tảng",
+        "desc": "Chuỗi cung ứng, logistics và hỗ trợ đều được xử lý. Bạn tập trung vào điều quan trọng — quảng bá."
+      }
+    ]
+  },
+  "faq": {
+    "label": "Câu hỏi thường gặp",
+    "title": "Có thắc mắc? Chúng tôi có câu trả lời",
+    "desc": "Không tìm thấy điều cần? Liên hệ tại https://t.me/Shopping_Operations",
+    "searchPlaceholder": "Tìm câu hỏi...",
+    "noResults": "Không tìm thấy câu hỏi phù hợp",
+    "noResultsHint": "Thử tìm kiếm hoặc danh mục khác",
+    "contactPrompt": "Vẫn còn thắc mắc?",
+    "contactButton": "Liên hệ hỗ trợ",
+    "categories": {
+      "platform": "Nền tảng",
+      "earning": "Thu nhập",
+      "withdraw": "Rút tiền",
+      "invite": "Giới thiệu",
+      "tech": "Kỹ thuật"
+    },
+    "items": [
+      {
+        "q": "Shopee Shopping Operations hoạt động với Amazon/Shopee thế nào?",
+        "a": "Chúng tôi tích hợp 20+ nền tảng thương mại điện tử gồm Amazon, Shopee, Lazada và AliExpress. Mỗi nhiệm vụ trên Shopee Shopping Operations tương ứng với một listing sản phẩm thật. Bạn quảng bá sản phẩm — khi có đơn, bạn nhận lợi nhuận. Nền tảng và thương hiệu lo hoàn thiện và hỗ trợ.",
+        "cat": "platform"
+      },
+      {
+        "q": "Tôi có cần mua hàng tồn kho không?",
+        "a": "Hoàn toàn không. Chúng tôi vận hành theo mô hình không tồn kho. Sản phẩm giao trực tiếp từ nền tảng và thương hiệu. Bạn không bao giờ chạm vào hàng — chỉ chọn nhiệm vụ và chia sẻ liên kết.",
+        "cat": "platform"
+      },
+      {
+        "q": "Shopee Shopping Operations có miễn phí không?",
+        "a": "100% miễn phí. Đăng ký, nhiệm vụ và quảng bá đều không mất phí. Chúng tôi chỉ lấy một khoản phí nền tảng nhỏ từ giao dịch thành công — bạn chỉ chia sẻ khi kiếm tiền.",
+        "cat": "platform"
+      },
+      {
+        "q": "Tôi kiếm tiền thế nào?",
+        "a": "Ba cách: 1) Chọn nhiệm vụ thương mại điện tử — quảng bá sản phẩm Amazon/Shopee và nhận lợi nhuận chênh lệch giá; 2) Điểm danh hàng ngày và nhiệm vụ thưởng để nhận điểm; 3) Mời bạn bè và nhận hoa hồng đội đến 3 cấp.",
+        "cat": "earning"
+      },
+      {
+        "q": "Tôi kiếm được bao nhiêu mỗi đơn?",
+        "a": "Tùy sản phẩm. Điện tử: $5-50 mỗi đơn. Đồ gia dụng: $3-15. Làm đẹp: $2-10. Giá vốn của chúng tôi là 85% giá thị trường — bạn giữ 15% lợi nhuận mỗi đơn.",
+        "cat": "earning"
+      },
+      {
+        "q": "Khi nào tôi được trả tiền?",
+        "a": "Khi đơn được xác nhận đã giao (thường 3-7 ngày), lợi nhuận vào ví của bạn ngay lập tức. Rút tiền bất cứ lúc nào.",
+        "cat": "earning"
+      },
+      {
+        "q": "Làm thế nào để rút tiền?",
+        "a": "Vào \"Tài khoản của tôi\" → \"Ví\" → \"Rút tiền\". Chúng tôi hỗ trợ chuyển khoản ngân hàng và ví điện tử. Rút tối thiểu $10, thường xử lý trong 1-3 ngày làm việc.",
+        "cat": "withdraw"
+      },
+      {
+        "q": "Có phí rút tiền không?",
+        "a": "Người dùng thường chịu 1%. Thành viên VIP rút tiền miễn phí.",
+        "cat": "withdraw"
+      },
+      {
+        "q": "Làm thế nào để mời bạn bè?",
+        "a": "Vào trang Nhiệm vụ, chạm \"Mời bạn bè\". Chia sẻ liên kết giới thiệu hoặc mã QR. Bạn nhận phần trăm thu nhập của họ đến 3 cấp sâu.",
+        "cat": "invite"
+      },
+      {
+        "q": "Có giới hạn lời mời không?",
+        "a": "Không giới hạn. Mời nhiều = thu nhập đội nhiều.",
+        "cat": "invite"
+      },
+      {
+        "q": "Thiết bị nào được hỗ trợ?",
+        "a": "App Android và web (H5) hiện có sẵn. Phiên bản iOS đang phát triển.",
+        "cat": "tech"
+      },
+      {
+        "q": "Dữ liệu của tôi có an toàn không?",
+        "a": "Mã hóa cấp ngân hàng. Bản ghi giao dịch bất biến. Chúng tôi không bao giờ bán hoặc xâm phạm thông tin cá nhân của bạn.",
+        "cat": "tech"
+      }
+    ]
+  },
+  "cta": {
+    "title": "Sẵn sàng kiếm tiền từ thương mại điện tử toàn cầu?",
+    "subtitle": "Không tồn kho. Không vốn. Không rủi ro. Tải app và bắt đầu kiếm tiền hôm nay.",
+    "button": "Tải App — Bắt đầu kiếm tiền"
+  },
+  "footer": {
+    "description": "Shopee Shopping Operations — Kết nối thị trường toàn cầu, trao quyền cho mọi người kiếm tiền từ thương mại điện tử.",
+    "links": "Liên kết nhanh",
+    "legal": "Pháp lý",
+    "terms": "Điều khoản dịch vụ",
+    "privacy": "Chính sách bảo mật",
+    "contact": "Liên hệ",
+    "email": "@Shopping_Operations",
+    "copyright": "© 2025 Shopee Shopping Operations. Bảo lưu mọi quyền."
+  },
+  "common": {
+    "language": "Ngôn ngữ",
+    "darkMode": "Chế độ tối",
+    "lightMode": "Chế độ sáng"
+  }
+}
