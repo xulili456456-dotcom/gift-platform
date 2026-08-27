@@ -8,13 +8,14 @@ import ms from './locales/ms.json';
 import tr from './locales/tr.json';
 import it from './locales/it.json';
 import id from './locales/id.json';
+import vi from './locales/vi.json';
 
-const SUPPORTED = ['en', 'zh', 'es', 'ja', 'ms', 'tr', 'it', 'id'];
+const SUPPORTED = ['en', 'zh', 'es', 'ja', 'ms', 'tr', 'it', 'id', 'vi'];
 let savedLang = localStorage.getItem('lang') || 'en';
 if (!SUPPORTED.includes(savedLang)) { savedLang = 'en'; localStorage.setItem('lang', 'en'); }
 
 i18n.use(initReactI18next).init({
-  resources: { en: { translation: en }, zh: { translation: zh }, es: { translation: es }, ja: { translation: ja }, ms: { translation: ms }, tr: { translation: tr }, it: { translation: it }, id: { translation: id } },
+  resources: { en: { translation: en }, zh: { translation: zh }, es: { translation: es }, ja: { translation: ja }, ms: { translation: ms }, tr: { translation: tr }, it: { translation: it }, id: { translation: id }, vi: { translation: vi } },
   lng: savedLang,
   fallbackLng: 'en',
   interpolation: { escapeValue: false },

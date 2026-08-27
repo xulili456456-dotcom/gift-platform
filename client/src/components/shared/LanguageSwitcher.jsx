@@ -10,6 +10,7 @@ const langs = [
   { code: 'id', label: 'Bahasa Indonesia', flag: '🇮🇩' },
   { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
   { code: 'it', label: 'Italiano', flag: '🇮🇹' },
+  { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳' },
 ];
 
 export default function LanguageSwitcher() {
