@@ -996,7 +996,21 @@ function build(obj, prefix = '') {
   const out = {};
   for (const k of Object.keys(obj)) {
     const key = prefix ? prefix + '.' + k : k;
-    if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+    if (Array.isArray(obj[k])) {
+      // 数组结构（如 legal.termsContent）：遍历元素，用带下标的 key 查翻译
+      out[k] = obj[k].map((item, idx) => {
+        const itemKey = key + '.' + idx;
+        if (typeof item === 'object' && item !== null) {
+          const sub = {};
+          for (const sk of Object.keys(item)) {
+            const subKey = itemKey + '.' + sk;
+            sub[sk] = all[subKey] !== undefined ? all[subKey] : item[sk];
+          }
+          return sub;
+        }
+        return all[itemKey] !== undefined ? all[itemKey] : item;
+      });
+    } else if (typeof obj[k] === 'object' && obj[k] !== null) {
       out[k] = build(obj[k], key);
     } else {
       out[k] = all[key] !== undefined ? all[key] : obj[k];
